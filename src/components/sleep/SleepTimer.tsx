@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Square } from "lucide-react";
+import { Moon, Sun, Square, Leaf, ChevronDown } from "lucide-react";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { Textarea } from "@/components/ui/textarea";
+import { EnvironmentPickerCompact, type EnvironmentData } from "./EnvironmentPicker";
 
 const SLEEP_TYPES = [
   { value: "NAP" as const, label: "Soneca", icon: Sun },
@@ -13,9 +15,7 @@ const SLEEP_TYPES = [
 /** Visual config per sleep type — colors, glows, labels */
 const TYPE_CONFIG = {
   NAP: {
-    /** Warm amber — daytime nap */
     bg: "#f59e0b",
-    bgHover: "#d97706",
     boxShadow: "0 0 28px rgba(245,158,11,0.5), 0 0 56px rgba(245,158,11,0.18)",
     ringColor: "rgba(245,158,11,0.45)",
     ringFaint: "rgba(245,158,11,0.2)",
@@ -24,9 +24,7 @@ const TYPE_CONFIG = {
     runningLabel: "Soneca em andamento",
   },
   NIGHT_SLEEP: {
-    /** Deep indigo — night sleep */
     bg: "#4338ca",
-    bgHover: "#3730a3",
     boxShadow: "0 0 28px rgba(67,56,202,0.55), 0 0 56px rgba(67,56,202,0.2)",
     ringColor: "rgba(99,102,241,0.45)",
     ringFaint: "rgba(99,102,241,0.2)",
@@ -42,14 +40,42 @@ export function SleepTimer() {
     elapsed,
     sleepType,
     notes,
+    roomTemp,
+    weatherCondition,
+    sleepSackType,
+    sleepSackTog,
     setSleepType,
     setNotes,
+    setRoomTemp,
+    setWeatherCondition,
+    setSleepSackType,
+    setSleepSackTog,
     handleStart,
     handleStop,
   } = useSleepTimer();
 
+  const [envOpen, setEnvOpen] = useState(false);
+
   const cfg = TYPE_CONFIG[sleepType];
   const TypeIcon = cfg.icon;
+
+  const envData: EnvironmentData = {
+    room_temp_celsius: roomTemp,
+    weather_condition: weatherCondition,
+    sleep_sack_type: sleepSackType,
+    sleep_sack_tog: sleepSackTog,
+    clothing_description: null,
+  };
+
+  function handleEnvChange(data: EnvironmentData) {
+    setRoomTemp(data.room_temp_celsius);
+    setWeatherCondition(data.weather_condition);
+    setSleepSackType(data.sleep_sack_type);
+    setSleepSackTog(data.sleep_sack_tog);
+  }
+
+  const envFilled = [roomTemp !== null, weatherCondition !== null, sleepSackType !== null]
+    .filter(Boolean).length;
 
   return (
     <div className="flex flex-col items-center gap-7">
@@ -69,7 +95,7 @@ export function SleepTimer() {
             </p>
             <p
               className="text-6xl font-mono font-bold tracking-wider tabular-nums"
-              style={{ color: isRunning ? cfg.bg : "var(--primary)" }}
+              style={{ color: cfg.bg }}
             >
               {elapsed}
             </p>
@@ -91,7 +117,7 @@ export function SleepTimer() {
 
       {/* Big start/stop button */}
       <div className="relative">
-        {/* Pulsing rings when running — color matches sleep type */}
+        {/* Pulsing rings when running */}
         <AnimatePresence>
           {isRunning && (
             <>
@@ -101,10 +127,7 @@ export function SleepTimer() {
                 animate={{ scale: [1, 1.35, 1], opacity: [0.6, 0, 0.6] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute inset-0 rounded-full border-2"
-                style={{
-                  margin: "-8px",
-                  borderColor: cfg.ringColor,
-                }}
+                style={{ margin: "-8px", borderColor: cfg.ringColor }}
               />
               <motion.div
                 key="ring2"
@@ -112,10 +135,7 @@ export function SleepTimer() {
                 animate={{ scale: [1, 1.6, 1], opacity: [0.35, 0, 0.35] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 className="absolute inset-0 rounded-full border"
-                style={{
-                  margin: "-16px",
-                  borderColor: cfg.ringFaint,
-                }}
+                style={{ margin: "-16px", borderColor: cfg.ringFaint }}
               />
             </>
           )}
@@ -137,7 +157,6 @@ export function SleepTimer() {
         >
           <AnimatePresence mode="wait">
             {isRunning ? (
-              /* Stop state — neutral square */
               <motion.div
                 key="stop"
                 initial={{ scale: 0, rotate: -90 }}
@@ -149,7 +168,6 @@ export function SleepTimer() {
                 <Square className="h-6 w-6 fill-white text-white" aria-hidden="true" />
               </motion.div>
             ) : (
-              /* Idle state — icon changes with sleep type */
               <motion.div
                 key={`start-${sleepType}`}
                 initial={{ scale: 0, rotate: 90 }}
@@ -173,7 +191,7 @@ export function SleepTimer() {
         {isRunning ? "Toque para parar" : "Toque para iniciar"}
       </motion.p>
 
-      {/* Sleep type animated pill toggle */}
+      {/* Sleep type pill toggle */}
       <AnimatePresence>
         {!isRunning && (
           <motion.div
@@ -196,10 +214,12 @@ export function SleepTimer() {
                   <button
                     key={value}
                     onClick={() => setSleepType(value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setSleepType(value); }}
                     aria-pressed={isActive}
                     className={`relative flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       isActive ? "text-white" : "text-muted-foreground hover:text-foreground"
                     }`}
+                    style={{ touchAction: "manipulation" }}
                   >
                     {isActive && (
                       <motion.div
@@ -219,6 +239,65 @@ export function SleepTimer() {
         )}
       </AnimatePresence>
 
+      {/* ── Environment quick-picker (idle only) ── */}
+      <AnimatePresence>
+        {!isRunning && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.05 }}
+            className="w-full max-w-[280px] rounded-2xl border border-border/40 bg-card/40 overflow-hidden"
+          >
+            <button
+              type="button"
+              aria-expanded={envOpen}
+              aria-controls="timer-env-section"
+              onClick={() => setEnvOpen(!envOpen)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setEnvOpen(!envOpen); }}
+              className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+              style={{ touchAction: "manipulation" }}
+            >
+              <div className="flex items-center gap-2">
+                <Leaf className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
+                <span className="text-xs font-medium text-muted-foreground">Condições do ambiente</span>
+                {envFilled > 0 && (
+                  <span className="rounded-full bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                    {envFilled}
+                  </span>
+                )}
+              </div>
+              <motion.div
+                animate={{ rotate: envOpen ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+              </motion.div>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {envOpen && (
+                <motion.div
+                  id="timer-env-section"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden border-t border-border/30"
+                >
+                  <div className="p-3">
+                    <EnvironmentPickerCompact
+                      value={envData}
+                      onChange={handleEnvChange}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Notes field while running */}
       <AnimatePresence>
         {isRunning && (
@@ -228,13 +307,14 @@ export function SleepTimer() {
             exit={{ opacity: 0, height: 0 }}
             className="w-full max-w-[280px] overflow-hidden"
           >
+            <label htmlFor="sleep-notes" className="sr-only">Notas sobre o sono</label>
             <Textarea
+              id="sleep-notes"
               placeholder="Notas rápidas…"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="rounded-2xl resize-none text-sm bg-muted/50 border-border/50"
               rows={2}
-              aria-label="Notas sobre o sono"
             />
           </motion.div>
         )}

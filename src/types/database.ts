@@ -49,6 +49,11 @@ export interface Database {
           quality: number | null;
           notes: string | null;
           location: string | null;
+          room_temp_celsius: number | null;
+          weather_condition: string | null;
+          sleep_sack_type: string | null;
+          sleep_sack_tog: number | null;
+          clothing_description: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -62,6 +67,11 @@ export interface Database {
           quality?: number | null;
           notes?: string | null;
           location?: string | null;
+          room_temp_celsius?: number | null;
+          weather_condition?: string | null;
+          sleep_sack_type?: string | null;
+          sleep_sack_tog?: number | null;
+          clothing_description?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -75,6 +85,11 @@ export interface Database {
           quality?: number | null;
           notes?: string | null;
           location?: string | null;
+          room_temp_celsius?: number | null;
+          weather_condition?: string | null;
+          sleep_sack_type?: string | null;
+          sleep_sack_tog?: number | null;
+          clothing_description?: string | null;
           created_at?: string;
           updated_at?: string;
         };

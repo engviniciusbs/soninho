@@ -71,7 +71,13 @@ export async function startSleepSession(
   supabase: Client,
   babyId: string,
   type: "NAP" | "NIGHT_SLEEP",
-  notes?: string
+  env?: {
+    notes?: string;
+    room_temp_celsius?: number | null;
+    weather_condition?: string | null;
+    sleep_sack_type?: string | null;
+    sleep_sack_tog?: number | null;
+  }
 ) {
   return supabase
     .from("sleep_sessions")
@@ -79,7 +85,11 @@ export async function startSleepSession(
       baby_id: babyId,
       type,
       start_time: new Date().toISOString(),
-      notes: notes || null,
+      notes: env?.notes || null,
+      room_temp_celsius: env?.room_temp_celsius ?? null,
+      weather_condition: env?.weather_condition ?? null,
+      sleep_sack_type: env?.sleep_sack_type ?? null,
+      sleep_sack_tog: env?.sleep_sack_tog ?? null,
     })
     .select()
     .single();
