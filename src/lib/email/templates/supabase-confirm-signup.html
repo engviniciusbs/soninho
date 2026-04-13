@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="x-apple-disable-message-reformatting" />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="supported-color-schemes" content="dark light" />
+  <title>Confirme seu e-mail — Soninho</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    /* Client resets */
+    html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+    * { -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    /* prefers-reduced-motion: avoid decorative motion in email */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+    /* Dark-friendly body (guideline: color-scheme + explicit colors) */
+    @media (prefers-color-scheme: dark) {
+      .email-body { background-color: #0c0a12 !important; }
+      .email-card { background-color: #16131f !important; border-color: #2a2438 !important; }
+      .email-text { color: #e8e4ef !important; }
+      .email-muted { color: #9d94b0 !important; }
+      .email-cta { background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%) !important; }
+    }
+  </style>
+</head>
+<body class="email-body" style="margin:0; padding:0; background-color:#f4f1fa; color-scheme: dark light;">
+  <!-- Preheader (hidden preview text in inbox) -->
+  <div style="display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;">
+    Confirme seu e-mail para começar a usar o Soninho e acompanhar o sono do bebê…
+  </div>
+
+  <table role="presentation" class="email-body" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f1fa; width:100%;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; width:100%;">
+          <tr>
+            <td align="center" style="padding-bottom:24px;">
+              <span translate="no" style="font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:22px; font-weight:700; color:#5b21b6; letter-spacing:-0.02em;">
+                🌙 Soninho
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table role="presentation" class="email-card" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border-radius:16px; border:1px solid #e5dff5; overflow:hidden;">
+                <tr>
+                  <td style="padding:40px 32px 32px 32px;" class="email-card">
+                    <h1 class="email-text" style="margin:0 0 12px 0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:24px; font-weight:700; line-height:1.25; color:#1a1424; text-wrap:balance;">
+                      Confirme seu e-mail
+                    </h1>
+                    <p class="email-text email-muted" style="margin:0 0 24px 0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; line-height:1.55; color:#5c5369;">
+                      Você está a um passo de usar o <span translate="no">Soninho</span> para registrar sonecas, sono noturno e janelas de vigília com a família.
+                    </p>
+                    <p class="email-text email-muted" style="margin:0 0 28px 0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:1.5; color:#5c5369;">
+                      Conta: <strong style="color:#1a1424; font-weight:600;">{{ .Email }}</strong>
+                    </p>
+
+                    <!-- Primary CTA: real link (guideline: use anchor for navigation) -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" style="padding:8px 0 28px 0;">
+                          <a
+                            href="{{ .ConfirmationURL }}"
+                            class="email-cta"
+                            style="display:inline-block; padding:16px 32px; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:16px; font-weight:600; line-height:1.25; color:#ffffff !important; text-decoration:none; border-radius:12px; background:linear-gradient(135deg,#7c3aed 0%,#5b21b6 100%); min-height:48px; box-sizing:border-box; -webkit-tap-highlight-color:rgba(124,58,237,0.35);"
+                          >
+                            Confirmar e-mail e entrar
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <p class="email-muted" style="margin:0 0 8px 0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:1.5; color:#7a7288;">
+                      Se o botão não funcionar, copie e cole este link no navegador:
+                    </p>
+                    <p style="margin:0 0 24px 0; word-break:break-all; font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace; font-size:12px; line-height:1.5; color:#5b21b6;">
+                      <a href="{{ .ConfirmationURL }}" style="color:#5b21b6; text-decoration:underline;">{{ .ConfirmationURL }}</a>
+                    </p>
+
+                    <p class="email-muted" style="margin:0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:13px; line-height:1.55; color:#9d94b0;">
+                      Se você não criou uma conta no <span translate="no">Soninho</span>, ignore este e-mail. Nenhuma ação será feita.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top:28px;">
+              <p class="email-muted" style="margin:0; font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:12px; line-height:1.5; color:#9d94b0;">
+                <span translate="no">Soninho</span> · Acompanhe o sono com calma<br />
+                <a href="{{ .SiteURL }}" style="color:#7c3aed; text-decoration:underline;">Abrir o site</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
