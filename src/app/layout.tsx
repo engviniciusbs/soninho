@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   title: "Soninho — Monitor de Sono do Bebê",
   description:
     "Acompanhe o sono do seu bebê, receba sugestões inteligentes e garanta noites mais tranquilas.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
