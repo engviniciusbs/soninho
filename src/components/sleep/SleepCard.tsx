@@ -13,12 +13,51 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Moon, Sun, Trash2, Pencil, Star } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  Trash2,
+  Pencil,
+  Star,
+  Thermometer,
+  Cloud,
+  CloudRain,
+  Snowflake,
+  Wind,
+  Shirt,
+} from "lucide-react";
 import { formatDuration, formatTimeRange } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { deleteSleepSession } from "@/lib/supabase/queries";
 import { toast } from "sonner";
 import type { SleepSession } from "@/types";
+import type { WeatherCondition } from "@/lib/sleep/clothingRecommendation";
+
+// ─── Weather icon map ─────────────────────────────────────────────────────────
+const WEATHER_ICONS: Record<WeatherCondition, React.ComponentType<{ className?: string }>> = {
+  sunny:  Sun,
+  cloudy: Cloud,
+  rainy:  CloudRain,
+  hot:    Thermometer,
+  cold:   Snowflake,
+  windy:  Wind,
+};
+
+const WEATHER_LABELS: Record<WeatherCondition, string> = {
+  sunny:  "Ensolarado",
+  cloudy: "Nublado",
+  rainy:  "Chuvoso",
+  hot:    "Muito quente",
+  cold:   "Frio",
+  windy:  "Ventando",
+};
+
+const SACK_SHORT: Record<string, string> = {
+  mesh:    "Malha",
+  flannel: "Flanela",
+  fleece:  "Fleece",
+  none:    "",
+};
 
 interface SleepCardProps {
   session: SleepSession;
@@ -32,6 +71,10 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
   const supabase = createClient();
 
   const isNap = session.type === "NAP";
+
+  const WeatherIcon = session.weather_condition
+    ? WEATHER_ICONS[session.weather_condition as WeatherCondition]
+    : null;
 
   async function handleDelete() {
     setDeleting(true);
@@ -76,7 +119,7 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold">
                 {isNap ? "Soneca" : "Sono noturno"}
               </span>
@@ -92,9 +135,43 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
                 </span>
               )}
             </div>
+
             <p className="text-xs text-muted-foreground mt-0.5">
               {formatTimeRange(session.start_time, session.end_time)}
             </p>
+
+            {/* Environment badges */}
+            {(session.room_temp_celsius != null ||
+              session.weather_condition ||
+              (session.sleep_sack_type && session.sleep_sack_type !== "none")) && (
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                {session.room_temp_celsius != null && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border/40 bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                    <Thermometer className="h-2.5 w-2.5" aria-hidden="true" />
+                    <span className="tabular-nums">{session.room_temp_celsius}°C</span>
+                  </span>
+                )}
+                {session.weather_condition && WeatherIcon && (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full border border-border/40 bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground"
+                    title={WEATHER_LABELS[session.weather_condition as WeatherCondition]}
+                  >
+                    <WeatherIcon className="h-2.5 w-2.5" aria-hidden="true" />
+                    <span>{WEATHER_LABELS[session.weather_condition as WeatherCondition]}</span>
+                  </span>
+                )}
+                {session.sleep_sack_type && session.sleep_sack_type !== "none" && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border/40 bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                    <Shirt className="h-2.5 w-2.5" aria-hidden="true" />
+                    <span>
+                      {SACK_SHORT[session.sleep_sack_type] ?? session.sleep_sack_type}
+                      {session.sleep_sack_tog != null && ` TOG ${session.sleep_sack_tog}`}
+                    </span>
+                  </span>
+                )}
+              </div>
+            )}
+
             {session.notes && (
               <p className="text-xs text-muted-foreground/70 truncate mt-0.5">
                 {session.notes}

@@ -23,10 +23,18 @@ export function useSleepTimer() {
     startTime,
     sleepType,
     notes,
+    roomTemp,
+    weatherCondition,
+    sleepSackType,
+    sleepSackTog,
     startTimer,
     stopTimer,
     setSleepType,
     setNotes,
+    setRoomTemp,
+    setWeatherCondition,
+    setSleepSackType,
+    setSleepSackTog,
     restoreFromSession,
   } = useSleepStore();
 
@@ -71,7 +79,13 @@ export function useSleepTimer() {
       supabase,
       activeBaby.id,
       sleepType,
-      notes || undefined
+      {
+        notes: notes || undefined,
+        room_temp_celsius: roomTemp,
+        weather_condition: weatherCondition,
+        sleep_sack_type: sleepSackType,
+        sleep_sack_tog: sleepSackTog,
+      }
     );
 
     if (error) {
@@ -87,7 +101,7 @@ export function useSleepTimer() {
           : "Sono noturno iniciado 🌙"
       );
     }
-  }, [activeBaby, sleepType, notes, supabase, startTimer]);
+  }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer]);
 
   const handleStop = useCallback(async () => {
     if (!sessionId) return;
@@ -111,8 +125,16 @@ export function useSleepTimer() {
     elapsed,
     sleepType,
     notes,
+    roomTemp,
+    weatherCondition,
+    sleepSackType,
+    sleepSackTog,
     setSleepType,
     setNotes,
+    setRoomTemp,
+    setWeatherCondition,
+    setSleepSackType,
+    setSleepSackTog,
     handleStart,
     handleStop,
   };

@@ -106,6 +106,37 @@ export function buildSleepContext(
 
   const currentTime = formatInTimeZone(nowUtc, timezone, "HH:mm");
 
+  // ── Environmental context from recent sessions ─────────────────────────────
+  const recentWithEnv = [...completed]
+    .reverse()
+    .slice(0, 5)
+    .filter((s) => s.room_temp_celsius != null || s.weather_condition || s.sleep_sack_type);
+
+  const envLines: string[] = recentWithEnv.map((s) => {
+    const parts: string[] = [];
+    if (s.room_temp_celsius != null) parts.push(`${s.room_temp_celsius}°C`);
+    if (s.weather_condition) parts.push(s.weather_condition);
+    if (s.sleep_sack_type && s.sleep_sack_type !== "none") {
+      const sackLabel = s.sleep_sack_type;
+      const togStr = s.sleep_sack_tog != null ? ` TOG ${s.sleep_sack_tog}` : "";
+      parts.push(`saquinho ${sackLabel}${togStr}`);
+    }
+    const sessionTime = formatInTimeZone(new Date(s.start_time), timezone, "dd/MM HH:mm");
+    const quality = s.quality != null ? ` (qualidade: ${s.quality}/5)` : "";
+    return `  ${sessionTime} — ${parts.join(", ")}${quality}`;
+  });
+
+  // Last session's environment (most relevant for clothing suggestion)
+  const lastEnv = lastCompleted
+    ? [
+        lastCompleted.room_temp_celsius != null ? `Temperatura do quarto: ${lastCompleted.room_temp_celsius}°C` : null,
+        lastCompleted.weather_condition ? `Clima: ${lastCompleted.weather_condition}` : null,
+        lastCompleted.sleep_sack_type && lastCompleted.sleep_sack_type !== "none"
+          ? `Saquinho: ${lastCompleted.sleep_sack_type}${lastCompleted.sleep_sack_tog != null ? ` TOG ${lastCompleted.sleep_sack_tog}` : ""}`
+          : null,
+      ].filter(Boolean)
+    : [];
+
   return `
 Nome do bebê: ${baby.name}
 Idade: ${ageWeeks} semanas (${ageMonths} meses)
@@ -116,6 +147,7 @@ Horário de referência (agora): ${currentTime} (fuso: ${timezone})
 Tipo: ${lastSleepType}
 Fim do sono: ${lastSleepEndTime}
 Duração: ${lastSleepDuration}
+${lastEnv.length > 0 ? lastEnv.join("\n") : "Sem dados de ambiente registrados"}
 
 === RESUMO DOS ÚLTIMOS 7 DIAS ===
 ${dailySummaries.join("\n")}
@@ -124,6 +156,8 @@ Total de sonecas (7 dias): ${naps.length}
 Duração média das sonecas: ${avgNapDur} minutos
 Total de sessões noturnas: ${nightSessions.length}
 Janelas de vigília recentes: ${wakeWindows.slice(-6).join(", ") || "Sem dados suficientes"}
+
+${envLines.length > 0 ? `=== CONDIÇÕES AMBIENTAIS RECENTES ===\n${envLines.join("\n")}` : ""}
 
 ${patterns.length > 0 ? `=== PADRÕES IDENTIFICADOS ===\n${patterns.join("\n")}` : ""}
 `.trim();
