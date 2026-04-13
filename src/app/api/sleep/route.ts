@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRoleForBaby } from "@/lib/supabase/queries";
 
 const createSchema = z.object({
   baby_id: z.string().uuid(),
@@ -22,6 +23,12 @@ export async function GET(request: Request) {
   if (!babyId) {
     return NextResponse.json({ error: "baby_id is required" }, { status: 400 });
   }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const role = await getUserRoleForBaby(supabase, user.id, babyId);
+  if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   let query = supabase
     .from("sleep_sessions")
@@ -47,11 +54,15 @@ export async function POST(request: Request) {
   const parsed = createSchema.safeParse(body);
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
   }
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const role = await getUserRoleForBaby(supabase, user.id, parsed.data.baby_id);
+  if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (role === "viewer") return NextResponse.json({ error: "Viewers cannot create sleep sessions" }, { status: 403 });
 
   const { data, error } = await supabase
     .from("sleep_sessions")

@@ -33,9 +33,13 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/register");
 
-  if (!user && !isAuthPage && !request.nextUrl.pathname.startsWith("/auth")) {
+  // /invite/* pages handle their own auth redirect
+  const isInvitePage = request.nextUrl.pathname.startsWith("/invite/");
+
+  if (!user && !isAuthPage && !isInvitePage && !request.nextUrl.pathname.startsWith("/auth")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 

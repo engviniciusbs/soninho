@@ -8,6 +8,7 @@ import { createBaby, updateBaby, deleteBaby, getNotificationPreferences, upsertN
 import { useBaby } from "@/components/providers/BabyProvider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
+import { FamilySettings } from "@/components/settings/FamilySettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ export default function SettingsPage() {
   const { babies, activeBaby } = useBaby();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [showBabyForm, setShowBabyForm] = useState(false);
   const [editingBaby, setEditingBaby] = useState<string | null>(null);
   const [babyName, setBabyName] = useState("");
@@ -67,6 +69,7 @@ export default function SettingsPage() {
   const loadNotifPrefs = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+    setCurrentUserId(user.id);
     const { data } = await getNotificationPreferences(supabase, user.id);
     if (data) {
       setNotifEnabled(data.enabled ?? true);
@@ -381,6 +384,11 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Family team */}
+      {activeBaby && currentUserId && (
+        <FamilySettings babyId={activeBaby.id} currentUserId={currentUserId} />
+      )}
 
       {/* Notifications */}
       <Card className="rounded-2xl">
