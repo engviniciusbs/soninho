@@ -2,9 +2,10 @@
 
 import { motion } from "framer-motion";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
-import { formatDuration } from "@/lib/utils";
+import { useSleepStore } from "@/store/sleepStore";
+import { formatDuration, formatElapsed } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Clock, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Clock, AlertTriangle, CheckCircle2, Moon } from "lucide-react";
 
 const statusConfig = {
   green: {
@@ -36,23 +37,68 @@ const statusConfig = {
 export function WakeWindowBadge() {
   const { elapsedMinutes, status, range, minutesUntilNextNap, isLoading } =
     useWakeWindow();
+  const { isRunning, startTime, sleepType } = useSleepStore();
 
   if (isLoading) {
     return <Skeleton className="h-28 rounded-2xl" />;
   }
 
+  // ── Sleeping state ────────────────────────────────────────────────────────
+  if (isRunning && startTime) {
+    const elapsed = formatElapsed(startTime);
+    const isNight = sleepType === "NIGHT_SLEEP";
+    return (
+      <motion.div
+        key="sleeping"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        className="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 p-4"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/20">
+              <Moon className="h-4 w-4 text-indigo-300" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                {isNight ? "Sono noturno" : "Soneca"}
+              </p>
+              <p className="text-2xl font-bold tabular-nums text-indigo-300 font-mono">
+                {elapsed}
+              </p>
+            </div>
+          </div>
+          <div className="rounded-full px-3 py-1 text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            Dormindo 💤
+          </div>
+        </div>
+
+        {/* Animated sleep bar */}
+        <div className="space-y-1">
+          <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/60">
+            <motion.div
+              className="absolute left-0 top-0 h-full rounded-full bg-indigo-400"
+              animate={{ width: ["0%", "100%", "0%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            O widget de vigília será atualizado quando o sono terminar
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // ── Wake window state (normal) ────────────────────────────────────────────
   const config = statusConfig[status];
   const IconComp = config.icon;
-
-  // Progress within wake window (0–100%)
-  const progress = Math.min(
-    100,
-    Math.max(0, ((elapsedMinutes - range.minMinutes) / (range.maxMinutes - range.minMinutes)) * 100)
-  );
   const barWidth = Math.min(100, (elapsedMinutes / range.maxMinutes) * 100);
 
   return (
     <motion.div
+      key="awake"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
