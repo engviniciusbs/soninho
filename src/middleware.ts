@@ -33,10 +33,11 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/register");
 
-  // /invite/* pages handle their own auth redirect
+  // /invite/* pages and the public accept API handle their own auth redirect
   const isInvitePage = request.nextUrl.pathname.startsWith("/invite/");
+  const isPublicApiRoute = request.nextUrl.pathname.startsWith("/api/family/accept/");
 
-  if (!user && !isAuthPage && !isInvitePage && !request.nextUrl.pathname.startsWith("/auth")) {
+  if (!user && !isAuthPage && !isInvitePage && !isPublicApiRoute && !request.nextUrl.pathname.startsWith("/auth")) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("redirect", request.nextUrl.pathname);
