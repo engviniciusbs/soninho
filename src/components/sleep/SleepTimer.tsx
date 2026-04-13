@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Square } from "lucide-react";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -9,6 +9,32 @@ const SLEEP_TYPES = [
   { value: "NAP" as const, label: "Soneca", icon: Sun },
   { value: "NIGHT_SLEEP" as const, label: "Noturno", icon: Moon },
 ];
+
+/** Visual config per sleep type — colors, glows, labels */
+const TYPE_CONFIG = {
+  NAP: {
+    /** Warm amber — daytime nap */
+    bg: "#f59e0b",
+    bgHover: "#d97706",
+    boxShadow: "0 0 28px rgba(245,158,11,0.5), 0 0 56px rgba(245,158,11,0.18)",
+    ringColor: "rgba(245,158,11,0.45)",
+    ringFaint: "rgba(245,158,11,0.2)",
+    pillBg: "#f59e0b",
+    icon: Sun,
+    runningLabel: "Soneca em andamento",
+  },
+  NIGHT_SLEEP: {
+    /** Deep indigo — night sleep */
+    bg: "#4338ca",
+    bgHover: "#3730a3",
+    boxShadow: "0 0 28px rgba(67,56,202,0.55), 0 0 56px rgba(67,56,202,0.2)",
+    ringColor: "rgba(99,102,241,0.45)",
+    ringFaint: "rgba(99,102,241,0.2)",
+    pillBg: "#4338ca",
+    icon: Moon,
+    runningLabel: "Sono noturno em andamento",
+  },
+} as const;
 
 export function SleepTimer() {
   const {
@@ -21,6 +47,9 @@ export function SleepTimer() {
     handleStart,
     handleStop,
   } = useSleepTimer();
+
+  const cfg = TYPE_CONFIG[sleepType];
+  const TypeIcon = cfg.icon;
 
   return (
     <div className="flex flex-col items-center gap-7">
@@ -36,11 +65,11 @@ export function SleepTimer() {
             className="text-center"
           >
             <p className="text-xs font-medium text-muted-foreground tracking-widest uppercase mb-2">
-              {sleepType === "NAP" ? "☀️ Soneca" : "🌙 Sono noturno"} em andamento
+              {cfg.runningLabel}
             </p>
             <p
               className="text-6xl font-mono font-bold tracking-wider tabular-nums"
-              style={{ color: "var(--primary)" }}
+              style={{ color: isRunning ? cfg.bg : "var(--primary)" }}
             >
               {elapsed}
             </p>
@@ -62,25 +91,31 @@ export function SleepTimer() {
 
       {/* Big start/stop button */}
       <div className="relative">
-        {/* Outer orbit rings when running */}
+        {/* Pulsing rings when running — color matches sleep type */}
         <AnimatePresence>
           {isRunning && (
             <>
               <motion.div
                 key="ring1"
                 initial={{ scale: 1, opacity: 0 }}
-                animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
+                animate={{ scale: [1, 1.35, 1], opacity: [0.6, 0, 0.6] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full border-2 border-primary/40"
-                style={{ margin: "-8px" }}
+                className="absolute inset-0 rounded-full border-2"
+                style={{
+                  margin: "-8px",
+                  borderColor: cfg.ringColor,
+                }}
               />
               <motion.div
                 key="ring2"
                 initial={{ scale: 1, opacity: 0 }}
-                animate={{ scale: [1, 1.6, 1], opacity: [0.3, 0, 0.3] }}
+                animate={{ scale: [1, 1.6, 1], opacity: [0.35, 0, 0.35] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                className="absolute inset-0 rounded-full border border-primary/20"
-                style={{ margin: "-16px" }}
+                className="absolute inset-0 rounded-full border"
+                style={{
+                  margin: "-16px",
+                  borderColor: cfg.ringFaint,
+                }}
               />
             </>
           )}
@@ -88,18 +123,21 @@ export function SleepTimer() {
 
         <motion.button
           onClick={isRunning ? handleStop : handleStart}
-          className={`relative flex h-[136px] w-[136px] items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-            isRunning
-              ? "bg-destructive/90 hover:bg-destructive glow-red"
-              : "bg-primary hover:bg-primary/90 glow-primary"
-          }`}
+          className="relative flex h-[136px] w-[136px] items-center justify-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          style={{
+            backgroundColor: isRunning ? "#f87171" : cfg.bg,
+            boxShadow: isRunning
+              ? "0 0 28px rgba(248,113,113,0.45), 0 0 56px rgba(248,113,113,0.15)"
+              : cfg.boxShadow,
+          }}
           whileTap={{ scale: 0.93 }}
           whileHover={{ scale: 1.03 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          aria-label={isRunning ? "Parar sono" : "Iniciar sono"}
+          aria-label={isRunning ? "Parar sono" : `Iniciar ${sleepType === "NAP" ? "soneca" : "sono noturno"}`}
         >
           <AnimatePresence mode="wait">
             {isRunning ? (
+              /* Stop state — neutral square */
               <motion.div
                 key="stop"
                 initial={{ scale: 0, rotate: -90 }}
@@ -108,17 +146,18 @@ export function SleepTimer() {
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20"
               >
-                <span className="block h-5 w-5 rounded-sm bg-white" aria-hidden="true" />
+                <Square className="h-6 w-6 fill-white text-white" aria-hidden="true" />
               </motion.div>
             ) : (
+              /* Idle state — icon changes with sleep type */
               <motion.div
-                key="start"
+                key={`start-${sleepType}`}
                 initial={{ scale: 0, rotate: 90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 exit={{ scale: 0, rotate: -90 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <Moon className="h-12 w-12 text-white" aria-hidden="true" />
+                <TypeIcon className="h-12 w-12 text-white drop-shadow-sm" aria-hidden="true" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -152,26 +191,25 @@ export function SleepTimer() {
             >
               {SLEEP_TYPES.map(({ value, label, icon: Icon }) => {
                 const isActive = sleepType === value;
+                const pillColor = TYPE_CONFIG[value].pillBg;
                 return (
                   <button
                     key={value}
                     onClick={() => setSleepType(value)}
                     aria-pressed={isActive}
                     className={`relative flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                      isActive ? "text-white" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="sleep-type-pill"
-                        className="absolute inset-0 rounded-full bg-primary"
+                        className="absolute inset-0 rounded-full"
+                        style={{ backgroundColor: pillColor }}
                         transition={{ type: "spring", stiffness: 500, damping: 35 }}
                       />
                     )}
-                    <Icon
-                      className="relative z-10 h-4 w-4"
-                      aria-hidden="true"
-                    />
+                    <Icon className="relative z-10 h-4 w-4" aria-hidden="true" />
                     <span className="relative z-10">{label}</span>
                   </button>
                 );
