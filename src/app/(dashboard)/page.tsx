@@ -7,6 +7,7 @@ import { WakeWindowBadge } from "@/components/sleep/WakeWindowBadge";
 import { AISuggestionCard } from "@/components/ai/AISuggestionCard";
 import { SleepTimeline } from "@/components/sleep/SleepTimeline";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Moon, Baby } from "lucide-react";
 import Link from "next/link";
@@ -100,8 +101,13 @@ export default function HomePage() {
         className="relative flex flex-col items-center gap-5 pt-4 pb-8 px-4"
       >
         {/* Baby greeting */}
-        <motion.div variants={item} className="text-center">
-          <p className="text-3xl mb-1">{activeBaby?.avatar_emoji ?? "🌙"}</p>
+        <motion.div variants={item} className="flex flex-col items-center gap-2">
+          <BabyAvatar
+            avatarUrl={activeBaby?.avatar_url}
+            emoji={activeBaby?.avatar_emoji ?? "🌙"}
+            name={activeBaby?.name}
+            size="lg"
+          />
           <h1 className="text-xl font-bold text-foreground">{activeBaby?.name}</h1>
         </motion.div>
 

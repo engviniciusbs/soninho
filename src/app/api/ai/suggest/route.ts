@@ -46,7 +46,9 @@ export async function POST(request: Request) {
 
     const response = await openai.chat.completions.create({
       model: OPENAI_MODEL,
-      max_tokens: 500,
+      max_tokens: 300,
+      temperature: 0,       // deterministic output: same data → same suggestion
+      seed: 42,             // extra reproducibility guarantee (OpenAI beta feature)
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },

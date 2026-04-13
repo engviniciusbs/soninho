@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -47,9 +48,12 @@ export function TopBar() {
             <SelectTrigger className="h-9 rounded-full border-border/50 bg-muted/40 px-3 text-sm gap-2 w-auto min-w-[120px]">
               <SelectValue>
                 <span className="flex items-center gap-2">
-                  <span role="img" aria-label={`Avatar de ${activeBaby.name}`}>
-                    {activeBaby.avatar_emoji}
-                  </span>
+                  <BabyAvatar
+                    avatarUrl={activeBaby.avatar_url}
+                    emoji={activeBaby.avatar_emoji}
+                    name={activeBaby.name}
+                    size="sm"
+                  />
                   <span className="truncate max-w-[80px]">{activeBaby.name}</span>
                 </span>
               </SelectValue>
@@ -58,9 +62,12 @@ export function TopBar() {
               {babies.map((baby) => (
                 <SelectItem key={baby.id} value={baby.id}>
                   <span className="flex items-center gap-2">
-                    <span role="img" aria-label={`Avatar de ${baby.name}`}>
-                      {baby.avatar_emoji}
-                    </span>
+                    <BabyAvatar
+                      avatarUrl={baby.avatar_url}
+                      emoji={baby.avatar_emoji}
+                      name={baby.name}
+                      size="sm"
+                    />
                     <span>{baby.name}</span>
                   </span>
                 </SelectItem>

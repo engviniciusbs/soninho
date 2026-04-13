@@ -66,10 +66,32 @@ export function buildSleepContext(baby: Baby, sessions: SleepSession[]): string 
     patterns.push("- Acordando antes das 6h frequentemente");
   }
 
+  // Find the last completed session as the anchor for the next nap suggestion.
+  // Using end_time of the most recent completed session (not "now") makes the
+  // suggestion deterministic: same data → same output every time.
+  const lastCompleted = sortedCompleted[sortedCompleted.length - 1];
+  const lastSleepEndTime = lastCompleted?.end_time
+    ? format(new Date(lastCompleted.end_time), "HH:mm 'de' dd/MM/yyyy")
+    : "Sem registro";
+  const lastSleepType =
+    lastCompleted?.type === "NAP" ? "soneca" : lastCompleted?.type === "NIGHT_SLEEP" ? "sono noturno" : "N/A";
+  const lastSleepDuration = lastCompleted?.duration_min
+    ? `${lastCompleted.duration_min} min`
+    : "N/A";
+
+  // Include current time only as reference context (not as calculation base)
+  const currentTime = format(now, "HH:mm");
+
   return `
 Nome do bebê: ${baby.name}
 Idade: ${ageWeeks} semanas (${ageMonths} meses)
 Data de nascimento: ${format(birth, "dd/MM/yyyy")}
+Horário de referência (agora): ${currentTime}
+
+=== ÚLTIMO SONO REGISTRADO (ÂNCORA PARA CÁLCULO) ===
+Tipo: ${lastSleepType}
+Fim do sono: ${lastSleepEndTime}
+Duração: ${lastSleepDuration}
 
 === RESUMO DOS ÚLTIMOS 7 DIAS ===
 ${dailySummaries.join("\n")}
@@ -80,7 +102,5 @@ Total de sessões noturnas: ${nightSessions.length}
 Janelas de vigília recentes: ${wakeWindows.slice(-6).join(", ") || "Sem dados suficientes"}
 
 ${patterns.length > 0 ? `=== PADRÕES IDENTIFICADOS ===\n${patterns.join("\n")}` : ""}
-
-Horário atual: ${format(now, "HH:mm dd/MM/yyyy")}
 `.trim();
 }

@@ -15,7 +15,7 @@ export async function getBaby(supabase: Client, babyId: string) {
 
 export async function createBaby(
   supabase: Client,
-  data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string }
+  data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
   return supabase.from("babies").insert(data).select().single();
 }
@@ -23,7 +23,7 @@ export async function createBaby(
 export async function updateBaby(
   supabase: Client,
   babyId: string,
-  data: { name?: string; birth_date?: string; avatar_emoji?: string }
+  data: { name?: string; birth_date?: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
   return supabase.from("babies").update(data).eq("id", babyId).select().single();
 }
