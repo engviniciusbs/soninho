@@ -38,6 +38,26 @@ export function usePushNotifications(): PushNotificationState {
 
       await registerServiceWorker();
       const existing = await getExistingSubscription();
+
+      if (existing) {
+        // Re-sync browser subscription with DB on every mount (handles the case
+        // where DB row was lost but browser still has a valid subscription)
+        try {
+          await fetch("/api/notifications/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              endpoint: existing.endpoint,
+              p256dh: btoa(String.fromCharCode(...new Uint8Array(existing.getKey("p256dh")!))),
+              auth: btoa(String.fromCharCode(...new Uint8Array(existing.getKey("auth")!))),
+              userAgent: navigator.userAgent,
+            }),
+          });
+        } catch {
+          // Silently ignore sync errors (e.g. user not logged in yet)
+        }
+      }
+
       setIsSubscribed(!!existing);
       setIsLoading(false);
     }
