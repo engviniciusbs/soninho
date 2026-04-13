@@ -1,9 +1,9 @@
 {
   "plugins": {
-    "supabase": {
+    "context7-plugin": {
       "enabled": true
     },
-    "context7-plugin": {
+    "supabase": {
       "enabled": true
     }
   }
