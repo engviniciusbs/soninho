@@ -1,34 +1,54 @@
-import { differenceInWeeks, differenceInMonths, format, subDays, startOfDay, eachDayOfInterval } from "date-fns";
+import {
+  differenceInWeeks,
+  differenceInMonths,
+  subDays,
+  eachDayOfInterval,
+} from "date-fns";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 import type { Baby, SleepSession } from "@/types";
 
-export function buildSleepContext(baby: Baby, sessions: SleepSession[]): string {
+/**
+ * Builds a human-readable sleep context string for the AI prompt.
+ *
+ * All date/time values are formatted in the user's local timezone (passed from
+ * the browser), so the AI always sees the correct local times regardless of
+ * whether the server runs in UTC (Vercel) or any other timezone.
+ */
+export function buildSleepContext(
+  baby: Baby,
+  sessions: SleepSession[],
+  timezone: string = "America/Sao_Paulo"
+): string {
   const birth = new Date(baby.birth_date);
-  const now = new Date();
-  const ageWeeks = differenceInWeeks(now, birth);
-  const ageMonths = differenceInMonths(now, birth);
+  // "now" in the user's local timezone
+  const nowUtc = new Date();
+  const nowLocal = toZonedTime(nowUtc, timezone);
+
+  const ageWeeks = differenceInWeeks(nowLocal, birth);
+  const ageMonths = differenceInMonths(nowLocal, birth);
+
+  // Compute "7 days ago" in the user's timezone to avoid off-by-one at midnight
+  const sevenDaysAgo = subDays(nowLocal, 7);
 
   const last7days = sessions.filter(
-    (s) => new Date(s.start_time) >= subDays(startOfDay(now), 7)
+    (s) => toZonedTime(new Date(s.start_time), timezone) >= sevenDaysAgo
   );
 
   const completed = last7days.filter((s) => s.duration_min != null);
   const naps = completed.filter((s) => s.type === "NAP");
   const nightSessions = completed.filter((s) => s.type === "NIGHT_SLEEP");
 
-  const days = eachDayOfInterval({
-    start: subDays(startOfDay(now), 6),
-    end: now,
-  });
+  // Daily summaries — all dates in user's timezone
+  const days = eachDayOfInterval({ start: subDays(nowLocal, 6), end: nowLocal });
 
   const dailySummaries = days.map((day) => {
-    const dayStr = format(day, "yyyy-MM-dd");
+    const dayStr = formatInTimeZone(day, timezone, "yyyy-MM-dd");
     const daySessions = completed.filter(
-      (s) => format(new Date(s.start_time), "yyyy-MM-dd") === dayStr
+      (s) => formatInTimeZone(new Date(s.start_time), timezone, "yyyy-MM-dd") === dayStr
     );
     const totalMin = daySessions.reduce((a, s) => a + (s.duration_min ?? 0), 0);
     const dayNaps = daySessions.filter((s) => s.type === "NAP");
-
-    return `  ${format(day, "dd/MM")}: ${(totalMin / 60).toFixed(1)}h total, ${dayNaps.length} sonecas`;
+    return `  ${formatInTimeZone(day, timezone, "dd/MM")}: ${(totalMin / 60).toFixed(1)}h total, ${dayNaps.length} sonecas`;
   });
 
   const avgNapDur =
@@ -36,6 +56,7 @@ export function buildSleepContext(baby: Baby, sessions: SleepSession[]): string 
       ? (naps.reduce((a, s) => a + (s.duration_min ?? 0), 0) / naps.length).toFixed(0)
       : "N/A";
 
+  // Wake windows — computed from raw timestamps (timezone-agnostic gap in ms)
   const wakeWindows: string[] = [];
   const sortedCompleted = [...completed].sort(
     (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
@@ -56,37 +77,40 @@ export function buildSleepContext(baby: Baby, sessions: SleepSession[]): string 
   if (shortNaps.length > naps.length * 0.5 && naps.length > 2) {
     patterns.push("- Sonecas predominantemente curtas (< 30min)");
   }
-
   const earlyWakes = nightSessions.filter((s) => {
     if (!s.end_time) return false;
-    const endHour = new Date(s.end_time).getHours();
+    // Check the local hour of wake-up
+    const endHour = parseInt(formatInTimeZone(new Date(s.end_time), timezone, "H"), 10);
     return endHour < 6;
   });
   if (earlyWakes.length > 2) {
     patterns.push("- Acordando antes das 6h frequentemente");
   }
 
-  // Find the last completed session as the anchor for the next nap suggestion.
-  // Using end_time of the most recent completed session (not "now") makes the
-  // suggestion deterministic: same data → same output every time.
+  // ── Anchor: last completed session ──────────────────────────────────────
+  // Format end_time in the user's timezone so the AI calculates with the
+  // correct local time, not UTC (which would be 3h off for Brazil).
   const lastCompleted = sortedCompleted[sortedCompleted.length - 1];
   const lastSleepEndTime = lastCompleted?.end_time
-    ? format(new Date(lastCompleted.end_time), "HH:mm 'de' dd/MM/yyyy")
+    ? formatInTimeZone(new Date(lastCompleted.end_time), timezone, "HH:mm 'de' dd/MM/yyyy")
     : "Sem registro";
   const lastSleepType =
-    lastCompleted?.type === "NAP" ? "soneca" : lastCompleted?.type === "NIGHT_SLEEP" ? "sono noturno" : "N/A";
+    lastCompleted?.type === "NAP"
+      ? "soneca"
+      : lastCompleted?.type === "NIGHT_SLEEP"
+        ? "sono noturno"
+        : "N/A";
   const lastSleepDuration = lastCompleted?.duration_min
     ? `${lastCompleted.duration_min} min`
     : "N/A";
 
-  // Include current time only as reference context (not as calculation base)
-  const currentTime = format(now, "HH:mm");
+  const currentTime = formatInTimeZone(nowUtc, timezone, "HH:mm");
 
   return `
 Nome do bebê: ${baby.name}
 Idade: ${ageWeeks} semanas (${ageMonths} meses)
-Data de nascimento: ${format(birth, "dd/MM/yyyy")}
-Horário de referência (agora): ${currentTime}
+Data de nascimento: ${formatInTimeZone(birth, timezone, "dd/MM/yyyy")}
+Horário de referência (agora): ${currentTime} (fuso: ${timezone})
 
 === ÚLTIMO SONO REGISTRADO (ÂNCORA PARA CÁLCULO) ===
 Tipo: ${lastSleepType}

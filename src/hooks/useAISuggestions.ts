@@ -40,7 +40,12 @@ export function useAISuggestions() {
       const res = await fetch("/api/ai/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ babyId: activeBaby.id }),
+        body: JSON.stringify({
+          babyId: activeBaby.id,
+          // Send the browser's timezone so the server formats dates correctly.
+          // Without this, Vercel (UTC) shows times 3h ahead of Brazil (UTC-3).
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       });
       if (!res.ok) return null;
       return res.json();

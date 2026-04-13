@@ -8,6 +8,7 @@ import type { Baby, SleepSession } from "@/types";
 
 const requestSchema = z.object({
   babyId: z.string().uuid(),
+  timezone: z.string().default("America/Sao_Paulo"),
 });
 
 export async function POST(request: Request) {
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
       .lte("start_time", new Date().toISOString())
       .order("start_time", { ascending: false });
 
-    const context = buildSleepContext(baby, (sessionsData ?? []) as SleepSession[]);
+    const context = buildSleepContext(baby, (sessionsData ?? []) as SleepSession[], parsed.data.timezone);
     const systemPrompt = getSleepSystemPrompt(context);
 
     const response = await openai.chat.completions.create({
