@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { createBaby, updateBaby, deleteBaby } from "@/lib/supabase/queries";
+import { createBaby, updateBaby, deleteBaby, getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,10 @@ import {
   LogOut,
   Baby,
   User,
+  Bell,
+  BellOff,
+  Loader2,
+  Send,
 } from "lucide-react";
 import type { SleepSession } from "@/types";
 
@@ -49,6 +54,60 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  // Notification state
+  const push = usePushNotifications();
+  const [alertBefore, setAlertBefore] = useState(15);
+  const [quietStart, setQuietStart] = useState("22:00");
+  const [quietEnd, setQuietEnd] = useState("07:00");
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [savingNotif, setSavingNotif] = useState(false);
+  const [testingSend, setTestingSend] = useState(false);
+
+  const loadNotifPrefs = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await getNotificationPreferences(supabase, user.id);
+    if (data) {
+      setNotifEnabled(data.enabled ?? true);
+      setAlertBefore(data.alert_before_minutes ?? 15);
+      setQuietStart(data.quiet_hours_start ?? "22:00");
+      setQuietEnd(data.quiet_hours_end ?? "07:00");
+    }
+  }, [supabase]);
+
+  useEffect(() => { loadNotifPrefs(); }, [loadNotifPrefs]);
+
+  async function handleSaveNotifPrefs() {
+    setSavingNotif(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSavingNotif(false); return; }
+
+    await upsertNotificationPreferences(supabase, user.id, {
+      enabled: notifEnabled,
+      alert_before_minutes: alertBefore,
+      quiet_hours_start: quietStart,
+      quiet_hours_end: quietEnd,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    toast.success("Preferências de notificação salvas!");
+    setSavingNotif(false);
+  }
+
+  async function handleTestNotification() {
+    setTestingSend(true);
+    try {
+      const res = await fetch("/api/notifications/test", { method: "POST" });
+      if (res.ok) {
+        toast.success("Notificação de teste enviada!");
+      } else {
+        toast.error("Erro ao enviar notificação de teste");
+      }
+    } catch {
+      toast.error("Erro de rede");
+    }
+    setTestingSend(false);
+  }
 
   function openAddForm() {
     setEditingBaby(null);
@@ -320,6 +379,165 @@ export default function SettingsPage() {
             <Download className="h-4 w-4" />
             {exporting ? "Exportando..." : "Exportar CSV"}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Notifications */}
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            Notificações Push
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!push.isSupported ? (
+            <p className="text-sm text-muted-foreground">
+              Seu navegador não suporta notificações push.
+            </p>
+          ) : (
+            <>
+              {/* Permission / subscription status */}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-medium">
+                    {push.isSubscribed ? "Notificações ativadas" : "Notificações desativadas"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {push.permission === "denied"
+                      ? "Bloqueado pelo navegador. Altere nas configurações do site."
+                      : push.isSubscribed
+                        ? "Você receberá alertas sobre sonecas e janelas de sono."
+                        : "Ative para receber alertas inteligentes."}
+                  </p>
+                </div>
+                <Button
+                  variant={push.isSubscribed ? "outline" : "default"}
+                  size="sm"
+                  className="rounded-xl gap-2"
+                  disabled={push.isLoading || push.permission === "denied"}
+                  onClick={async () => {
+                    if (push.isSubscribed) {
+                      await push.unsubscribe();
+                      toast.info("Notificações desativadas");
+                    } else {
+                      const ok = await push.subscribe();
+                      if (ok) toast.success("Notificações ativadas!");
+                      else toast.error("Não foi possível ativar notificações");
+                    }
+                  }}
+                >
+                  {push.isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : push.isSubscribed ? (
+                    <BellOff className="h-4 w-4" />
+                  ) : (
+                    <Bell className="h-4 w-4" />
+                  )}
+                  {push.isSubscribed ? "Desativar" : "Ativar"}
+                </Button>
+              </div>
+
+              {push.isSubscribed && (
+                <>
+                  {/* Alert timing */}
+                  <div className="space-y-2 pt-2 border-t border-border/50">
+                    <label className="text-xs text-muted-foreground">
+                      Alertar antes da soneca (minutos)
+                    </label>
+                    <div className="flex gap-2">
+                      {[5, 10, 15, 20].map((min) => (
+                        <button
+                          key={min}
+                          type="button"
+                          onClick={() => setAlertBefore(min)}
+                          className={`flex h-9 w-12 items-center justify-center rounded-lg text-sm font-medium transition-all ${
+                            alertBefore === min
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary hover:bg-secondary/80"
+                          }`}
+                        >
+                          {min}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quiet hours */}
+                  <div className="space-y-2">
+                    <label className="text-xs text-muted-foreground">
+                      Horário silencioso (sem notificações)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="time"
+                        value={quietStart}
+                        onChange={(e) => setQuietStart(e.target.value)}
+                        className="rounded-xl w-28"
+                      />
+                      <span className="text-xs text-muted-foreground">até</span>
+                      <Input
+                        type="time"
+                        value={quietEnd}
+                        onChange={(e) => setQuietEnd(e.target.value)}
+                        className="rounded-xl w-28"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Enable/disable dispatch */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                    <div className="space-y-0.5">
+                      <p className="text-sm">Envio automático</p>
+                      <p className="text-xs text-muted-foreground">
+                        Receber alertas a cada 5 minutos quando necessário
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={notifEnabled}
+                      onClick={() => setNotifEnabled(!notifEnabled)}
+                      className={`relative h-6 w-11 rounded-full transition-colors ${
+                        notifEnabled ? "bg-primary" : "bg-secondary"
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+                          notifEnabled ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Save + Test */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={handleSaveNotifPrefs}
+                      disabled={savingNotif}
+                      className="rounded-xl flex-1 gap-2"
+                    >
+                      {savingNotif ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                      Salvar preferências
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleTestNotification}
+                      disabled={testingSend}
+                      className="rounded-xl gap-2"
+                    >
+                      {testingSend ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      Testar
+                    </Button>
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 
