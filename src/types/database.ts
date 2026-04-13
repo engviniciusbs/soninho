@@ -16,6 +16,7 @@ export interface Database {
           name: string;
           birth_date: string;
           avatar_emoji: string;
+          avatar_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -24,6 +25,7 @@ export interface Database {
           name: string;
           birth_date: string;
           avatar_emoji?: string;
+          avatar_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -32,6 +34,7 @@ export interface Database {
           name?: string;
           birth_date?: string;
           avatar_emoji?: string;
+          avatar_url?: string | null;
           created_at?: string;
         };
       };

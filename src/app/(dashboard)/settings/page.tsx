@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { createBaby, updateBaby, deleteBaby } from "@/lib/supabase/queries";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,14 +37,17 @@ export default function SettingsPage() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { babies, activeBaby } = useBaby();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showBabyForm, setShowBabyForm] = useState(false);
   const [editingBaby, setEditingBaby] = useState<string | null>(null);
   const [babyName, setBabyName] = useState("");
   const [babyBirthDate, setBabyBirthDate] = useState("");
   const [babyEmoji, setBabyEmoji] = useState("🍼");
+  const [babyAvatarUrl, setBabyAvatarUrl] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   function openAddForm() {
@@ -51,15 +55,57 @@ export default function SettingsPage() {
     setBabyName("");
     setBabyBirthDate("");
     setBabyEmoji("🍼");
+    setBabyAvatarUrl(null);
     setShowBabyForm(true);
   }
 
-  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string }) {
+  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string; avatar_url: string | null }) {
     setEditingBaby(baby.id);
     setBabyName(baby.name);
     setBabyBirthDate(baby.birth_date);
     setBabyEmoji(baby.avatar_emoji);
+    setBabyAvatarUrl(baby.avatar_url);
     setShowBabyForm(true);
+  }
+
+  async function handleAvatarUpload(file: File) {
+    if (!file) return;
+
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error("Foto muito grande. Máximo 5 MB.");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { toast.error("Não autenticado"); return; }
+
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${user.id}/${Date.now()}.${ext}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("baby-avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (uploadError) {
+        toast.error("Erro ao enviar foto");
+        return;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("baby-avatars")
+        .getPublicUrl(path);
+
+      setBabyAvatarUrl(publicUrl);
+      toast.success("Foto carregada!");
+    } catch {
+      toast.error("Erro inesperado ao enviar foto");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleSaveBaby() {
@@ -76,6 +122,7 @@ export default function SettingsPage() {
         name: babyName.trim(),
         birth_date: babyBirthDate,
         avatar_emoji: babyEmoji,
+        avatar_url: babyAvatarUrl,
       });
       if (error) {
         toast.error("Erro ao atualizar bebê");
@@ -97,6 +144,7 @@ export default function SettingsPage() {
         name: babyName.trim(),
         birth_date: babyBirthDate,
         avatar_emoji: babyEmoji,
+        avatar_url: babyAvatarUrl,
       });
       if (error) {
         toast.error("Erro ao adicionar bebê");
@@ -212,7 +260,12 @@ export default function SettingsPage() {
                 className="flex items-center justify-between rounded-xl bg-secondary/50 px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">{baby.avatar_emoji}</span>
+                  <BabyAvatar
+                    avatarUrl={baby.avatar_url}
+                    emoji={baby.avatar_emoji}
+                    name={baby.name}
+                    size="md"
+                  />
                   <div>
                     <p className="text-sm font-semibold">{baby.name}</p>
                     <p className="text-xs text-muted-foreground">
@@ -299,11 +352,49 @@ export default function SettingsPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {/* Avatar upload area */}
+            <div className="flex flex-col items-center gap-2 py-2">
+              <BabyAvatar
+                avatarUrl={babyAvatarUrl}
+                emoji={babyEmoji}
+                name={babyName || "Bebê"}
+                size="xl"
+                editable
+                uploading={uploading}
+                onUploadClick={() => fileInputRef.current?.click()}
+              />
+              <p className="text-xs text-muted-foreground">
+                {babyAvatarUrl ? "Toque para alterar a foto" : "Toque para adicionar uma foto"}
+              </p>
+              {babyAvatarUrl && (
+                <button
+                  type="button"
+                  onClick={() => setBabyAvatarUrl(null)}
+                  className="text-xs text-destructive hover:underline"
+                >
+                  Remover foto
+                </button>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="sr-only"
+                aria-label="Selecionar foto do bebê"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleAvatarUpload(file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+
             <Input
               placeholder="Nome do bebê"
               value={babyName}
               onChange={(e) => setBabyName(e.target.value)}
               className="rounded-xl"
+              autoComplete="off"
             />
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">
@@ -317,7 +408,7 @@ export default function SettingsPage() {
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs text-muted-foreground">Emoji</label>
+              <label className="text-xs text-muted-foreground">Emoji (fallback sem foto)</label>
               <div className="flex flex-wrap gap-2">
                 {EMOJIS.map((emoji) => (
                   <button
@@ -346,7 +437,7 @@ export default function SettingsPage() {
             </Button>
             <Button
               onClick={handleSaveBaby}
-              disabled={saving}
+              disabled={saving || uploading}
               className="rounded-xl"
             >
               {saving ? "Salvando..." : "Salvar"}
