@@ -17,6 +17,11 @@ export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  const redirectParam =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("redirect")
+      : null;
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -30,7 +35,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    router.push(redirectParam ?? "/");
     router.refresh();
   }
 

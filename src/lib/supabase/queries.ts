@@ -17,7 +17,30 @@ export async function createBaby(
   supabase: Client,
   data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
-  return supabase.from("babies").insert(data).select().single();
+  // 1. Create the family
+  const { data: family, error: familyError } = await supabase
+    .from("families")
+    .insert({ name: `${data.name}'s familia`, created_by: data.user_id })
+    .select()
+    .single();
+
+  if (familyError) return { data: null, error: familyError };
+
+  // 2. Add owner as member
+  const { error: memberError } = await supabase.from("family_members").insert({
+    family_id: family.id,
+    user_id: data.user_id,
+    role: "owner",
+  });
+
+  if (memberError) return { data: null, error: memberError };
+
+  // 3. Create baby linked to family
+  return supabase
+    .from("babies")
+    .insert({ ...data, family_id: family.id })
+    .select()
+    .single();
 }
 
 export async function updateBaby(
@@ -201,4 +224,175 @@ export async function deactivatePushSubscription(
     .update({ is_active: false })
     .eq("user_id", userId)
     .eq("endpoint", endpoint);
+}
+
+// ── Family helpers ──────────────────────────────────────────────────────────
+
+export async function getFamilyForBaby(supabase: Client, babyId: string) {
+  const { data: baby, error } = await supabase
+    .from("babies")
+    .select("family_id")
+    .eq("id", babyId)
+    .single();
+  if (error || !baby?.family_id) return { data: null, error };
+  return supabase
+    .from("families")
+    .select("*")
+    .eq("id", baby.family_id)
+    .single();
+}
+
+export async function getFamilyMembers(supabase: Client, familyId: string) {
+  return supabase
+    .from("family_members")
+    .select("*")
+    .eq("family_id", familyId)
+    .order("joined_at", { ascending: true });
+}
+
+export async function getUserFamilies(supabase: Client, userId: string) {
+  return supabase
+    .from("family_members")
+    .select("family_id, role, families(*)")
+    .eq("user_id", userId);
+}
+
+export async function getUserRoleForBaby(
+  supabase: Client,
+  userId: string,
+  babyId: string
+): Promise<"owner" | "caregiver" | "viewer" | null> {
+  const { data: baby } = await supabase
+    .from("babies")
+    .select("family_id, user_id")
+    .eq("id", babyId)
+    .single();
+
+  if (!baby) return null;
+
+  const { data: member } = await supabase
+    .from("family_members")
+    .select("role")
+    .eq("family_id", baby.family_id)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (member) return member.role as "owner" | "caregiver" | "viewer";
+
+  // Fallback: direct owner (for babies without family_id set)
+  if (baby.user_id === userId) return "owner";
+
+  return null;
+}
+
+export async function createFamilyInvite(
+  supabase: Client,
+  familyId: string,
+  createdBy: string,
+  role: "caregiver" | "viewer"
+) {
+  return supabase
+    .from("family_invites")
+    .insert({ family_id: familyId, created_by: createdBy, role })
+    .select()
+    .single();
+}
+
+export async function getActiveFamilyInvites(
+  supabase: Client,
+  familyId: string
+) {
+  return supabase
+    .from("family_invites")
+    .select("*")
+    .eq("family_id", familyId)
+    .is("accepted_at", null)
+    .is("revoked_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+}
+
+export async function revokeFamilyInvite(
+  supabase: Client,
+  inviteId: string
+) {
+  return supabase
+    .from("family_invites")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("id", inviteId);
+}
+
+export async function getInviteByToken(supabase: Client, token: string) {
+  return supabase
+    .from("family_invites")
+    .select("*, families(name, created_by)")
+    .eq("token", token)
+    .is("revoked_at", null)
+    .is("accepted_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .maybeSingle();
+}
+
+export async function acceptFamilyInvite(
+  supabase: Client,
+  token: string,
+  userId: string,
+  displayName: string | null,
+  email: string | null
+) {
+  const { data: invite, error } = await supabase
+    .from("family_invites")
+    .select("*")
+    .eq("token", token)
+    .is("revoked_at", null)
+    .is("accepted_at", null)
+    .gt("expires_at", new Date().toISOString())
+    .single();
+
+  if (error || !invite) return { data: null, error: error ?? new Error("Invalid or expired invite") };
+
+  // Add member
+  const { error: memberError } = await supabase.from("family_members").insert({
+    family_id: invite.family_id,
+    user_id: userId,
+    role: invite.role,
+    display_name: displayName,
+    email,
+    invited_by: invite.created_by,
+  });
+
+  if (memberError) return { data: null, error: memberError };
+
+  // Mark invite as accepted
+  await supabase
+    .from("family_invites")
+    .update({ accepted_at: new Date().toISOString(), accepted_by: userId })
+    .eq("id", invite.id);
+
+  return { data: invite, error: null };
+}
+
+export async function removeFamilyMember(
+  supabase: Client,
+  familyId: string,
+  userId: string
+) {
+  return supabase
+    .from("family_members")
+    .delete()
+    .eq("family_id", familyId)
+    .eq("user_id", userId);
+}
+
+export async function updateMemberRole(
+  supabase: Client,
+  familyId: string,
+  userId: string,
+  role: "caregiver" | "viewer"
+) {
+  return supabase
+    .from("family_members")
+    .update({ role })
+    .eq("family_id", familyId)
+    .eq("user_id", userId);
 }

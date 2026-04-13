@@ -17,6 +17,7 @@ export interface Database {
           birth_date: string;
           avatar_emoji: string;
           avatar_url: string | null;
+          family_id: string | null;
           created_at: string;
         };
         Insert: {
@@ -26,6 +27,7 @@ export interface Database {
           birth_date: string;
           avatar_emoji?: string;
           avatar_url?: string | null;
+          family_id?: string | null;
           created_at?: string;
         };
         Update: {
@@ -35,7 +37,98 @@ export interface Database {
           birth_date?: string;
           avatar_emoji?: string;
           avatar_url?: string | null;
+          family_id?: string | null;
           created_at?: string;
+        };
+      };
+      families: {
+        Row: {
+          id: string;
+          name: string;
+          created_by: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          name?: string;
+          created_by: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          created_by?: string;
+          created_at?: string;
+        };
+      };
+      family_members: {
+        Row: {
+          id: string;
+          family_id: string;
+          user_id: string;
+          role: "owner" | "caregiver" | "viewer";
+          display_name: string | null;
+          email: string | null;
+          invited_by: string | null;
+          joined_at: string;
+        };
+        Insert: {
+          id?: string;
+          family_id: string;
+          user_id: string;
+          role?: "owner" | "caregiver" | "viewer";
+          display_name?: string | null;
+          email?: string | null;
+          invited_by?: string | null;
+          joined_at?: string;
+        };
+        Update: {
+          id?: string;
+          family_id?: string;
+          user_id?: string;
+          role?: "owner" | "caregiver" | "viewer";
+          display_name?: string | null;
+          email?: string | null;
+          invited_by?: string | null;
+          joined_at?: string;
+        };
+      };
+      family_invites: {
+        Row: {
+          id: string;
+          family_id: string;
+          token: string;
+          role: "caregiver" | "viewer";
+          created_by: string;
+          created_at: string;
+          expires_at: string;
+          accepted_at: string | null;
+          accepted_by: string | null;
+          revoked_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          family_id: string;
+          token?: string;
+          role?: "caregiver" | "viewer";
+          created_by: string;
+          created_at?: string;
+          expires_at?: string;
+          accepted_at?: string | null;
+          accepted_by?: string | null;
+          revoked_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          family_id?: string;
+          token?: string;
+          role?: "caregiver" | "viewer";
+          created_by?: string;
+          created_at?: string;
+          expires_at?: string;
+          accepted_at?: string | null;
+          accepted_by?: string | null;
+          revoked_at?: string | null;
         };
       };
       sleep_sessions: {
