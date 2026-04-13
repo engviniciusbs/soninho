@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
-import { getSleepSystemPrompt, SUGGESTION_PROMPT } from "@/lib/ai/prompts";
-import { buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
-import type { Baby, SleepSession } from "@/types";
+import { getLastSleepSession } from "@/lib/supabase/queries";
+import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
+import type { Baby } from "@/types";
 
 const requestSchema = z.object({
   babyId: z.string().uuid(),
   timezone: z.string().default("America/Sao_Paulo"),
 });
 
+/**
+ * Nap window + suggested time use the same {@link getWakeWindowRange} table as
+ * WakeWindowBadge — no LLM, so numbers never diverge from the dashboard.
+ */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -32,45 +35,16 @@ export async function POST(request: Request) {
     }
     const baby = babyData as Baby;
 
-    const from = new Date();
-    from.setDate(from.getDate() - 7);
-    const { data: sessionsData } = await supabase
-      .from("sleep_sessions")
-      .select("*")
-      .eq("baby_id", baby.id)
-      .gte("start_time", from.toISOString())
-      .lte("start_time", new Date().toISOString())
-      .order("start_time", { ascending: false });
+    const { data: lastSession } = await getLastSleepSession(supabase, baby.id);
+    const lastEnd = lastSession?.end_time ?? null;
 
-    const context = buildSleepContext(baby, (sessionsData ?? []) as SleepSession[], parsed.data.timezone);
-    const systemPrompt = getSleepSystemPrompt(context);
-
-    const response = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      max_tokens: 300,
-      temperature: 0,       // deterministic output: same data → same suggestion
-      seed: 42,             // extra reproducibility guarantee (OpenAI beta feature)
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: SUGGESTION_PROMPT },
-      ],
+    const suggestion = computeNapSuggestion({
+      birthDateIso: baby.birth_date,
+      lastSleepEndIso: lastEnd,
+      timezone: parsed.data.timezone,
     });
 
-    const text = response.choices[0]?.message?.content ?? "";
-
-    try {
-      const suggestion = JSON.parse(text);
-      return NextResponse.json(suggestion);
-    } catch {
-      return NextResponse.json({
-        suggestedNapTime: "",
-        windowStart: "",
-        windowEnd: "",
-        reasoning: text,
-        confidence: "low" as const,
-      });
-    }
+    return NextResponse.json(suggestion);
   } catch (error) {
     console.error("AI suggest error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
