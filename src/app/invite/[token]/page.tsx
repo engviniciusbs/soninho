@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Users, ShieldCheck, Eye, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 import { createClient } from "@/lib/supabase/client";
 
 type InviteInfo = {
@@ -66,7 +67,7 @@ export default function InvitePage() {
     const res = await fetch(`/api/family/accept/${token}`, { method: "POST" });
     if (res.ok) {
       setStatus("success");
-      setTimeout(() => router.push("/"), 2000);
+      setTimeout(() => router.push("/app"), 2000);
     } else {
       const body = await res.json();
       setErrorMsg(body.error ?? "Erro ao aceitar convite.");
@@ -93,8 +94,8 @@ export default function InvitePage() {
       >
         <div className="glass rounded-2xl p-8 flex flex-col items-center gap-6 text-center border border-border/50">
           {/* Logo */}
-          <div className="flex items-center gap-2 text-primary">
-            <span className="text-3xl animate-breathe">🌙</span>
+          <div className="flex items-center gap-2.5">
+            <SoninhoLogoMark size={40} className="animate-breathe" />
             <span className="text-xl font-bold shimmer-text">Soninho</span>
           </div>
 
@@ -108,7 +109,7 @@ export default function InvitePage() {
               <XCircle className="w-12 h-12 text-destructive" />
               <p className="font-semibold text-destructive">Convite inválido</p>
               <p className="text-sm text-muted-foreground">{errorMsg}</p>
-              <Button variant="outline" onClick={() => router.push("/")}>
+              <Button variant="outline" onClick={() => router.push("/app")}>
                 Ir para o app
               </Button>
             </div>

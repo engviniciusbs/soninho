@@ -12,7 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LogOut, Moon } from "lucide-react";
+import { LogOut } from "lucide-react";
+import { SoninhoLogo } from "@/components/brand/SoninhoLogo";
 
 export function TopBar() {
   const { babies, activeBaby, setActiveBaby } = useBaby();
@@ -28,12 +29,7 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 px-4 md:px-6 glass">
       {/* Mobile logo */}
-      <div className="flex items-center gap-2.5 md:hidden">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15">
-          <Moon className="h-4 w-4 text-primary animate-breathe" aria-hidden="true" />
-        </div>
-        <span className="text-base font-bold shimmer-text">Soninho</span>
-      </div>
+      <SoninhoLogo href="/app" markSize={30} textClassName="text-base" className="md:hidden" />
 
       {/* Right side controls */}
       <div className="flex items-center gap-2 ml-auto">

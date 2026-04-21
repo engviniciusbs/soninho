@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, List, BarChart3, Sparkles, Settings, Moon } from "lucide-react";
+import { Home, List, BarChart3, Sparkles, Settings } from "lucide-react";
+import { SoninhoLogo } from "@/components/brand/SoninhoLogo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/", label: "Início", icon: Home },
+  { href: "/app", label: "Início", icon: Home },
   { href: "/history", label: "Registro", icon: List },
   { href: "/analytics", label: "Análise", icon: BarChart3 },
   { href: "/ai-insights", label: "IA Insights", icon: Sparkles },
@@ -20,10 +21,7 @@ export function Sidebar() {
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col border-r border-sidebar-border bg-sidebar">
       <div className="flex h-16 items-center gap-3 px-5 border-b border-sidebar-border">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15">
-          <Moon className="h-5 w-5 text-primary animate-breathe" aria-hidden="true" />
-        </div>
-        <span className="text-lg font-bold shimmer-text">Soninho</span>
+        <SoninhoLogo href="/app" markSize={34} textClassName="text-lg" />
       </div>
 
       <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-0.5 p-3">

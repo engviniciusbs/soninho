@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const links = [
-  { href: "/", label: "Início", icon: Home },
+  { href: "/app", label: "Início", icon: Home },
   { href: "/history", label: "Registro", icon: List },
   { href: "/analytics", label: "Análise", icon: BarChart3 },
   { href: "/ai-insights", label: "IA", icon: Sparkles },
