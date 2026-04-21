@@ -187,7 +187,7 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
           )}
 
           {/* Actions */}
-          <div className="flex gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex gap-1 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             {onEdit && (
               <Button
                 variant="ghost"
