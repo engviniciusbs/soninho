@@ -100,6 +100,8 @@ export async function startSleepSession(
     weather_condition?: string | null;
     sleep_sack_type?: string | null;
     sleep_sack_tog?: number | null;
+    /** Override the start time (ISO string). Defaults to now. */
+    start_time?: string;
   }
 ) {
   return supabase
@@ -107,7 +109,7 @@ export async function startSleepSession(
     .insert({
       baby_id: babyId,
       type,
-      start_time: new Date().toISOString(),
+      start_time: env?.start_time ?? new Date().toISOString(),
       notes: env?.notes || null,
       room_temp_celsius: env?.room_temp_celsius ?? null,
       weather_condition: env?.weather_condition ?? null,
