@@ -19,9 +19,8 @@ import { ptBR } from "date-fns/locale";
 import { formatDuration, formatTimeRange } from "@/lib/utils";
 import type { SleepSession } from "@/types";
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const TIMELINE_START = 0;
-const TIMELINE_END = 24;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function SleepTimeline() {
   const { activeBaby } = useBaby();
@@ -31,7 +30,11 @@ export function SleepTimeline() {
   const dayStart = startOfDay(currentDate);
   const dayEnd = endOfDay(currentDate);
 
-  const { data: sessions = [], isLoading } = useQuery({
+  // Fetch from previous day's start so night sleep that began before midnight
+  // (e.g. 22:00 last night, ending 06:00 today) is included.
+  const extendedFrom = subDays(dayStart, 1);
+
+  const { data: allSessions = [], isLoading } = useQuery({
     queryKey: [
       "sleep-sessions",
       activeBaby?.id,
@@ -43,7 +46,7 @@ export function SleepTimeline() {
       const { data, error } = await getSleepSessions(
         supabase,
         activeBaby.id,
-        dayStart,
+        extendedFrom,
         dayEnd
       );
       if (error) throw error;
@@ -53,33 +56,37 @@ export function SleepTimeline() {
   });
 
   const blocks = useMemo(() => {
-    return sessions
-      .filter((s) => s.end_time)
+    return allSessions
+      .filter((s) => {
+        if (!s.end_time) return false;
+        const start = new Date(s.start_time);
+        const end = new Date(s.end_time);
+        // Keep only sessions that overlap with the current day
+        return start < dayEnd && end > dayStart;
+      })
       .map((s) => {
         const start = new Date(s.start_time);
         const end = new Date(s.end_time!);
 
-        const startHour =
-          start.getHours() + start.getMinutes() / 60;
-        const endHour = end.getHours() + end.getMinutes() / 60;
+        // Clamp both boundaries to [dayStart, dayEnd] and compute as ms offsets.
+        // This handles sessions that cross midnight correctly without using getHours().
+        const clampedStartMs =
+          Math.max(start.getTime(), dayStart.getTime()) - dayStart.getTime();
+        const clampedEndMs =
+          Math.min(end.getTime(), dayEnd.getTime() + 1) - dayStart.getTime();
 
-        const left =
-          ((Math.max(startHour, TIMELINE_START) - TIMELINE_START) /
-            (TIMELINE_END - TIMELINE_START)) *
-          100;
-        const width =
-          ((Math.min(endHour, TIMELINE_END) -
-            Math.max(startHour, TIMELINE_START)) /
-            (TIMELINE_END - TIMELINE_START)) *
-          100;
+        const left = (clampedStartMs / DAY_MS) * 100;
+        const width = ((clampedEndMs - clampedStartMs) / DAY_MS) * 100;
 
         return {
           session: s,
           left: Math.max(0, left),
-          width: Math.max(1, Math.min(width, 100 - left)),
+          width: Math.max(0.5, Math.min(width, 100 - left)),
+          crossesMidnight:
+            new Date(s.start_time) < dayStart || new Date(s.end_time!) > dayEnd,
         };
       });
-  }, [sessions]);
+  }, [allSessions, dayStart, dayEnd]);
 
   if (isLoading) {
     return <Skeleton className="h-40 rounded-2xl" />;
@@ -140,7 +147,7 @@ export function SleepTimeline() {
 
         {/* Timeline bar */}
         <div className="relative h-12 mt-5 rounded-xl bg-secondary/50 overflow-hidden">
-          {blocks.map(({ session, left, width }) => (
+          {blocks.map(({ session, left, width, crossesMidnight }) => (
             <Popover key={session.id}>
               <PopoverTrigger
                   className={`absolute top-1 bottom-1 rounded-lg cursor-pointer transition-opacity hover:opacity-80 ${
@@ -155,13 +162,18 @@ export function SleepTimeline() {
                   }}
                   aria-label={`${session.type === "NAP" ? "Soneca" : "Sono noturno"}: ${formatTimeRange(session.start_time, session.end_time)}`}
               />
-              <PopoverContent className="w-52 rounded-xl p-3 text-sm space-y-1">
+              <PopoverContent className="w-56 rounded-xl p-3 text-sm space-y-1">
                 <p className="font-semibold">
                   {session.type === "NAP" ? "Soneca" : "Sono noturno"}
                 </p>
                 <p className="text-muted-foreground">
                   {formatTimeRange(session.start_time, session.end_time)}
                 </p>
+                {crossesMidnight && (
+                  <p className="text-[11px] text-amber-400">
+                    ↗ Cruzou a meia-noite
+                  </p>
+                )}
                 {session.duration_min != null && (
                   <p className="font-medium">
                     {formatDuration(session.duration_min)}
