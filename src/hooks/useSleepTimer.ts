@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import {
   startSleepSession,
@@ -69,6 +69,33 @@ export function useSleepTimer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeBaby?.id]);
 
+  // Poll the active session every 20s while running.
+  // If it disappears (another caregiver stopped it), auto-stop the local timer.
+  const { data: liveSession, fetchStatus } = useQuery({
+    queryKey: ["active-session-live", activeBaby?.id],
+    queryFn: async () => {
+      if (!activeBaby) return null;
+      const { data } = await getActiveSleepSession(supabase, activeBaby.id);
+      return data ?? null;
+    },
+    enabled: !!activeBaby && isRunning,
+    refetchInterval: 20_000,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    // Only act once the query has settled (not on the initial undefined state)
+    if (!isRunning || fetchStatus === "fetching") return;
+    if (liveSession === null) {
+      stopTimer();
+      queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
+      toast.info("Sono finalizado por outro cuidador(a)");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveSession, fetchStatus, isRunning]);
+
   const handleStart = useCallback(async () => {
     if (!activeBaby) {
       toast.error("Adicione um bebê primeiro nas configurações");
@@ -104,12 +131,42 @@ export function useSleepTimer() {
   }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer]);
 
   const handleStop = useCallback(async () => {
-    if (!sessionId) return;
+    if (!sessionId) {
+      stopTimer();
+      return;
+    }
+
+    // Verify the session still exists and hasn't already been ended.
+    // This covers: another user stopped it, stale Zustand state, or auth cookie issues.
+    const { data: current } = await supabase
+      .from("sleep_sessions")
+      .select("id, end_time")
+      .eq("id", sessionId)
+      .maybeSingle();
+
+    if (!current) {
+      // Session not found (deleted or never created) — clean up silently
+      stopTimer();
+      queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
+      return;
+    }
+
+    if (current.end_time) {
+      // Already ended by another caregiver — just sync local state
+      stopTimer();
+      queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
+      toast.success("Sono já estava finalizado ✨");
+      return;
+    }
 
     const { error } = await endSleepSession(supabase, sessionId);
 
     if (error) {
-      toast.error("Erro ao finalizar sessão de sono");
+      toast.error("Sessão expirada. Faça login novamente.");
       return;
     }
 
