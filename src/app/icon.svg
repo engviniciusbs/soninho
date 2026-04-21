@@ -1,11 +1,21 @@
-<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="128" height="128" rx="32" fill="#080E1A"/>
-  <circle cx="64" cy="64" r="42" fill="#312E81"/>
-  <circle cx="64" cy="64" r="36" fill="#4338CA"/>
-  <path d="M78 64C78 71.732 71.732 78 64 78C56.268 78 50 71.732 50 64C50 56.268 56.268 50 64 50C71.732 50 78 56.268 78 64Z" fill="#F8FAFC"/>
-  <path d="M74.5 60C74.5 65.799 69.799 70.5 64 70.5C58.201 70.5 53.5 65.799 53.5 60C53.5 54.201 58.201 49.5 64 49.5C69.799 49.5 74.5 54.201 74.5 60Z" fill="#E2E8F0"/>
-  <circle cx="45" cy="43" r="3" fill="#A5B4FC"/>
-  <circle cx="86" cy="46" r="2.5" fill="#C4B5FD"/>
-  <circle cx="40" cy="82" r="2.5" fill="#A5B4FC"/>
-  <circle cx="88" cy="84" r="3" fill="#C4B5FD"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 32 32" fill="none" role="img" aria-label="Soninho">
+  <title>Soninho</title>
+  <defs>
+    <linearGradient id="m" x1="6" y1="4" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e9d5ff"/>
+      <stop offset="0.45" stop-color="#c4b5fd"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <linearGradient id="o" x1="0" y1="24" x2="32" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#818cf8" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#818cf8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#818cf8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="9" fill="#080e1a"/>
+  <path d="M5 23.5C10.5 27.5 21.5 27.5 27 23.5" stroke="url(#o)" stroke-width="1.25" stroke-linecap="round"/>
+  <circle cx="14.25" cy="16" r="9.25" fill="url(#m)"/>
+  <circle cx="20.75" cy="15.25" r="8.1" fill="#080e1a"/>
+  <ellipse cx="11" cy="12" rx="2.2" ry="1.4" fill="#fff" fill-opacity="0.35" transform="rotate(-28 11 12)"/>
+  <path fill="#fde68a" fill-opacity="0.95" d="M24.5 7.5l.55 1.35 1.45.1-1.1.95.35 1.4-1.25-.75-1.25.75.35-1.4-1.1-.95 1.45-.1z"/>
 </svg>

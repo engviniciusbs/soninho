@@ -9,7 +9,8 @@ import { SleepTimeline } from "@/components/sleep/SleepTimeline";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Moon, Baby } from "lucide-react";
+import { Baby } from "lucide-react";
+import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -23,7 +24,7 @@ const item: Variants = {
   show: { opacity: 1, y: 0 },
 };
 
-export default function HomePage() {
+export default function AppHomePage() {
   const { activeBaby, isLoading, babies } = useBaby();
 
   if (isLoading) {
@@ -40,7 +41,6 @@ export default function HomePage() {
   if (babies.length === 0) {
     return (
       <div className="relative flex flex-col items-center justify-center gap-8 pt-20 text-center px-6">
-        {/* Ambient glow */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -54,7 +54,7 @@ export default function HomePage() {
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
           className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 animate-float"
         >
-          <Moon className="h-12 w-12 text-primary animate-breathe" aria-hidden="true" />
+          <SoninhoLogoMark size={72} className="animate-breathe" />
         </motion.div>
 
         <motion.div
@@ -87,7 +87,6 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-full">
-      {/* Ambient background orbs */}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-20 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/8 blur-3xl" />
         <div className="absolute top-1/3 -right-20 h-60 w-60 rounded-full bg-indigo/6 blur-3xl" />
@@ -100,7 +99,6 @@ export default function HomePage() {
         animate="show"
         className="relative flex flex-col items-center gap-5 pt-4 pb-8 px-4"
       >
-        {/* Baby greeting */}
         <motion.div variants={item} className="flex flex-col items-center gap-2">
           <BabyAvatar
             avatarUrl={activeBaby?.avatar_url}
@@ -111,14 +109,12 @@ export default function HomePage() {
           <h1 className="text-xl font-bold text-foreground">{activeBaby?.name}</h1>
         </motion.div>
 
-        {/* Timer card */}
         <motion.div variants={item} className="w-full max-w-sm">
           <div className="glass rounded-3xl border border-white/8 p-5 sm:p-8 shadow-2xl">
             <SleepTimer />
           </div>
         </motion.div>
 
-        {/* Info widgets */}
         <motion.div variants={item} className="w-full max-w-sm">
           <WakeWindowBadge />
         </motion.div>

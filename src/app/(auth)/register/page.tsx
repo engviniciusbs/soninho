@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Moon, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
+import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -88,7 +89,7 @@ export default function RegisterPage() {
             {/* Header */}
             <div className="mb-8 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 glow-primary">
-                <Moon className="h-8 w-8 text-primary animate-breathe" aria-hidden="true" />
+                <SoninhoLogoMark size={52} className="animate-breathe" />
               </div>
               <h1 className="text-2xl font-bold shimmer-text">Criar Conta</h1>
               <p className="mt-1 text-sm text-muted-foreground">

@@ -29,15 +29,30 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const pathname = request.nextUrl.pathname;
+
+  // Legacy marketing URL → home (LP)
+  if (pathname === "/landing" || pathname.startsWith("/landing/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
+  }
+
   const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/register");
+    pathname.startsWith("/login") || pathname.startsWith("/register");
 
-  // /invite/* pages and the public accept API handle their own auth redirect
-  const isInvitePage = request.nextUrl.pathname.startsWith("/invite/");
-  const isPublicApiRoute = request.nextUrl.pathname.startsWith("/api/family/accept/");
+  const isInvitePage = pathname.startsWith("/invite/");
+  const isPublicApiRoute = pathname.startsWith("/api/family/accept/");
+  const isPublicMarketing = pathname === "/";
 
-  if (!user && !isAuthPage && !isInvitePage && !isPublicApiRoute && !request.nextUrl.pathname.startsWith("/auth")) {
+  if (
+    !user &&
+    !isAuthPage &&
+    !isInvitePage &&
+    !isPublicApiRoute &&
+    !isPublicMarketing &&
+    !pathname.startsWith("/auth")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("redirect", request.nextUrl.pathname);
@@ -46,7 +61,14 @@ export async function middleware(request: NextRequest) {
 
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = "/app";
+    return NextResponse.redirect(url);
+  }
+
+  // Logged-in users skip the marketing home and go straight to the app
+  if (user && pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/app";
     return NextResponse.redirect(url);
   }
 

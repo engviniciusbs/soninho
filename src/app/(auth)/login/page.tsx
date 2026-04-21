@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Moon } from "lucide-react";
+import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push(redirectParam ?? "/");
+    router.push(redirectParam ?? "/app");
     router.refresh();
   }
 
@@ -61,7 +61,7 @@ export default function LoginPage() {
           transition={{ type: "spring", stiffness: 400, damping: 25, delay: 0.1 }}
           className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/15 glow-primary"
         >
-          <Moon className="h-8 w-8 text-primary animate-breathe" aria-hidden="true" />
+          <SoninhoLogoMark size={52} className="animate-breathe" />
         </motion.div>
         <h1 className="text-2xl font-bold shimmer-text">Soninho</h1>
         <p className="mt-1 text-sm text-muted-foreground">
