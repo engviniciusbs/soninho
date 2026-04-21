@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Clock, Moon, Sun } from "lucide-react";
-import { format, startOfDay, subDays, isToday } from "date-fns";
+import { format, startOfDay, subDays, isToday, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatDuration } from "@/lib/utils";
 import type { SleepSession } from "@/types";
@@ -185,9 +185,9 @@ export default function HistoryPage() {
             .map(([day, daySessions]) => (
               <div key={day} className="space-y-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider sticky top-0 bg-background/90 backdrop-blur-sm py-1 z-10">
-                  {isToday(new Date(day))
+                  {isToday(parseISO(day))
                     ? "Hoje"
-                    : format(new Date(day), "EEEE, d 'de' MMMM", {
+                    : format(parseISO(day), "EEEE, d 'de' MMMM", {
                         locale: ptBR,
                       })}
                 </h3>
