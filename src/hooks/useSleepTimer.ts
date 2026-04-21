@@ -96,7 +96,7 @@ export function useSleepTimer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [liveSession, fetchStatus, isRunning]);
 
-  const handleStart = useCallback(async () => {
+  const handleStart = useCallback(async (startTimeIso?: string) => {
     if (!activeBaby) {
       toast.error("Adicione um bebê primeiro nas configurações");
       return;
@@ -112,6 +112,7 @@ export function useSleepTimer() {
         weather_condition: weatherCondition,
         sleep_sack_type: sleepSackType,
         sleep_sack_tog: sleepSackTog,
+        start_time: startTimeIso,
       }
     );
 

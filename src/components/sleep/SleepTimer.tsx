@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Moon, Sun, Square, Leaf, ChevronDown } from "lucide-react";
+import { Moon, Sun, Square, Leaf, ChevronDown, Clock } from "lucide-react";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { Textarea } from "@/components/ui/textarea";
 import { EnvironmentPickerCompact, type EnvironmentData } from "./EnvironmentPicker";
+import { format, subMinutes } from "date-fns";
 
 const SLEEP_TYPES = [
   { value: "NAP" as const, label: "Soneca", icon: Sun },
@@ -34,6 +35,28 @@ const TYPE_CONFIG = {
   },
 } as const;
 
+/** Quick-offset options in minutes. 0 = "Agora". */
+const OFFSET_OPTIONS = [
+  { label: "Agora", value: 0 },
+  { label: "5 min", value: 5 },
+  { label: "10 min", value: 10 },
+  { label: "15 min", value: 15 },
+  { label: "30 min", value: 30 },
+] as const;
+
+/** Convert a local HH:MM string (from <input type="time">) to an ISO UTC string for today */
+function localTimeInputToIso(timeStr: string): string {
+  const [h, m] = timeStr.split(":").map(Number);
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+}
+
+/** Returns "HH:MM" for the current time minus `minutes` */
+function offsetToTimeString(minutes: number): string {
+  return format(subMinutes(new Date(), minutes), "HH:mm");
+}
+
 export function SleepTimer() {
   const {
     isRunning,
@@ -56,6 +79,11 @@ export function SleepTimer() {
 
   const [envOpen, setEnvOpen] = useState(false);
 
+  // Back-date state
+  const [selectedOffset, setSelectedOffset] = useState<number>(0); // minutes ago
+  const [customTime, setCustomTime] = useState<string>(() => format(new Date(), "HH:mm"));
+  const [useCustom, setUseCustom] = useState(false);
+
   const cfg = TYPE_CONFIG[sleepType];
   const TypeIcon = cfg.icon;
 
@@ -77,8 +105,46 @@ export function SleepTimer() {
   const envFilled = [roomTemp !== null, weatherCondition !== null, sleepSackType !== null]
     .filter(Boolean).length;
 
+  /** Computed display of the resolved start time */
+  const resolvedStartDisplay = useMemo(() => {
+    if (useCustom) return customTime;
+    if (selectedOffset === 0) return null;
+    return offsetToTimeString(selectedOffset);
+  }, [useCustom, selectedOffset, customTime]);
+
+  function onMainButtonClick() {
+    if (isRunning) {
+      handleStop();
+      return;
+    }
+
+    let startIso: string | undefined;
+
+    if (useCustom) {
+      startIso = localTimeInputToIso(customTime);
+    } else if (selectedOffset > 0) {
+      startIso = subMinutes(new Date(), selectedOffset).toISOString();
+    }
+
+    handleStart(startIso);
+    // Reset offset back to "Agora" after starting
+    setSelectedOffset(0);
+    setUseCustom(false);
+  }
+
+  function handleOffsetSelect(minutes: number) {
+    setUseCustom(false);
+    setSelectedOffset(minutes);
+  }
+
+  function handleCustomSelect() {
+    setUseCustom(true);
+    setSelectedOffset(-1);
+    setCustomTime(format(new Date(), "HH:mm"));
+  }
+
   return (
-    <div className="flex flex-col items-center gap-7">
+    <div className="flex flex-col items-center gap-5 sm:gap-7">
       {/* Elapsed time display */}
       <AnimatePresence mode="wait">
         {isRunning ? (
@@ -94,7 +160,7 @@ export function SleepTimer() {
               {cfg.runningLabel}
             </p>
             <p
-              className="text-6xl font-mono font-bold tracking-wider tabular-nums"
+              className="text-5xl sm:text-6xl font-mono font-bold tracking-wider tabular-nums"
               style={{ color: cfg.bg }}
             >
               {elapsed}
@@ -106,11 +172,21 @@ export function SleepTimer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center"
+            className="text-center space-y-1"
           >
             <p className="text-sm text-muted-foreground">
               Pronto para registrar o sono?
             </p>
+            {resolvedStartDisplay && (
+              <motion.p
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xs font-semibold tabular-nums"
+                style={{ color: cfg.bg }}
+              >
+                Iniciado às {resolvedStartDisplay}
+              </motion.p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -142,8 +218,8 @@ export function SleepTimer() {
         </AnimatePresence>
 
         <motion.button
-          onClick={isRunning ? handleStop : handleStart}
-          className="relative flex h-[136px] w-[136px] items-center justify-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          onClick={onMainButtonClick}
+          className="relative flex h-[120px] w-[120px] sm:h-[136px] sm:w-[136px] items-center justify-center rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{
             backgroundColor: isRunning ? "#f87171" : cfg.bg,
             boxShadow: isRunning
@@ -175,7 +251,7 @@ export function SleepTimer() {
                 exit={{ scale: 0, rotate: -90 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
-                <TypeIcon className="h-12 w-12 text-white drop-shadow-sm" aria-hidden="true" />
+                <TypeIcon className="h-10 w-10 sm:h-12 sm:w-12 text-white drop-shadow-sm" aria-hidden="true" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -239,6 +315,93 @@ export function SleepTimer() {
         )}
       </AnimatePresence>
 
+      {/* ── Back-date chips (idle only) ── */}
+      <AnimatePresence>
+        {!isRunning && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.03 }}
+            className="w-full max-w-[280px] space-y-2"
+          >
+            {/* Label */}
+            <p className="text-[11px] font-medium text-muted-foreground text-center tracking-wide uppercase">
+              Iniciou há quanto tempo?
+            </p>
+
+            {/* Quick offset chips */}
+            <div
+              role="group"
+              aria-label="Tempo de início"
+              className="flex flex-wrap justify-center gap-1.5"
+            >
+              {OFFSET_OPTIONS.map(({ label, value }) => {
+                const isActive = !useCustom && selectedOffset === value;
+                return (
+                  <button
+                    key={value}
+                    onClick={() => handleOffsetSelect(value)}
+                    aria-pressed={isActive}
+                    className={`relative rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      isActive
+                        ? "text-white"
+                        : "text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                    }`}
+                    style={isActive ? { backgroundColor: cfg.bg } : undefined}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+
+              {/* Custom time button */}
+              <button
+                onClick={handleCustomSelect}
+                aria-pressed={useCustom}
+                aria-label="Inserir horário personalizado"
+                className={`relative flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  useCustom
+                    ? "text-white"
+                    : "text-muted-foreground hover:text-foreground border border-border/60 hover:border-border"
+                }`}
+                style={useCustom ? { backgroundColor: cfg.bg } : undefined}
+              >
+                <Clock className="h-3 w-3" aria-hidden="true" />
+                Horário
+              </button>
+            </div>
+
+            {/* Custom time input — visible when "Horário" is selected */}
+            <AnimatePresence>
+              {useCustom && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <label htmlFor="backdate-time" className="text-xs text-muted-foreground">
+                      Horário de início:
+                    </label>
+                    <input
+                      id="backdate-time"
+                      type="time"
+                      value={customTime}
+                      onChange={(e) => setCustomTime(e.target.value)}
+                      className="rounded-lg border border-border/60 bg-muted/50 px-2 py-1 text-sm font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-ring"
+                      style={{ colorScheme: "dark" }}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── Environment quick-picker (idle only) ── */}
       <AnimatePresence>
         {!isRunning && (
@@ -246,7 +409,7 @@ export function SleepTimer() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.06 }}
             className="w-full max-w-[280px] rounded-2xl border border-border/40 bg-card/40 overflow-hidden"
           >
             <button

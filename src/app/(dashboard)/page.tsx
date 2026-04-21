@@ -113,7 +113,7 @@ export default function HomePage() {
 
         {/* Timer card */}
         <motion.div variants={item} className="w-full max-w-sm">
-          <div className="glass rounded-3xl border border-white/8 p-8 shadow-2xl">
+          <div className="glass rounded-3xl border border-white/8 p-5 sm:p-8 shadow-2xl">
             <SleepTimer />
           </div>
         </motion.div>
