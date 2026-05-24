@@ -15,6 +15,7 @@ import {
   getLast24hStats,
   getOverallStats,
 } from "@/lib/sleep/statistics";
+import { allocateSessionToLocalDays } from "@/lib/sleep/sessionDayAllocation";
 import { SleepBarChart } from "@/components/charts/SleepBarChart";
 import { NapPatternHeatmap } from "@/components/charts/NapPatternHeatmap";
 import { SleepQualityTrend } from "@/components/charts/SleepQualityTrend";
@@ -84,16 +85,21 @@ export default function AnalyticsPage() {
 
     return days.map((day) => {
       const dayStr = format(day, "yyyy-MM-dd");
-      const naps = sessions.filter(
-        (s: SleepSession) =>
-          format(new Date(s.start_time), "yyyy-MM-dd") === dayStr &&
-          s.type === "NAP" &&
-          s.duration_min != null
-      );
-      const avg =
-        naps.length > 0
-          ? naps.reduce((a: number, s: SleepSession) => a + (s.duration_min ?? 0), 0) / naps.length
-          : 0;
+      let napMinutesOnDay = 0;
+      let napCountOnDay = 0;
+
+      for (const s of sessions) {
+        if (s.type !== "NAP" || s.duration_min == null) continue;
+        const alloc = allocateSessionToLocalDays(s).find(
+          (a) => a.dayKey === dayStr
+        );
+        if (alloc && alloc.napMinutes > 0) {
+          napMinutesOnDay += alloc.napMinutes;
+          napCountOnDay += 1;
+        }
+      }
+
+      const avg = napCountOnDay > 0 ? napMinutesOnDay / napCountOnDay : 0;
       return {
         date: format(day, "dd/MM"),
         avgDuration: Math.round(avg),

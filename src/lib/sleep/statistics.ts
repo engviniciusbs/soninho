@@ -1,37 +1,15 @@
 import { format, startOfDay, eachDayOfInterval, subDays, getDay } from "date-fns";
 import type { SleepSession, SleepStats } from "@/types";
+import {
+  allocateSessionToLocalDays,
+  buildDailySleepTotals,
+} from "@/lib/sleep/sessionDayAllocation";
 
 export function getDailyTotals(
   sessions: SleepSession[],
   days: number = 7
 ): { date: string; totalHours: number; napHours: number; nightHours: number }[] {
-  const end = new Date();
-  const start = subDays(startOfDay(end), days - 1);
-  const interval = eachDayOfInterval({ start, end });
-
-  return interval.map((day) => {
-    const dayStr = format(day, "yyyy-MM-dd");
-    const daySessions = sessions.filter(
-      (s) =>
-        format(new Date(s.start_time), "yyyy-MM-dd") === dayStr &&
-        s.duration_min != null
-    );
-
-    const napMin = daySessions
-      .filter((s) => s.type === "NAP")
-      .reduce((a, s) => a + (s.duration_min ?? 0), 0);
-
-    const nightMin = daySessions
-      .filter((s) => s.type === "NIGHT_SLEEP")
-      .reduce((a, s) => a + (s.duration_min ?? 0), 0);
-
-    return {
-      date: format(day, "dd/MM"),
-      totalHours: parseFloat(((napMin + nightMin) / 60).toFixed(1)),
-      napHours: parseFloat((napMin / 60).toFixed(1)),
-      nightHours: parseFloat((nightMin / 60).toFixed(1)),
-    };
-  });
+  return buildDailySleepTotals(sessions, days);
 }
 
 export function getNapCountPerDay(
@@ -44,12 +22,12 @@ export function getNapCountPerDay(
 
   return interval.map((day) => {
     const dayStr = format(day, "yyyy-MM-dd");
-    const count = sessions.filter(
-      (s) =>
-        format(new Date(s.start_time), "yyyy-MM-dd") === dayStr &&
-        s.type === "NAP" &&
-        s.duration_min != null
-    ).length;
+    const count = sessions.filter((s) => {
+      if (s.type !== "NAP" || s.duration_min == null) return false;
+      return allocateSessionToLocalDays(s).some(
+        (a) => a.dayKey === dayStr && a.napMinutes > 0
+      );
+    }).length;
     return { date: format(day, "dd/MM"), count };
   });
 }
@@ -64,20 +42,25 @@ export function getLongestNightStretch(
 
   return interval.map((day) => {
     const dayStr = format(day, "yyyy-MM-dd");
-    const nightSessions = sessions.filter(
-      (s) =>
-        format(new Date(s.start_time), "yyyy-MM-dd") === dayStr &&
-        s.type === "NIGHT_SLEEP" &&
-        s.duration_min != null
-    );
 
-    const longest = nightSessions.length
-      ? Math.max(...nightSessions.map((s) => s.duration_min ?? 0))
-      : 0;
+    let longestNightMinutes = 0;
+    for (const session of sessions) {
+      if (session.type !== "NIGHT_SLEEP" || session.duration_min == null) {
+        continue;
+      }
+      for (const alloc of allocateSessionToLocalDays(session)) {
+        if (alloc.dayKey === dayStr) {
+          longestNightMinutes = Math.max(
+            longestNightMinutes,
+            alloc.nightMinutes
+          );
+        }
+      }
+    }
 
     return {
       date: format(day, "dd/MM"),
-      hours: parseFloat((longest / 60).toFixed(1)),
+      hours: parseFloat((longestNightMinutes / 60).toFixed(1)),
     };
   });
 }
