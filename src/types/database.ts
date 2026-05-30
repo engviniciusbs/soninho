@@ -147,6 +147,8 @@ export interface Database {
           sleep_sack_type: string | null;
           sleep_sack_tog: number | null;
           clothing_description: string | null;
+          how_fell_asleep: string | null;
+          wake_reason: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -165,6 +167,8 @@ export interface Database {
           sleep_sack_type?: string | null;
           sleep_sack_tog?: number | null;
           clothing_description?: string | null;
+          how_fell_asleep?: string | null;
+          wake_reason?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -183,8 +187,71 @@ export interface Database {
           sleep_sack_type?: string | null;
           sleep_sack_tog?: number | null;
           clothing_description?: string | null;
+          how_fell_asleep?: string | null;
+          wake_reason?: string | null;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      nap_suggestion_feedback: {
+        Row: {
+          id: string;
+          baby_id: string;
+          user_id: string;
+          suggested_time: string | null;
+          window_start: string | null;
+          window_end: string | null;
+          age_weeks: number | null;
+          vote: "up" | "down";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          user_id: string;
+          suggested_time?: string | null;
+          window_start?: string | null;
+          window_end?: string | null;
+          age_weeks?: number | null;
+          vote: "up" | "down";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          user_id?: string;
+          suggested_time?: string | null;
+          window_start?: string | null;
+          window_end?: string | null;
+          age_weeks?: number | null;
+          vote?: "up" | "down";
+          created_at?: string;
+        };
+      };
+      family_notes: {
+        Row: {
+          id: string;
+          family_id: string;
+          author_id: string | null;
+          author_name: string | null;
+          body: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          family_id: string;
+          author_id?: string | null;
+          author_name?: string | null;
+          body: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          family_id?: string;
+          author_id?: string | null;
+          author_name?: string | null;
+          body?: string;
+          created_at?: string;
         };
       };
     };

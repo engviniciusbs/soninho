@@ -21,7 +21,12 @@ export function SoninhoLogo({
   const inner = (
     <>
       <SoninhoLogoMark size={markSize} />
-      <span className={cn("font-bold shimmer-text", textClassName ?? "text-lg")}>
+      <span
+        className={cn(
+          "font-display font-semibold tracking-tight text-foreground",
+          textClassName ?? "text-lg"
+        )}
+      >
         Soninho
       </span>
     </>

@@ -17,7 +17,8 @@ import type { Baby, SleepSession } from "@/types";
 export function buildSleepContext(
   baby: Baby,
   sessions: SleepSession[],
-  timezone: string = "America/Sao_Paulo"
+  timezone: string = "America/Sao_Paulo",
+  feedbackSummary?: string | null
 ): string {
   const birth = new Date(baby.birth_date);
   // "now" in the user's local timezone
@@ -160,5 +161,7 @@ Janelas de vigília recentes: ${wakeWindows.slice(-6).join(", ") || "Sem dados s
 ${envLines.length > 0 ? `=== CONDIÇÕES AMBIENTAIS RECENTES ===\n${envLines.join("\n")}` : ""}
 
 ${patterns.length > 0 ? `=== PADRÕES IDENTIFICADOS ===\n${patterns.join("\n")}` : ""}
+
+${feedbackSummary ? `=== FEEDBACK DOS PAIS SOBRE SUGESTÕES ===\n${feedbackSummary}` : ""}
 `.trim();
 }

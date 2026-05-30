@@ -27,7 +27,7 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 px-4 md:px-6 glass">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/85 px-4 md:px-6 backdrop-blur-md supports-backdrop-filter:bg-background/70">
       {/* Mobile logo */}
       <SoninhoLogo href="/app" markSize={30} textClassName="text-base" className="md:hidden" />
 

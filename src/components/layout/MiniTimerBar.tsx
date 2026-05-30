@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Moon, Sun } from "lucide-react";
 import { useSleepStore } from "@/store/sleepStore";
 import { formatElapsed } from "@/lib/utils";
 
@@ -17,6 +18,10 @@ export function MiniTimerBar() {
     return () => clearInterval(interval);
   }, [isRunning, startTime]);
 
+  const isNap = sleepType === "NAP";
+  const accent = isNap ? "#f59e0b" : "#818cf8";
+  const TypeIcon = isNap ? Sun : Moon;
+
   return (
     <AnimatePresence>
       {isRunning && (
@@ -29,24 +34,22 @@ export function MiniTimerBar() {
         >
           <div
             aria-live="polite"
-            aria-label={`${sleepType === "NAP" ? "Soneca" : "Sono noturno"} em andamento por ${elapsed}`}
-            className="flex items-center justify-center gap-3 px-4 py-2 text-sm font-medium"
-            style={{
-              background: "linear-gradient(90deg, rgba(129,140,248,0.12) 0%, rgba(196,181,253,0.08) 50%, rgba(129,140,248,0.12) 100%)",
-              borderBottom: "1px solid rgba(129,140,248,0.15)",
-            }}
+            aria-label={`${isNap ? "Soneca" : "Sono noturno"} em andamento por ${elapsed}`}
+            className="flex items-center justify-center gap-2.5 border-b border-border bg-secondary/60 px-4 py-2 text-sm font-medium"
           >
             {/* Pulsing dot */}
             <motion.div
-              className="h-2 w-2 rounded-full bg-primary"
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: accent }}
               animate={{ scale: [1, 1.4, 1], opacity: [1, 0.6, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               aria-hidden="true"
             />
-            <span className="text-primary/80">
-              {sleepType === "NAP" ? "☀️ Soneca" : "🌙 Sono noturno"} em andamento
+            <TypeIcon className="h-3.5 w-3.5" style={{ color: accent }} aria-hidden="true" />
+            <span className="text-muted-foreground">
+              {isNap ? "Soneca" : "Sono noturno"} em andamento
             </span>
-            <span className="font-mono font-bold text-primary tabular-nums">
+            <span className="num-display font-semibold tabular-nums" style={{ color: accent }}>
               {elapsed}
             </span>
           </div>

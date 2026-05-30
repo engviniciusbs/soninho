@@ -24,7 +24,7 @@ export function Sidebar() {
         <SoninhoLogo href="/app" markSize={34} textClassName="text-lg" />
       </div>
 
-      <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-0.5 p-3">
+      <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-1 p-3">
         {links.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href;
           return (
@@ -33,20 +33,33 @@ export function Sidebar() {
               href={href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 isActive
-                  ? "text-sidebar-primary"
-                  : "text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  ? "text-foreground"
+                  : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
               {isActive && (
-                <motion.div
+                <motion.span
                   layoutId="sidebar-indicator"
-                  className="absolute inset-0 rounded-xl bg-primary/12"
+                  className="absolute inset-0 rounded-xl bg-secondary"
                   transition={{ type: "spring", stiffness: 500, damping: 38 }}
                 />
               )}
-              <Icon className="relative z-10 h-4.5 w-4.5" aria-hidden="true" />
+              {isActive && (
+                <motion.span
+                  layoutId="sidebar-accent"
+                  className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary"
+                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
+                />
+              )}
+              <Icon
+                className={cn(
+                  "relative z-10 h-4.5 w-4.5 transition-colors",
+                  isActive ? "text-primary" : ""
+                )}
+                aria-hidden="true"
+              />
               <span className="relative z-10">{label}</span>
             </Link>
           );

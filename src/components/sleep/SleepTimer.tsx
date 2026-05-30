@@ -6,6 +6,7 @@ import { Moon, Sun, Square, Leaf, ChevronDown, Clock } from "lucide-react";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { Textarea } from "@/components/ui/textarea";
 import { EnvironmentPickerCompact, type EnvironmentData } from "./EnvironmentPicker";
+import { PostSleepReview } from "./PostSleepReview";
 import { format, subMinutes } from "date-fns";
 
 const SLEEP_TYPES = [
@@ -17,18 +18,18 @@ const SLEEP_TYPES = [
 const TYPE_CONFIG = {
   NAP: {
     bg: "#f59e0b",
-    boxShadow: "0 0 28px rgba(245,158,11,0.5), 0 0 56px rgba(245,158,11,0.18)",
-    ringColor: "rgba(245,158,11,0.45)",
-    ringFaint: "rgba(245,158,11,0.2)",
+    boxShadow: "0 12px 32px -10px rgba(245,158,11,0.5)",
+    ringColor: "rgba(245,158,11,0.4)",
+    ringFaint: "rgba(245,158,11,0.18)",
     pillBg: "#f59e0b",
     icon: Sun,
     runningLabel: "Soneca em andamento",
   },
   NIGHT_SLEEP: {
     bg: "#4338ca",
-    boxShadow: "0 0 28px rgba(67,56,202,0.55), 0 0 56px rgba(67,56,202,0.2)",
-    ringColor: "rgba(99,102,241,0.45)",
-    ringFaint: "rgba(99,102,241,0.2)",
+    boxShadow: "0 12px 32px -10px rgba(67,56,202,0.55)",
+    ringColor: "rgba(99,102,241,0.4)",
+    ringFaint: "rgba(99,102,241,0.18)",
     pillBg: "#4338ca",
     icon: Moon,
     runningLabel: "Sono noturno em andamento",
@@ -79,6 +80,11 @@ export function SleepTimer() {
 
   const [envOpen, setEnvOpen] = useState(false);
 
+  // Post-sleep review dialog state
+  const [reviewSessionId, setReviewSessionId] = useState<string | null>(null);
+  const [reviewType, setReviewType] = useState<"NAP" | "NIGHT_SLEEP">("NAP");
+  const [reviewOpen, setReviewOpen] = useState(false);
+
   // Back-date state
   const [selectedOffset, setSelectedOffset] = useState<number>(0); // minutes ago
   const [customTime, setCustomTime] = useState<string>(() => format(new Date(), "HH:mm"));
@@ -112,9 +118,14 @@ export function SleepTimer() {
     return offsetToTimeString(selectedOffset);
   }, [useCustom, selectedOffset, customTime]);
 
-  function onMainButtonClick() {
+  async function onMainButtonClick() {
     if (isRunning) {
-      handleStop();
+      const result = await handleStop();
+      if (result) {
+        setReviewSessionId(result.endedSessionId);
+        setReviewType(result.sleepType);
+        setReviewOpen(true);
+      }
       return;
     }
 
@@ -160,7 +171,7 @@ export function SleepTimer() {
               {cfg.runningLabel}
             </p>
             <p
-              className="text-5xl sm:text-6xl font-mono font-bold tracking-wider tabular-nums"
+              className="num-display text-5xl sm:text-6xl font-semibold tabular-nums"
               style={{ color: cfg.bg }}
             >
               {elapsed}
@@ -223,7 +234,7 @@ export function SleepTimer() {
           style={{
             backgroundColor: isRunning ? "#f87171" : cfg.bg,
             boxShadow: isRunning
-              ? "0 0 28px rgba(248,113,113,0.45), 0 0 56px rgba(248,113,113,0.15)"
+              ? "0 12px 32px -10px rgba(248,113,113,0.5)"
               : cfg.boxShadow,
           }}
           whileTap={{ scale: 0.93 }}
@@ -410,7 +421,7 @@ export function SleepTimer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ type: "spring", stiffness: 400, damping: 30, delay: 0.06 }}
-            className="w-full max-w-[280px] rounded-2xl border border-border/40 bg-card/40 overflow-hidden"
+            className="w-full max-w-[280px] rounded-2xl surface-muted overflow-hidden"
           >
             <button
               type="button"
@@ -482,6 +493,13 @@ export function SleepTimer() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <PostSleepReview
+        sessionId={reviewSessionId}
+        sleepType={reviewType}
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+      />
     </div>
   );
 }

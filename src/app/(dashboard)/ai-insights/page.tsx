@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { AIChat } from "@/components/ai/AIChat";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -152,7 +153,11 @@ export default function AIInsightsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">IA Insights</h1>
+      <PageHeader
+        eyebrow="Inteligência"
+        title="IA Insights"
+        subtitle="Análises e conversa sobre o sono do bebê"
+      />
 
       <Tabs defaultValue="insights" className="w-full">
         <TabsList className="rounded-xl w-full">

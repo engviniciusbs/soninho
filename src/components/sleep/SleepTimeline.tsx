@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { getSleepSessions } from "@/lib/supabase/queries";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SectionCard } from "@/components/ui/section-card";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -93,11 +93,9 @@ export function SleepTimeline() {
   }
 
   return (
-    <Card className="rounded-2xl border-border/60">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-semibold">
-          Linha do tempo
-        </CardTitle>
+    <SectionCard>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-sm font-semibold">Linha do tempo</h2>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -124,9 +122,9 @@ export function SleepTimeline() {
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        {/* Hour labels */}
+      </div>
+
+      {/* Hour labels */}
         <div className="relative mb-1">
           <div className="flex justify-between">
             {[0, 4, 8, 12, 16, 20, 24].map((h) => (
@@ -200,7 +198,6 @@ export function SleepTimeline() {
             Soneca
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </SectionCard>
   );
 }

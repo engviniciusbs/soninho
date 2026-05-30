@@ -131,11 +131,21 @@ export function useSleepTimer() {
     }
   }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer]);
 
-  const handleStop = useCallback(async () => {
+  /**
+   * Ends the running session. Returns the ended session's id/type when THIS
+   * user successfully ended it (so the UI can prompt a post-sleep review),
+   * or null in every other case (no session, already ended, error).
+   */
+  const handleStop = useCallback(async (): Promise<{
+    endedSessionId: string;
+    sleepType: "NAP" | "NIGHT_SLEEP";
+  } | null> => {
     if (!sessionId) {
       stopTimer();
-      return;
+      return null;
     }
+
+    const endedType = sleepType;
 
     // Verify the session still exists and hasn't already been ended.
     // This covers: another user stopped it, stale Zustand state, or auth cookie issues.
@@ -151,7 +161,7 @@ export function useSleepTimer() {
       queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["last-session"] });
       queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
-      return;
+      return null;
     }
 
     if (current.end_time) {
@@ -161,22 +171,25 @@ export function useSleepTimer() {
       queryClient.invalidateQueries({ queryKey: ["last-session"] });
       queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
       toast.success("Sono já estava finalizado ✨");
-      return;
+      return null;
     }
 
     const { error } = await endSleepSession(supabase, sessionId);
 
     if (error) {
       toast.error("Sessão expirada. Faça login novamente.");
-      return;
+      return null;
     }
 
+    const endedId = sessionId;
     stopTimer();
     toast.success("Sono registrado com sucesso ✨");
     queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
     queryClient.invalidateQueries({ queryKey: ["last-session"] });
     queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
-  }, [sessionId, supabase, stopTimer, queryClient]);
+
+    return { endedSessionId: endedId, sleepType: endedType };
+  }, [sessionId, sleepType, supabase, stopTimer, queryClient]);
 
   return {
     isRunning,

@@ -139,6 +139,13 @@ export async function updateSleepSession(
     quality?: number | null;
     notes?: string | null;
     location?: string | null;
+    how_fell_asleep?: string | null;
+    wake_reason?: string | null;
+    room_temp_celsius?: number | null;
+    weather_condition?: string | null;
+    sleep_sack_type?: string | null;
+    sleep_sack_tog?: number | null;
+    clothing_description?: string | null;
   }
 ) {
   return supabase
@@ -182,6 +189,7 @@ export async function upsertNotificationPreferences(
     quiet_hours_start?: string;
     quiet_hours_end?: string;
     timezone?: string;
+    weekly_email_enabled?: boolean;
   }
 ) {
   return supabase.from("notification_preferences").upsert(
@@ -397,4 +405,42 @@ export async function updateMemberRole(
     .update({ role })
     .eq("family_id", familyId)
     .eq("user_id", userId);
+}
+
+// ── Family notes (mural / handoff) ──────────────────────────────────────────
+
+export async function getFamilyNotes(
+  supabase: Client,
+  familyId: string,
+  limit: number = 10
+) {
+  return supabase
+    .from("family_notes")
+    .select("*")
+    .eq("family_id", familyId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+}
+
+export async function createFamilyNote(
+  supabase: Client,
+  familyId: string,
+  authorId: string,
+  authorName: string | null,
+  body: string
+) {
+  return supabase
+    .from("family_notes")
+    .insert({
+      family_id: familyId,
+      author_id: authorId,
+      author_name: authorName,
+      body,
+    })
+    .select()
+    .single();
+}
+
+export async function deleteFamilyNote(supabase: Client, noteId: string) {
+  return supabase.from("family_notes").delete().eq("id", noteId);
 }

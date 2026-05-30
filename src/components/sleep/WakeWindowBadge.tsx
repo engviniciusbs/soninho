@@ -1,11 +1,37 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
 import { useSleepStore } from "@/store/sleepStore";
+import { useBaby } from "@/components/providers/BabyProvider";
+import { createClient } from "@/lib/supabase/client";
+import { getRecentSessions } from "@/lib/supabase/queries";
 import { formatDuration, formatElapsed } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Clock, AlertTriangle, CheckCircle2, Moon } from "lucide-react";
+import { Clock, AlertTriangle, CheckCircle2, Moon, TrendingUp } from "lucide-react";
+import type { SleepSession } from "@/types";
+
+/** Average wake window (gap between consecutive completed sleeps) over the period, in minutes. */
+function computeAvgWakeWindow(sessions: SleepSession[]): number | null {
+  const completed = sessions
+    .filter((s) => s.duration_min != null && s.end_time)
+    .sort(
+      (a, b) =>
+        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+    );
+  const gaps: number[] = [];
+  for (let i = 1; i < completed.length; i++) {
+    const prevEnd = completed[i - 1].end_time!;
+    const currStart = completed[i].start_time;
+    const gap =
+      (new Date(currStart).getTime() - new Date(prevEnd).getTime()) / 60000;
+    if (gap > 0 && gap < 600) gaps.push(gap);
+  }
+  if (gaps.length === 0) return null;
+  return Math.round(gaps.reduce((a, g) => a + g, 0) / gaps.length);
+}
 
 const statusConfig = {
   green: {
@@ -38,6 +64,24 @@ export function WakeWindowBadge() {
   const { elapsedMinutes, status, range, minutesUntilNextNap, isLoading } =
     useWakeWindow();
   const { isRunning, startTime, sleepType } = useSleepStore();
+  const { activeBaby } = useBaby();
+  const supabase = createClient();
+
+  const { data: recentSessions = [] } = useQuery({
+    queryKey: ["sleep-sessions", activeBaby?.id, "wake-window-trend"],
+    queryFn: async (): Promise<SleepSession[]> => {
+      if (!activeBaby) return [];
+      const { data } = await getRecentSessions(supabase, activeBaby.id, 7);
+      return (data ?? []) as SleepSession[];
+    },
+    enabled: !!activeBaby,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const avgWakeWindow = useMemo(
+    () => computeAvgWakeWindow(recentSessions),
+    [recentSessions]
+  );
 
   if (isLoading) {
     return <Skeleton className="h-28 rounded-2xl" />;
@@ -64,13 +108,13 @@ export function WakeWindowBadge() {
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                 {isNight ? "Sono noturno" : "Soneca"}
               </p>
-              <p className="text-2xl font-bold tabular-nums text-indigo-300 font-mono">
+              <p className="num-display text-2xl font-semibold tabular-nums text-indigo-300">
                 {elapsed}
               </p>
             </div>
           </div>
           <div className="rounded-full px-3 py-1 text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            Dormindo 💤
+            Dormindo
           </div>
         </div>
 
@@ -113,7 +157,7 @@ export function WakeWindowBadge() {
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               Tempo acordado
             </p>
-            <p className={`text-2xl font-bold tabular-nums ${config.text}`}>
+            <p className={`num-display text-2xl font-semibold tabular-nums ${config.text}`}>
               {formatDuration(elapsedMinutes)}
             </p>
           </div>
@@ -152,6 +196,18 @@ export function WakeWindowBadge() {
             </span>
           )}
         </div>
+
+        {avgWakeWindow != null && (
+          <div className="flex items-center gap-1.5 pt-1 text-xs text-muted-foreground">
+            <TrendingUp className="h-3 w-3 shrink-0" aria-hidden="true" />
+            <span>
+              Janela média (7d):{" "}
+              <span className="font-medium text-foreground/80">
+                {formatDuration(avgWakeWindow)}
+              </span>
+            </span>
+          </div>
+        )}
       </div>
     </motion.div>
   );
