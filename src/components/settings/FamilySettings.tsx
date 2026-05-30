@@ -26,6 +26,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  FAMILY_RELATIONS,
+  getFamilyRelationLabel,
+  PERMISSION_ROLE_LABELS,
+} from "@/lib/family/relations";
 import type { FamilyMember, FamilyInvite, FamilyRole } from "@/types";
 
 interface FamilySettingsProps {
@@ -34,9 +46,9 @@ interface FamilySettingsProps {
 }
 
 const ROLE_LABELS: Record<FamilyRole, string> = {
-  owner: "Proprietário",
-  caregiver: "Cuidador(a)",
-  viewer: "Visualizador(a)",
+  owner: PERMISSION_ROLE_LABELS.owner,
+  caregiver: PERMISSION_ROLE_LABELS.caregiver,
+  viewer: PERMISSION_ROLE_LABELS.viewer,
 };
 
 const ROLE_BADGE_CLASSES: Record<FamilyRole, string> = {
@@ -68,6 +80,7 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
   const [currentUserRole, setCurrentUserRole] = useState<FamilyRole | null>(null);
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [inviteRole, setInviteRole] = useState<"caregiver" | "viewer">("caregiver");
+  const [inviteRelation, setInviteRelation] = useState<string>("");
   const [generatingLink, setGeneratingLink] = useState(false);
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -106,7 +119,11 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
     const res = await fetch("/api/family/invite", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ babyId, role: inviteRole }),
+      body: JSON.stringify({
+        babyId,
+        role: inviteRole,
+        familyRelation: inviteRelation || null,
+      }),
     });
     if (res.ok) {
       const { data } = await res.json();
@@ -159,7 +176,7 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
           Equipe Família
         </CardTitle>
         <CardDescription>
-          Compartilhe o acompanhamento do sono com cuidadores e familiares.
+          Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
         </CardDescription>
       </CardHeader>
 
@@ -203,6 +220,11 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
                           <span className="ml-1 text-xs text-muted-foreground">(você)</span>
                         )}
                       </p>
+                      {getFamilyRelationLabel(member.family_relation) && (
+                        <p className="text-xs text-primary/90 truncate">
+                          {getFamilyRelationLabel(member.family_relation)}
+                        </p>
+                      )}
                       {member.email && member.display_name && (
                         <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                       )}
@@ -284,6 +306,31 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
               ))}
             </div>
 
+            <div className="space-y-1.5">
+              <p className="text-xs text-muted-foreground">
+                Papel na família (opcional no convite)
+              </p>
+              <Select
+                value={inviteRelation || "none"}
+                onValueChange={(v) => {
+                  setInviteRelation(!v || v === "none" ? "" : v);
+                  setGeneratedLink(null);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Ex.: Avó, Babá…" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Não especificar</SelectItem>
+                  {FAMILY_RELATIONS.map((r) => (
+                    <SelectItem key={r.value} value={r.value}>
+                      {r.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Generate link button */}
             <Button
               variant="outline"
@@ -328,6 +375,9 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground pl-1">
                     Válido por 7 dias · {ROLE_LABELS[inviteRole]}
+                    {inviteRelation
+                      ? ` · ${getFamilyRelationLabel(inviteRelation)}`
+                      : ""}
                   </p>
                 </motion.div>
               )}
@@ -373,6 +423,9 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
                           className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs border mt-0.5 ${ROLE_BADGE_CLASSES[invite.role as FamilyRole]}`}
                         >
                           {ROLE_LABELS[invite.role as FamilyRole]}
+                          {invite.family_relation
+                            ? ` · ${getFamilyRelationLabel(invite.family_relation)}`
+                            : ""}
                         </span>
                       </div>
                       <Button

@@ -19,6 +19,18 @@ export type FamilyInviteInsert =
 
 export type FamilyRole = "owner" | "caregiver" | "viewer";
 
+export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
+export type UserProfileUpdate =
+  Database["public"]["Tables"]["user_profiles"]["Update"];
+
+export type SleepActivityLog =
+  Database["public"]["Tables"]["sleep_activity_log"]["Row"];
+
+export type UiMode = "standard" | "nanny";
+
+export type FamilyRelationValue =
+  import("@/lib/family/relations").FamilyRelationValue;
+
 export type SleepSession =
   Database["public"]["Tables"]["sleep_sessions"]["Row"];
 export type SleepSessionInsert =

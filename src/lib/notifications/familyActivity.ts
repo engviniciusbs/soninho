@@ -1,0 +1,129 @@
+import webpush from "web-push";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { formatSleepActivityMessage } from "@/lib/family/activityMessages";
+import type { SleepType } from "@/types";
+
+webpush.setVapidDetails(
+  process.env.VAPID_CONTACT_EMAIL!,
+  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+  process.env.VAPID_PRIVATE_KEY!
+);
+
+interface NotifyFamilyActivityParams {
+  babyId: string;
+  actorUserId: string;
+  action: "started" | "stopped";
+  sleepType: SleepType;
+  babyName: string;
+  actorName: string | null;
+  actorRelation: string | null;
+}
+
+/** Push to other family members when someone starts/stops sleep. */
+export async function notifyFamilySleepActivity(
+  params: NotifyFamilyActivityParams
+): Promise<number> {
+  const {
+    babyId,
+    actorUserId,
+    action,
+    sleepType,
+    babyName,
+    actorName,
+    actorRelation,
+  } = params;
+
+  if (
+    !process.env.VAPID_PRIVATE_KEY ||
+    !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+  ) {
+    return 0;
+  }
+
+  const supabase = createAdminClient();
+
+  const { data: baby } = await supabase
+    .from("babies")
+    .select("family_id, user_id")
+    .eq("id", babyId)
+    .single();
+
+  if (!baby) return 0;
+
+  const familyId = baby.family_id;
+  const recipientIds = new Set<string>();
+
+  if (familyId) {
+    const { data: members } = await supabase
+      .from("family_members")
+      .select("user_id")
+      .eq("family_id", familyId)
+      .neq("user_id", actorUserId);
+
+    for (const m of members ?? []) {
+      recipientIds.add(m.user_id);
+    }
+  } else if (baby.user_id && baby.user_id !== actorUserId) {
+    recipientIds.add(baby.user_id);
+  }
+
+  if (recipientIds.size === 0) return 0;
+
+  const title =
+    action === "started"
+      ? sleepType === "NAP"
+        ? "Soneca iniciada"
+        : "Sono noturno iniciado"
+      : "Sono finalizado";
+
+  const body = formatSleepActivityMessage(
+    action,
+    actorRelation,
+    actorName,
+    sleepType,
+    babyName
+  );
+
+  const payload = JSON.stringify({
+    title,
+    body,
+    icon: "/icons/icon-192.png",
+    tag: `family-sleep-${babyId}-${action}`,
+    url: "/app",
+  });
+
+  let sent = 0;
+
+  for (const userId of recipientIds) {
+    const { data: prefs } = await supabase
+      .from("notification_preferences")
+      .select("enabled")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (prefs && prefs.enabled === false) continue;
+
+    const { data: subs } = await supabase
+      .from("push_subscriptions")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("is_active", true);
+
+    for (const sub of subs ?? []) {
+      try {
+        await webpush.sendNotification(
+          {
+            endpoint: sub.endpoint,
+            keys: { p256dh: sub.p256dh, auth: sub.auth },
+          },
+          payload
+        );
+        sent++;
+      } catch {
+        // Expired subscription — ignore
+      }
+    }
+  }
+
+  return sent;
+}

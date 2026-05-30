@@ -7,6 +7,9 @@ import { WakeWindowBadge } from "@/components/sleep/WakeWindowBadge";
 import { AISuggestionCard } from "@/components/ai/AISuggestionCard";
 import { RegressionRadar } from "@/components/sleep/RegressionRadar";
 import { FamilyNoteCard } from "@/components/family/FamilyNoteCard";
+import { FamilyActivityFeed } from "@/components/family/FamilyActivityFeed";
+import { useUserProfile } from "@/components/providers/UserProfileProvider";
+import { useFamilyActivityToasts } from "@/hooks/useFamilyActivityToasts";
 import { SleepTimeline } from "@/components/sleep/SleepTimeline";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
@@ -36,6 +39,8 @@ function ageLabel(birthDate: string): string {
 
 export default function AppHomePage() {
   const { activeBaby, isLoading, babies } = useBaby();
+  const { isNannyMode } = useUserProfile();
+  useFamilyActivityToasts(true);
 
   if (isLoading) {
     return (
@@ -131,23 +136,32 @@ export default function AppHomePage() {
           <SleepTimer />
         </motion.div>
 
-        {/* Live status + insights */}
+        {/* Live status + insights (modo babá: só mural e atividade) */}
         <div className="space-y-5">
-          <motion.div variants={item}>
-            <WakeWindowBadge />
-          </motion.div>
-          <motion.div variants={item}>
-            <AISuggestionCard />
-          </motion.div>
-          <motion.div variants={item}>
-            <RegressionRadar />
-          </motion.div>
+          {!isNannyMode && (
+            <>
+              <motion.div variants={item}>
+                <WakeWindowBadge />
+              </motion.div>
+              <motion.div variants={item}>
+                <AISuggestionCard />
+              </motion.div>
+              <motion.div variants={item}>
+                <RegressionRadar />
+              </motion.div>
+            </>
+          )}
           <motion.div variants={item}>
             <FamilyNoteCard />
           </motion.div>
           <motion.div variants={item}>
-            <SleepTimeline />
+            <FamilyActivityFeed />
           </motion.div>
+          {!isNannyMode && (
+            <motion.div variants={item}>
+              <SleepTimeline />
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>

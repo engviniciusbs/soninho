@@ -2,21 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, List, BarChart3, Sparkles, Settings } from "lucide-react";
 import { SoninhoLogo } from "@/components/brand/SoninhoLogo";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { href: "/app", label: "Início", icon: Home },
-  { href: "/history", label: "Registro", icon: List },
-  { href: "/analytics", label: "Análise", icon: BarChart3 },
-  { href: "/ai-insights", label: "IA Insights", icon: Sparkles },
-  { href: "/settings", label: "Configurações", icon: Settings },
-];
+import { getNavLinks } from "@/components/layout/navLinks";
+import { useUserProfile } from "@/components/providers/UserProfileProvider";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { isNannyMode } = useUserProfile();
+  const links = getNavLinks(isNannyMode);
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col border-r border-sidebar-border bg-sidebar">

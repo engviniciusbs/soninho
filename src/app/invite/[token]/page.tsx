@@ -11,13 +11,16 @@ import { createClient } from "@/lib/supabase/client";
 type InviteInfo = {
   id: string;
   role: "caregiver" | "viewer";
+  family_relation: string | null;
   family_name: string;
   expires_at: string;
 };
 
+import { getFamilyRelationLabel, PERMISSION_ROLE_LABELS } from "@/lib/family/relations";
+
 const ROLE_LABELS: Record<string, string> = {
-  caregiver: "Cuidador(a)",
-  viewer: "Visualizador(a)",
+  caregiver: PERMISSION_ROLE_LABELS.caregiver,
+  viewer: PERMISSION_ROLE_LABELS.viewer,
 };
 
 const ROLE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -132,9 +135,18 @@ export default function InvitePage() {
               </div>
 
               {/* Role badge */}
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
-                <RoleIcon className="w-4 h-4" />
-                <span className="text-sm font-medium">{invite ? ROLE_LABELS[invite.role] : ""}</span>
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+                  <RoleIcon className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {invite ? ROLE_LABELS[invite.role] : ""}
+                  </span>
+                </div>
+                {invite?.family_relation && (
+                  <p className="text-sm text-muted-foreground">
+                    como {getFamilyRelationLabel(invite.family_relation)}
+                  </p>
+                )}
               </div>
 
               <div className="w-full space-y-3">

@@ -12,6 +12,7 @@ import { useSleepStore } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsed } from "@/lib/utils";
 import { toast } from "sonner";
+import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
 
 export function useSleepTimer() {
   const supabase = createClient();
@@ -128,6 +129,13 @@ export function useSleepTimer() {
           ? "Soneca iniciada 🌙"
           : "Sono noturno iniciado 🌙"
       );
+      void recordSleepActivity({
+        babyId: activeBaby.id,
+        babyName: activeBaby.name,
+        action: "started",
+        sleepSessionId: data.id,
+        sleepType,
+      });
     }
   }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer]);
 
@@ -188,8 +196,18 @@ export function useSleepTimer() {
     queryClient.invalidateQueries({ queryKey: ["last-session"] });
     queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
 
+    if (activeBaby) {
+      void recordSleepActivity({
+        babyId: activeBaby.id,
+        babyName: activeBaby.name,
+        action: "stopped",
+        sleepSessionId: endedId,
+        sleepType: endedType,
+      });
+    }
+
     return { endedSessionId: endedId, sleepType: endedType };
-  }, [sessionId, sleepType, supabase, stopTimer, queryClient]);
+  }, [sessionId, sleepType, activeBaby, supabase, stopTimer, queryClient]);
 
   return {
     isRunning,

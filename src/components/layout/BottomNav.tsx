@@ -2,20 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, List, BarChart3, Sparkles, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { href: "/app", label: "Início", icon: Home },
-  { href: "/history", label: "Registro", icon: List },
-  { href: "/analytics", label: "Análise", icon: BarChart3 },
-  { href: "/ai-insights", label: "IA", icon: Sparkles },
-  { href: "/settings", label: "Config", icon: Settings },
-];
+import { getNavLinks } from "@/components/layout/navLinks";
+import { useUserProfile } from "@/components/providers/UserProfileProvider";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { isNannyMode } = useUserProfile();
+  const links = getNavLinks(isNannyMode);
 
   return (
     <nav
@@ -28,7 +23,7 @@ export function BottomNav() {
       {/* Solid backdrop */}
       <div className="border-t border-border bg-background/90 backdrop-blur-md supports-backdrop-filter:bg-background/75">
         <div className="flex items-center justify-around px-2 py-1">
-          {links.map(({ href, label, icon: Icon }) => {
+          {links.map(({ href, label, mobileLabel, icon: Icon }) => {
             const isActive = pathname === href;
             return (
               <Link
@@ -56,7 +51,9 @@ export function BottomNav() {
                 >
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </motion.div>
-                <span className="relative z-10 tracking-tight">{label}</span>
+                <span className="relative z-10 tracking-tight">
+                  {mobileLabel ?? label}
+                </span>
               </Link>
             );
           })}
