@@ -36,7 +36,11 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { babyId, role } = body as { babyId: string; role: "caregiver" | "viewer" };
+  const { babyId, role, familyRelation } = body as {
+    babyId: string;
+    role: "caregiver" | "viewer";
+    familyRelation?: string | null;
+  };
 
   if (!babyId || !role) {
     return NextResponse.json({ error: "babyId and role required" }, { status: 400 });
@@ -50,7 +54,13 @@ export async function POST(req: NextRequest) {
   const { data: family } = await getFamilyForBaby(supabase, babyId);
   if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
 
-  const { data, error } = await createFamilyInvite(supabase, family.id, user.id, role);
+  const { data, error } = await createFamilyInvite(
+    supabase,
+    family.id,
+    user.id,
+    role,
+    familyRelation ?? null
+  );
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ data });

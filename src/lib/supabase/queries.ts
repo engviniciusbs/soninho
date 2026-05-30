@@ -299,11 +299,17 @@ export async function createFamilyInvite(
   supabase: Client,
   familyId: string,
   createdBy: string,
-  role: "caregiver" | "viewer"
+  role: "caregiver" | "viewer",
+  familyRelation?: string | null
 ) {
   return supabase
     .from("family_invites")
-    .insert({ family_id: familyId, created_by: createdBy, role })
+    .insert({
+      family_id: familyId,
+      created_by: createdBy,
+      role,
+      family_relation: familyRelation ?? null,
+    })
     .select()
     .single();
 }
@@ -368,6 +374,7 @@ export async function acceptFamilyInvite(
     role: invite.role,
     display_name: displayName,
     email,
+    family_relation: invite.family_relation ?? null,
     invited_by: invite.created_by,
   });
 
@@ -443,4 +450,81 @@ export async function createFamilyNote(
 
 export async function deleteFamilyNote(supabase: Client, noteId: string) {
   return supabase.from("family_notes").delete().eq("id", noteId);
+}
+
+// ── User profiles ───────────────────────────────────────────────────────────
+
+export async function getUserProfile(supabase: Client, userId: string) {
+  return supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
+}
+
+export async function upsertUserProfile(
+  supabase: Client,
+  userId: string,
+  patch: {
+    display_name?: string | null;
+    family_relation?: string | null;
+    ui_mode?: "standard" | "nanny";
+  }
+) {
+  return supabase
+    .from("user_profiles")
+    .upsert(
+      {
+        user_id: userId,
+        ...patch,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" }
+    )
+    .select()
+    .single();
+}
+
+export async function updateMemberFamilyRelation(
+  supabase: Client,
+  familyId: string,
+  userId: string,
+  familyRelation: string | null
+) {
+  return supabase
+    .from("family_members")
+    .update({ family_relation: familyRelation })
+    .eq("family_id", familyId)
+    .eq("user_id", userId);
+}
+
+// ── Sleep activity log ──────────────────────────────────────────────────────
+
+export async function getSleepActivityLog(
+  supabase: Client,
+  babyId: string,
+  limit: number = 15
+) {
+  return supabase
+    .from("sleep_activity_log")
+    .select("*")
+    .eq("baby_id", babyId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+}
+
+export async function insertSleepActivityLog(
+  supabase: Client,
+  row: {
+    baby_id: string;
+    family_id?: string | null;
+    actor_user_id: string;
+    actor_name?: string | null;
+    actor_relation?: string | null;
+    action: "started" | "stopped";
+    sleep_session_id?: string | null;
+    sleep_type?: "NAP" | "NIGHT_SLEEP" | null;
+  }
+) {
+  return supabase.from("sleep_activity_log").insert(row).select().single();
 }

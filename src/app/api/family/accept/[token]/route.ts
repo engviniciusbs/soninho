@@ -19,6 +19,7 @@ export async function GET(
     data: {
       id: invite.id,
       role: invite.role,
+      family_relation: invite.family_relation,
       family_id: invite.family_id,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       family_name: (invite as any).families?.name ?? "Familia",

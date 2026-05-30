@@ -69,6 +69,7 @@ export interface Database {
           role: "owner" | "caregiver" | "viewer";
           display_name: string | null;
           email: string | null;
+          family_relation: string | null;
           invited_by: string | null;
           joined_at: string;
         };
@@ -79,6 +80,7 @@ export interface Database {
           role?: "owner" | "caregiver" | "viewer";
           display_name?: string | null;
           email?: string | null;
+          family_relation?: string | null;
           invited_by?: string | null;
           joined_at?: string;
         };
@@ -89,6 +91,7 @@ export interface Database {
           role?: "owner" | "caregiver" | "viewer";
           display_name?: string | null;
           email?: string | null;
+          family_relation?: string | null;
           invited_by?: string | null;
           joined_at?: string;
         };
@@ -99,6 +102,7 @@ export interface Database {
           family_id: string;
           token: string;
           role: "caregiver" | "viewer";
+          family_relation: string | null;
           created_by: string;
           created_at: string;
           expires_at: string;
@@ -111,6 +115,7 @@ export interface Database {
           family_id: string;
           token?: string;
           role?: "caregiver" | "viewer";
+          family_relation?: string | null;
           created_by: string;
           created_at?: string;
           expires_at?: string;
@@ -123,6 +128,7 @@ export interface Database {
           family_id?: string;
           token?: string;
           role?: "caregiver" | "viewer";
+          family_relation?: string | null;
           created_by?: string;
           created_at?: string;
           expires_at?: string;
@@ -254,9 +260,80 @@ export interface Database {
           created_at?: string;
         };
       };
+      sleep_activity_log: {
+        Row: {
+          id: string;
+          baby_id: string;
+          family_id: string | null;
+          actor_user_id: string;
+          actor_name: string | null;
+          actor_relation: string | null;
+          action: "started" | "stopped";
+          sleep_session_id: string | null;
+          sleep_type: "NAP" | "NIGHT_SLEEP" | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          family_id?: string | null;
+          actor_user_id: string;
+          actor_name?: string | null;
+          actor_relation?: string | null;
+          action: "started" | "stopped";
+          sleep_session_id?: string | null;
+          sleep_type?: "NAP" | "NIGHT_SLEEP" | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          family_id?: string | null;
+          actor_user_id?: string;
+          actor_name?: string | null;
+          actor_relation?: string | null;
+          action?: "started" | "stopped";
+          sleep_session_id?: string | null;
+          sleep_type?: "NAP" | "NIGHT_SLEEP" | null;
+          created_at?: string;
+        };
+      };
+      user_profiles: {
+        Row: {
+          user_id: string;
+          display_name: string | null;
+          family_relation: string | null;
+          ui_mode: "standard" | "nanny";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          display_name?: string | null;
+          family_relation?: string | null;
+          ui_mode?: "standard" | "nanny";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          display_name?: string | null;
+          family_relation?: string | null;
+          ui_mode?: "standard" | "nanny";
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_user_family_ids: { Args: { uid: string }; Returns: string[] };
+      get_user_owned_family_ids: { Args: { uid: string }; Returns: string[] };
+      user_can_write_family: {
+        Args: { uid: string; fid: string };
+        Returns: boolean;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

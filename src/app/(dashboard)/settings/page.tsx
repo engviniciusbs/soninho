@@ -9,6 +9,7 @@ import { useBaby } from "@/components/providers/BabyProvider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { FamilySettings } from "@/components/settings/FamilySettings";
+import { UserProfileSettings } from "@/components/settings/UserProfileSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -405,6 +406,8 @@ export default function SettingsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      <UserProfileSettings />
 
       {/* Family team */}
       {activeBaby && currentUserId && (
