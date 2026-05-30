@@ -4,22 +4,60 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { differenceInWeeks } from "date-fns";
 import { useAISuggestions } from "@/hooks/useAISuggestions";
+import { useWakeWindow } from "@/hooks/useWakeWindow";
+import { useSleepStore } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CalendarClock, Clock, ThumbsUp, ThumbsDown, Check } from "lucide-react";
+import {
+  CalendarClock,
+  Clock,
+  ThumbsUp,
+  ThumbsDown,
+  Check,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const confidenceConfig = {
-  high: { label: "Na janela", className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" },
-  medium: { label: "Passou da janela", className: "bg-amber-500/15 text-amber-400 border-amber-500/20" },
-  low: { label: "Sem dados", className: "bg-red-500/15 text-red-400 border-red-500/20" },
+  high: {
+    label: "Na janela",
+    className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+  },
+  medium: {
+    label: "Passou da janela",
+    className: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+  },
+  low: {
+    label: "Sem dados",
+    className: "bg-red-500/15 text-red-400 border-red-500/20",
+  },
 };
+
+function isSleepingForBaby(
+  isRunning: boolean,
+  activeBabyId: string | null,
+  babyId: string | undefined
+): boolean {
+  if (!isRunning || !babyId) return false;
+  return !activeBabyId || activeBabyId === babyId;
+}
 
 export function AISuggestionCard() {
   const { data: suggestion, isLoading, error } = useAISuggestions();
+  const { minutesUntilNextNap, status } = useWakeWindow();
+  const { isRunning, activeBabyId } = useSleepStore();
   const { activeBaby } = useBaby();
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const [voting, setVoting] = useState(false);
+
+  const sleeping = isSleepingForBaby(
+    isRunning,
+    activeBabyId,
+    activeBaby?.id
+  );
+  const isOverdue =
+    !sleeping &&
+    (minutesUntilNextNap <= 0 ||
+      suggestion?.suggestedNapTime === "Assim que possível");
 
   async function handleVote(value: "up" | "down") {
     if (!activeBaby || !suggestion || voting || vote) return;
@@ -48,6 +86,9 @@ export function AISuggestionCard() {
     }
   }
 
+  // WakeWindowBadge already covers active sleep — hide to avoid duplicate UI.
+  if (sleeping) return null;
+
   if (isLoading) {
     return <Skeleton className="h-36 rounded-2xl" />;
   }
@@ -55,9 +96,23 @@ export function AISuggestionCard() {
   if (error || !suggestion) return null;
 
   const confidence = confidenceConfig[suggestion.confidence];
+  const showWindow =
+    suggestion.windowStart &&
+    suggestion.windowEnd &&
+    !isOverdue;
+  const headline = isOverdue ? "Hora da soneca" : "Próxima soneca";
+  const displayTime = isOverdue
+    ? "Agora"
+    : suggestion.suggestedNapTime;
+  const timeClass = isOverdue
+    ? status === "red"
+      ? "text-red-400"
+      : "text-amber-400"
+    : "text-primary";
 
   return (
     <motion.div
+      key="awake"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -70,24 +125,42 @@ export function AISuggestionCard() {
 
         <div className="flex-1 min-w-0 space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold">Próxima soneca</span>
+            <span className="text-sm font-semibold">{headline}</span>
             <span
-              className={`rounded-full px-2 py-0.5 text-[11px] font-medium border ${confidence.className}`}
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[11px] font-medium border",
+                isOverdue
+                  ? confidenceConfig.medium.className
+                  : confidence.className
+              )}
             >
-              {confidence.label}
+              {isOverdue ? "Passou da janela" : confidence.label}
             </span>
           </div>
 
-          {suggestion.suggestedNapTime && (
-            <div className="flex items-center gap-2 text-primary">
+          {displayTime && (
+            <div className={cn("flex items-center gap-2", timeClass)}>
               <Clock className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="num-display text-xl font-semibold tabular-nums">{suggestion.suggestedNapTime}</span>
+              <span className="num-display text-xl font-semibold tabular-nums">
+                {displayTime}
+              </span>
+              {!isOverdue && minutesUntilNextNap > 0 && (
+                <span className="text-xs text-muted-foreground font-medium">
+                  (~{Math.round(minutesUntilNextNap)} min)
+                </span>
+              )}
             </div>
           )}
 
-          {suggestion.windowStart && suggestion.windowEnd && (
+          {showWindow && (
             <p className="text-xs text-muted-foreground">
               Janela ideal: {suggestion.windowStart} – {suggestion.windowEnd}
+            </p>
+          )}
+
+          {isOverdue && suggestion.windowStart && suggestion.windowEnd && (
+            <p className="text-xs text-muted-foreground">
+              Janela era {suggestion.windowStart} – {suggestion.windowEnd}
             </p>
           )}
 
@@ -95,7 +168,6 @@ export function AISuggestionCard() {
             {suggestion.reasoning}
           </p>
 
-          {/* Feedback */}
           <div className="flex items-center gap-2 pt-1">
             <AnimatePresence mode="wait" initial={false}>
               {vote ? (
@@ -125,9 +197,7 @@ export function AISuggestionCard() {
                     onClick={() => handleVote("up")}
                     disabled={voting}
                     aria-label="Sugestão foi útil"
-                    className={cn(
-                      "flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 text-muted-foreground transition-colors hover:border-emerald-500/40 hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    )}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 text-muted-foreground transition-colors hover:border-emerald-500/40 hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <ThumbsUp className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
@@ -136,9 +206,7 @@ export function AISuggestionCard() {
                     onClick={() => handleVote("down")}
                     disabled={voting}
                     aria-label="Sugestão não foi útil"
-                    className={cn(
-                      "flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 text-muted-foreground transition-colors hover:border-red-500/40 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    )}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/50 text-muted-foreground transition-colors hover:border-red-500/40 hover:text-red-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <ThumbsDown className="h-3.5 w-3.5" aria-hidden="true" />
                   </button>
