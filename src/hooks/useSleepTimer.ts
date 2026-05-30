@@ -91,6 +91,7 @@ export function useSleepTimer() {
       stopTimer();
       queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session-key"] });
       queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
       toast.info("Sono finalizado por outro cuidador(a)");
     }
@@ -168,6 +169,7 @@ export function useSleepTimer() {
       stopTimer();
       queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session-key"] });
       queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
       return null;
     }
@@ -177,6 +179,7 @@ export function useSleepTimer() {
       stopTimer();
       queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["last-session"] });
+      queryClient.invalidateQueries({ queryKey: ["last-session-key"] });
       queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
       toast.success("Sono já estava finalizado ✨");
       return null;
@@ -194,6 +197,7 @@ export function useSleepTimer() {
     toast.success("Sono registrado com sucesso ✨");
     queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
     queryClient.invalidateQueries({ queryKey: ["last-session"] });
+    queryClient.invalidateQueries({ queryKey: ["last-session-key"] });
     queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
 
     if (activeBaby) {

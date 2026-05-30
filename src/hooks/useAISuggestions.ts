@@ -2,12 +2,19 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { useSleepStore } from "@/store/sleepStore";
 import { createClient } from "@/lib/supabase/client";
 import type { AISuggestion } from "@/types";
 
 export function useAISuggestions() {
   const { activeBaby } = useBaby();
+  const { isRunning, activeBabyId } = useSleepStore();
   const supabase = createClient();
+
+  const sleepingForActiveBaby =
+    isRunning &&
+    !!activeBaby &&
+    (!activeBabyId || activeBabyId === activeBaby.id);
 
   // Fetch the last completed session so we can key the suggestion by it.
   // When the last sleep data changes (new nap ends), we get a fresh suggestion.
@@ -50,10 +57,11 @@ export function useAISuggestions() {
       if (!res.ok) return null;
       return res.json();
     },
-    enabled: !!activeBaby && lastSessionKey !== undefined,
-    staleTime: 60 * 60 * 1000,  // 1 hour — same last-sleep data = same suggestion
+    enabled:
+      !!activeBaby && lastSessionKey !== undefined && !sleepingForActiveBaby,
+    staleTime: 60 * 60 * 1000, // 1 hour — same last-sleep data = same suggestion
     gcTime: 2 * 60 * 60 * 1000, // keep in cache 2 hours
     refetchOnWindowFocus: false,
-    refetchOnMount: false,       // don't re-fetch on every component mount
+    refetchOnMount: false, // don't re-fetch on every component mount
   });
 }
