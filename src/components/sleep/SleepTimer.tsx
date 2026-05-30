@@ -193,7 +193,11 @@ export function SleepTimer() {
   const centerSub = isRunning
     ? cfg.runLabel
     : !wwLoading && minutesUntilNextNap <= 0
-    ? "hora da soneca!"
+    ? ai?.kind === "NIGHT_SLEEP"
+      ? "hora de dormir!"
+      : "hora da soneca!"
+    : ai?.kind === "NIGHT_SLEEP"
+    ? "sono noturno"
     : "próxima soneca";
 
   /* ── Handlers ─────────────────────────────────────────────────────────── */

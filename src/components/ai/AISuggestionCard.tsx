@@ -54,10 +54,6 @@ export function AISuggestionCard() {
     activeBabyId,
     activeBaby?.id
   );
-  const isOverdue =
-    !sleeping &&
-    (minutesUntilNextNap <= 0 ||
-      suggestion?.suggestedNapTime === "Assim que possível");
 
   async function handleVote(value: "up" | "down") {
     if (!activeBaby || !suggestion || voting || vote) return;
@@ -95,12 +91,24 @@ export function AISuggestionCard() {
 
   if (error || !suggestion) return null;
 
+  const isNight = suggestion.kind === "NIGHT_SLEEP";
+  const isOverdue =
+    minutesUntilNextNap <= 0 ||
+    suggestion.suggestedNapTime === "Assim que possível";
+  const minutesLeft = suggestion.minutesUntilSuggested ?? minutesUntilNextNap;
+
   const confidence = confidenceConfig[suggestion.confidence];
   const showWindow =
     suggestion.windowStart &&
     suggestion.windowEnd &&
     !isOverdue;
-  const headline = isOverdue ? "Hora da soneca" : "Próxima soneca";
+  const headline = isOverdue
+    ? isNight
+      ? "Hora de dormir"
+      : "Hora da soneca"
+    : isNight
+      ? "Sono noturno"
+      : "Próxima soneca";
   const displayTime = isOverdue
     ? "Agora"
     : suggestion.suggestedNapTime;
@@ -108,7 +116,11 @@ export function AISuggestionCard() {
     ? status === "red"
       ? "text-red-400"
       : "text-amber-400"
-    : "text-primary";
+    : isNight
+      ? "text-indigo-300"
+      : "text-primary";
+  const windowLabel = isNight ? "Horário sugerido" : "Janela ideal";
+  const overdueWindowLabel = isNight ? "Horário era" : "Janela era";
 
   return (
     <motion.div
@@ -116,11 +128,27 @@ export function AISuggestionCard() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="rounded-2xl border border-primary/20 bg-primary/6 p-4"
+      className={cn(
+        "rounded-2xl border p-4",
+        isNight && !isOverdue
+          ? "border-indigo-500/20 bg-indigo-500/8"
+          : "border-primary/20 bg-primary/6"
+      )}
     >
       <div className="flex items-start gap-3">
-        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
-          <CalendarClock className="h-5 w-5 text-primary" aria-hidden="true" />
+        <div
+          className={cn(
+            "relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+            isNight && !isOverdue ? "bg-indigo-500/15" : "bg-primary/15"
+          )}
+        >
+          <CalendarClock
+            className={cn(
+              "h-5 w-5",
+              isNight && !isOverdue ? "text-indigo-300" : "text-primary"
+            )}
+            aria-hidden="true"
+          />
         </div>
 
         <div className="flex-1 min-w-0 space-y-2">
@@ -144,9 +172,9 @@ export function AISuggestionCard() {
               <span className="num-display text-xl font-semibold tabular-nums">
                 {displayTime}
               </span>
-              {!isOverdue && minutesUntilNextNap > 0 && (
+              {!isOverdue && minutesLeft > 0 && (
                 <span className="text-xs text-muted-foreground font-medium">
-                  (~{Math.round(minutesUntilNextNap)} min)
+                  (~{Math.round(minutesLeft)} min)
                 </span>
               )}
             </div>
@@ -154,13 +182,13 @@ export function AISuggestionCard() {
 
           {showWindow && (
             <p className="text-xs text-muted-foreground">
-              Janela ideal: {suggestion.windowStart} – {suggestion.windowEnd}
+              {windowLabel}: {suggestion.windowStart} – {suggestion.windowEnd}
             </p>
           )}
 
           {isOverdue && suggestion.windowStart && suggestion.windowEnd && (
             <p className="text-xs text-muted-foreground">
-              Janela era {suggestion.windowStart} – {suggestion.windowEnd}
+              {overdueWindowLabel}: {suggestion.windowStart} – {suggestion.windowEnd}
             </p>
           )}
 
