@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getLastSleepSession } from "@/lib/supabase/queries";
+import { getLastSleepSession, getRecentSessions } from "@/lib/supabase/queries";
 import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
-import type { Baby } from "@/types";
+import type { Baby, SleepSession } from "@/types";
 
 const requestSchema = z.object({
   babyId: z.string().uuid(),
@@ -11,8 +11,8 @@ const requestSchema = z.object({
 });
 
 /**
- * Nap window + suggested time use the same {@link getWakeWindowRange} table as
- * WakeWindowBadge — no LLM, so numbers never diverge from the dashboard.
+ * Next-sleep suggestion (nap vs. night) using wake-window math plus schedule/history.
+ * Same {@link getWakeWindowRange} table as WakeWindowBadge — no LLM drift.
  */
 export async function POST(request: Request) {
   try {
@@ -38,9 +38,14 @@ export async function POST(request: Request) {
     const { data: lastSession } = await getLastSleepSession(supabase, baby.id);
     const lastEnd = lastSession?.end_time ?? null;
 
+    const { data: recentData } = await getRecentSessions(supabase, baby.id, 14);
+    const recentSessions = (recentData ?? []) as SleepSession[];
+
     const suggestion = computeNapSuggestion({
       birthDateIso: baby.birth_date,
       lastSleepEndIso: lastEnd,
+      lastSessionType: lastSession?.type ?? null,
+      recentSessions,
       timezone: parsed.data.timezone,
     });
 

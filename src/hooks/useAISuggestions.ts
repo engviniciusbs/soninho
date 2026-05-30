@@ -41,7 +41,7 @@ export function useAISuggestions() {
   return useQuery<AISuggestion | null>({
     // Query key includes the last session anchor so the suggestion is stable
     // until actual sleep data changes.
-    queryKey: ["ai-suggestion", activeBaby?.id, lastSessionKey],
+    queryKey: ["ai-suggestion", "v2", activeBaby?.id, lastSessionKey],
     queryFn: async () => {
       if (!activeBaby) return null;
       const res = await fetch("/api/ai/suggest", {

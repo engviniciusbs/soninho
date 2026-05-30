@@ -68,11 +68,15 @@ export type WakeReason =
   | "outro";
 
 export interface AISuggestion {
+  /** Whether the next sleep is a daytime nap or night/bedtime sleep. */
+  kind: SleepType;
   suggestedNapTime: string;
   windowStart: string;
   windowEnd: string;
   reasoning: string;
   confidence: "high" | "medium" | "low";
+  /** Minutes until suggested time (0 when overdue or "Assim que possível"). */
+  minutesUntilSuggested: number;
 }
 
 export interface SleepStats {
