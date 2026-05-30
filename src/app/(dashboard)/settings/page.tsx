@@ -10,7 +10,9 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { FamilySettings } from "@/components/settings/FamilySettings";
 import { UserProfileSettings } from "@/components/settings/UserProfileSettings";
+import { ToolsSettings } from "@/components/settings/ToolsSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +38,7 @@ import {
   Loader2,
   Send,
   Mail,
+  Wrench,
 } from "lucide-react";
 import type { SleepSession } from "@/types";
 
@@ -313,10 +316,24 @@ export default function SettingsPage() {
     <div className="space-y-6 max-w-lg mx-auto">
       <PageHeader
         title="Configurações"
-        subtitle="Bebês, família, notificações e conta"
+        subtitle="Bebês, família, notificações e ferramentas"
       />
 
-      {/* Baby profiles */}
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 rounded-xl">
+          <TabsTrigger value="general" className="rounded-lg">
+            Geral
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="rounded-lg">
+            Notificações
+          </TabsTrigger>
+          <TabsTrigger value="tools" className="rounded-lg">
+            <Wrench className="h-3.5 w-3.5" />
+            Ferramentas
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-6 mt-4">
       <Card className="rounded-2xl">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -383,30 +400,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Data export */}
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Exportar Dados
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-3">
-            Exporte todos os registros de sono em formato CSV.
-          </p>
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={!activeBaby || exporting}
-            className="rounded-xl gap-2"
-          >
-            <Download className="h-4 w-4" />
-            {exporting ? "Exportando..." : "Exportar CSV"}
-          </Button>
-        </CardContent>
-      </Card>
-
       <UserProfileSettings />
 
       {/* Family team */}
@@ -414,7 +407,28 @@ export default function SettingsPage() {
         <FamilySettings babyId={activeBaby.id} currentUserId={currentUserId} />
       )}
 
-      {/* Notifications */}
+      {/* Account */}
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <User className="h-4 w-4" />
+            Conta
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            className="rounded-xl gap-2 text-destructive hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4" />
+            Sair da conta
+          </Button>
+        </CardContent>
+      </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6 mt-4">
       <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -612,28 +626,37 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
 
-      {/* Account */}
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Conta
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Button
-            variant="outline"
-            onClick={handleLogout}
-            className="rounded-xl gap-2 text-destructive hover:text-destructive"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair da conta
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="tools" className="space-y-6 mt-4">
+          <ToolsSettings />
 
-      {/* Baby form dialog */}
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Exportar dados
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-3">
+                Exporte todos os registros de sono do bebê ativo em formato CSV.
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                disabled={!activeBaby || exporting}
+                className="rounded-xl gap-2"
+              >
+                <Download className="h-4 w-4" />
+                {exporting ? "Exportando..." : "Exportar CSV"}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Dialogs — outside tabs */}
       <Dialog open={showBabyForm} onOpenChange={setShowBabyForm}>
         <DialogContent className="rounded-2xl max-w-md">
           <DialogHeader>
