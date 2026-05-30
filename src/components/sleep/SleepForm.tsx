@@ -28,6 +28,10 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { EnvironmentPicker, type EnvironmentData } from "./EnvironmentPicker";
+import {
+  HOW_FELL_ASLEEP_OPTIONS,
+  WAKE_REASON_OPTIONS,
+} from "@/lib/sleep/captureLabels";
 import type { SleepSession } from "@/types";
 
 /** Format a Date as YYYY-MM-DD using the browser's LOCAL timezone (not UTC). */
@@ -60,6 +64,8 @@ const formSchema = z.object({
   end_date: z.string().min(1),
   end_time_input: z.string().min(1),
   quality: z.string().optional(),
+  how_fell_asleep: z.string().optional(),
+  wake_reason: z.string().optional(),
   notes: z.string().optional(),
   location: z.string().optional(),
 });
@@ -101,6 +107,8 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
       end_date: toLocalDateString(end),
       end_time_input: toLocalTimeString(end),
       quality: s?.quality?.toString() ?? "",
+      how_fell_asleep: s?.how_fell_asleep ?? "",
+      wake_reason: s?.wake_reason ?? "",
       notes: s?.notes ?? "",
       location: s?.location ?? "",
     };
@@ -164,6 +172,8 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
       start_time: startTime,
       end_time: endTime,
       quality: data.quality ? parseInt(data.quality) : null,
+      how_fell_asleep: data.how_fell_asleep || null,
+      wake_reason: data.wake_reason || null,
       notes: data.notes || null,
       location: data.location || null,
       room_temp_celsius: envData.room_temp_celsius,
@@ -294,6 +304,40 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
               ))}
             </SelectContent>
           </Select>
+
+          <Select
+            value={watch("how_fell_asleep") ?? ""}
+            onValueChange={(v) => v && setValue("how_fell_asleep", v)}
+          >
+            <SelectTrigger className="rounded-xl" aria-label="Como adormeceu">
+              <SelectValue placeholder="Como adormeceu? (opcional)" />
+            </SelectTrigger>
+            <SelectContent>
+              {HOW_FELL_ASLEEP_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.emoji} {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {selectedType === "NIGHT_SLEEP" && (
+            <Select
+              value={watch("wake_reason") ?? ""}
+              onValueChange={(v) => v && setValue("wake_reason", v)}
+            >
+              <SelectTrigger className="rounded-xl" aria-label="Motivo do despertar">
+                <SelectValue placeholder="Por que acordou? (opcional)" />
+              </SelectTrigger>
+              <SelectContent>
+                {WAKE_REASON_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.emoji} {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <div className="space-y-1">
             <label htmlFor="location" className="sr-only">Local</label>

@@ -10,6 +10,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { FamilySettings } from "@/components/settings/FamilySettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +34,7 @@ import {
   BellOff,
   Loader2,
   Send,
+  Mail,
 } from "lucide-react";
 import type { SleepSession } from "@/types";
 
@@ -63,7 +65,9 @@ export default function SettingsPage() {
   const [quietStart, setQuietStart] = useState("22:00");
   const [quietEnd, setQuietEnd] = useState("07:00");
   const [notifEnabled, setNotifEnabled] = useState(true);
+  const [weeklyEmailEnabled, setWeeklyEmailEnabled] = useState(true);
   const [savingNotif, setSavingNotif] = useState(false);
+  const [savingWeekly, setSavingWeekly] = useState(false);
   const [testingSend, setTestingSend] = useState(false);
 
   const loadNotifPrefs = useCallback(async () => {
@@ -76,6 +80,7 @@ export default function SettingsPage() {
       setAlertBefore(data.alert_before_minutes ?? 15);
       setQuietStart(data.quiet_hours_start ?? "22:00");
       setQuietEnd(data.quiet_hours_end ?? "07:00");
+      setWeeklyEmailEnabled(data.weekly_email_enabled ?? true);
     }
   }, [supabase]);
 
@@ -95,6 +100,19 @@ export default function SettingsPage() {
     });
     toast.success("Preferências de notificação salvas!");
     setSavingNotif(false);
+  }
+
+  async function handleToggleWeeklyEmail(next: boolean) {
+    setWeeklyEmailEnabled(next);
+    setSavingWeekly(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSavingWeekly(false); return; }
+    await upsertNotificationPreferences(supabase, user.id, {
+      weekly_email_enabled: next,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+    toast.success(next ? "Relatório semanal ativado!" : "Relatório semanal desativado");
+    setSavingWeekly(false);
   }
 
   async function handleTestNotification() {
@@ -292,7 +310,10 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold">Configurações</h1>
+      <PageHeader
+        title="Configurações"
+        subtitle="Bebês, família, notificações e conta"
+      />
 
       {/* Baby profiles */}
       <Card className="rounded-2xl">
@@ -546,6 +567,46 @@ export default function SettingsPage() {
               )}
             </>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Weekly email report */}
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Relatório semanal por e-mail
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5 pr-4">
+              <p className="text-sm font-medium">
+                {weeklyEmailEnabled ? "Ativado" : "Desativado"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Receba toda segunda-feira um resumo do sono da semana: total por
+                dia, média de soneca, maior trecho noturno e aderência à meta.
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={weeklyEmailEnabled}
+              aria-label="Relatório semanal por e-mail"
+              disabled={savingWeekly}
+              onClick={() => handleToggleWeeklyEmail(!weeklyEmailEnabled)}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-60 ${
+                weeklyEmailEnabled ? "bg-primary" : "bg-secondary"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+                  weeklyEmailEnabled ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
         </CardContent>
       </Card>
 

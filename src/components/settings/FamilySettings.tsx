@@ -95,6 +95,8 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
   }, [babyId]);
 
   useEffect(() => {
+    // On-mount data fetch (synchronizing with an external system).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMembers();
     fetchInvites();
   }, [fetchMembers, fetchInvites]);

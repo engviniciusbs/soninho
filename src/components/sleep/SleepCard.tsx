@@ -29,6 +29,12 @@ import {
 import { formatDuration, formatTimeRange } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { deleteSleepSession } from "@/lib/supabase/queries";
+import {
+  HOW_FELL_ASLEEP_LABELS,
+  HOW_FELL_ASLEEP_EMOJI,
+  WAKE_REASON_LABELS,
+  WAKE_REASON_EMOJI,
+} from "@/lib/sleep/captureLabels";
 import { toast } from "sonner";
 import type { SleepSession } from "@/types";
 import type { WeatherCondition } from "@/lib/sleep/clothingRecommendation";
@@ -96,11 +102,7 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -16 }}
         layout
-        className={`group rounded-2xl border transition-colors hover:border-border/80 ${
-          isNap
-            ? "border-lavender/15 bg-lavender/5"
-            : "border-sky-sleep/15 bg-sky-sleep/5"
-        }`}
+        className="group rounded-2xl surface transition-colors hover:border-foreground/15"
       >
         <div className="flex items-center gap-3 py-3.5 px-4">
           {/* Type icon */}
@@ -166,6 +168,34 @@ export function SleepCard({ session, onEdit }: SleepCardProps) {
                     <span>
                       {SACK_SHORT[session.sleep_sack_type] ?? session.sleep_sack_type}
                       {session.sleep_sack_tog != null && ` TOG ${session.sleep_sack_tog}`}
+                    </span>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Behaviour tags */}
+            {(session.how_fell_asleep || session.wake_reason) && (
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                {session.how_fell_asleep && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border/40 bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                    <span aria-hidden="true">
+                      {HOW_FELL_ASLEEP_EMOJI[session.how_fell_asleep] ?? "💤"}
+                    </span>
+                    <span>
+                      {HOW_FELL_ASLEEP_LABELS[session.how_fell_asleep] ??
+                        session.how_fell_asleep}
+                    </span>
+                  </span>
+                )}
+                {session.wake_reason && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border/40 bg-card/60 px-2 py-0.5 text-[11px] text-muted-foreground">
+                    <span aria-hidden="true">
+                      {WAKE_REASON_EMOJI[session.wake_reason] ?? "👀"}
+                    </span>
+                    <span>
+                      {WAKE_REASON_LABELS[session.wake_reason] ??
+                        session.wake_reason}
                     </span>
                   </span>
                 )}

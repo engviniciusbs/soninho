@@ -28,6 +28,33 @@ export type SleepSessionUpdate =
 
 export type SleepType = "NAP" | "NIGHT_SLEEP";
 
+export type NapSuggestionFeedback =
+  Database["public"]["Tables"]["nap_suggestion_feedback"]["Row"];
+export type NapSuggestionFeedbackInsert =
+  Database["public"]["Tables"]["nap_suggestion_feedback"]["Insert"];
+
+export type FamilyNote = Database["public"]["Tables"]["family_notes"]["Row"];
+export type FamilyNoteInsert =
+  Database["public"]["Tables"]["family_notes"]["Insert"];
+
+/** How the baby fell asleep — captured on stop / manual entry. */
+export type HowFellAsleep =
+  | "peito"
+  | "mamadeira"
+  | "colo"
+  | "berco"
+  | "carrinho"
+  | "movimento";
+
+/** Reason the baby woke up — mainly for night sleep. */
+export type WakeReason =
+  | "fome"
+  | "fralda"
+  | "barulho"
+  | "sozinho"
+  | "desconforto"
+  | "outro";
+
 export interface AISuggestion {
   suggestedNapTime: string;
   windowStart: string;

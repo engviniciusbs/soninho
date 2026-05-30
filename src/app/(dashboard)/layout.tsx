@@ -21,9 +21,9 @@ export default function DashboardLayout({
             <MiniTimerBar />
             <main
               id="main-content"
-              className="flex-1 overflow-y-auto overscroll-contain pb-24 md:pb-8 px-4 md:px-6 py-4"
+              className="flex-1 overflow-y-auto overscroll-contain pb-24 md:pb-10 px-4 md:px-8 py-5 md:py-7"
             >
-              {children}
+              <div className="mx-auto w-full max-w-5xl">{children}</div>
             </main>
             <BottomNav />
           </div>

@@ -25,8 +25,8 @@ export function BottomNav() {
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      {/* Glass backdrop */}
-      <div className="glass border-t border-white/8">
+      {/* Solid backdrop */}
+      <div className="border-t border-border bg-background/90 backdrop-blur-md supports-backdrop-filter:bg-background/75">
         <div className="flex items-center justify-around px-2 py-1">
           {links.map(({ href, label, icon: Icon }) => {
             const isActive = pathname === href;
@@ -44,7 +44,7 @@ export function BottomNav() {
                 {isActive && (
                   <motion.div
                     layoutId="bottom-nav-indicator"
-                    className="absolute inset-x-1 inset-y-0.5 rounded-xl bg-primary/12"
+                    className="absolute inset-x-1 inset-y-0.5 rounded-xl bg-secondary"
                     transition={{ type: "spring", stiffness: 500, damping: 38 }}
                   />
                 )}

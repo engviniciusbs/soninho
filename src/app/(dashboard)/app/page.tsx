@@ -5,77 +5,94 @@ import type { Variants } from "framer-motion";
 import { SleepTimer } from "@/components/sleep/SleepTimer";
 import { WakeWindowBadge } from "@/components/sleep/WakeWindowBadge";
 import { AISuggestionCard } from "@/components/ai/AISuggestionCard";
+import { RegressionRadar } from "@/components/sleep/RegressionRadar";
+import { FamilyNoteCard } from "@/components/family/FamilyNoteCard";
 import { SleepTimeline } from "@/components/sleep/SleepTimeline";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
+import { PageHeader } from "@/components/ui/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Baby } from "lucide-react";
 import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
+import { getBabyAge } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const container: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
 };
 
 const item: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   show: { opacity: 1, y: 0 },
 };
+
+function ageLabel(birthDate: string): string {
+  const { weeks, months } = getBabyAge(birthDate);
+  if (months >= 1) return `${months} ${months === 1 ? "mês" : "meses"}`;
+  return `${weeks} ${weeks === 1 ? "semana" : "semanas"}`;
+}
 
 export default function AppHomePage() {
   const { activeBaby, isLoading, babies } = useBaby();
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center gap-6 pt-10 px-4">
-        <Skeleton className="h-7 w-36 rounded-full" />
-        <Skeleton className="h-[300px] w-full max-w-sm rounded-3xl" />
-        <Skeleton className="h-24 w-full max-w-sm rounded-2xl" />
-        <Skeleton className="h-32 w-full max-w-sm rounded-2xl" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-12 w-12 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-40 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded-lg" />
+          </div>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+          <Skeleton className="h-[360px] w-full rounded-3xl" />
+          <div className="space-y-5">
+            <Skeleton className="h-28 w-full rounded-2xl" />
+            <Skeleton className="h-36 w-full rounded-2xl" />
+            <Skeleton className="h-40 w-full rounded-2xl" />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (babies.length === 0) {
     return (
-      <div className="relative flex flex-col items-center justify-center gap-8 pt-20 text-center px-6">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-        >
-          <div className="absolute left-1/2 top-1/4 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
-        </div>
-
+      <div className="flex flex-col items-center justify-center gap-7 pt-20 text-center px-6">
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.85, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 animate-float"
+          className="flex h-24 w-24 items-center justify-center rounded-full surface"
         >
-          <SoninhoLogoMark size={72} className="animate-breathe" />
+          <SoninhoLogoMark size={64} />
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          transition={{ delay: 0.12 }}
           className="space-y-3"
         >
-          <h2 className="text-2xl font-bold">Bem-vindo ao Soninho!</h2>
+          <h1 className="font-display text-2xl font-semibold">
+            Bem-vindo ao Soninho
+          </h1>
           <p className="text-muted-foreground max-w-xs leading-relaxed">
-            Adicione seu bebê para começar a monitorar o sono e receber dicas personalizadas.
+            Adicione seu bebê para começar a monitorar o sono e receber dicas
+            personalizadas.
           </p>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.2 }}
         >
           <Link href="/settings">
-            <Button size="lg" className="rounded-full px-8 glow-primary">
+            <Button size="lg" className="rounded-full px-8">
               <Baby className="mr-2 h-4 w-4" aria-hidden="true" />
               Adicionar bebê
             </Button>
@@ -86,47 +103,53 @@ export default function AppHomePage() {
   }
 
   return (
-    <div className="relative min-h-full">
-      <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-20 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-primary/8 blur-3xl" />
-        <div className="absolute top-1/3 -right-20 h-60 w-60 rounded-full bg-indigo/6 blur-3xl" />
-        <div className="absolute bottom-1/3 -left-20 h-60 w-60 rounded-full bg-lavender/5 blur-3xl" />
-      </div>
-
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="relative flex flex-col items-center gap-5 pt-4 pb-8 px-4"
-      >
-        <motion.div variants={item} className="flex flex-col items-center gap-2">
-          <BabyAvatar
-            avatarUrl={activeBaby?.avatar_url}
-            emoji={activeBaby?.avatar_emoji ?? "🌙"}
-            name={activeBaby?.name}
-            size="lg"
-          />
-          <h1 className="text-xl font-bold text-foreground">{activeBaby?.name}</h1>
-        </motion.div>
-
-        <motion.div variants={item} className="w-full max-w-sm">
-          <div className="glass rounded-3xl border border-white/8 p-5 sm:p-8 shadow-2xl">
-            <SleepTimer />
-          </div>
-        </motion.div>
-
-        <motion.div variants={item} className="w-full max-w-sm">
-          <WakeWindowBadge />
-        </motion.div>
-
-        <motion.div variants={item} className="w-full max-w-sm">
-          <AISuggestionCard />
-        </motion.div>
-
-        <motion.div variants={item} className="w-full max-w-sm">
-          <SleepTimeline />
-        </motion.div>
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
+      <motion.div variants={item}>
+        <PageHeader
+          leading={
+            <BabyAvatar
+              avatarUrl={activeBaby?.avatar_url}
+              emoji={activeBaby?.avatar_emoji ?? "🌙"}
+              name={activeBaby?.name}
+              size="md"
+            />
+          }
+          eyebrow="Acompanhamento"
+          title={activeBaby?.name ?? "Bebê"}
+          subtitle={activeBaby ? ageLabel(activeBaby.birth_date) : undefined}
+        />
       </motion.div>
-    </div>
+
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start">
+        {/* Timer — primary action */}
+        <motion.div variants={item} className="rounded-3xl surface p-5 sm:p-7">
+          <SleepTimer />
+        </motion.div>
+
+        {/* Live status + insights */}
+        <div className="space-y-5">
+          <motion.div variants={item}>
+            <WakeWindowBadge />
+          </motion.div>
+          <motion.div variants={item}>
+            <AISuggestionCard />
+          </motion.div>
+          <motion.div variants={item}>
+            <RegressionRadar />
+          </motion.div>
+          <motion.div variants={item}>
+            <FamilyNoteCard />
+          </motion.div>
+          <motion.div variants={item}>
+            <SleepTimeline />
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
