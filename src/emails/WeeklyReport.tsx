@@ -28,6 +28,12 @@ export interface WeeklyReportBabyStats {
   longestNightHours: number;
   adherencePct: number;
   bestEnvironment: string | null;
+  feeding?: {
+    avgBottlesPerDay: number;
+    avgBottleVolumeMlPerDay: number;
+    avgBreastfeedsPerDay: number;
+    avgSolidMealsPerDay: number;
+  } | null;
 }
 
 export interface WeeklyReportProps {
@@ -322,6 +328,40 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
         <Section style={envBox}>
           <Text style={envLabel}>Melhor ambiente</Text>
           <Text style={envValue}>{baby.bestEnvironment}</Text>
+        </Section>
+      ) : null}
+
+      {baby.feeding &&
+      (baby.feeding.avgBottlesPerDay > 0 ||
+        baby.feeding.avgBreastfeedsPerDay > 0 ||
+        baby.feeding.avgSolidMealsPerDay > 0) ? (
+        <Section style={{ marginTop: "18px" }}>
+          <Text style={statGridLabel}>Alimentação (média diária)</Text>
+          <Row>
+            {baby.feeding.avgBottlesPerDay > 0 ? (
+              <StatCell
+                label="Mamadeiras"
+                value={baby.feeding.avgBottlesPerDay.toFixed(1)}
+                unit={`· ${Math.round(baby.feeding.avgBottleVolumeMlPerDay)}ml`}
+              />
+            ) : null}
+            {baby.feeding.avgBreastfeedsPerDay > 0 ? (
+              <StatCell
+                label="Mamadas no peito"
+                value={baby.feeding.avgBreastfeedsPerDay.toFixed(1)}
+                unit="/ dia"
+              />
+            ) : null}
+          </Row>
+          {baby.feeding.avgSolidMealsPerDay > 0 ? (
+            <Row>
+              <StatCell
+                label="Refeições de sólidos"
+                value={baby.feeding.avgSolidMealsPerDay.toFixed(1)}
+                unit="/ dia"
+              />
+            </Row>
+          ) : null}
         </Section>
       ) : null}
     </Section>

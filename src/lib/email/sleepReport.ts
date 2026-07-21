@@ -9,10 +9,16 @@ import {
 } from "@/lib/sleep/statistics";
 import { computeEnvironmentCorrelation } from "@/lib/sleep/environmentCorrelation";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { computeFeedingStats } from "@/lib/feeding/feedingStatistics";
 import WeeklyReport, {
   type WeeklyReportBabyStats,
 } from "@/emails/WeeklyReport";
-import type { SleepSession } from "@/types";
+import type {
+  SleepSession,
+  BottleFeeding,
+  BreastfeedingSession,
+  SolidFeeding,
+} from "@/types";
 const FROM = "Soninho <sono@soninho.baby>";
 
 export function buildBabyStats(
@@ -20,7 +26,12 @@ export function buildBabyStats(
   birthDate: string,
   name: string,
   emoji: string,
-  periodDays: number
+  periodDays: number,
+  feeding?: {
+    bottles: BottleFeeding[];
+    breastSessions: BreastfeedingSession[];
+    solids: SolidFeeding[];
+  }
 ): WeeklyReportBabyStats {
   const ageWeeks = differenceInWeeks(new Date(), parseISO(birthDate));
   const schedule = getAgeSchedule(ageWeeks);
@@ -54,6 +65,15 @@ export function buildBabyStats(
     ? `${env.bestTemperature.label} (qualidade ${env.bestTemperature.avgQuality}/5)`
     : null;
 
+  const feedingStats = feeding
+    ? computeFeedingStats(
+        feeding.bottles,
+        feeding.breastSessions,
+        feeding.solids,
+        periodDays
+      )
+    : null;
+
   return {
     name,
     emoji,
@@ -65,6 +85,7 @@ export function buildBabyStats(
     longestNightHours,
     adherencePct,
     bestEnvironment,
+    feeding: feedingStats,
   };
 }
 
@@ -115,15 +136,43 @@ export async function sendSleepReport(params: {
   const babyStats: WeeklyReportBabyStats[] = [];
 
   for (const baby of params.babies) {
-    const { data: sessions } = await params.supabase
-      .from("sleep_sessions")
-      .select("*")
-      .eq("baby_id", baby.id)
-      .gte("start_time", periodStart.toISOString())
-      .order("start_time", { ascending: true });
+    const [{ data: sessions }, { data: bottles }, { data: breastSessions }, { data: solids }] =
+      await Promise.all([
+        params.supabase
+          .from("sleep_sessions")
+          .select("*")
+          .eq("baby_id", baby.id)
+          .gte("start_time", periodStart.toISOString())
+          .order("start_time", { ascending: true }),
+        params.supabase
+          .from("bottle_feedings")
+          .select("*")
+          .eq("baby_id", baby.id)
+          .gte("start_time", periodStart.toISOString()),
+        params.supabase
+          .from("breastfeeding_sessions")
+          .select("*")
+          .eq("baby_id", baby.id)
+          .gte("start_time", periodStart.toISOString()),
+        params.supabase
+          .from("solid_feedings")
+          .select("*")
+          .eq("baby_id", baby.id)
+          .gte("start_time", periodStart.toISOString()),
+      ]);
 
     const list = (sessions ?? []) as SleepSession[];
-    if (list.filter((s) => s.duration_min != null).length === 0) continue;
+    const feeding = {
+      bottles: (bottles ?? []) as BottleFeeding[],
+      breastSessions: (breastSessions ?? []) as BreastfeedingSession[],
+      solids: (solids ?? []) as SolidFeeding[],
+    };
+    const hasSleepData = list.filter((s) => s.duration_min != null).length > 0;
+    const hasFeedingData =
+      feeding.bottles.length > 0 ||
+      feeding.breastSessions.length > 0 ||
+      feeding.solids.length > 0;
+    if (!hasSleepData && !hasFeedingData) continue;
 
     babyStats.push(
       buildBabyStats(
@@ -131,7 +180,8 @@ export async function sendSleepReport(params: {
         baby.birth_date,
         baby.name,
         baby.avatar_emoji || "👶",
-        params.periodDays
+        params.periodDays,
+        feeding
       )
     );
   }

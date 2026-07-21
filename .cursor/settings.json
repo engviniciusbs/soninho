@@ -3,9 +3,6 @@
     "context7-plugin": {
       "enabled": true
     },
-    "supabase": {
-      "enabled": true
-    },
     "resend": {
       "enabled": true
     }

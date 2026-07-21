@@ -1,0 +1,17 @@
+export const COMMON_FOOD_TAGS = [
+  "Banana",
+  "Maçã",
+  "Pera",
+  "Mamão",
+  "Abacate",
+  "Batata-doce",
+  "Cenoura",
+  "Abóbora",
+  "Brócolis",
+  "Arroz",
+  "Aveia",
+  "Frango",
+  "Feijão",
+  "Ovo",
+  "Iogurte",
+] as const;

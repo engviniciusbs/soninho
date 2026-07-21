@@ -1,5 +1,6 @@
 import {
   Home,
+  Milk,
   List,
   BarChart3,
   Sparkles,
@@ -16,6 +17,7 @@ export interface NavLink {
 
 export const ALL_NAV_LINKS: NavLink[] = [
   { href: "/app", label: "Início", icon: Home },
+  { href: "/feeding", label: "Alimentação", icon: Milk, mobileLabel: "Comida" },
   { href: "/history", label: "Registro", icon: List },
   { href: "/analytics", label: "Análise", icon: BarChart3 },
   { href: "/ai-insights", label: "IA Insights", icon: Sparkles, mobileLabel: "IA" },
