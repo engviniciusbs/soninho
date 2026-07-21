@@ -3,24 +3,48 @@
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
-import { Activity, Moon, Sun } from "lucide-react";
+import { Activity, Moon, Sun, Milk, Baby as BabyIcon, Salad } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getFamilyRelationLabel } from "@/lib/family/relations";
 import { useBaby } from "@/components/providers/BabyProvider";
-import type { SleepActivityLog } from "@/types";
+import type { UnifiedActivityItem } from "@/app/api/family/activity/route";
 
-function activityLine(entry: SleepActivityLog): string {
+const FEEDING_LABELS: Record<string, string> = {
+  BOTTLE: "mamadeira",
+  BREAST: "mamada no peito",
+  SOLID: "refeição de sólidos",
+};
+
+function activityLine(entry: UnifiedActivityItem): string {
   const who =
     getFamilyRelationLabel(entry.actor_relation) ??
     entry.actor_name ??
     "Alguém";
-  const kind =
-    entry.sleep_type === "NIGHT_SLEEP" ? "sono noturno" : "soneca";
-  if (entry.action === "started") {
-    return `${who} iniciou ${kind}`;
+
+  if (entry.kind === "feeding") {
+    const label = FEEDING_LABELS[entry.feeding_type ?? "BOTTLE"];
+    if (entry.action === "started") return `${who} iniciou ${label}`;
+    if (entry.action === "stopped") return `${who} finalizou ${label}`;
+    return `${who} registrou ${label}`;
   }
+
+  const kind = entry.sleep_type === "NIGHT_SLEEP" ? "sono noturno" : "soneca";
+  if (entry.action === "started") return `${who} iniciou ${kind}`;
   return `${who} finalizou ${kind}`;
+}
+
+function ActivityIcon({ entry }: { entry: UnifiedActivityItem }) {
+  if (entry.kind === "feeding") {
+    if (entry.feeding_type === "BREAST") return <BabyIcon className="h-4 w-4 text-rose-400" />;
+    if (entry.feeding_type === "SOLID") return <Salad className="h-4 w-4 text-emerald-400" />;
+    return <Milk className="h-4 w-4 text-sky-400" />;
+  }
+  return entry.sleep_type === "NIGHT_SLEEP" ? (
+    <Moon className="h-4 w-4 text-indigo-400" />
+  ) : (
+    <Sun className="h-4 w-4 text-amber-400" />
+  );
 }
 
 export function FamilyActivityFeed() {
@@ -34,13 +58,13 @@ export function FamilyActivityFeed() {
       const membersJson = membersRes.ok ? await membersRes.json() : { data: [] };
       const memberCount = (membersJson.data as unknown[])?.length ?? 1;
       if (memberCount < 2) {
-        return { memberCount, items: [] as SleepActivityLog[] };
+        return { memberCount, items: [] as UnifiedActivityItem[] };
       }
       const res = await fetch(`/api/family/activity?babyId=${babyId}&limit=8`);
       const activityJson = res.ok ? await res.json() : { data: [] };
       return {
         memberCount,
-        items: (activityJson.data ?? []) as SleepActivityLog[],
+        items: (activityJson.data ?? []) as UnifiedActivityItem[],
       };
     },
     enabled: !!babyId,
@@ -61,7 +85,7 @@ export function FamilyActivityFeed() {
           <Activity className="h-4 w-4 text-primary" aria-hidden />
           Atividade da família
         </CardTitle>
-        <CardDescription>Quem iniciou ou parou o sono recentemente</CardDescription>
+        <CardDescription>Quem registrou sono ou alimentação recentemente</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -71,7 +95,7 @@ export function FamilyActivityFeed() {
           </div>
         ) : items.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Ainda sem registros — quando alguém iniciar uma soneca, aparece aqui.
+            Ainda sem registros — quando alguém iniciar uma soneca ou registrar uma mamada, aparece aqui.
           </p>
         ) : (
           <ul className="space-y-2">
@@ -84,11 +108,7 @@ export function FamilyActivityFeed() {
                   className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background"
                   aria-hidden
                 >
-                  {entry.sleep_type === "NIGHT_SLEEP" ? (
-                    <Moon className="h-4 w-4 text-indigo-400" />
-                  ) : (
-                    <Sun className="h-4 w-4 text-amber-400" />
-                  )}
+                  <ActivityIcon entry={entry} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium leading-snug">{activityLine(entry)}</p>

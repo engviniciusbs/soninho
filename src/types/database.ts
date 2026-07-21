@@ -298,6 +298,167 @@ export interface Database {
           created_at?: string;
         };
       };
+      bottle_feedings: {
+        Row: {
+          id: string;
+          baby_id: string;
+          start_time: string;
+          volume_ml: number;
+          milk_type: "FORMULA" | "BREAST_MILK" | "MIXED";
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          start_time: string;
+          volume_ml: number;
+          milk_type: "FORMULA" | "BREAST_MILK" | "MIXED";
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          start_time?: string;
+          volume_ml?: number;
+          milk_type?: "FORMULA" | "BREAST_MILK" | "MIXED";
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      breastfeeding_sessions: {
+        Row: {
+          id: string;
+          baby_id: string;
+          start_time: string;
+          end_time: string | null;
+          side_left_sec: number;
+          side_right_sec: number;
+          last_side: "LEFT" | "RIGHT" | null;
+          duration_min: number | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          start_time: string;
+          end_time?: string | null;
+          side_left_sec?: number;
+          side_right_sec?: number;
+          last_side?: "LEFT" | "RIGHT" | null;
+          duration_min?: number | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          start_time?: string;
+          end_time?: string | null;
+          side_left_sec?: number;
+          side_right_sec?: number;
+          last_side?: "LEFT" | "RIGHT" | null;
+          duration_min?: number | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      solid_feedings: {
+        Row: {
+          id: string;
+          baby_id: string;
+          start_time: string;
+          food_tags: string[];
+          reaction:
+            | "LOVED"
+            | "LIKED"
+            | "NEUTRAL"
+            | "DISLIKED"
+            | "ALLERGIC_REACTION"
+            | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          start_time: string;
+          food_tags?: string[];
+          reaction?:
+            | "LOVED"
+            | "LIKED"
+            | "NEUTRAL"
+            | "DISLIKED"
+            | "ALLERGIC_REACTION"
+            | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          start_time?: string;
+          food_tags?: string[];
+          reaction?:
+            | "LOVED"
+            | "LIKED"
+            | "NEUTRAL"
+            | "DISLIKED"
+            | "ALLERGIC_REACTION"
+            | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      feeding_activity_log: {
+        Row: {
+          id: string;
+          baby_id: string;
+          family_id: string | null;
+          actor_user_id: string;
+          actor_name: string | null;
+          actor_relation: string | null;
+          action: "started" | "stopped" | "logged";
+          feeding_type: "BOTTLE" | "BREAST" | "SOLID";
+          reference_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          baby_id: string;
+          family_id?: string | null;
+          actor_user_id: string;
+          actor_name?: string | null;
+          actor_relation?: string | null;
+          action: "started" | "stopped" | "logged";
+          feeding_type: "BOTTLE" | "BREAST" | "SOLID";
+          reference_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          baby_id?: string;
+          family_id?: string | null;
+          actor_user_id?: string;
+          actor_name?: string | null;
+          actor_relation?: string | null;
+          action?: "started" | "stopped" | "logged";
+          feeding_type?: "BOTTLE" | "BREAST" | "SOLID";
+          reference_id?: string | null;
+          created_at?: string;
+        };
+      };
       user_profiles: {
         Row: {
           user_id: string;

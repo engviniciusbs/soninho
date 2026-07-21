@@ -4,6 +4,18 @@ import {
   getSleepActivityLog,
   getUserRoleForBaby,
 } from "@/lib/supabase/queries";
+import { getFeedingActivityLog } from "@/lib/supabase/feedingQueries";
+
+export interface UnifiedActivityItem {
+  id: string;
+  kind: "sleep" | "feeding";
+  action: string;
+  created_at: string;
+  actor_name: string | null;
+  actor_relation: string | null;
+  sleep_type?: "NAP" | "NIGHT_SLEEP" | null;
+  feeding_type?: "BOTTLE" | "BREAST" | "SOLID" | null;
+}
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -22,10 +34,41 @@ export async function GET(req: NextRequest) {
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const { data, error } = await getSleepActivityLog(supabase, babyId, limit);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  const [sleepRes, feedingRes] = await Promise.all([
+    getSleepActivityLog(supabase, babyId, limit),
+    getFeedingActivityLog(supabase, babyId, limit),
+  ]);
+
+  if (sleepRes.error) {
+    return NextResponse.json({ error: sleepRes.error.message }, { status: 500 });
+  }
+  if (feedingRes.error) {
+    return NextResponse.json({ error: feedingRes.error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ data: data ?? [] });
+  const sleepItems: UnifiedActivityItem[] = (sleepRes.data ?? []).map((row) => ({
+    id: row.id,
+    kind: "sleep",
+    action: row.action,
+    created_at: row.created_at,
+    actor_name: row.actor_name,
+    actor_relation: row.actor_relation,
+    sleep_type: row.sleep_type,
+  }));
+
+  const feedingItems: UnifiedActivityItem[] = (feedingRes.data ?? []).map((row) => ({
+    id: row.id,
+    kind: "feeding",
+    action: row.action,
+    created_at: row.created_at,
+    actor_name: row.actor_name,
+    actor_relation: row.actor_relation,
+    feeding_type: row.feeding_type,
+  }));
+
+  const data = [...sleepItems, ...feedingItems]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, limit);
+
+  return NextResponse.json({ data });
 }
