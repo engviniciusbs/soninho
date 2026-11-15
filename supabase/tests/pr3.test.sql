@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(15);
+select plan(22);
 
 select tests.create_user('33333333-0000-0000-0000-000000000001', 'pr3-owner@test.local');
 insert into public.families (id, name, created_by)
@@ -84,6 +84,30 @@ select has_function('public', 'guard_member_self_update', '{}'::name[], 'guard_m
 select ok(coalesce(not has_function_privilege('authenticated', to_regprocedure('public.guard_member_self_update()'), 'execute')
                and not has_function_privilege('anon', to_regprocedure('public.guard_member_self_update()'), 'execute'), false),
   'guard_member_self_update_not_executable_by_clients');
+
+-- ===================================================== Task 3: AI quota
+select tests.logout();
+select tests.create_user('33333333-0000-0000-0000-000000000004', 'pr3-ai@test.local');
+select tests.login_as('33333333-0000-0000-0000-000000000004');
+select is(tests.try_val($$select public.consume_ai_quota(2)$$), 'true', 'ai_quota_atomic_limit_1');
+select is(tests.try_val($$select public.consume_ai_quota(2)$$), 'true', 'ai_quota_atomic_limit_2');
+select is(tests.try_val($$select public.consume_ai_quota(2)$$), 'false', 'ai_quota_atomic_limit_3_denied');
+
+select tests.logout();
+update public.ai_usage set day = day - 1 where user_id = '33333333-0000-0000-0000-000000000004';
+select tests.login_as('33333333-0000-0000-0000-000000000004');
+select is(tests.try_val($$select public.consume_ai_quota(2)$$), 'true', 'ai_quota_resets_next_day');
+select tests.logout();
+select is((select count from public.ai_usage where user_id = '33333333-0000-0000-0000-000000000004'
+           and day = (now() at time zone 'America/Sao_Paulo')::date), 1, 'ai_quota_new_day_row_starts_at_1');
+
+select ok(not has_function_privilege('anon', to_regprocedure('public.consume_ai_quota(int)'), 'execute')
+          and has_function_privilege('authenticated', to_regprocedure('public.consume_ai_quota(int)'), 'execute'),
+  'anon_cannot_execute_ai_quota');
+
+select tests.login_as('33333333-0000-0000-0000-000000000004');
+select is(tests.try_val($$select count(*) from public.ai_usage$$), '0', 'clients_cannot_read_ai_usage');
+select tests.logout();
 
 select * from finish();
 rollback;

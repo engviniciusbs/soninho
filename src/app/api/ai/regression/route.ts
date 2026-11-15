@@ -3,6 +3,7 @@ import { z } from "zod";
 import { differenceInWeeks, differenceInMonths } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentSessions, getUserRoleForBaby } from "@/lib/supabase/queries";
+import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
@@ -72,6 +73,10 @@ export async function POST(request: Request) {
         explanation: null,
         tips: [],
       });
+    }
+
+    if (!(await consumeAiQuota(supabase))) {
+      return NextResponse.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
 
     const context = [

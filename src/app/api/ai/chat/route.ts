@@ -1,20 +1,11 @@
-import { z } from "zod";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
 import { buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries";
+import { chatRequestSchema } from "@/lib/ai/chatSchema";
+import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
 import type { Baby, SleepSession } from "@/types";
-
-const requestSchema = z.object({
-  babyId: z.string().uuid(),
-  messages: z.array(
-    z.object({
-      role: z.enum(["user", "assistant"]),
-      content: z.string(),
-    })
-  ),
-});
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +18,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const parsed = requestSchema.safeParse(body);
+    const parsed = chatRequestSchema.safeParse(body);
 
     if (!parsed.success) {
       return new Response("Invalid request", { status: 400 });
@@ -36,6 +27,9 @@ export async function POST(request: Request) {
     const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
     if (!role) {
       return new Response("Forbidden", { status: 403 });
+    }
+    if (!(await consumeAiQuota(supabase))) {
+      return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
