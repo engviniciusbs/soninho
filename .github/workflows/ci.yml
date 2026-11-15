@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      - name: Build
+        run: npm run build
+        # Dummy values only, so the build can run without any secret (works on
+        # fork PRs). The VAPID pair below is a throwaway generated for CI; it is
+        # NOT the production key pair and protects nothing.
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci
+          SUPABASE_SERVICE_ROLE_KEY: ci
+          OPENAI_API_KEY: ci
+          RESEND_API_KEY: ci
+          CRON_SECRET: ci
+          VAPID_CONTACT_EMAIL: mailto:ci@example.com
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: BCG4e_ha-NUqG_qMvanoTluvXjQ5sa7vnbEYPPK4LutO1lOwYBMate5jAKf7dx6yph5-wPhOK9Pnq-RT915GsPY
+          VAPID_PRIVATE_KEY: 9A2JZLrw3OX6KkAsaviR-c6jWnH5DXJsj8-si2e1_iU
+
+  db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.1.0
+      # Starts only the Postgres container and applies supabase/migrations.
+      - run: supabase db start
+      - run: supabase test db
