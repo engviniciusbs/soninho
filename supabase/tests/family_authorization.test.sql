@@ -1,6 +1,7 @@
+-- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(42);
+select plan(44);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner a1, caregiver a2, viewer a3 | F2: owner b1 | c1,c2,c3 no family
@@ -24,6 +25,9 @@ insert into public.family_invites (id, family_id, token, role, created_by, expir
   ('00000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-0000000000f1', 'tok-i3', 'caregiver', '00000000-0000-0000-0000-0000000000a1', now() + interval '7 days', now()),
   ('00000000-0000-0000-0000-000000000014', '00000000-0000-0000-0000-0000000000f1', 'tok-i4', 'caregiver', '00000000-0000-0000-0000-0000000000a1', now() + interval '7 days', null);
 
+insert into public.sleep_sessions (id, baby_id, type, start_time) values
+  ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-0000000000b1', 'NAP', now() - interval '1 hour');
+
 -- --------------------------------------------- function existence (RED guard)
 select has_function('public', 'get_invite_preview', array['text'], 'get_invite_preview(text) exists');
 select has_function('public', 'accept_family_invite', array['text','text'], 'accept_family_invite(text,text) exists');
@@ -31,8 +35,9 @@ select has_function('public', 'create_baby_with_family', array['text','date','te
 
 -- ------------------------------------------------------------ invites RLS
 select tests.login_anon();
-select is(tests.try_val('select count(*) from public.family_invites'), '0', 'anon_cannot_list_invites');
+select matches(tests.try_val('select count(*) from public.family_invites'), '^(0|ERR:42501)', 'anon_cannot_list_invites');
 select tests.login_as('00000000-0000-0000-0000-0000000000a3');
+select is(auth.uid()::text, '00000000-0000-0000-0000-0000000000a3', 'login_as sets auth.uid()');
 select is(tests.try_val('select count(*) from public.family_invites'), '0', 'viewer_cannot_list_invites');
 
 -- ------------------------------------------------- outsider (c1) insertions
@@ -52,14 +57,16 @@ select is(tests.try_val($$select count(*) from public.get_user_family_ids('00000
   'helpers_ignore_foreign_uid: a1 asking about self gets 1');
 
 select tests.login_as('00000000-0000-0000-0000-0000000000a2');
-select isnt(tests.try_exec($$update public.babies set family_id='00000000-0000-0000-0000-0000000000f2' where id='00000000-0000-0000-0000-0000000000b1'$$), 'OK:1',
-  'caregiver_cannot_move_baby_to_foreign_family: update neither succeeds');
+select matches(tests.try_exec($$update public.babies set family_id='00000000-0000-0000-0000-0000000000f2' where id='00000000-0000-0000-0000-0000000000b1'$$),
+  '^(OK:0|ERR:42501)', 'caregiver_cannot_move_baby_to_foreign_family: update denied or 0 rows');
+select tests.try_val($$update public.babies set family_id='00000000-0000-0000-0000-0000000000f2' where id='00000000-0000-0000-0000-0000000000b1' returning 1$$);
+select tests.logout();
 select is((select family_id::text from public.babies where id='00000000-0000-0000-0000-0000000000b1'),
-  '00000000-0000-0000-0000-0000000000f1', 'caregiver_cannot_move_baby_to_foreign_family: family_id unchanged');
+  '00000000-0000-0000-0000-0000000000f1', 'caregiver_cannot_move_baby_to_foreign_family: family_id unchanged (real run, checked as superuser)');
 
 select tests.login_as('00000000-0000-0000-0000-0000000000a3');
 select matches(tests.try_exec($$update public.family_members set role='owner' where user_id='00000000-0000-0000-0000-0000000000a3'$$),
-  '^ERR:42501', 'viewer_cannot_change_own_role');
+  '^ERR:42501:.*forbidden_role_change', 'viewer_cannot_change_own_role');
 
 select tests.login_as('00000000-0000-0000-0000-0000000000a2');
 select is(tests.try_exec($$update public.family_members set family_relation='avo', display_name='X' where user_id='00000000-0000-0000-0000-0000000000a2'$$),
@@ -75,11 +82,14 @@ select matches(tests.try_exec($$delete from public.family_members where user_id=
 select tests.login_as('00000000-0000-0000-0000-0000000000a2');
 select is(tests.try_exec($$insert into public.sleep_sessions(baby_id,type,start_time) values ('00000000-0000-0000-0000-0000000000b1','NAP',now())$$),
   'OK:1', 'existing_family_access: caregiver inserts sleep_session');
-select is(tests.try_exec($$update public.sleep_sessions set notes='n' where baby_id='00000000-0000-0000-0000-0000000000b1'$$),
-  'OK:0', 'existing_family_access: caregiver update (no rows yet, no error)');
+select is(tests.try_exec($$update public.sleep_sessions set notes='n' where id='00000000-0000-0000-0000-0000000000e1'$$),
+  'OK:1', 'existing_family_access: caregiver updates seeded sleep_session');
 select tests.login_as('00000000-0000-0000-0000-0000000000a3');
 select matches(tests.try_exec($$insert into public.sleep_sessions(baby_id,type,start_time) values ('00000000-0000-0000-0000-0000000000b1','NAP',now())$$),
   '^ERR:42501', 'existing_family_access: viewer cannot insert sleep_session');
+select tests.login_as('00000000-0000-0000-0000-0000000000a2');
+select is(tests.try_val($$select count(*) from public.sleep_sessions where baby_id='00000000-0000-0000-0000-0000000000b1'$$), '1',
+  'existing_family_access: caregiver sees 1 session of B1 (positive control)');
 select tests.login_as('00000000-0000-0000-0000-0000000000b1');
 select is(tests.try_val($$select count(*) from public.sleep_sessions where baby_id='00000000-0000-0000-0000-0000000000b1'$$), '0',
   'existing_family_access: foreign owner sees 0 sessions of B1');
@@ -141,8 +151,8 @@ select is((select count(*)::int from public.family_members fm join public.babies
   'create_baby_with_family_new_user: c3 is owner of the new family');
 
 -- ------------------------------------------------------------ search_path
-select ok((select coalesce(proconfig::text, '') like '%search_path=public%' from pg_proc
-           where proname='calculate_duration' and pronamespace='public'::regnamespace),
+select ok(exists(select 1 from pg_proc where proname='calculate_duration' and pronamespace='public'::regnamespace
+                 and (coalesce(proconfig::text,'') like '%search_path=public%' or coalesce(proconfig::text,'') like '%search_path=""%')),
   'calculate_duration_search_path');
 
 select * from finish();
