@@ -12,6 +12,7 @@ import { useSleepStore } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsed } from "@/lib/utils";
 import { toast } from "sonner";
+import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
 
 export function useSleepTimer() {
@@ -117,6 +118,21 @@ export function useSleepTimer() {
         start_time: startTimeIso,
       }
     );
+
+    if (error && isUniqueViolation(error)) {
+      // Another caregiver already has an open session: sync to it.
+      const { data: existing } = await getActiveSleepSession(supabase, activeBaby.id);
+      if (existing) {
+        startTimer(
+          existing.id,
+          existing.start_time,
+          existing.type as "NAP" | "NIGHT_SLEEP",
+          activeBaby.id
+        );
+        toast.success("Já existe um sono em andamento — sincronizado ✨");
+        return;
+      }
+    }
 
     if (error) {
       toast.error("Erro ao iniciar sessão de sono");

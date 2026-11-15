@@ -17,30 +17,13 @@ export async function createBaby(
   supabase: Client,
   data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
-  // 1. Create the family
-  const { data: family, error: familyError } = await supabase
-    .from("families")
-    .insert({ name: `${data.name}'s familia`, created_by: data.user_id })
-    .select()
-    .single();
-
-  if (familyError) return { data: null, error: familyError };
-
-  // 2. Add owner as member
-  const { error: memberError } = await supabase.from("family_members").insert({
-    family_id: family.id,
-    user_id: data.user_id,
-    role: "owner",
+  // family + owner membership + baby are created atomically server-side
+  return supabase.rpc("create_baby_with_family", {
+    p_name: data.name,
+    p_birth_date: data.birth_date,
+    p_avatar_emoji: data.avatar_emoji ?? "🍼",
+    p_avatar_url: data.avatar_url ?? null,
   });
-
-  if (memberError) return { data: null, error: memberError };
-
-  // 3. Create baby linked to family
-  return supabase
-    .from("babies")
-    .insert({ ...data, family_id: family.id })
-    .select()
-    .single();
 }
 
 export async function updateBaby(
@@ -330,63 +313,46 @@ export async function getActiveFamilyInvites(
 
 export async function revokeFamilyInvite(
   supabase: Client,
-  inviteId: string
+  inviteId: string,
+  familyId: string
 ) {
   return supabase
     .from("family_invites")
     .update({ revoked_at: new Date().toISOString() })
-    .eq("id", inviteId);
+    .eq("id", inviteId)
+    .eq("family_id", familyId);
 }
 
-export async function getInviteByToken(supabase: Client, token: string) {
-  return supabase
-    .from("family_invites")
-    .select("*, families(name, created_by)")
-    .eq("token", token)
-    .is("revoked_at", null)
-    .is("accepted_at", null)
-    .gt("expires_at", new Date().toISOString())
-    .maybeSingle();
+export type InvitePreview = {
+  status: "valid" | "expired" | "revoked" | "accepted" | "not_found";
+  family_name: string | null;
+  role: "caregiver" | "viewer" | null;
+  family_relation: string | null;
+  inviter_name: string | null;
+  expires_at: string | null;
+};
+
+export async function getInvitePreview(
+  supabase: Client,
+  token: string
+): Promise<{ data: InvitePreview | null; error: { message: string } | null }> {
+  const { data, error } = await supabase.rpc("get_invite_preview", { p_token: token });
+  if (error) return { data: null, error };
+  const row = (Array.isArray(data) ? data[0] : data) as InvitePreview | undefined;
+  return { data: row ?? null, error: null };
 }
 
 export async function acceptFamilyInvite(
   supabase: Client,
   token: string,
-  userId: string,
-  displayName: string | null,
-  email: string | null
-) {
-  const { data: invite, error } = await supabase
-    .from("family_invites")
-    .select("*")
-    .eq("token", token)
-    .is("revoked_at", null)
-    .is("accepted_at", null)
-    .gt("expires_at", new Date().toISOString())
-    .single();
-
-  if (error || !invite) return { data: null, error: error ?? new Error("Invalid or expired invite") };
-
-  // Add member
-  const { error: memberError } = await supabase.from("family_members").insert({
-    family_id: invite.family_id,
-    user_id: userId,
-    role: invite.role,
-    display_name: displayName,
-    email,
-    family_relation: invite.family_relation ?? null,
-    invited_by: invite.created_by,
+  displayName: string | null
+): Promise<{ data: { family_id: string } | null; error: { message: string; code?: string } | null }> {
+  const { data, error } = await supabase.rpc("accept_family_invite", {
+    p_token: token,
+    p_display_name: displayName,
   });
-
-  if (memberError) return { data: null, error: memberError };
-
-  // Mark invite as accepted
-  await supabase
-    .from("family_invites")
-    .update({ accepted_at: new Date().toISOString(), accepted_by: userId })
-    .eq("id", invite.id);
-
-  return { data: invite, error: null };
+  if (error) return { data: null, error };
+  return { data: { family_id: data as string }, error: null };
 }
 
 export async function removeFamilyMember(

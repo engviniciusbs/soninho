@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -31,6 +31,12 @@ export async function middleware(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // API routes enforce their own auth (getUser / CRON_SECRET); the proxy only
+  // refreshes the session cookies and must never redirect them.
+  if (pathname.startsWith("/api/")) {
+    return supabaseResponse;
+  }
+
   // Legacy marketing URL → home (LP)
   if (pathname === "/landing" || pathname.startsWith("/landing/")) {
     const url = request.nextUrl.clone();
@@ -42,14 +48,12 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/login") || pathname.startsWith("/register");
 
   const isInvitePage = pathname.startsWith("/invite/");
-  const isPublicApiRoute = pathname.startsWith("/api/family/accept/");
   const isPublicMarketing = pathname === "/";
 
   if (
     !user &&
     !isAuthPage &&
     !isInvitePage &&
-    !isPublicApiRoute &&
     !isPublicMarketing &&
     !pathname.startsWith("/auth")
   ) {
@@ -76,5 +80,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|sw\\.js$|manifest\\.webmanifest$|robots\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

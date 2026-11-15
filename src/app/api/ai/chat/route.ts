@@ -3,6 +3,7 @@ import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
 import { buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRoleForBaby } from "@/lib/supabase/queries";
 import type { Baby, SleepSession } from "@/types";
 
 const requestSchema = z.object({
@@ -17,6 +18,14 @@ const requestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return new Response("Unauthorized", { status: 401 });
+    }
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
@@ -24,7 +33,10 @@ export async function POST(request: Request) {
       return new Response("Invalid request", { status: 400 });
     }
 
-    const supabase = await createClient();
+    const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
+    if (!role) {
+      return new Response("Forbidden", { status: 403 });
+    }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
       .select("*")

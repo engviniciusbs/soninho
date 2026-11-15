@@ -9,10 +9,10 @@ import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 import { createClient } from "@/lib/supabase/client";
 
 type InviteInfo = {
-  id: string;
   role: "caregiver" | "viewer";
   family_relation: string | null;
   family_name: string;
+  inviter_name: string | null;
   expires_at: string;
 };
 

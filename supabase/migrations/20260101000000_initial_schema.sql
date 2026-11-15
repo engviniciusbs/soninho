@@ -1,5 +1,5 @@
 -- Soninho Database Schema
--- Run this in Supabase SQL Editor (https://supabase.com/dashboard → SQL Editor)
+-- Baseline migration: original schema for babies and sleep_sessions, applied before the later migrations.
 
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
@@ -47,6 +47,7 @@ create policy "Users can only access sleep sessions of their own babies"
   );
 
 -- Trigger: auto-calculate duration_min on end_time update
+-- NOTE: the CRLF line endings inside the function body below are deliberate, to match production byte-for-byte (keeps `db diff` clean).
 create or replace function calculate_duration()
 returns trigger as $$
 begin

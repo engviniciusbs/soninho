@@ -1,5 +1,6 @@
 "use client";
 
+import { safeRedirectPath } from "@/lib/safeRedirect";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -35,7 +36,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push(redirectParam ?? "/app");
+    router.push(safeRedirectPath(redirectParam));
     router.refresh();
   }
 

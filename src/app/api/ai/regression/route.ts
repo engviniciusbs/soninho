@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { differenceInWeeks, differenceInMonths } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
-import { getRecentSessions } from "@/lib/supabase/queries";
+import { getRecentSessions, getUserRoleForBaby } from "@/lib/supabase/queries";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
@@ -15,13 +15,24 @@ const requestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
+    if (!role) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
       .select("*")
