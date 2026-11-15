@@ -6,6 +6,7 @@ create table public.ai_usage (
   primary key (user_id, day)
 );
 alter table public.ai_usage enable row level security;
+revoke all on table public.ai_usage from anon, authenticated;
 
 create or replace function public.consume_ai_quota(p_limit int) returns boolean
 language plpgsql security definer set search_path = public as $$

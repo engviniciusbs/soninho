@@ -106,7 +106,7 @@ select ok(not has_function_privilege('anon', to_regprocedure('public.consume_ai_
   'anon_cannot_execute_ai_quota');
 
 select tests.login_as('33333333-0000-0000-0000-000000000004');
-select is(tests.try_val($$select count(*) from public.ai_usage$$), '0', 'clients_cannot_read_ai_usage');
+select matches(tests.try_val($$select count(*) from public.ai_usage$$), '^(0|ERR:42501)', 'clients_cannot_read_ai_usage');
 select tests.logout();
 
 select * from finish();
