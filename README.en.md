@@ -200,7 +200,7 @@ email_log                  — user_id · kind · period_start · period_end · 
 
 ### Security
 
-Every table should have **Row Level Security** enabled. the original pattern (baby owner via `auth.uid()`) is in `supabase/migrations/20260101000000_initial_schema.sql`; with families, policies should allow access to babies in the user's families (`get_user_family_ids`) and writes only for `owner`/`caregiver` (`user_can_write_family`). Cross-user operations (crons, invite acceptance, family push) use the admin client (`service_role`).
+Every table should have **Row Level Security** enabled. The original pattern (baby owner via `auth.uid()`) is in `supabase/migrations/20260101000000_initial_schema.sql`; with families, policies should allow access to babies in the user's families (`get_user_family_ids`) and writes only for `owner`/`caregiver` (`user_can_write_family`). Cross-user operations (crons, invite acceptance, family push) use the admin client (`service_role`).
 
 The `calculate_sleep_duration` trigger fills `duration_min` and `updated_at` on `sleep_sessions`.
 
