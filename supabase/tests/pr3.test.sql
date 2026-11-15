@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(24);
 
 select tests.create_user('33333333-0000-0000-0000-000000000001', 'pr3-owner@test.local');
 insert into public.families (id, name, created_by)
@@ -107,6 +107,20 @@ select ok(not has_function_privilege('anon', to_regprocedure('public.consume_ai_
 
 select tests.login_as('33333333-0000-0000-0000-000000000004');
 select matches(tests.try_val($$select count(*) from public.ai_usage$$), '^(0|ERR:42501)', 'clients_cannot_read_ai_usage');
+select tests.logout();
+
+-- ===================================================== Task 9: RETURNING under RLS (404-on-no-op detection)
+select tests.login_as('33333333-0000-0000-0000-000000000002');
+select is(tests.try_val($$with d as (delete from public.family_members
+    where family_id = '33333333-0000-0000-0000-0000000000f1' and user_id = '33333333-0000-0000-0000-000000000002'
+    returning id) select count(*) from d$$), '1', 'caregiver_self_removal_returning_one_row');
+select tests.logout();
+insert into public.family_members (family_id, user_id, role, email)
+  values ('33333333-0000-0000-0000-0000000000f1', '33333333-0000-0000-0000-000000000002', 'caregiver', 'pr3-care@test.local');
+select tests.login_as('33333333-0000-0000-0000-000000000001');
+select is(tests.try_val($$with d as (delete from public.family_members
+    where family_id = '33333333-0000-0000-0000-0000000000f1' and user_id = '33333333-0000-0000-0000-000000000002'
+    returning id) select count(*) from d$$), '1', 'owner_removes_caregiver_returning_one_row');
 select tests.logout();
 
 select * from finish();

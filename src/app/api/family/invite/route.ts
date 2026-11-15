@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { zUuid } from "@/lib/validation/common";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import {
   createFamilyInvite,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/supabase/queries";
 
 const postSchema = z.object({
-  babyId: z.string().uuid(),
+  babyId: zUuid,
   role: z.enum(["caregiver", "viewer"]),
   familyRelation: z.string().max(40).nullish(),
 });
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const babyId = req.nextUrl.searchParams.get("babyId");
-  if (!babyId) return NextResponse.json({ error: "babyId required" }, { status: 400 });
+  if (!babyId) return NextResponse.json({ error: "babyId obrigatório" }, { status: 400 });
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (role !== "owner") return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
@@ -78,7 +79,7 @@ export async function DELETE(req: NextRequest) {
   const inviteId = req.nextUrl.searchParams.get("inviteId");
   const babyId = req.nextUrl.searchParams.get("babyId");
   if (!inviteId || !babyId) {
-    return NextResponse.json({ error: "inviteId and babyId required" }, { status: 400 });
+    return NextResponse.json({ error: "inviteId e babyId obrigatórios" }, { status: 400 });
   }
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);

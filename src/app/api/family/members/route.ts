@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { zUuid } from "@/lib/validation/common";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import {
   getFamilyForBaby,
@@ -11,14 +12,14 @@ import {
 } from "@/lib/supabase/queries";
 
 const patchSchema = z.object({
-  babyId: z.uuid(),
-  targetUserId: z.uuid(),
+  babyId: zUuid,
+  targetUserId: zUuid,
   role: z.enum(["caregiver", "viewer"]),
 });
 
 const deleteSchema = z.object({
-  babyId: z.uuid(),
-  targetUserId: z.uuid(),
+  babyId: zUuid,
+  targetUserId: zUuid,
 });
 
 // GET /api/family/members?babyId=... — list family members
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const babyId = req.nextUrl.searchParams.get("babyId");
-  if (!babyId) return NextResponse.json({ error: "babyId required" }, { status: 400 });
+  if (!babyId) return NextResponse.json({ error: "babyId obrigatório" }, { status: 400 });
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
   if (!family) return NextResponse.json({ data: [] });
 
   const { data, error } = await getFamilyMembers(supabase, family.id);
-  if (error) return NextResponse.json({ error: "Ocorreu um erro. Tente novamente." }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({ data, currentUserRole: role });
 }
@@ -50,7 +51,7 @@ export async function PATCH(req: NextRequest) {
 
   const parsed = patchSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
   const { babyId, targetUserId, role } = parsed.data;
 
@@ -91,7 +92,7 @@ export async function DELETE(req: NextRequest) {
     targetUserId: sp.get("targetUserId") ?? sp.get("userId"),
   });
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
   const { babyId, targetUserId } = parsed.data;
 
