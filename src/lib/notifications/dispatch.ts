@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import * as webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
 import { differenceInWeeks, differenceInMinutes, parseISO } from "date-fns";
