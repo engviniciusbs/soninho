@@ -1,10 +1,23 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { combineOutcomes, deliverAlerts, mapPool } from "./deliverAlerts";
+import {
+  alertTtlSeconds,
+  combineOutcomes,
+  deliverAlerts,
+  mapPool,
+  sweepStalePendingClaims,
+} from "./deliverAlerts";
 import type { PlannedAlert } from "./selectAlerts";
 
 const NOW = new Date("2026-11-16T15:00:00Z");
 
-type Op = { table: string; op: "update" | "delete"; values?: unknown; column: string; arg: unknown };
+type Op = {
+  table: string;
+  op: "update" | "delete";
+  values?: unknown;
+  column: string;
+  arg: unknown;
+  filters?: [string, string, unknown][];
+};
 
 /** Fake admin client that records every write. */
 function fakeStore() {
@@ -24,6 +37,23 @@ function fakeStore() {
             in(column: string, arg: unknown) {
               ops.push({ table, op: "delete", column, arg });
               return Promise.resolve({ error: null });
+            },
+            eq(column: string, arg: unknown) {
+              return {
+                lt(ltColumn: string, ltArg: unknown) {
+                  ops.push({
+                    table,
+                    op: "delete",
+                    column,
+                    arg,
+                    filters: [
+                      ["eq", column, arg],
+                      ["lt", ltColumn, ltArg],
+                    ],
+                  });
+                  return Promise.resolve({ error: null });
+                },
+              };
             },
           };
         },
@@ -53,7 +83,7 @@ const sub = (name: string) => ({
 });
 
 /** wp whose result is decided per endpoint name. */
-function fakeWp(behavior: Record<string, "ok" | 410 | 500>) {
+function fakeWp(behavior: Record<string, "ok" | 403 | 410 | 500>) {
   return {
     sendNotification: vi.fn(async ({ endpoint }: { endpoint: string }) => {
       const b = behavior[endpoint.split("/").pop()!];
@@ -158,12 +188,81 @@ describe("deliverAlerts", () => {
   });
 });
 
+describe("deliverAlerts payload and TTL", () => {
+  it("uses the brand icon and the per-alert TTL", async () => {
+    const { store } = fakeStore();
+    const wp = fakeWp({ a1: "ok" });
+    await deliverAlerts({
+      wp: wp as never,
+      store,
+      alerts: [alert("u1")],
+      subsByUser: new Map([["u1", [sub("a1")]]]),
+      now: NOW,
+      ttlFor: () => 900,
+    });
+    const [, payload, options] = wp.sendNotification.mock.calls[0] as unknown as [
+      unknown,
+      string,
+      unknown,
+    ];
+    expect(JSON.parse(payload).icon).toBe("/brand/soninho-mark@2x.png");
+    expect(options).toEqual({ timeout: 10_000, TTL: 900 });
+  });
+
+  it("marks a 403-only alert failed without retrying or deactivating", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const { ops, store } = fakeStore();
+    await deliverAlerts({
+      wp: fakeWp({ r1: 403 }) as never,
+      store,
+      alerts: [alert("u1")],
+      subsByUser: new Map([["u1", [sub("r1")]]]),
+      now: NOW,
+    });
+    expect(ops).toEqual([
+      {
+        table: "notification_events",
+        op: "update",
+        values: { status: "failed", sent_at: null },
+        column: "dedupe_key",
+        arg: [alert("u1").dedupeKey],
+      },
+    ]);
+  });
+});
+
+describe("alertTtlSeconds", () => {
+  it("bounds NAP_SOON by its window (min 5 min) and keeps 1h for OVERDUE", () => {
+    expect(alertTtlSeconds("NAP_SOON", 15)).toBe(900);
+    expect(alertTtlSeconds("NAP_SOON", 2)).toBe(300);
+    expect(alertTtlSeconds("OVERDUE", 15)).toBe(3600);
+  });
+});
+
+describe("sweepStalePendingClaims", () => {
+  it("deletes only pending claims older than 10 minutes", async () => {
+    const { ops, store } = fakeStore();
+    await sweepStalePendingClaims(store, NOW);
+    expect(ops).toHaveLength(1);
+    expect(ops[0]).toMatchObject({
+      table: "notification_events",
+      op: "delete",
+      filters: [
+        ["eq", "status", "pending"],
+        ["lt", "scheduled_for", "2026-11-16T14:50:00.000Z"],
+      ],
+    });
+  });
+});
+
 describe("combineOutcomes", () => {
-  it("prefers sent, then all-dead, else failed", () => {
+  it("prefers sent, then transient if any device may recover, else permanent", () => {
     expect(combineOutcomes(["failed", "sent"])).toBe("sent");
-    expect(combineOutcomes(["dead", "dead"])).toBe("dead");
-    expect(combineOutcomes(["dead", "failed"])).toBe("failed");
-    expect(combineOutcomes([])).toBe("failed");
+    expect(combineOutcomes(["dead", "dead"])).toBe("permanent");
+    expect(combineOutcomes(["dead", "rejected"])).toBe("permanent");
+    expect(combineOutcomes(["rejected", "failed"])).toBe("transient");
+    expect(combineOutcomes(["dead", "failed"])).toBe("transient");
+    expect(combineOutcomes([])).toBe("transient");
   });
 });
 

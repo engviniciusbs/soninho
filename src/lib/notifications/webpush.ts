@@ -57,23 +57,33 @@ export interface SubscriptionStore {
 
 /**
  * Outcome of one push: delivered, subscription dead (deactivated), or a
- * transient failure (timeout, 5xx, network) worth retrying later.
+ * transient failure worth retrying later.
+ * - "sent": delivered.
+ * - "dead": subscription is permanently unusable and was deactivated
+ *   (disallowed host, 404/410 gone, 400 malformed, 413 payload too large).
+ * - "rejected": 403 — usually a VAPID key mismatch (e.g. after key rotation),
+ *   which would hit every subscription at once, so it is NOT deactivated; the
+ *   current alert should not be retried either.
+ * - "failed": transient (timeout, network, 5xx, 429, ...) — retry later.
  */
-export type SendOutcome = "sent" | "dead" | "failed";
+export type SendOutcome = "sent" | "dead" | "rejected" | "failed";
 
 /** web-push has no default timeout; keep well under the route's maxDuration. */
-export const PUSH_SEND_OPTIONS = { timeout: 10_000, TTL: 3600 } as const;
+export const PUSH_TIMEOUT_MS = 10_000;
+export const DEFAULT_PUSH_TTL_SECONDS = 3600;
+
+const DEAD_STATUS = new Set([400, 404, 410, 413]);
 
 /**
  * Sends one push. Endpoints outside the allowlist are never contacted and the
- * row is deactivated ("dead"); 404/410 deactivate ("dead"); other errors are
- * only logged ("failed").
+ * row is deactivated. See SendOutcome for how errors are classified.
  */
 export async function sendToSubscription(
   wp: Pick<WebPush, "sendNotification">,
   sub: PushSubscriptionRow,
   payload: string,
-  store: SubscriptionStore
+  store: SubscriptionStore,
+  options: { ttl?: number } = {}
 ): Promise<SendOutcome> {
   const deactivate = async () => {
     await store
@@ -92,16 +102,19 @@ export async function sendToSubscription(
     await wp.sendNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
       payload,
-      PUSH_SEND_OPTIONS
+      { timeout: PUSH_TIMEOUT_MS, TTL: options.ttl ?? DEFAULT_PUSH_TTL_SECONDS }
     );
     return "sent";
   } catch (err: unknown) {
     const statusCode = (err as { statusCode?: number })?.statusCode;
-    const dead = statusCode === 404 || statusCode === 410;
-    if (dead) await deactivate();
     console.error(
       `[push] Send failed for ${endpointHost(sub.endpoint)} (status ${statusCode ?? "n/a"})`
     );
-    return dead ? "dead" : "failed";
+    if (statusCode !== undefined && DEAD_STATUS.has(statusCode)) {
+      await deactivate();
+      return "dead";
+    }
+    if (statusCode === 403) return "rejected";
+    return "failed";
   }
 }

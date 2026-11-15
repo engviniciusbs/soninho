@@ -50,4 +50,34 @@ describe("sendToSubscription", () => {
     expect(err).toHaveBeenCalledOnce();
     expect(String(err.mock.calls[0][0])).not.toContain("/fcm/send/x");
   });
+
+  it("passes a custom TTL", async () => {
+    const t = setup(async () => ({}));
+    await sendToSubscription(t.wp as never, good, "{}", t.store, { ttl: 900 });
+    expect(t.wp.sendNotification).toHaveBeenCalledWith(expect.anything(), "{}", {
+      timeout: 10_000,
+      TTL: 900,
+    });
+  });
+
+  it.each([400, 404, 413])("deactivates on permanent %i", async (statusCode) => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = setup(() => Promise.reject({ statusCode }));
+    expect(await sendToSubscription(t.wp as never, good, "{}", t.store)).toBe("dead");
+    expect(t.update).toHaveBeenCalledWith({ is_active: false });
+  });
+
+  it("rejects on 403 without deactivating (VAPID mismatch hits every subscription)", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = setup(() => Promise.reject({ statusCode: 403 }));
+    expect(await sendToSubscription(t.wp as never, good, "{}", t.store)).toBe("rejected");
+    expect(t.update).not.toHaveBeenCalled();
+  });
+
+  it.each([429, undefined])("treats %s as transient", async (statusCode) => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const t = setup(() => Promise.reject(statusCode ? { statusCode } : new Error("Socket timeout")));
+    expect(await sendToSubscription(t.wp as never, good, "{}", t.store)).toBe("failed");
+    expect(t.update).not.toHaveBeenCalled();
+  });
 });

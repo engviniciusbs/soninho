@@ -1,6 +1,15 @@
-import { deliverAlerts } from "@/lib/notifications/deliverAlerts";
+import {
+  alertTtlSeconds,
+  deliverAlerts,
+  sweepStalePendingClaims,
+} from "@/lib/notifications/deliverAlerts";
 import { getWebPush, type PushSubscriptionRow } from "@/lib/notifications/webpush";
-import { selectAlerts, type AlertPref, type SelectAlertsInput } from "@/lib/notifications/selectAlerts";
+import {
+  DEFAULT_ALERT_BEFORE_MINUTES,
+  selectAlerts,
+  type AlertPref,
+  type SelectAlertsInput,
+} from "@/lib/notifications/selectAlerts";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Completed sessions older than this are not considered (wake windows max out at 4h). */
@@ -31,6 +40,9 @@ const uniq = (xs: string[]) => [...new Set(xs)];
 
 export async function dispatchNotifications(now: Date = new Date()): Promise<number> {
   const supabase = createAdminClient();
+
+  // 0. Release claims left 'pending' by a run that died mid-send.
+  await sweepStalePendingClaims(supabase, now);
 
   // 1. Users with notifications enabled.
   const { data: prefRows, error: prefError } = await supabase
@@ -126,6 +138,8 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
         session_id: a.sessionId,
         event_type: a.eventType,
         dedupe_key: a.dedupeKey,
+        // Claim time; the sweep releases claims still pending after 10 min.
+        scheduled_for: now.toISOString(),
         sent_at: null,
         status: "pending",
       })),
@@ -139,5 +153,15 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
   if (owned.length === 0) return 0;
 
   // 8. Send (bounded concurrency, per-send timeout) and settle each claim.
-  return deliverAlerts({ wp: webpush, store: supabase, alerts: owned, subsByUser, now });
+  const alertBefore = new Map(
+    prefs.map((p) => [p.user_id, p.alert_before_minutes || DEFAULT_ALERT_BEFORE_MINUTES])
+  );
+  return deliverAlerts({
+    wp: webpush,
+    store: supabase,
+    alerts: owned,
+    subsByUser,
+    now,
+    ttlFor: (a) => alertTtlSeconds(a.eventType, alertBefore.get(a.userId)!),
+  });
 }
