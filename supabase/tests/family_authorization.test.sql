@@ -25,8 +25,8 @@ insert into public.family_invites (id, family_id, token, role, created_by, expir
   ('00000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-0000000000f1', 'tok-i3', 'caregiver', '00000000-0000-0000-0000-0000000000a1', now() + interval '7 days', now()),
   ('00000000-0000-0000-0000-000000000014', '00000000-0000-0000-0000-0000000000f1', 'tok-i4', 'caregiver', '00000000-0000-0000-0000-0000000000a1', now() + interval '7 days', null);
 
-insert into public.sleep_sessions (id, baby_id, type, start_time) values
-  ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-0000000000b1', 'NAP', now() - interval '1 hour');
+insert into public.sleep_sessions (id, baby_id, type, start_time, end_time) values
+  ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-0000000000b1', 'NAP', now() - interval '2 hours', now() - interval '1 hour');
 
 -- --------------------------------------------- function existence (RED guard)
 select has_function('public', 'get_invite_preview', array['text'], 'get_invite_preview(text) exists');
