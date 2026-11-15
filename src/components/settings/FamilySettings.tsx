@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -75,6 +76,14 @@ function getInitials(name: string | null, email: string | null): string {
     .toUpperCase();
 }
 
+async function errorMessage(res: Response): Promise<string> {
+  try {
+    const body = await res.json();
+    if (typeof body?.error === "string") return body.error;
+  } catch {}
+  return "Ocorreu um erro. Tente novamente.";
+}
+
 export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [invites, setInvites] = useState<FamilyInvite[]>([]);
@@ -131,6 +140,8 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
       const link = buildInviteLink(window.location.origin, data.token);
       setGeneratedLink(link);
       fetchInvites();
+    } else {
+      toast.error(await errorMessage(res));
     }
     setGeneratingLink(false);
   };
@@ -151,6 +162,8 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
       if (generatedLink && invites.find((i) => i.id === inviteId)) {
         setGeneratedLink(null);
       }
+    } else {
+      toast.error(await errorMessage(res));
     }
   };
 
@@ -162,6 +175,8 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
     );
     if (res.ok) {
       setMembers((prev) => prev.filter((m) => m.user_id !== removingMember.user_id));
+    } else {
+      toast.error(await errorMessage(res));
     }
     setRemovingMember(null);
     setConfirmOpen(false);

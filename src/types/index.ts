@@ -1,8 +1,6 @@
 import type { Database } from "./database";
 
-export type Baby = Omit<Database["public"]["Tables"]["babies"]["Row"], "avatar_emoji"> & {
-  avatar_emoji: string;
-};
+export type Baby = Database["public"]["Tables"]["babies"]["Row"];
 export type BabyInsert = Database["public"]["Tables"]["babies"]["Insert"];
 export type BabyUpdate = Database["public"]["Tables"]["babies"]["Update"];
 

@@ -16,7 +16,7 @@ export async function getBaby(supabase: Client, babyId: string) {
 
 export async function createBaby(
   supabase: Client,
-  data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
+  data: { name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
   // family + owner membership + baby are created atomically server-side
   return supabase.rpc("create_baby_with_family", {
@@ -336,7 +336,8 @@ export async function revokeFamilyInvite(
     .from("family_invites")
     .update({ revoked_at: new Date().toISOString() })
     .eq("id", inviteId)
-    .eq("family_id", familyId);
+    .eq("family_id", familyId)
+    .select("id");
 }
 
 export type InvitePreview = {
@@ -380,7 +381,8 @@ export async function removeFamilyMember(
     .from("family_members")
     .delete()
     .eq("family_id", familyId)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("id");
 }
 
 export async function updateMemberRole(
@@ -393,7 +395,8 @@ export async function updateMemberRole(
     .from("family_members")
     .update({ role })
     .eq("family_id", familyId)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("id");
 }
 
 // ── Family notes (mural / handoff) ──────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import {
   getFamilyForBaby,
   getFamilyMembers,
@@ -20,38 +21,23 @@ const deleteSchema = z.object({
   targetUserId: z.uuid(),
 });
 
-/** Maps a DB error to a generic client response (never exposes error.message). */
-function dbErrorResponse(error: { message?: string; code?: string }) {
-  const msg = error.message ?? "";
-  if (msg.includes("family_needs_owner")) {
-    return NextResponse.json(
-      { error: "A família precisa de pelo menos um responsável" },
-      { status: 409 }
-    );
-  }
-  if (msg.includes("forbidden_role_change") || error.code === "42501") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-  return NextResponse.json({ error: "Internal error" }, { status: 500 });
-}
-
 // GET /api/family/members?babyId=... — list family members
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const babyId = req.nextUrl.searchParams.get("babyId");
   if (!babyId) return NextResponse.json({ error: "babyId required" }, { status: 400 });
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
-  if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!role) return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
   if (!family) return NextResponse.json({ data: [] });
 
   const { data, error } = await getFamilyMembers(supabase, family.id);
-  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Ocorreu um erro. Tente novamente." }, { status: 500 });
 
   return NextResponse.json({ data, currentUserRole: role });
 }
@@ -60,7 +46,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const parsed = patchSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
@@ -77,14 +63,17 @@ export async function PATCH(req: NextRequest) {
 
   const userRole = await getUserRoleForBaby(supabase, user.id, babyId);
   if (userRole !== "owner") {
-    return NextResponse.json({ error: "Only owners can change roles" }, { status: 403 });
+    return NextResponse.json({ error: "Apenas responsáveis podem alterar papéis" }, { status: 403 });
   }
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
-  if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
+  if (!family) return NextResponse.json({ error: "Família não encontrada" }, { status: 404 });
 
-  const { error } = await updateMemberRole(supabase, family.id, targetUserId, role);
-  if (error) return dbErrorResponse(error);
+  const { data: updated, error } = await updateMemberRole(supabase, family.id, targetUserId, role);
+  if (error) return dbErrorToResponse(error);
+  if (!updated || updated.length === 0) {
+    return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  }
 
   return NextResponse.json({ success: true });
 }
@@ -93,7 +82,7 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   // Accepts targetUserId (preferred) or legacy userId query param.
   const sp = req.nextUrl.searchParams;
@@ -109,14 +98,32 @@ export async function DELETE(req: NextRequest) {
   // Allow self-removal or owner removing others
   const userRole = await getUserRoleForBaby(supabase, user.id, babyId);
   if (user.id !== targetUserId && userRole !== "owner") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
   }
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
-  if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
+  if (!family) return NextResponse.json({ error: "Família não encontrada" }, { status: 404 });
 
-  const { error } = await removeFamilyMember(supabase, family.id, targetUserId);
-  if (error) return dbErrorResponse(error);
+  // Defense in depth: the DB trigger also enforces this.
+  const { data: members, error: membersError } = await getFamilyMembers(supabase, family.id);
+  if (membersError) return dbErrorToResponse(membersError);
+  const target = members?.find((m) => m.user_id === targetUserId);
+  if (!target) return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  if (
+    target.role === "owner" &&
+    members.filter((m) => m.role === "owner").length <= 1
+  ) {
+    return NextResponse.json(
+      { error: "A família precisa de pelo menos um responsável" },
+      { status: 409 }
+    );
+  }
+
+  const { data: removed, error } = await removeFamilyMember(supabase, family.id, targetUserId);
+  if (error) return dbErrorToResponse(error);
+  if (!removed || removed.length === 0) {
+    return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  }
 
   return NextResponse.json({ success: true });
 }

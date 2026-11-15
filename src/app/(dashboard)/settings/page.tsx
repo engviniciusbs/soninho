@@ -144,11 +144,11 @@ export default function SettingsPage() {
     setShowBabyForm(true);
   }
 
-  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string; avatar_url: string | null }) {
+  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string | null; avatar_url: string | null }) {
     setEditingBaby(baby.id);
     setBabyName(baby.name);
     setBabyBirthDate(baby.birth_date);
-    setBabyEmoji(baby.avatar_emoji);
+    setBabyEmoji(baby.avatar_emoji ?? "🍼");
     setBabyAvatarUrl(baby.avatar_url);
     setShowBabyForm(true);
   }
@@ -225,7 +225,6 @@ export default function SettingsPage() {
       }
 
       const { error } = await createBaby(supabase, {
-        user_id: user.id,
         name: babyName.trim(),
         birth_date: babyBirthDate,
         avatar_emoji: babyEmoji,
@@ -364,7 +363,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <BabyAvatar
                     avatarUrl={baby.avatar_url}
-                    emoji={baby.avatar_emoji}
+                    emoji={baby.avatar_emoji ?? "🍼"}
                     name={baby.name}
                     size="md"
                   />

@@ -46,7 +46,7 @@ export function TopBar() {
                 <span className="flex items-center gap-2">
                   <BabyAvatar
                     avatarUrl={activeBaby.avatar_url}
-                    emoji={activeBaby.avatar_emoji}
+                    emoji={activeBaby.avatar_emoji ?? "🍼"}
                     name={activeBaby.name}
                     size="sm"
                   />
@@ -60,7 +60,7 @@ export function TopBar() {
                   <span className="flex items-center gap-2">
                     <BabyAvatar
                       avatarUrl={baby.avatar_url}
-                      emoji={baby.avatar_emoji}
+                      emoji={baby.avatar_emoji ?? "🍼"}
                       name={baby.name}
                       size="sm"
                     />
