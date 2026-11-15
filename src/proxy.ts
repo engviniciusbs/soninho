@@ -12,13 +12,17 @@ export async function proxy(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
+          );
+          // Prevent CDNs from caching responses that carry auth cookies.
+          Object.entries(headers).forEach(([key, value]) =>
+            supabaseResponse.headers.set(key, value)
           );
         },
       },
@@ -47,6 +51,7 @@ export async function proxy(request: NextRequest) {
   const isAuthPage =
     pathname.startsWith("/login") || pathname.startsWith("/register");
 
+  const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/");
   const isInvitePage = pathname.startsWith("/invite/");
   const isPublicMarketing = pathname === "/";
 
@@ -55,12 +60,19 @@ export async function proxy(request: NextRequest) {
     !isAuthPage &&
     !isInvitePage &&
     !isPublicMarketing &&
-    !pathname.startsWith("/auth")
+    !isAuthRoute
   ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("redirect", request.nextUrl.pathname);
-    return NextResponse.redirect(url);
+    url.search = "";
+    url.searchParams.set("redirect", pathname + request.nextUrl.search);
+    const redirectResponse = NextResponse.redirect(url);
+    // Carry refreshed cookies/headers onto the redirect.
+    supabaseResponse.cookies.getAll().forEach((c) => redirectResponse.cookies.set(c));
+    supabaseResponse.headers.forEach((value, key) => {
+      if (/^(cache-control|expires|pragma)$/i.test(key)) redirectResponse.headers.set(key, value);
+    });
+    return redirectResponse;
   }
 
   if (user && isAuthPage) {

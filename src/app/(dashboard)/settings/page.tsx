@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { toCsv } from "@/lib/export/csv";
 import { createBaby, updateBaby, deleteBaby, getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -289,7 +290,7 @@ export default function SettingsPage() {
         s.notes ?? "",
       ]);
 
-      const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n");
+      const csv = toCsv([headers, ...rows]);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
