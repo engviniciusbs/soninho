@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { differenceInWeeks } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
+import { getUserRoleForBaby } from "@/lib/supabase/queries";
 import { getRecentMilkFeedTimes } from "@/lib/supabase/feedingQueries";
 import { computeFeedingSuggestion } from "@/lib/feeding/computeFeedingSuggestion";
 import type { Baby } from "@/types";
@@ -17,6 +18,14 @@ const requestSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const parsed = requestSchema.safeParse(body);
 
@@ -24,7 +33,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
+    if (!role) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
       .select("*")
