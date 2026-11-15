@@ -61,6 +61,20 @@ const statusConfig = {
   },
 };
 
+/**
+ * Ticking "HH:MM:SS" while sleeping. Its own component so only it subscribes
+ * to the 1s clock, and only while the sleeping state is mounted.
+ */
+function SleepingElapsed({ startTime }: { startTime: string }) {
+  const now = useNow();
+  const [initialNow] = useState(() => Date.now());
+  return (
+    <p className="num-display text-2xl font-semibold tabular-nums text-indigo-300">
+      {formatElapsed(startTime, now ?? initialNow)}
+    </p>
+  );
+}
+
 export function WakeWindowBadge() {
   const { elapsedMinutes, status, range, minutesUntilNextNap, isLoading } =
     useWakeWindow();
@@ -69,8 +83,6 @@ export function WakeWindowBadge() {
   const isRunning = timer !== null;
   const startTime = timer?.startTime ?? null;
   const sleepType = timer?.sleepType ?? "NAP";
-  const now = useNow();
-  const [initialNow] = useState(() => Date.now());
   const supabase = createClient();
 
   const { data: recentSessions = [] } = useQuery({
@@ -95,7 +107,6 @@ export function WakeWindowBadge() {
 
   // ── Sleeping state ────────────────────────────────────────────────────────
   if (isRunning && startTime) {
-    const elapsed = formatElapsed(startTime, now ?? initialNow);
     const isNight = sleepType === "NIGHT_SLEEP";
     return (
       <motion.div
@@ -114,9 +125,7 @@ export function WakeWindowBadge() {
               <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
                 {isNight ? "Sono noturno" : "Soneca"}
               </p>
-              <p className="num-display text-2xl font-semibold tabular-nums text-indigo-300">
-                {elapsed}
-              </p>
+              <SleepingElapsed startTime={startTime} />
             </div>
           </div>
           <div className="rounded-full px-3 py-1 text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">

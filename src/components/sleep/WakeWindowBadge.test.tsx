@@ -39,7 +39,7 @@ async function mount() {
 const secondTicks = () => setIntervalSpy.mock.calls.filter(([, ms]) => ms === 1000);
 
 describe("WakeWindowBadge", () => {
-  it.fails("does_not_subscribe_to_1s_clock_when_awake", async () => {
+  it("does_not_subscribe_to_1s_clock_when_awake", async () => {
     await mount();
 
     expect(screen.getByText("Tempo acordado")).toBeInTheDocument();

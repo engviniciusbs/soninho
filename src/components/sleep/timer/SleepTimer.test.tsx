@@ -190,7 +190,7 @@ describe("SleepTimer (characterization)", () => {
     expect(useSleepStore.getState().timers[baby.id]).toBeUndefined();
   });
 
-  it.fails("fallback_time_bubble_has_no_hydration_mismatch", async () => {
+  it("fallback_time_bubble_has_no_hydration_mismatch", async () => {
     // As on the server/first client render: no baby loaded yet, so the wake
     // window is not loading and the fallback bubble is eligible.
     const babyCtx: BabyContextValue = {
