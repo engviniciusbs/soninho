@@ -7,6 +7,7 @@ import { Users, ShieldCheck, Eye, Loader2, CheckCircle2, XCircle } from "lucide-
 import { Button } from "@/components/ui/button";
 import { SoninhoLogoMark } from "@/components/brand/SoninhoLogoMark";
 import { createClient } from "@/lib/supabase/client";
+import { normalizeInviteToken } from "@/lib/invites/inviteLink";
 
 type InviteInfo = {
   role: "caregiver" | "viewer";
@@ -23,13 +24,23 @@ const ROLE_LABELS: Record<string, string> = {
   viewer: PERMISSION_ROLE_LABELS.viewer,
 };
 
+const INVITE_STATUS_MESSAGES: Record<string, string> = {
+  accepted: "Este convite já foi utilizado.",
+  expired: "Este convite expirou. Peça um novo link.",
+  revoked: "Este convite foi cancelado.",
+  not_found: "Convite não encontrado.",
+};
+
 const ROLE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   caregiver: ShieldCheck,
   viewer: Eye,
 };
 
 export default function InvitePage() {
-  const { token } = useParams<{ token: string }>();
+  const { token: rawToken } = useParams<{ token: string }>();
+  // Next decodes the segment once; normalize never double-decodes (see inviteLink.ts).
+  const token = normalizeInviteToken(rawToken);
+  const encodedToken = encodeURIComponent(token);
   const router = useRouter();
   const supabase = createClient();
 
@@ -47,27 +58,30 @@ export default function InvitePage() {
       setIsAuthenticated(!!user);
 
       // Fetch invite info (public endpoint)
-      const res = await fetch(`/api/family/accept/${token}`);
+      const res = await fetch(`/api/family/accept/${encodedToken}`);
       if (res.ok) {
         const { data } = await res.json();
         setInvite(data);
       } else {
         setStatus("error");
-        setErrorMsg("Convite inválido ou expirado.");
+        const body = await res.json().catch(() => null);
+        setErrorMsg(
+          INVITE_STATUS_MESSAGES[body?.status as string] ?? "Convite inválido ou expirado."
+        );
       }
       setLoading(false);
     }
     init();
-  }, [token, supabase]);
+  }, [encodedToken, supabase]);
 
   const handleAccept = async () => {
     if (!isAuthenticated) {
-      router.push(`/login?redirect=/invite/${token}`);
+      router.push(`/login?redirect=${encodeURIComponent(`/invite/${encodedToken}`)}`);
       return;
     }
 
     setAccepting(true);
-    const res = await fetch(`/api/family/accept/${token}`, { method: "POST" });
+    const res = await fetch(`/api/family/accept/${encodedToken}`, { method: "POST" });
     if (res.ok) {
       setStatus("success");
       setTimeout(() => router.push("/app"), 2000);

@@ -39,6 +39,7 @@ import {
   PERMISSION_ROLE_LABELS,
 } from "@/lib/family/relations";
 import type { FamilyMember, FamilyInvite, FamilyRole } from "@/types";
+import { buildInviteLink } from "@/lib/invites/inviteLink";
 
 interface FamilySettingsProps {
   babyId: string;
@@ -127,7 +128,7 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
     });
     if (res.ok) {
       const { data } = await res.json();
-      const link = `${window.location.origin}/invite/${data.token}`;
+      const link = buildInviteLink(window.location.origin, data.token);
       setGeneratedLink(link);
       fetchInvites();
     }

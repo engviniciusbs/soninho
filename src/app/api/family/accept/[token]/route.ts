@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeInviteToken } from "@/lib/invites/inviteLink";
 import { acceptFamilyInvite, getInvitePreview } from "@/lib/supabase/queries";
 
 // GET /api/family/accept/[token] — preview invite info (for the accept page)
@@ -7,7 +8,8 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = await params;
+  // Next already decoded `params` once; normalize only decodes if a `%` remains.
+  const token = normalizeInviteToken((await params).token);
   const supabase = await createClient();
 
   const { data: preview, error } = await getInvitePreview(supabase, token);
@@ -38,7 +40,8 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ token: string }> }
 ) {
-  const { token } = await params;
+  // Next already decoded `params` once; normalize only decodes if a `%` remains.
+  const token = normalizeInviteToken((await params).token);
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
