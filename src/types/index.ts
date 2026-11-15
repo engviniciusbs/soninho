@@ -1,6 +1,8 @@
 import type { Database } from "./database";
 
-export type Baby = Database["public"]["Tables"]["babies"]["Row"];
+export type Baby = Omit<Database["public"]["Tables"]["babies"]["Row"], "avatar_emoji"> & {
+  avatar_emoji: string;
+};
 export type BabyInsert = Database["public"]["Tables"]["babies"]["Insert"];
 export type BabyUpdate = Database["public"]["Tables"]["babies"]["Update"];
 
@@ -19,12 +21,17 @@ export type FamilyInviteInsert =
 
 export type FamilyRole = "owner" | "caregiver" | "viewer";
 
-export type UserProfile = Database["public"]["Tables"]["user_profiles"]["Row"];
+export type UserProfile = Omit<
+  Database["public"]["Tables"]["user_profiles"]["Row"],
+  "ui_mode"
+> & { ui_mode: UiMode };
 export type UserProfileUpdate =
   Database["public"]["Tables"]["user_profiles"]["Update"];
 
-export type SleepActivityLog =
-  Database["public"]["Tables"]["sleep_activity_log"]["Row"];
+export type SleepActivityLog = Omit<
+  Database["public"]["Tables"]["sleep_activity_log"]["Row"],
+  "action"
+> & { action: "started" | "stopped" };
 
 export type UiMode = "standard" | "nanny";
 

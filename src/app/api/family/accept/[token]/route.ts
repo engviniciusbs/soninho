@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { acceptFamilyInvite, getInviteByToken } from "@/lib/supabase/queries";
+import { acceptFamilyInvite, getInvitePreview } from "@/lib/supabase/queries";
 
 // GET /api/family/accept/[token] — preview invite info (for the accept page)
 export async function GET(
@@ -10,20 +10,25 @@ export async function GET(
   const { token } = await params;
   const supabase = await createClient();
 
-  const { data: invite, error } = await getInviteByToken(supabase, token);
-  if (error || !invite) {
-    return NextResponse.json({ error: "Invite not found or expired" }, { status: 404 });
+  const { data: preview, error } = await getInvitePreview(supabase, token);
+  if (error) {
+    return NextResponse.json({ error: "Erro ao carregar convite" }, { status: 500 });
+  }
+  if (!preview || preview.status !== "valid") {
+    return NextResponse.json(
+      { error: "Convite inválido ou expirado", status: preview?.status ?? "not_found" },
+      { status: 404 }
+    );
   }
 
   return NextResponse.json({
     data: {
-      id: invite.id,
-      role: invite.role,
-      family_relation: invite.family_relation,
-      family_id: invite.family_id,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      family_name: (invite as any).families?.name ?? "Familia",
-      expires_at: invite.expires_at,
+      status: preview.status,
+      family_name: preview.family_name,
+      role: preview.role,
+      family_relation: preview.family_relation,
+      inviter_name: preview.inviter_name,
+      expires_at: preview.expires_at,
     },
   });
 }
@@ -40,11 +45,13 @@ export async function POST(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const displayName = user.user_metadata?.full_name ?? user.user_metadata?.name ?? null;
-  const email = user.email ?? null;
 
-  const { data, error } = await acceptFamilyInvite(supabase, token, user.id, displayName, email);
+  const { data, error } = await acceptFamilyInvite(supabase, token, displayName);
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error.message?.includes("invite_not_valid")) {
+      return NextResponse.json({ error: "Convite inválido ou expirado" }, { status: 410 });
+    }
+    return NextResponse.json({ error: "Erro ao aceitar convite" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, data });

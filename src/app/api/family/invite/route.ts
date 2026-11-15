@@ -18,13 +18,13 @@ export async function GET(req: NextRequest) {
   if (!babyId) return NextResponse.json({ error: "babyId required" }, { status: 400 });
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
-  if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (role !== "owner") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
   if (!family) return NextResponse.json({ data: [] });
 
   const { data, error } = await getActiveFamilyInvites(supabase, family.id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
 
   return NextResponse.json({ data });
 }
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     role,
     familyRelation ?? null
   );
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
 
   return NextResponse.json({ data });
 }
@@ -83,8 +83,11 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Only owners can revoke invites" }, { status: 403 });
   }
 
-  const { error } = await revokeFamilyInvite(supabase, inviteId);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const { data: family } = await getFamilyForBaby(supabase, babyId);
+  if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
+
+  const { error } = await revokeFamilyInvite(supabase, inviteId, family.id);
+  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
 
   return NextResponse.json({ success: true });
 }
