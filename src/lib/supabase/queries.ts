@@ -122,6 +122,8 @@ export async function endSleepSession(supabase: Client, sessionId: string, start
     .from("sleep_sessions")
     .update({ end_time: clampEndTime(startTime) })
     .eq("id", sessionId)
+    // Only an open session: 0 rows (PGRST116) means someone else ended it.
+    .is("end_time", null)
     .select()
     .single();
 }

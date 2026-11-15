@@ -32,3 +32,19 @@ export function classifyLiveSession(
   if (result.data.baby_id !== babyId) return "mismatch";
   return "running";
 }
+
+export type EndResult = "ok" | "already-ended" | "check" | "error";
+
+/**
+ * Interprets the error of a guarded end update
+ * (`.eq("id").is("end_time", null).select().single()`):
+ * - PGRST116 (0 rows matched): someone else ended it first — sync locally;
+ * - 23514: end_time < start_time rejected — generic error, keep the timer;
+ * - anything else: generic/auth error, keep the timer.
+ */
+export function classifyEndResult(error: { code?: string } | null): EndResult {
+  if (!error) return "ok";
+  if (error.code === "PGRST116") return "already-ended";
+  if (isCheckViolation(error)) return "check";
+  return "error";
+}

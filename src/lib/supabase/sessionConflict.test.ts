@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { classifyLiveSession, isCheckViolation, isUniqueViolation } from "./sessionConflict";
+import {
+  classifyEndResult,
+  classifyLiveSession,
+  isCheckViolation,
+  isUniqueViolation,
+} from "./sessionConflict";
 
 describe("isUniqueViolation", () => {
   it("is true for unique_violation (23505)", () => {
@@ -40,5 +45,20 @@ describe("classifyLiveSession", () => {
   });
   it("is a mismatch when the session belongs to another baby", () => {
     expect(classifyLiveSession({ data: row, error: null }, "B2")).toBe("mismatch");
+  });
+});
+
+describe("classifyEndResult", () => {
+  it("is ok without error", () => {
+    expect(classifyEndResult(null)).toBe("ok");
+  });
+  it("is already-ended when the guarded update matched 0 rows (PGRST116)", () => {
+    expect(classifyEndResult({ code: "PGRST116" })).toBe("already-ended");
+  });
+  it("is check for check_violation (23514)", () => {
+    expect(classifyEndResult({ code: "23514" })).toBe("check");
+  });
+  it.each([{ code: "42501" }, { code: "PGRST301" }, {}])("is error for %j", (e) => {
+    expect(classifyEndResult(e)).toBe("error");
   });
 });

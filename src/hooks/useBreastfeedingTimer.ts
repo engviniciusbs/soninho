@@ -11,8 +11,8 @@ import {
   getBreastfeedingSessionStatus,
 } from "@/lib/supabase/feedingQueries";
 import {
+  classifyEndResult,
   classifyLiveSession,
-  isCheckViolation,
   isUniqueViolation,
 } from "@/lib/supabase/sessionConflict";
 import { useFeedingStore, useActiveBreastTimer } from "@/store/feedingStore";
@@ -200,11 +200,20 @@ export function useBreastfeedingTimer() {
       toast.error("Erro ao finalizar a mamada. Tente novamente.");
       return null;
     }
-    if (!current || current.end_time) {
+    if (current && current.baby_id !== babyId) {
+      // Stale local state pointing at another baby's session (e.g. migrated
+      // v0 state): drop this baby's timer, never end that session.
+      stopBreastTimer(babyId);
+      return null;
+    }
+    const syncEnded = (alreadyEnded: boolean) => {
       stopBreastTimer(babyId);
       queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
       queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
-      if (current) toast.success("Mamada já estava finalizada ✨");
+      if (alreadyEnded) toast.success("Mamada já estava finalizada ✨");
+    };
+    if (!current || current.end_time) {
+      syncEnded(!!current);
       return null;
     }
 
@@ -213,11 +222,17 @@ export function useBreastfeedingTimer() {
       side_left_sec: finalLeft,
       side_right_sec: finalRight,
     });
+    const outcome = classifyEndResult(error);
 
-    if (error) {
+    if (outcome === "already-ended") {
+      // Lost the race (double tap / another caregiver): no second "stopped".
+      syncEnded(true);
+      return null;
+    }
+    if (outcome !== "ok") {
       // Keep the local timer: the session is still open in the DB.
       toast.error(
-        isCheckViolation(error)
+        outcome === "check"
           ? "Erro ao finalizar a mamada. Tente novamente."
           : "Sessão expirada. Faça login novamente."
       );

@@ -14,8 +14,8 @@ import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsed } from "@/lib/utils";
 import { toast } from "sonner";
 import {
+  classifyEndResult,
   classifyLiveSession,
-  isCheckViolation,
   isUniqueViolation,
 } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
@@ -192,20 +192,37 @@ export function useSleepTimer() {
       return null;
     }
 
-    if (current.end_time) {
+    if (current.baby_id !== babyId) {
+      // Stale local state pointing at another baby's session (e.g. migrated
+      // v0 state): drop this baby's timer, never end that session.
+      stopTimer(babyId);
+      return null;
+    }
+
+    const syncAlreadyEnded = () => {
       // Already ended by another caregiver — just sync local state
       stopTimer(babyId);
       invalidateSleepQueries();
       toast.success("Sono já estava finalizado ✨");
+    };
+
+    if (current.end_time) {
+      syncAlreadyEnded();
       return null;
     }
 
     // DB start_time is authoritative (it may have been edited by someone else).
     const { error } = await endSleepSession(supabase, sessionId, current.start_time);
+    const outcome = classifyEndResult(error);
 
-    if (error) {
+    if (outcome === "already-ended") {
+      // Lost the race (double tap / another caregiver): no second "stopped".
+      syncAlreadyEnded();
+      return null;
+    }
+    if (outcome !== "ok") {
       toast.error(
-        isCheckViolation(error)
+        outcome === "check"
           ? "Erro ao finalizar o sono. Tente novamente."
           : "Sessão expirada. Faça login novamente."
       );

@@ -168,6 +168,8 @@ export async function endBreastfeedingSession(
       notes: data.notes ?? null,
     })
     .eq("id", id)
+    // Only an open session: 0 rows (PGRST116) means someone else ended it.
+    .is("end_time", null)
     .select()
     .single();
 }
