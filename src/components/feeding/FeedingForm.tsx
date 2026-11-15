@@ -30,7 +30,7 @@ import {
   updateBottleFeeding,
   logSolidFeeding,
   updateSolidFeeding,
-  startBreastfeedingSession,
+  insertBreastfeedingSession,
   updateBreastfeedingSession,
 } from "@/lib/supabase/feedingQueries";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
@@ -208,20 +208,19 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
         if (error) return toast.error("Erro ao atualizar mamada");
         toast.success("Mamada atualizada");
       } else {
-        const { data: created, error } = await startBreastfeedingSession(
+        const { data: created, error } = await insertBreastfeedingSession(
           supabase,
           activeBaby.id,
-          sideLeftSec >= sideRightSec ? "LEFT" : "RIGHT",
-          startTime
+          {
+            start_time: startTime,
+            end_time: endTime ?? startTime,
+            side_left_sec: sideLeftSec,
+            side_right_sec: sideRightSec,
+            last_side: sideLeftSec >= sideRightSec ? "LEFT" : "RIGHT",
+            notes,
+          }
         );
         if (error || !created) return toast.error("Erro ao registrar mamada");
-        const { error: updateError } = await updateBreastfeedingSession(supabase, created.id, {
-          end_time: endTime ?? startTime,
-          side_left_sec: sideLeftSec,
-          side_right_sec: sideRightSec,
-          notes,
-        });
-        if (updateError) return toast.error("Erro ao registrar mamada");
         toast.success("Mamada registrada");
         void recordFeedingActivity({
           babyId: activeBaby.id,

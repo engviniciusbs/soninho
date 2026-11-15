@@ -99,6 +99,34 @@ export async function startBreastfeedingSession(
     .single();
 }
 
+/** Manual log: inserts an already-closed session (never counts as "open"). */
+export async function insertBreastfeedingSession(
+  supabase: Client,
+  babyId: string,
+  data: {
+    start_time: string;
+    end_time: string;
+    side_left_sec: number;
+    side_right_sec: number;
+    last_side: BreastSide;
+    notes?: string | null;
+  }
+) {
+  return supabase
+    .from("breastfeeding_sessions")
+    .insert({
+      baby_id: babyId,
+      start_time: data.start_time,
+      end_time: data.end_time,
+      side_left_sec: data.side_left_sec,
+      side_right_sec: data.side_right_sec,
+      last_side: data.last_side,
+      notes: data.notes ?? null,
+    })
+    .select()
+    .single();
+}
+
 export async function updateBreastfeedingSides(
   supabase: Client,
   id: string,

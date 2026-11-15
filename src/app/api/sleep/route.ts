@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { getUserRoleForBaby } from "@/lib/supabase/queries";
 
 const createSchema = z.object({
@@ -71,6 +72,9 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
+    if (isUniqueViolation(error)) {
+      return NextResponse.json({ error: "Já existe um sono em andamento" }, { status: 409 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 

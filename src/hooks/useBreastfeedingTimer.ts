@@ -9,6 +9,7 @@ import {
   endBreastfeedingSession,
   getActiveBreastfeedingSession,
 } from "@/lib/supabase/feedingQueries";
+import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { useFeedingStore } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
@@ -105,6 +106,21 @@ export function useBreastfeedingTimer() {
       return;
     }
     const { data, error } = await startBreastfeedingSession(supabase, activeBaby.id, side);
+    if (error && isUniqueViolation(error)) {
+      // Another caregiver already has an open session: sync to it.
+      const { data: existing } = await getActiveBreastfeedingSession(supabase, activeBaby.id);
+      if (existing) {
+        restoreBreastSession(
+          existing.id,
+          existing.start_time,
+          (existing.last_side as BreastSide) ?? "LEFT",
+          existing.side_left_sec,
+          existing.side_right_sec
+        );
+        toast.success("Já existe uma mamada em andamento — sincronizada 🤱");
+        return;
+      }
+    }
     if (error || !data) {
       toast.error("Erro ao iniciar mamada");
       return;
@@ -118,7 +134,7 @@ export function useBreastfeedingTimer() {
       feedingType: "BREAST",
       referenceId: data.id,
     });
-  }, [activeBaby, supabase, startBreastTimer]);
+  }, [activeBaby, supabase, startBreastTimer, restoreBreastSession]);
 
   const handleSwitchSide = useCallback(async (newSide: BreastSide) => {
     if (!sessionId || newSide === activeSide) return;
