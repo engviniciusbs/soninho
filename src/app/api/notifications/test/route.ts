@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getWebPush, PUSH_ICON } from "@/lib/notifications/webpush";
+import { getWebPush, PUSH_ICON, sendToSubscription } from "@/lib/notifications/webpush";
 
 export async function POST() {
   const supabase = await createClient();
@@ -37,15 +37,7 @@ export async function POST() {
 
   let sent = 0;
   for (const sub of subs) {
-    try {
-      await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-        payload
-      );
-      sent++;
-    } catch (err) {
-      console.error("[test push] Failed:", err);
-    }
+    if (await sendToSubscription(webpush, sub, payload, supabase)) sent++;
   }
 
   return NextResponse.json({ ok: true, sent });

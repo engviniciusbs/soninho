@@ -1,4 +1,4 @@
-import { getWebPush, PUSH_ICON } from "@/lib/notifications/webpush";
+import { getWebPush, PUSH_ICON, sendToSubscription } from "@/lib/notifications/webpush";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   formatSleepActivityMessage,
@@ -63,25 +63,7 @@ async function pushToRecipients(
       .eq("is_active", true);
 
     for (const sub of subs ?? []) {
-      try {
-        await webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          payload
-        );
-        sent++;
-      } catch (err: unknown) {
-        const statusCode = (err as { statusCode?: number })?.statusCode;
-        if (statusCode === 404 || statusCode === 410) {
-          await supabase
-            .from("push_subscriptions")
-            .update({ is_active: false })
-            .eq("endpoint", sub.endpoint);
-        }
-        console.error(`[push] Family push failed for ${sub.endpoint}:`, err);
-      }
+      if (await sendToSubscription(webpush, sub, payload, supabase)) sent++;
     }
   }
 

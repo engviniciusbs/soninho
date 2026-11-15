@@ -7,6 +7,8 @@ describe("isAllowedPushEndpoint", () => {
     "https://updates.push.services.mozilla.com/wpush/v2/x",
     "https://web.push.apple.com/x",
     "https://wns2-bl2p.notify.windows.com/w/?token=x",
+    "https://FCM.GOOGLEAPIS.COM/x",
+    "https://fcm.googleapis.com:443/x",
   ])("accepts %s", (url) => {
     expect(isAllowedPushEndpoint(url)).toBe(true);
   });
@@ -19,6 +21,8 @@ describe("isAllowedPushEndpoint", () => {
     "https://localhost/",
     "https://fcm.googleapis.com:8443/x",
     "not a url",
+    "https://fcm.googleapis.com@evil.com",
+    "https://fcm.googleapis.com./x",
   ])("rejects %s", (url) => {
     expect(isAllowedPushEndpoint(url)).toBe(false);
   });
