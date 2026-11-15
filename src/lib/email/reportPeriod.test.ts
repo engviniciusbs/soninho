@@ -45,4 +45,37 @@ describe("reportPeriod", () => {
     expect(tokyo.endKey).toBe("2026-05-25");
     expect(tokyo.startUtc.toISOString()).toBe("2026-05-18T15:00:00.000Z");
   });
+
+  describe("DST (America/New_York, spring forward 2026-03-08)", () => {
+    const tz = "America/New_York";
+
+    it("period ending 2026-03-10 has 7 local keys and DST-aware bounds", () => {
+      const now = new Date("2026-03-10T15:00:00Z");
+      const p = getReportPeriod(now, 7, tz);
+      expect(p.startKey).toBe("2026-03-04");
+      expect(p.endKey).toBe("2026-03-10");
+      expect(p.label).toBe("de 04/03 a 10/03 (últimos 7 dias)");
+      // 03-04 00:00 EST = 05:00Z; 03-11 00:00 EDT = 04:00Z
+      expect(p.startUtc.toISOString()).toBe("2026-03-04T05:00:00.000Z");
+      expect(p.endUtc.toISOString()).toBe("2026-03-11T04:00:00.000Z");
+    });
+
+    it("splits a session across the spring-forward night", () => {
+      // 23:00 EST on 03-07 -> 06:00 EDT on 03-08 (6 real hours)
+      const s = sess("2026-03-08T04:00:00Z", "2026-03-08T10:00:00Z");
+      const m = groupSessionsByLocalDay([s], tz);
+      expect([...m.keys()]).toEqual(["2026-03-07", "2026-03-08"]);
+      // 04:00Z -> 05:00Z (local midnight EST) = 60 min
+      expect(m.get("2026-03-07")![0].nightMinutes).toBe(60);
+      // 05:00Z -> 10:00Z = 300 min
+      expect(m.get("2026-03-08")![0].nightMinutes).toBe(300);
+    });
+
+    it("treats 2026-03-08 as a 23-hour local day", () => {
+      const s = sess("2026-03-08T05:00:00Z", "2026-03-09T04:00:00Z");
+      const m = groupSessionsByLocalDay([s], tz);
+      expect([...m.keys()]).toEqual(["2026-03-08"]);
+      expect(m.get("2026-03-08")![0].nightMinutes).toBe(23 * 60);
+    });
+  });
 });
