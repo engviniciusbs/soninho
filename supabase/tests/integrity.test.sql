@@ -1,7 +1,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(7);
+select plan(8);
 
 select tests.create_user(('00000000-0000-0000-0000-0000000000' || u.s)::uuid, u.s || '@example.test')
 from (values ('a1'),('a2')) as u(s);
@@ -54,8 +54,10 @@ select matches(tests.try_exec($$insert into public.email_log (user_id, kind, ded
   ('00000000-0000-0000-0000-0000000000a1','weekly','dk-1')$$),
   '^ERR:23505', 'dedupe_key_unique_email_log');
 
-select is((select count(*)::int from pg_constraint where conrelid in ('public.notification_events'::regclass,'public.email_log'::regclass) and contype='u'), 2,
-  'dedupe_key unique constraints exist (one per table)');
+select ok(exists (select 1 from pg_constraint where conrelid='public.notification_events'::regclass and contype='u' and conname='notification_events_dedupe_key_key'),
+  'notification_events_dedupe_key_key unique constraint exists');
+select ok(exists (select 1 from pg_constraint where conrelid='public.email_log'::regclass and contype='u' and conname='email_log_dedupe_key_key'),
+  'email_log_dedupe_key_key unique constraint exists');
 
 select * from finish();
 rollback;

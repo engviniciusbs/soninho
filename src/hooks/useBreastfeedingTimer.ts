@@ -38,19 +38,35 @@ export function useBreastfeedingTimer() {
     restoreBreastSession,
   } = useFeedingStore();
 
-  const [liveLeftSec, setLiveLeftSec] = useState(0);
-  const [liveRightSec, setLiveRightSec] = useState(0);
+  // Last interval tick, tagged with the side segment it was computed for.
+  // While stopped (or before the first tick of a segment) the live counters
+  // are the stored totals, derived in render instead of copied by an effect.
+  const [tick, setTick] = useState<{
+    sideStartedAt: string;
+    activeSide: BreastSide;
+    left: number;
+    right: number;
+  } | null>(null);
 
+  const ticking = isRunning && !!sideStartedAt;
+  const tickIsCurrent =
+    ticking && tick?.sideStartedAt === sideStartedAt && tick.activeSide === activeSide;
+  const liveLeftSec = tickIsCurrent ? tick.left : sideLeftSec;
+  const liveRightSec = tickIsCurrent ? tick.right : sideRightSec;
+
+  // TODO(PR4): replace this interval + immediate tick() with a shared clock via
+  // useSyncExternalStore so the live counters can be fully derived in render.
   useEffect(() => {
-    if (!isRunning || !sideStartedAt) {
-      setLiveLeftSec(sideLeftSec);
-      setLiveRightSec(sideRightSec);
-      return;
-    }
+    if (!isRunning || !sideStartedAt) return;
+    const startedAt = sideStartedAt;
     function tick() {
-      const extra = secondsSince(sideStartedAt!);
-      setLiveLeftSec(activeSide === "LEFT" ? sideLeftSec + extra : sideLeftSec);
-      setLiveRightSec(activeSide === "RIGHT" ? sideRightSec + extra : sideRightSec);
+      const extra = secondsSince(startedAt);
+      setTick({
+        sideStartedAt: startedAt,
+        activeSide,
+        left: activeSide === "LEFT" ? sideLeftSec + extra : sideLeftSec,
+        right: activeSide === "RIGHT" ? sideRightSec + extra : sideRightSec,
+      });
     }
     tick();
     const interval = setInterval(tick, 1000);

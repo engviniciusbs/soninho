@@ -1,7 +1,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(60);
+select plan(64);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner a1, caregiver a2, viewer a3 | F2: owner b1 | c1,c2,c3 no family
@@ -200,6 +200,17 @@ select tests.logout();
 create function public.zz_default_acl_probe() returns int language sql as 'select 1';
 select ok(not has_function_privilege('anon', 'public.zz_default_acl_probe()', 'execute'),
   'default_privileges: new public function not executable by anon');
+
+-- ------------------------------------------- guard functions not executable by clients
+select tests.logout();
+select ok(not has_function_privilege('authenticated', 'public.guard_family_member_change()', 'execute'),
+  'guard_fns_not_executable_by_clients: authenticated / guard_family_member_change');
+select ok(not has_function_privilege('authenticated', 'public.guard_baby_change()', 'execute'),
+  'guard_fns_not_executable_by_clients: authenticated / guard_baby_change');
+select ok(not has_function_privilege('anon', 'public.guard_family_member_change()', 'execute'),
+  'guard_fns_not_executable_by_clients: anon / guard_family_member_change');
+select ok(not has_function_privilege('anon', 'public.guard_baby_change()', 'execute'),
+  'guard_fns_not_executable_by_clients: anon / guard_baby_change');
 
 select * from finish();
 rollback;

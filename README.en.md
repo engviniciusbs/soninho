@@ -1,5 +1,7 @@
 # Soninho 🌙
 
+[![CI](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml/badge.svg)](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml)
+
 **English** · [Português](README.md)
 
 Baby sleep and feeding tracker for families. Parents and caregivers log naps, night sleep and feeds from their phones; Soninho computes age-based wake windows, suggests when the next nap and feed should happen, sends push alerts when the wake window is running out, and produces analytics, email reports and AI insights — all in Brazilian Portuguese.
@@ -41,8 +43,8 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 
 | Layer | Technology |
 | --- | --- |
-| Framework | **Next.js 16.2** (App Router, Route Handlers, Middleware) |
-| UI | **React 19.2**, TypeScript 5 |
+| Framework | **Next.js 16.4** (App Router, Route Handlers, Proxy) |
+| UI | **React 19.3**, TypeScript 5 |
 | Styling | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
 | Components | **shadcn/ui** (`base-nova` style) on top of **Base UI** (`@base-ui/react`), `lucide-react` icons |
 | Animation | `framer-motion` |
@@ -63,7 +65,7 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 
 ## Prerequisites
 
-- **Node.js 20+** (the project uses `@types/node@20`; Next 16 requires Node ≥ 20.9)
+- **Node.js 22** (`engines` `22.x`; openai 7 and supabase-js require Node ≥ 22)
 - **npm** (the repository uses `package-lock.json`)
 - A **Supabase** project (free tier works) — Auth, Postgres and Storage
 - Optional, but required for the matching features:
@@ -85,14 +87,20 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com/dashboard).
 2. Under **Project Settings → API**, copy the URL, the `anon key` and the `service_role key`.
-3. Create the schema from the versioned migrations in `supabase/migrations/` (tables, RLS, functions and the public `baby-avatars` storage bucket): locally run `npx supabase start`, `npx supabase db reset` and `npx supabase test db`; for your hosted project run `npx supabase link` and `npx supabase db push`. See [Database](#database-supabase).
+3. Create the schema from the versioned migrations in `supabase/migrations/` (tables, RLS, functions and the public `baby-avatars` storage bucket): locally run `npx supabase start`, `npx supabase db reset` and `npx supabase test db`; for your hosted project run `npx supabase link` and `npx supabase db push --remote` (run with `--dry-run` first). See [Database](#database-supabase).
 4. The `baby-avatars` bucket (baby photos, path `<user_id>/<timestamp>.<ext>`) is created by the migrations.
 5. Under **Authentication → URL Configuration**, add `http://localhost:3000/auth/callback` (and your production URL) to the *Redirect URLs*.
 6. (Optional) Use the template at `src/lib/email/templates/supabase-confirm-signup.html` in **Authentication → Email Templates → Confirm signup**. It uses `{{ .ConfirmationURL }}` (default flow via `/auth/callback`). The `/api/auth/confirm` route is also available if you change the link to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 ### 3. Environment variables
 
-Create `.env.local` in the project root (`.env*` files are git-ignored):
+Copy the `.env.example` template to `.env.local` in the project root (`.env*` files are git-ignored, except `.env.example`) and fill it in:
+
+```bash
+cp .env.example .env.local
+```
+
+Example contents:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
@@ -336,15 +344,21 @@ Everything in `src/lib/` is plain, deterministic TypeScript — a good starting 
 
 ## Testing and Quality
 
-There is **no test suite yet**. Before opening a PR, run:
+```bash
+npm test            # unit tests (Vitest)
+npm run test:db     # database tests (pgTAP; needs Docker and `npx supabase db start`)
+```
+
+CI (GitHub Actions) runs lint, `tsc`, tests, build and database tests on every PR. Before opening a PR, run locally:
 
 ```bash
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
 
-Suggestion: start with unit tests (Vitest) for the pure functions in `src/lib/sleep` and `src/lib/feeding` — especially `sessionDayAllocation`, `computeNapSuggestion` and `computeFeedingSuggestion`.
+For database changes, see [docs/CONTRIBUTING-DB.md](docs/CONTRIBUTING-DB.md).
 
 ## Deployment (Vercel)
 
@@ -416,3 +430,7 @@ Check `OPENAI_API_KEY` and your account credits.
 
 **Wrong times**
 The app defaults to `America/Sao_Paulo`; the browser timezone is sent with AI/suggestion calls, and the notification timezone is stored in `notification_preferences.timezone`.
+
+## License
+
+[MIT](LICENSE) © 2026 engviniciusbs

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
@@ -74,21 +74,22 @@ export default function SettingsPage() {
   const [savingWeekly, setSavingWeekly] = useState(false);
   const [testingSend, setTestingSend] = useState(false);
 
-  const loadNotifPrefs = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    setCurrentUserId(user.id);
-    const { data } = await getNotificationPreferences(supabase, user.id);
-    if (data) {
-      setNotifEnabled(data.enabled ?? true);
-      setAlertBefore(data.alert_before_minutes ?? 15);
-      setQuietStart(data.quiet_hours_start ?? "22:00");
-      setQuietEnd(data.quiet_hours_end ?? "07:00");
-      setWeeklyEmailEnabled(data.weekly_email_enabled ?? true);
+  useEffect(() => {
+    async function loadNotifPrefs() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setCurrentUserId(user.id);
+      const { data } = await getNotificationPreferences(supabase, user.id);
+      if (data) {
+        setNotifEnabled(data.enabled ?? true);
+        setAlertBefore(data.alert_before_minutes ?? 15);
+        setQuietStart(data.quiet_hours_start ?? "22:00");
+        setQuietEnd(data.quiet_hours_end ?? "07:00");
+        setWeeklyEmailEnabled(data.weekly_email_enabled ?? true);
+      }
     }
+    loadNotifPrefs();
   }, [supabase]);
-
-  useEffect(() => { loadNotifPrefs(); }, [loadNotifPrefs]);
 
   async function handleSaveNotifPrefs() {
     setSavingNotif(true);

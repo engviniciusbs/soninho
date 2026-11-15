@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { AIChat } from "@/components/ai/AIChat";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

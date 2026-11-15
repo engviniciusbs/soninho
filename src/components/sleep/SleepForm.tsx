@@ -148,6 +148,7 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, session?.id]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- reactCompiler is not enabled (next.config.ts), so "compilation skipped" has no runtime effect; RHF watch() is used intentionally (TODO(PR4): consider useWatch).
   const selectedType = watch("type");
 
   // Count how many env fields are filled

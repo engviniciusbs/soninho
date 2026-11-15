@@ -75,11 +75,12 @@ export function AIChat() {
               const parsed = JSON.parse(data);
               if (parsed.text) {
                 assistantContent += parsed.text;
+                const content = assistantContent;
                 setMessages((prev) => {
                   const updated = [...prev];
                   updated[updated.length - 1] = {
                     role: "assistant",
-                    content: assistantContent,
+                    content,
                   };
                   return updated;
                 });
