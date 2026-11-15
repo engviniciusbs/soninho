@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeInviteToken } from "@/lib/invites/inviteLink";
 import { acceptFamilyInvite, getInvitePreview } from "@/lib/supabase/queries";
@@ -51,10 +52,7 @@ export async function POST(
 
   const { data, error } = await acceptFamilyInvite(supabase, token, displayName);
   if (error) {
-    if (error.message?.includes("invite_not_valid")) {
-      return NextResponse.json({ error: "Convite inválido ou expirado" }, { status: 410 });
-    }
-    return NextResponse.json({ error: "Erro ao aceitar convite" }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json({ success: true, data });

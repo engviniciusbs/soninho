@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
 import { isAllowedPushEndpoint } from "@/lib/notifications/pushEndpoint";
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
   );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   // Ensure default notification preferences exist

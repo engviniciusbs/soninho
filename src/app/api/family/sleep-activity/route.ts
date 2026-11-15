@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import {
   getFamilyForBaby,
@@ -8,6 +10,15 @@ import {
 } from "@/lib/supabase/queries";
 import { getActorDisplayLabel } from "@/lib/family/relations";
 import { notifyFamilySleepActivity } from "@/lib/notifications/familyActivity";
+import { zUuid } from "@/lib/validation/common";
+
+const bodySchema = z.object({
+  babyId: zUuid,
+  action: z.enum(["started", "stopped"]),
+  sleepSessionId: zUuid.nullish(),
+  sleepType: z.enum(["NAP", "NIGHT_SLEEP"]),
+  babyName: z.string().optional(), // ignored: name is read server-side
+});
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -16,22 +27,11 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { babyId, action, sleepSessionId, sleepType } = body as {
-    babyId: string;
-    action: "started" | "stopped";
-    sleepSessionId?: string;
-    sleepType: "NAP" | "NIGHT_SLEEP";
-    babyName?: string; // ignored: name is read server-side
-  };
-
-  if (!babyId || !action || !sleepType) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const parsed = bodySchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
-
-  if (action !== "started" && action !== "stopped") {
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  }
+  const { babyId, action, sleepSessionId, sleepType } = parsed.data;
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role || role === "viewer") {
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   const pushSent = await notifyFamilySleepActivity({

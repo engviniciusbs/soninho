@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { zTimeZone, zUuid } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
 import { getLastSleepSession, getRecentSessions, getUserRoleForBaby } from "@/lib/supabase/queries";
 import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
 import type { Baby, SleepSession } from "@/types";
 
 const requestSchema = z.object({
-  babyId: z.string().uuid(),
-  timezone: z.string().default("America/Sao_Paulo"),
+  babyId: zUuid,
+  timezone: zTimeZone,
 });
 
 /**

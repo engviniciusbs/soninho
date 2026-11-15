@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { dbErrorToResponse } from "@/lib/http/errors";
+import { zUuid } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries";
 
@@ -15,7 +17,10 @@ const updateSchema = z.object({
   sleep_sack_type: z.string().nullable().optional(),
   sleep_sack_tog: z.number().nullable().optional(),
   clothing_description: z.string().nullable().optional(),
-});
+}).refine(
+  (v) => !v.end_time || !v.start_time || new Date(v.end_time).getTime() >= new Date(v.start_time).getTime(),
+  { message: "O fim não pode ser antes do início", path: ["end_time"] }
+);
 
 type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -33,7 +38,10 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const idParsed = zUuid.safeParse(rawId);
+  if (!idParsed.success) return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+  const id = idParsed.data;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -46,7 +54,8 @@ export async function GET(
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 404 });
+    console.error("sleep GET error:", error);
+    return NextResponse.json({ error: "Sessão não encontrada" }, { status: 404 });
   }
 
   const role = await getUserRoleForBaby(supabase, user.id, data.baby_id);
@@ -59,13 +68,15 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const idParsed = zUuid.safeParse(rawId);
+  if (!idParsed.success) return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+  const id = idParsed.data;
   const supabase = await createClient();
-  const body = await request.json();
-  const parsed = updateSchema.safeParse(body);
+  const parsed = updateSchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -83,7 +94,7 @@ export async function PUT(
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json(data);
@@ -93,7 +104,10 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const idParsed = zUuid.safeParse(rawId);
+  if (!idParsed.success) return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+  const id = idParsed.data;
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -109,7 +123,7 @@ export async function DELETE(
     .eq("id", id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json({ success: true });
