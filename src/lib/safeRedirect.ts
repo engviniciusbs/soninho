@@ -14,7 +14,10 @@ export function safeRedirectPath(
   try {
     const u = new URL(value, "http://x");
     if (u.origin !== "http://x") return fallback;
-    return u.pathname + u.search + u.hash;
+    const out = u.pathname + u.search + u.hash;
+    // Dot segments can collapse to a protocol-relative path ("/.//evil.com").
+    if (out.startsWith("//") || out.includes("\\")) return fallback;
+    return out;
   } catch {
     return fallback;
   }
