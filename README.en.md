@@ -8,16 +8,16 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 
 ## Key Features
 
-- **Sleep timer** (nap / night sleep) with back-dated start ("started 10 min ago"), synced across caregivers and persisted locally.
+- **Sleep timer** (nap / night sleep) with back-dated start ("started 10 min ago"), one per baby, synced across caregivers and persisted locally (old persisted state is migrated v0→v1); the end time is never before the start.
 - **Wake window** by age (green/yellow/red indicator) and a **deterministic next-nap suggestion** — no LLM, one shared table across the whole app.
 - **Post-sleep review**: quality (1–5), how the baby fell asleep, wake reason, room temperature, weather, sleep sack/TOG and clothing — with a **clothing recommendation** based on temperature.
 - **Feeding**: per-side breastfeeding timer (left/right), bottle (formula / breast milk / mixed, in ml) and solid food logging with food tags and reaction (including allergic reactions). Next-feed suggestion based on the recent average interval.
-- **Shared family**: link invites with roles (`owner`, `caregiver`, `viewer`), family relation (mother, father, grandmother, nanny…), a notes board, an activity feed, and toasts/push when another caregiver starts or stops a sleep/feed.
+- **Shared family**: link invites (48-char hex tokens; old base64 tokens still work; the invite page shows specific states: used, expired, revoked or not found) with roles (`owner`, `caregiver`, `viewer`), family relation (mother, father, grandmother, nanny…), a notes board, an activity feed, and toasts/push when another caregiver starts or stops a sleep/feed.
 - **Nanny mode**: reduced interface (Home and Settings only).
 - **Analytics**: daily sleep bar chart, quality trend, nap-time heatmap, environment × sleep correlation, sleep debt and a regression radar.
-- **AI (OpenAI `gpt-4o-mini`)**: streaming chat with a sleep consultant, insights (today's assessment, patterns, trends, recommendations) and sleep regression analysis.
-- **Push notifications (Web Push/VAPID)**: "nap coming up" and "past the wake window", with per-user quiet hours and timezone.
-- **Emails (Resend + React Email)**: automatic weekly report (cron) and on-demand 7/14/30-day reports; PDF export (`@react-pdf/renderer`).
+- **AI (OpenAI `gpt-4o-mini`)**: streaming chat with a sleep consultant, insights (today's assessment, patterns, trends, recommendations) and sleep regression analysis. **Daily quota of 50 calls per user** (`America/Sao_Paulo` day), shared by chat and regression; the nap suggestion is deterministic and does not use quota. The chat accepts at most 20 messages of up to 2000 characters (the client trims history); when the quota is exceeded the API returns 429 and the app shows "Limite diário de uso da IA atingido…".
+- **Push notifications (Web Push/VAPID)**: "nap coming up" and "past the wake window", sent to every owner and caregiver with notifications on (viewers excluded), with per-user quiet hours and timezone. Only FCM, Mozilla, Apple and Windows push endpoints are accepted (at subscribe and at send time); invalid or dead subscriptions (400/404/410/413) are deactivated.
+- **Emails (Resend + React Email)**: automatic weekly report (cron) and on-demand 7/14/30-day reports, with days and periods computed in the user's timezone (`notification_preferences.timezone`); PDF export (`@react-pdf/renderer`).
 - **Public landing page** at `/`; signed-in users go straight to `/app`.
 
 ---
@@ -208,6 +208,8 @@ email_log                  — user_id · kind · period_start · period_end · 
 
 ### Security
 
+Family integrity: members only join through an invite (`accept_family_invite`) or the baby-creation RPC; each member can edit only their own `display_name`/`family_relation`; a family always keeps an owner; `end_time ≥ start_time` is enforced for sleep and breastfeeding. The API validates all input with zod, never leaks database errors and replies in PT-BR. CSV export neutralizes formula prefixes (`= + - @`), the proxy applies the Supabase cookie cache headers, and the login redirect preserves the query string.
+
 Every table should have **Row Level Security** enabled. The original pattern (baby owner via `auth.uid()`) is in `supabase/migrations/20260101000000_initial_schema.sql`; with families, policies should allow access to babies in the user's families (`get_user_family_ids`) and writes only for `owner`/`caregiver` (`user_can_write_family`). Cross-user operations (crons, invite acceptance, family push) use the admin client (`service_role`).
 
 The `calculate_sleep_duration` trigger fills `duration_min` and `updated_at` on `sleep_sessions`.
@@ -328,7 +330,7 @@ Everything in `src/lib/` is plain, deterministic TypeScript — a good starting 
 - **`sleep/environmentCorrelation.ts`** — temperature/TOG/weather × quality and duration.
 - **`sleep/clothingRecommendation.ts`** — recommended clothing by temperature, sack type and TOG.
 - **`feeding/computeFeedingSuggestion.ts`** — next feed from the recent average interval; age-based fallback (`feedingIntervals.ts`).
-- **`notifications/dispatch.ts`** — for each user with push enabled, outside quiet hours and with no sleep in progress: sends `NAP_SOON` when `alert_before_minutes` (default 15) remain until the end of the window and `OVERDUE` once it has passed. Deduped via `notification_events`.
+- **`notifications/dispatch.ts`** — for each user with push enabled, outside quiet hours and with no sleep in progress: sends `NAP_SOON` when `alert_before_minutes` (default 15) remain until the end of the window and `OVERDUE` once it has passed. Deduped via `notification_events`. Recipients: every owner and caregiver with notifications on, each with their own quiet hours and timezone; queries are batched; transient failures are retried on the next tick; stale claims are swept after 10 min; per-event TTL.
 - **`ai/analyzeSleep.ts` + `ai/prompts.ts`** — builds the sleep context in the browser's timezone and uses PT-BR prompts.
 
 ## Scripts
@@ -371,7 +373,7 @@ The project targets **Vercel** (`vercel.json`).
 
 ### Crons
 
-`vercel.json` schedules only the weekly email:
+`vercel.json` schedules only the weekly email (nap alerts run via `pg_cron`, see below):
 
 ```json
 { "crons": [{ "path": "/api/email/weekly", "schedule": "0 11 * * 1" }] }
@@ -379,10 +381,7 @@ The project targets **Vercel** (`vercel.json`).
 
 Every Monday at 11:00 UTC (08:00 Brasília time). With `CRON_SECRET` set, Vercel sends `Authorization: Bearer <CRON_SECRET>`.
 
-**Nap alerts (`/api/notifications/dispatch`) are not scheduled.** They need to run frequently (e.g. every 5 min). Options:
-
-- Add it to `vercel.json` (`"schedule": "*/5 * * * *"`) — requires a Vercel plan that allows frequent crons;
-- Or use an external scheduler (GitHub Actions, cron-job.org, Supabase `pg_cron` + `pg_net`, Upstash QStash):
+Nap alerts (`/api/notifications/dispatch`) are scheduled by Supabase `pg_cron` + `pg_net` every 5 minutes (migration `20261115120300_schedule_notification_dispatch.sql`). To call it manually:
 
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" https://<domain>/api/notifications/dispatch
@@ -417,7 +416,7 @@ Create the `baby-avatars` bucket as public and allow uploads for authenticated u
 - Requires HTTPS (or `localhost`) and browser permission. On iOS it only works with the app added to the home screen (iOS 16.4+).
 - Check all three VAPID variables — `VAPID_CONTACT_EMAIL` must start with `mailto:`.
 - Use **Configurações → Notificações → Testar** (Settings → Notifications → Test, `/api/notifications/test`).
-- Remember that dispatch needs a scheduler (see [Crons](#crons)).
+- Dispatch runs via `pg_cron` every 5 min (see [Crons](#crons)); check that the `soninho-notification-dispatch` job exists.
 
 **`RESEND_API_KEY not configured` / email not sent**
 Set the key and verify the `soninho.baby` domain in Resend (or change `FROM` in `src/lib/email/sleepReport.ts`).

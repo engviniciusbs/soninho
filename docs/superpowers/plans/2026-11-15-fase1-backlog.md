@@ -13,36 +13,17 @@ Itens adiados durante a execução do PR 1 (#1). Entram nos planos dos PRs 2–4
 - `integrity.test.sql:57`: filtrar a contagem de constraints únicas pelo nome.
 - Guard triggers: trocar `for update` por `for no key update`.
 
-## PR 3 — Correções da aplicação
-- **Tokens de convite em base64** podem conter `/`, `+` e `=`, o que quebra `/invite/[token]` em cerca de 40% dos casos. Gerar com default hex/base64url e usar `encodeURIComponent`.
-- **SSRF via endpoint de push** (auditoria, low): allowlist dos hosts de push (FCM, Mozilla, Windows, Apple).
-- **IA:** cota por usuário e limites de mensagens (já está no design). Hoje os viewers também chamam a IA.
-- **Export CSV:** escapar aspas e neutralizar prefixos `= + - @`.
-- **Timer:**
-  - `restoreBreastSession` não define `activeBabyId`;
-  - fazer retry quando a sessão ativa vier nula logo após um 23505;
-  - rascunhos locais podem ser gravados na sessão de outro cuidador ao parar;
-  - store por bebê.
-- **Página de convite:** tratar `status` (aceito, expirado, revogado) com mensagens específicas.
-- **Rotas que não alteram nada:** retornar 404 quando nenhuma linha foi afetada (revogação de convite, PATCH/DELETE de membro).
-- **Mapeamento de erros:** usar `code` em vez de substring da mensagem.
-- **Validação e consistência:**
-  - zod no `role` do POST de convite;
-  - padronizar mensagens de erro em PT-BR;
-  - remover o parâmetro não usado `user_id` de `createBaby`;
-  - `Baby.avatar_emoji` nullable ou `NOT NULL`.
-- **`guard_baby_change`:** proibir `family_id = NULL` quando já existe família. Também remover o fallback `created_by` da policy de leitura de `families`.
-- **Remoção de owner:** checagem no app de "último owner" no DELETE de membros (hoje só o trigger impede).
-- **`proxy.ts`:** o prefixo `/auth` também casa `/authors`, e o redirect para o login perde a query string.
-- **Funções de trigger:** revogar `EXECUTE` de `authenticated` em `guard_baby_change` e `guard_family_member_change` (alerta do Supabase).
-- **Pendências estacionadas no PR 1:**
-  - owner consegue inserir um uid arbitrário na própria família (expõe `user_profiles`);
-  - membro consegue editar o próprio `email` em `family_members`.
-- **Dispatch:** notificar todos os owners e caregivers e consolidar as queries (já está no design). O aviso de segredo ausente fica silencioso em produção.
+## PR 3 — Correções da aplicação ✅ (concluído no #3)
+Tudo da lista original foi tratado: tokens hex com `encodeURIComponent`, allowlist de push, cota de IA e limites do chat, CSV, timers por bebê, estados da página de convite, 404 em rotas sem efeito, mapeamento de erros por `code`, zod e mensagens PT-BR, `guard_baby_change`, último owner, `proxy.ts` (prefixo `/auth`, query string, headers de cache), revoke de EXECUTE nos triggers, e-mail próprio imutável em `family_members` e dispatch para owners e caregivers. O item "owner insere uid arbitrário na família" foi fechado pelo Task 2 (membros só entram por convite ou pela RPC de criação de bebê).
 
-### Herdado do PR 2
-- **Segurança:** em `src/proxy.ts` (e em `server.ts`), o `setAll` do `@supabase/ssr` 0.12 ignora o 2º argumento `headers` (headers anti-cache de CDN para respostas com cookie de sessão). Aplicar esses headers na resposta.
-- **Testes:** limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
+### Ficou de fora do PR 3 (motivo)
+- **Redirects do `proxy.ts` que não são o do login** ainda não carregam os cookies renovados: só o redirect para o login foi corrigido; os demais são raros e não ocorrem com sessão em refresh.
+- **Cota de IA consumida antes da busca do bebê:** uma requisição para bebê inexistente gasta cota. Impacto baixo; mover exigiria reordenar a rota.
+- **Claim de e-mail gravado como `sent` antes do envio:** uma falha no envio deixa o registro como enviado (evita duplicados, ao custo de possível perda). Exige um estado intermediário.
+
+### Herdado do PR 2 (resolvido no PR 3)
+- Headers anti-cache do `setAll` aplicados no `proxy.ts`.
+- **Testes** ainda pendentes: limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
 
 ## PR 4 — Refatoração (herdado dos PRs 1–2)
 - `useWatch` no lugar de `watch()` em `SleepForm`/`FeedingForm`; remover os `eslint-disable` com `TODO(PR4)`.
