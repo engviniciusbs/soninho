@@ -17,15 +17,15 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { babyId, action, sleepSessionId, sleepType, babyName } = body as {
+  const { babyId, action, sleepSessionId, sleepType } = body as {
     babyId: string;
     action: "started" | "stopped";
     sleepSessionId?: string;
     sleepType: "NAP" | "NIGHT_SLEEP";
-    babyName: string;
+    babyName?: string; // ignored: name is read server-side
   };
 
-  if (!babyId || !action || !sleepType || !babyName) {
+  if (!babyId || !action || !sleepType) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
@@ -37,6 +37,13 @@ export async function POST(req: NextRequest) {
   if (!role || role === "viewer") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const { data: babyRow } = await supabase
+    .from("babies")
+    .select("name")
+    .eq("id", babyId)
+    .maybeSingle();
+  const babyName = babyRow?.name ?? "o bebê";
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
 

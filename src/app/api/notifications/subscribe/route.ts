@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod";
+import { isAllowedPushEndpoint } from "@/lib/notifications/pushEndpoint";
 
 const subscribeSchema = z.object({
   endpoint: z.string().url(),
@@ -30,6 +31,13 @@ export async function POST(req: NextRequest) {
   }
 
   const { endpoint, p256dh, auth, userAgent } = parsed.data;
+
+  if (!isAllowedPushEndpoint(endpoint)) {
+    return NextResponse.json(
+      { error: "Endpoint de notificação inválido" },
+      { status: 400 }
+    );
+  }
 
   const { error } = await supabase.from("push_subscriptions").upsert(
     {

@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import * as webpush from "web-push";
-
-webpush.setVapidDetails(
-  process.env.VAPID_CONTACT_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+import { getWebPush, PUSH_ICON } from "@/lib/notifications/webpush";
 
 export async function POST() {
   const supabase = await createClient();
@@ -16,6 +10,11 @@ export async function POST() {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const webpush = getWebPush();
+  if (!webpush) {
+    return NextResponse.json({ error: "Push not configured" }, { status: 503 });
   }
 
   const { data: subs } = await supabase
@@ -31,7 +30,7 @@ export async function POST() {
   const payload = JSON.stringify({
     title: "🧪 Teste — Soninho",
     body: "As notificações estão funcionando! Você receberá alertas sobre sonecas.",
-    icon: "/icon.svg",
+    icon: PUSH_ICON,
     tag: "test-notification",
     url: "/settings",
   });

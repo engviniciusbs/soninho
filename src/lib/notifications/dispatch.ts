@@ -1,14 +1,8 @@
-import * as webpush from "web-push";
+import { getWebPush } from "@/lib/notifications/webpush";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
 import { differenceInWeeks, differenceInMinutes, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-
-webpush.setVapidDetails(
-  process.env.VAPID_CONTACT_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
 
 interface NotificationPayload {
   title: string;
@@ -188,6 +182,9 @@ async function sendIfNew(
     .limit(1);
 
   if (existing && existing.length > 0) return false;
+
+  const webpush = getWebPush();
+  if (!webpush) return false;
 
   // Send to all subscriptions
   const payloadStr = JSON.stringify(opts.payload);
