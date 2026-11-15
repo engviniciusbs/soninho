@@ -17,11 +17,10 @@ Itens adiados durante a execução do PR 1 (#1). Entram nos planos dos PRs 2–4
 Tudo da lista original foi tratado: tokens hex com `encodeURIComponent`, allowlist de push, cota de IA e limites do chat, CSV, timers por bebê, estados da página de convite, 404 em rotas sem efeito, mapeamento de erros por `code`, zod e mensagens PT-BR, `guard_baby_change`, último owner, `proxy.ts` (prefixo `/auth`, query string, headers de cache), revoke de EXECUTE nos triggers, e-mail próprio imutável em `family_members` e dispatch para owners e caregivers. O item "owner insere uid arbitrário na família" foi fechado pelo Task 2 (membros só entram por convite ou pela RPC de criação de bebê).
 
 ### Ficou de fora do PR 3 (motivo)
-- **Redirects do `proxy.ts` que não são o do login** ainda não carregam os cookies renovados: só o redirect para o login foi corrigido; os demais são raros e não ocorrem com sessão em refresh.
 - **Cota de IA consumida antes da busca do bebê:** uma requisição para bebê inexistente gasta cota. Impacto baixo; mover exigiria reordenar a rota.
 - **Claim de e-mail gravado como `sent` antes do envio:** uma falha no envio deixa o registro como enviado (evita duplicados, ao custo de possível perda). Exige um estado intermediário.
 
-### Herdado do PR 2 (resolvido no PR 3)
+### Herdado do PR 2 (parcialmente resolvido)
 - Headers anti-cache do `setAll` aplicados no `proxy.ts`.
 - **Testes** ainda pendentes: limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
 

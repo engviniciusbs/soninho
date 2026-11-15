@@ -4,7 +4,7 @@ import { zTimeZone, zUuid } from "@/lib/validation/common";
 import { differenceInWeeks, differenceInMonths } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentSessions, getUserRoleForBaby } from "@/lib/supabase/queries";
-import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
+import { consumeAiQuota } from "@/lib/ai/quota";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
@@ -13,6 +13,8 @@ import type { Baby, SleepSession } from "@/types";
 const requestSchema = z.object({
   babyId: zUuid,
   timezone: zTimeZone,
+  // The client asks for the LLM explanation at most once per baby per day.
+  withAi: z.boolean().default(true),
 });
 
 export async function POST(request: Request) {
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
     };
 
     // Only spend an LLM call when there is something to explain.
-    if (!regression.detected) {
+    if (!regression.detected || !parsed.data.withAi) {
       return NextResponse.json({
         ...base,
         explanation: null,
@@ -76,8 +78,9 @@ export async function POST(request: Request) {
       });
     }
 
+    // Quota exhausted: still render the deterministic result, without AI text.
     if (!(await consumeAiQuota(supabase))) {
-      return NextResponse.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
+      return NextResponse.json({ ...base, explanation: null, tips: [] });
     }
 
     const context = [
@@ -94,38 +97,44 @@ export async function POST(request: Request) {
       `Meta de sono para a idade: ${schedule.totalSleepHours}h/dia; média atual ${debt.avgHours}h/dia.`,
     ].join(" ");
 
-    const completion = await openai.chat.completions.create({
-      model: OPENAI_MODEL,
-      temperature: 0,
-      seed: 42,
-      max_tokens: 500,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content:
-            "Você é um consultor de sono infantil acolhedor e baseado em evidências. " +
-            "Responda SEMPRE em português do Brasil e SOMENTE em JSON válido com as chaves " +
-            '"explanation" (string curta, 1-2 frases, tom tranquilizador) e "tips" ' +
-            "(array de 2 a 3 strings curtas e acionáveis). Não dê diagnóstico médico.",
-        },
-        {
-          role: "user",
-          content: `Contexto do bebê: ${context}\n\nExplique de forma breve o que pode estar acontecendo e dê 2-3 dicas práticas.`,
-        },
-      ],
-    });
-
-    const raw = completion.choices[0]?.message?.content ?? "{}";
     let explanation: string | null = null;
     let tips: string[] = [];
     try {
-      const json = JSON.parse(raw);
-      explanation = typeof json.explanation === "string" ? json.explanation : null;
-      tips = Array.isArray(json.tips)
-        ? json.tips.filter((t: unknown): t is string => typeof t === "string").slice(0, 3)
-        : [];
-    } catch {
+      const completion = await openai.chat.completions.create({
+        model: OPENAI_MODEL,
+        temperature: 0,
+        seed: 42,
+        max_tokens: 500,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um consultor de sono infantil acolhedor e baseado em evidências. " +
+              "Responda SEMPRE em português do Brasil e SOMENTE em JSON válido com as chaves " +
+              '"explanation" (string curta, 1-2 frases, tom tranquilizador) e "tips" ' +
+              "(array de 2 a 3 strings curtas e acionáveis). Não dê diagnóstico médico.",
+          },
+          {
+            role: "user",
+            content: `Contexto do bebê: ${context}\n\nExplique de forma breve o que pode estar acontecendo e dê 2-3 dicas práticas.`,
+          },
+        ],
+      });
+
+      const raw = completion.choices[0]?.message?.content ?? "{}";
+      try {
+        const json = JSON.parse(raw);
+        explanation = typeof json.explanation === "string" ? json.explanation : null;
+        tips = Array.isArray(json.tips)
+          ? json.tips.filter((t: unknown): t is string => typeof t === "string").slice(0, 3)
+          : [];
+      } catch {
+        explanation = null;
+        tips = [];
+      }
+    } catch (aiError) {
+      console.error("AI regression OpenAI error:", aiError);
       explanation = null;
       tips = [];
     }

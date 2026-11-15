@@ -6,6 +6,8 @@
 --     only change display_name / family_relation.
 --  4. Drop "Owner can insert members": membership is created only by the
 --     SECURITY DEFINER RPCs accept_family_invite / create_baby_with_family.
+--  4b. Drop "Creator can insert family": families are created only by the
+--      SECURITY DEFINER RPC create_baby_with_family.
 --  5. end_time >= start_time on sleep_sessions and breastfeeding_sessions.
 
 -- ---------------------------------------------------------------------------
@@ -104,6 +106,8 @@ create trigger guard_member_self_update
 -- 4. no direct member inserts by clients
 -- ---------------------------------------------------------------------------
 drop policy if exists "Owner can insert members" on public.family_members;
+
+drop policy if exists "Creator can insert family" on public.families;
 
 -- ---------------------------------------------------------------------------
 -- 5. session time ordering (production: 0 violations, checked 2026-11-16)

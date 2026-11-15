@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(24);
+select plan(25);
 
 select tests.create_user('33333333-0000-0000-0000-000000000001', 'pr3-owner@test.local');
 insert into public.families (id, name, created_by)
@@ -121,6 +121,13 @@ select tests.login_as('33333333-0000-0000-0000-000000000001');
 select is(tests.try_val($$with d as (delete from public.family_members
     where family_id = '33333333-0000-0000-0000-0000000000f1' and user_id = '33333333-0000-0000-0000-000000000002'
     returning id) select count(*) from d$$), '1', 'owner_removes_caregiver_returning_one_row');
+select tests.logout();
+
+-- families are only created via create_baby_with_family (no client INSERT policy)
+select tests.login_as('33333333-0000-0000-0000-000000000003');
+select matches(tests.try_exec($$insert into public.families (name, created_by)
+    values ('Direct', '33333333-0000-0000-0000-000000000003')$$),
+  '^ERR:42501', 'client_cannot_insert_family_directly');
 select tests.logout();
 
 select * from finish();

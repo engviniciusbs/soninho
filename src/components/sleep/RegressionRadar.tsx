@@ -6,6 +6,10 @@ import { Radar, ShieldCheck, Lightbulb } from "lucide-react";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { createClient } from "@/lib/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  shouldRequestRegressionAi,
+  markRegressionAiRequested,
+} from "@/lib/sleep/regressionAiGate";
 
 interface RegressionResponse {
   detected: boolean;
@@ -45,16 +49,24 @@ export function RegressionRadar() {
     queryKey: ["regression", activeBaby?.id, lastSessionKey],
     queryFn: async () => {
       if (!activeBaby) return null;
+      // The LLM explanation (which consumes shared AI quota) is requested at
+      // most once per baby per day; later opens get the deterministic result.
+      const withAi = shouldRequestRegressionAi(activeBaby.id);
       const res = await fetch("/api/ai/regression", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           babyId: activeBaby.id,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          withAi,
         }),
       });
       if (!res.ok) return null;
-      return res.json();
+      const json: RegressionResponse = await res.json();
+      if (withAi && json.detected && json.explanation) {
+        markRegressionAiRequested(activeBaby.id);
+      }
+      return json;
     },
     enabled: !!activeBaby && lastSessionKey !== undefined,
     staleTime: 60 * 60 * 1000,
