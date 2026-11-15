@@ -15,9 +15,12 @@ Start the local DB with `npx supabase db start` (Docker required).
 ## Rules for functions
 
 - `security definer` only with a fixed `search_path` (e.g. `set search_path = ''`).
-- Grants are explicit. The global default revokes EXECUTE from PUBLIC, so every new
-  function needs its own `grant execute ... to ...`.
-- Functions outside `public` need `grant execute ... to authenticated` as well.
+- New `public` functions are executable by `authenticated` by default (the default
+  privileges only revoke from PUBLIC and anon). This is what RLS helpers and RPCs need.
+- Trigger/internal functions must run `revoke execute on function ... from public, anon,
+  authenticated`.
+- Functions in non-public schemas need an explicit `grant execute ... to authenticated`
+  if clients or RLS must call them.
 
 ## Writing pgTAP tests
 
@@ -27,4 +30,10 @@ Start the local DB with `npx supabase db start` (Docker required).
 
 ## Production
 
-Apply to production only with `supabase db push`, and only after taking a backup.
+Apply to production only after taking a backup. In Supabase CLI 3.x `db push` targets the
+local DB by default; production needs `--remote`. Preview first with `--dry-run`:
+
+```bash
+npx supabase db push --remote --dry-run
+npx supabase db push --remote
+```

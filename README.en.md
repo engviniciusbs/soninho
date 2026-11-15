@@ -44,7 +44,7 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 | Layer | Technology |
 | --- | --- |
 | Framework | **Next.js 16.2** (App Router, Route Handlers, Middleware) |
-| UI | **React 19.2**, TypeScript 5 |
+| UI | **React 19.3**, TypeScript 5 |
 | Styling | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
 | Components | **shadcn/ui** (`base-nova` style) on top of **Base UI** (`@base-ui/react`), `lucide-react` icons |
 | Animation | `framer-motion` |
@@ -65,7 +65,7 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 
 ## Prerequisites
 
-- **Node.js 20+** (the project uses `@types/node@20`; Next 16 requires Node ≥ 20.9)
+- **Node.js 22** (`engines` `22.x`; openai 7 and supabase-js require Node ≥ 22)
 - **npm** (the repository uses `package-lock.json`)
 - A **Supabase** project (free tier works) — Auth, Postgres and Storage
 - Optional, but required for the matching features:
@@ -87,7 +87,7 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com/dashboard).
 2. Under **Project Settings → API**, copy the URL, the `anon key` and the `service_role key`.
-3. Create the schema from the versioned migrations in `supabase/migrations/` (tables, RLS, functions and the public `baby-avatars` storage bucket): locally run `npx supabase start`, `npx supabase db reset` and `npx supabase test db`; for your hosted project run `npx supabase link` and `npx supabase db push`. See [Database](#database-supabase).
+3. Create the schema from the versioned migrations in `supabase/migrations/` (tables, RLS, functions and the public `baby-avatars` storage bucket): locally run `npx supabase start`, `npx supabase db reset` and `npx supabase test db`; for your hosted project run `npx supabase link` and `npx supabase db push --remote` (run with `--dry-run` first). See [Database](#database-supabase).
 4. The `baby-avatars` bucket (baby photos, path `<user_id>/<timestamp>.<ext>`) is created by the migrations.
 5. Under **Authentication → URL Configuration**, add `http://localhost:3000/auth/callback` (and your production URL) to the *Redirect URLs*.
 6. (Optional) Use the template at `src/lib/email/templates/supabase-confirm-signup.html` in **Authentication → Email Templates → Confirm signup**. It uses `{{ .ConfirmationURL }}` (default flow via `/auth/callback`). The `/api/auth/confirm` route is also available if you change the link to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.

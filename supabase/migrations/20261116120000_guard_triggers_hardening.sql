@@ -6,6 +6,8 @@
 --  * EXECUTE is revoked from public/anon/authenticated. `create or replace` keeps
 --    existing ACLs and authenticated still had the default grant. Triggers keep
 --    firing: EXECUTE is not checked when a trigger fires.
+--  * guard_baby_change is re-created unchanged (only for the explicit revoke);
+--    guard_family_member_change changes only the lock clause (plus the revoke).
 
 create or replace function public.guard_family_member_change()
 returns trigger

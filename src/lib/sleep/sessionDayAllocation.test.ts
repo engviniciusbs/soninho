@@ -75,16 +75,17 @@ describe("allocateSessionToLocalDays", () => {
 
   it("dst_spring_forward_split", () => {
     // Brazil DST began 2018-11-04 00:00 local (clock jumps to 01:00), so the
-    // real elapsed time is 22:00 -> 06:00 = 480 min across two local days.
+    // real elapsed time is 480 min across two local days (21:00 -> 06:00 at -02:00).
     const s = makeSession({
       type: "NIGHT_SLEEP",
-      start_time: "2018-11-04T00:00:00Z", // 2018-11-03 22:00 local
+      start_time: "2018-11-04T00:00:00Z", // 2018-11-03 21:00 local (-03:00)
       end_time: "2018-11-04T08:00:00Z", // 2018-11-04 06:00 local
     });
     const result = allocateSessionToLocalDays(s);
     const total = result.reduce((a, r) => a + r.nightMinutes, 0);
     expect(result.map((r) => r.dayKey)).toEqual(["2018-11-03", "2018-11-04"]);
     expect(total).toBe(480);
+    expect(result.map((r) => r.nightMinutes)).toEqual([180, 300]);
   });
 });
 
