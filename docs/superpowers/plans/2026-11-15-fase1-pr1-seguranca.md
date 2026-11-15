@@ -255,10 +255,13 @@ src/types/database.ts                             # regenerado
 ### Task 11: Aplicar em produção e publicar
 
 - [ ] **Step 1: Backup.** `mkdir -p ~/soninho-backups/2026-11-15`, depois `npx supabase db dump --remote -f ~/soninho-backups/2026-11-15/schema.sql` e `npx supabase db dump --remote --data-only -f ~/soninho-backups/2026-11-15/data.sql`. Conferir que `data.sql` tem `sleep_sessions` com cerca de 965 linhas.
-- [ ] **Step 2: Segredos do Vault.** O `CRON_SECRET` atual da Vercel não está acessível (Vercel CLI não instalada nem autenticada). Tentar `npx vercel whoami`.
-  - **Se autenticado:** `npx vercel env pull` num arquivo temporário fora do repo, ler `CRON_SECRET` e apagar o arquivo.
-  - **Se não:** gerar um novo `openssl rand -hex 32` e registrar no resumo final que o autor precisa colar o mesmo valor em `CRON_SECRET` na Vercel. Essa é a única ação que pode sobrar para ele, e o e-mail semanal da Vercel depende disso.
-  - Em seguida, via MCP `execute_sql`: `select vault.create_secret('<secret>', 'cron_secret'); select vault.create_secret('https://soninho.baby/api/notifications/dispatch', 'dispatch_url');`. Nunca registrar o valor no repo, no PR nem no log.
+- [ ] **Step 2: Rotacionar `CRON_SECRET` (Vercel + Vault).** Projeto Vercel `prj_luHjWmaCj0RLusRH1RdMbU0803NT` (team `team_6eAS3Y1o8vCDs3oiR4Vy6Uc4`), env `CRON_SECRET` id `H6O2Z9FeaCQuySXF`. Não descriptografar o valor antigo.
+  1. Gerar um novo valor com `openssl rand -hex 32`, guardando-o apenas em variável de shell.
+  2. Vercel MCP: atualizar `CRON_SECRET` (development, preview, production) para o novo valor, recriando como `sensitive`.
+  3. Supabase MCP `execute_sql`: `select vault.create_secret('<novo>', 'cron_secret'); select vault.create_secret('https://soninho.baby/api/notifications/dispatch', 'dispatch_url');`.
+  4. Nunca escrever o valor no repo, no PR nem em logs.
+  5. O novo valor só vale para a Vercel após um deploy: o merge do Step 5 já faz isso.
+  6. Hardening extra *(decisão do Claude)*: recriar também como `sensitive` as envs marcadas `readable-secret` (`SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PRIVATE_KEY`, `OPENAI_API_KEY`), com o mesmo valor. Isso exige ler o valor uma única vez via MCP com decrypt, sem imprimir. Se o MCP não permitir trocar o tipo sem expor o valor no contexto, pular e listar no resumo.
 - [ ] **Step 3: Push.** `npx supabase db push --dry-run` (deve listar só `20261115120000…120300`), depois `npx supabase db push`.
 - [ ] **Step 4: Verificar produção** via MCP:
   - `get_advisors(security)`: sem `anon_security_definer_function_executable` para as helpers e sem `function_search_path_mutable`;

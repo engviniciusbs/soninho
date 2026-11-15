@@ -88,7 +88,7 @@ npm install
 3. Create the tables — see [Database](#database-supabase). **Note:** the repository's `supabase-schema.sql` only covers `babies` and `sleep_sessions`; everything else must be created following the schema section.
 4. Under **Storage**, create a **public** bucket named `baby-avatars` (baby photos, path `<user_id>/<timestamp>.<ext>`).
 5. Under **Authentication → URL Configuration**, add `http://localhost:3000/auth/callback` (and your production URL) to the *Redirect URLs*.
-6. (Optional) Use the template at `src/lib/email/templates/supabase-confirm-signup.html` in **Authentication → Email Templates → Confirm signup**. It points to `/api/auth/confirm?token_hash=...&type=...`.
+6. (Optional) Use the template at `src/lib/email/templates/supabase-confirm-signup.html` in **Authentication → Email Templates → Confirm signup**. It uses `{{ .ConfirmationURL }}` (default flow via `/auth/callback`). The `/api/auth/confirm` route is also available if you change the link to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 ### 3. Environment variables
 
@@ -257,7 +257,7 @@ public/
 4. Signed-in user on `/login`, `/register` or `/` → redirect to `/app`.
 5. `/landing` (legacy URL) → `/`.
 
-Sign-up confirmation: `emailRedirectTo` points to `/auth/callback` (PKCE flow with `code`); the custom email template uses `/api/auth/confirm` (`verifyOtp` with `token_hash`).
+Sign-up confirmation: `emailRedirectTo` points to `/auth/callback` (PKCE flow with `code`); the `/api/auth/confirm` route (`verifyOtp` with `token_hash`) exists as an alternative for templates that send `token_hash`.
 
 ### Data flow
 
@@ -391,7 +391,7 @@ Runs on any Node host (`npm run build && npm run start`, port 3000) or in Docker
 Check `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and make sure the domain is in the Supabase Redirect URLs.
 
 **`/login?error=auth` or `?error=confirmation` after clicking the email link**
-The link expired or the Redirect URL isn't registered. For the custom template, confirm it points to `/api/auth/confirm`.
+The link expired or the Redirect URL isn't registered. Check that the email template and the Redirect URL point to the same domain as the app.
 
 **Data doesn't show up / permission error**
 It's almost always RLS: check the policies and the `get_user_family_ids` / `user_can_write_family` functions.

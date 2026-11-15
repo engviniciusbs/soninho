@@ -88,7 +88,7 @@ npm install
 3. Crie as tabelas — veja [Banco de dados](#banco-de-dados-supabase). **Atenção:** o `supabase-schema.sql` do repositório cobre só `babies` e `sleep_sessions`; o restante precisa ser criado conforme a seção de schema.
 4. Em **Storage**, crie um bucket **público** chamado `baby-avatars` (fotos dos bebês, caminho `<user_id>/<timestamp>.<ext>`).
 5. Em **Authentication → URL Configuration**, adicione `http://localhost:3000/auth/callback` (e a URL de produção) às *Redirect URLs*.
-6. (Opcional) Use o template em `src/lib/email/templates/supabase-confirm-signup.html` em **Authentication → Email Templates → Confirm signup**. Ele aponta para `/api/auth/confirm?token_hash=...&type=...`.
+6. (Opcional) Use o template em `src/lib/email/templates/supabase-confirm-signup.html` em **Authentication → Email Templates → Confirm signup**. Ele usa `{{ .ConfirmationURL }}` (fluxo padrão via `/auth/callback`). A rota `/api/auth/confirm` também está disponível caso você troque o link por `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 ### 3. Variáveis de ambiente
 
@@ -257,7 +257,7 @@ public/
 4. Usuário logado em `/login`, `/register` ou `/` → redirect para `/app`.
 5. `/landing` (URL antiga) → `/`.
 
-Confirmação de cadastro: `emailRedirectTo` aponta para `/auth/callback` (fluxo PKCE com `code`); o template de e-mail customizado usa `/api/auth/confirm` (`verifyOtp` com `token_hash`).
+Confirmação de cadastro: `emailRedirectTo` aponta para `/auth/callback` (fluxo PKCE com `code`); a rota `/api/auth/confirm` (`verifyOtp` com `token_hash`) existe como alternativa para templates que enviem `token_hash`.
 
 ### Fluxo de dados
 
@@ -391,7 +391,7 @@ Funciona em qualquer host Node (`npm run build && npm run start`, porta 3000) ou
 Verifique `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` e se o domínio está nas Redirect URLs do Supabase.
 
 **`/login?error=auth` ou `?error=confirmation` após clicar no e-mail**
-O link expirou ou a Redirect URL não está cadastrada. Para o template customizado, confirme que ele aponta para `/api/auth/confirm`.
+O link expirou ou a Redirect URL não está cadastrada. Confira se o template de e-mail e a Redirect URL apontam para o mesmo domínio do app.
 
 **Dados não aparecem / erro de permissão**
 Quase sempre é RLS: confira as políticas e as funções `get_user_family_ids` / `user_can_write_family`.
