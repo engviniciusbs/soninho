@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { format } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -41,23 +40,15 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient();
-  const hourKey = format(new Date(), "yyyy-MM-dd-HH");
+  const hourKey = new Date().toISOString().slice(0, 13);
   const dedupeKey = `${user.id}:manual:${days}:${hourKey}`;
 
-  const { data: recent } = await admin
-    .from("email_log")
-    .select("id")
-    .eq("dedupe_key", dedupeKey)
-    .limit(1);
-
-  if (recent && recent.length > 0) {
-    return NextResponse.json(
-      {
-        error: "Você já solicitou este relatório na última hora. Tente novamente em breve.",
-      },
-      { status: 429 }
-    );
-  }
+  const { data: prefs } = await admin
+    .from("notification_preferences")
+    .select("timezone")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const timeZone = prefs?.timezone || "America/Sao_Paulo";
 
   const { data: babies, error: babiesError } = await supabase
     .from("babies")
@@ -90,6 +81,7 @@ export async function POST(req: NextRequest) {
       periodDays: days,
       kind: "manual",
       dedupeKey,
+      timeZone,
       babies,
     });
 
@@ -104,7 +96,10 @@ export async function POST(req: NextRequest) {
       }
       if (result.reason === "deduped") {
         return NextResponse.json(
-          { error: "Relatório já enviado recentemente." },
+          {
+            error:
+              "Você já solicitou este relatório na última hora. Tente novamente em breve.",
+          },
           { status: 429 }
         );
       }

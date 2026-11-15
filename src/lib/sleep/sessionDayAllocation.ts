@@ -1,4 +1,5 @@
 import { addDays, format, max, min, startOfDay, subDays, eachDayOfInterval } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import type { SleepSession } from "@/types";
 
 export type DaySleepAllocation = {
@@ -26,9 +27,11 @@ export function getSessionEnd(session: SleepSession): Date | null {
  * Night sleep from 23/05 18:30 → 24/05 06:09 yields minutes on both days.
  */
 export function allocateSessionToLocalDays(
-  session: SleepSession
+  session: SleepSession,
+  timeZone?: string
 ): DaySleepAllocation[] {
   if (session.duration_min == null) return [];
+  if (timeZone) return allocateInTimeZone(session, timeZone);
 
   const start = new Date(session.start_time);
   const end = getSessionEnd(session);
@@ -69,6 +72,56 @@ export function allocateSessionToLocalDays(
   return Array.from(byDay.values());
 }
 
+function shiftKey(key: string, deltaDays: number): string {
+  const d = new Date(`${key}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + deltaDays);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Same as the local-day allocation but with day boundaries in an explicit IANA timezone. */
+function allocateInTimeZone(
+  session: SleepSession,
+  timeZone: string
+): DaySleepAllocation[] {
+  const start = new Date(session.start_time);
+  const end = getSessionEnd(session);
+  if (!end || end <= start) return [];
+
+  const isNap = session.type === "NAP";
+  const result: DaySleepAllocation[] = [];
+  let key = formatInTimeZone(start, timeZone, "yyyy-MM-dd");
+  const lastKey = formatInTimeZone(end, timeZone, "yyyy-MM-dd");
+
+  while (key <= lastKey) {
+    const dayStart = fromZonedTime(`${key}T00:00:00`, timeZone);
+    const dayEnd = fromZonedTime(`${shiftKey(key, 1)}T00:00:00`, timeZone);
+    const overlapStart = max([start, dayStart]);
+    const overlapEnd = min([end, dayEnd]);
+    if (overlapEnd > overlapStart) {
+      const minutes = Math.round(
+        (overlapEnd.getTime() - overlapStart.getTime()) / 60_000
+      );
+      result.push({
+        dayKey: key,
+        napMinutes: isNap ? minutes : 0,
+        nightMinutes: isNap ? 0 : minutes,
+      });
+    }
+    key = shiftKey(key, 1);
+  }
+  return result;
+}
+
+/** Day keys (yyyy-MM-dd) of the last N days in a timezone, ending today there. */
+export function lastDayKeysInTimeZone(
+  days: number,
+  timeZone: string,
+  now: Date = new Date()
+): string[] {
+  const endKey = formatInTimeZone(now, timeZone, "yyyy-MM-dd");
+  return Array.from({ length: days }, (_, i) => shiftKey(endKey, i - (days - 1)));
+}
+
 export type DaySleepTotals = {
   date: string;
   totalHours: number;
@@ -82,8 +135,11 @@ export type DaySleepTotals = {
  */
 export function buildDailySleepTotals(
   sessions: SleepSession[],
-  days: number = 7
+  days: number = 7,
+  timeZone?: string,
+  now: Date = new Date()
 ): DaySleepTotals[] {
+  if (timeZone) return buildDailySleepTotalsInTimeZone(sessions, days, timeZone, now);
   const end = new Date();
   const rangeStart = subDays(startOfDay(end), days - 1);
   const interval = eachDayOfInterval({ start: rangeStart, end });
@@ -112,6 +168,36 @@ export function buildDailySleepTotals(
     };
     return {
       date: format(day, "dd/MM"),
+      totalHours: parseFloat(((napMin + nightMin) / 60).toFixed(1)),
+      napHours: parseFloat((napMin / 60).toFixed(1)),
+      nightHours: parseFloat((nightMin / 60).toFixed(1)),
+    };
+  });
+}
+
+function buildDailySleepTotalsInTimeZone(
+  sessions: SleepSession[],
+  days: number,
+  timeZone: string,
+  now: Date
+): DaySleepTotals[] {
+  const keys = lastDayKeysInTimeZone(days, timeZone, now);
+  const totals = new Map<string, { napMin: number; nightMin: number }>();
+  for (const k of keys) totals.set(k, { napMin: 0, nightMin: 0 });
+
+  for (const session of sessions) {
+    for (const alloc of allocateSessionToLocalDays(session, timeZone)) {
+      const bucket = totals.get(alloc.dayKey);
+      if (!bucket) continue;
+      bucket.napMin += alloc.napMinutes;
+      bucket.nightMin += alloc.nightMinutes;
+    }
+  }
+
+  return keys.map((k) => {
+    const { napMin, nightMin } = totals.get(k)!;
+    return {
+      date: `${k.slice(8, 10)}/${k.slice(5, 7)}`,
       totalHours: parseFloat(((napMin + nightMin) / 60).toFixed(1)),
       napHours: parseFloat((napMin / 60).toFixed(1)),
       nightHours: parseFloat((nightMin / 60).toFixed(1)),

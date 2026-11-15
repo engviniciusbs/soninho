@@ -3,28 +3,33 @@ import type { SleepSession, SleepStats } from "@/types";
 import {
   allocateSessionToLocalDays,
   buildDailySleepTotals,
+  lastDayKeysInTimeZone,
 } from "@/lib/sleep/sessionDayAllocation";
 
 export function getDailyTotals(
   sessions: SleepSession[],
-  days: number = 7
+  days: number = 7,
+  timeZone?: string
 ): { date: string; totalHours: number; napHours: number; nightHours: number }[] {
-  return buildDailySleepTotals(sessions, days);
+  return buildDailySleepTotals(sessions, days, timeZone);
 }
 
 export function getNapCountPerDay(
   sessions: SleepSession[],
-  days: number = 7
+  days: number = 7,
+  timeZone?: string
 ): { date: string; count: number }[] {
   const end = new Date();
   const start = subDays(startOfDay(end), days - 1);
-  const interval = eachDayOfInterval({ start, end });
+  const interval = timeZone
+    ? lastDayKeysInTimeZone(days, timeZone, end).map((k) => new Date(`${k}T12:00:00`))
+    : eachDayOfInterval({ start, end });
 
   return interval.map((day) => {
     const dayStr = format(day, "yyyy-MM-dd");
     const count = sessions.filter((s) => {
       if (s.type !== "NAP" || s.duration_min == null) return false;
-      return allocateSessionToLocalDays(s).some(
+      return allocateSessionToLocalDays(s, timeZone).some(
         (a) => a.dayKey === dayStr && a.napMinutes > 0
       );
     }).length;
@@ -34,11 +39,14 @@ export function getNapCountPerDay(
 
 export function getLongestNightStretch(
   sessions: SleepSession[],
-  days: number = 7
+  days: number = 7,
+  timeZone?: string
 ): { date: string; hours: number }[] {
   const end = new Date();
   const start = subDays(startOfDay(end), days - 1);
-  const interval = eachDayOfInterval({ start, end });
+  const interval = timeZone
+    ? lastDayKeysInTimeZone(days, timeZone, end).map((k) => new Date(`${k}T12:00:00`))
+    : eachDayOfInterval({ start, end });
 
   return interval.map((day) => {
     const dayStr = format(day, "yyyy-MM-dd");
@@ -48,7 +56,7 @@ export function getLongestNightStretch(
       if (session.type !== "NIGHT_SLEEP" || session.duration_min == null) {
         continue;
       }
-      for (const alloc of allocateSessionToLocalDays(session)) {
+      for (const alloc of allocateSessionToLocalDays(session, timeZone)) {
         if (alloc.dayKey === dayStr) {
           longestNightMinutes = Math.max(
             longestNightMinutes,
