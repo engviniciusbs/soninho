@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Branch: `fase1/01-seguranca` (já existe, contém o commit do design).
-- Commits como `engviniciusbs <engviniciusbs@gmail.com>` (config local do repo), mensagens convencionais, terminando com `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Commits como `engviniciusbs` (config local do repo), mensagens convencionais, terminando com `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - CLI: sempre `npx supabase …` (v3.1.0). Usar `--remote`, não `--linked`. DDL em produção **somente** via `npx supabase db push`; nunca `apply_migration` do MCP.
 - **Nada de dados pessoais no repo**: nenhum UUID, e-mail ou nome real em migrations, testes, fixtures, PR ou docs. Fixtures de teste usam UUIDs fixos inventados (`00000000-0000-0000-0000-0000000000a1` etc.).
 - Next 16: ler `node_modules/next/dist/docs/01-app/02-guides/upgrading/version-16.md` antes de mexer em `middleware`/`proxy`.
