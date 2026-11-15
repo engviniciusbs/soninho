@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import type { ReactElement, ReactNode } from "react";
-import { render, type RenderOptions } from "@testing-library/react";
+import { render, renderHook, type RenderOptions } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   BabyContext,
@@ -19,8 +19,10 @@ interface Options extends Omit<RenderOptions, "wrapper"> {
   queryClient?: QueryClient;
 }
 
-export function renderWithProviders(ui: ReactElement, opts: Options = {}) {
-  const { baby, profile, queryClient, ...rest } = opts;
+type ProviderOptions = Pick<Options, "baby" | "profile" | "queryClient">;
+
+function createProviders(opts: ProviderOptions) {
+  const { baby, profile, queryClient } = opts;
   const client =
     queryClient ??
     new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -52,5 +54,17 @@ export function renderWithProviders(ui: ReactElement, opts: Options = {}) {
     return tree;
   }
 
+  return { client, Wrapper };
+}
+
+export function renderWithProviders(ui: ReactElement, opts: Options = {}) {
+  const { baby, profile, queryClient, ...rest } = opts;
+  const { client, Wrapper } = createProviders({ baby, profile, queryClient });
   return { queryClient: client, ...render(ui, { wrapper: Wrapper, ...rest }) };
+}
+
+/** renderHook counterpart of {@link renderWithProviders}. */
+export function renderHookWithProviders<R>(hook: () => R, opts: ProviderOptions = {}) {
+  const { client, Wrapper } = createProviders(opts);
+  return { queryClient: client, ...renderHook(hook, { wrapper: Wrapper }) };
 }
