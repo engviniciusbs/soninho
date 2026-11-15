@@ -216,6 +216,32 @@ describe("FeedingForm", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
+  it("post_submit_end_time_change_keeps_range_error_when_still_invalid", async () => {
+    await mount();
+    pick("Peito");
+    change("end_time_input", "08:00");
+    submit();
+    expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
+    change("end_time_input", "08:30");
+    // Let the post-submit re-validation (async resolver) settle.
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.getByRole("alert")).toHaveTextContent(MSG);
+    expect(field("end_time_input")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("post_submit_end_time_change_clears_range_error_when_valid", async () => {
+    await mount();
+    pick("Peito");
+    change("end_time_input", "08:00");
+    submit();
+    expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
+    change("end_time_input", "09:30");
+    await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());
+    await new Promise((r) => setTimeout(r, 50));
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(field("end_time_input")).toHaveAttribute("aria-invalid", "false");
+  });
+
   it("end_date_change_clears_or_sets_range_error", async () => {
     await mount();
     pick("Peito");
