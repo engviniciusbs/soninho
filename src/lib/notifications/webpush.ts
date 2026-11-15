@@ -56,16 +56,25 @@ export interface SubscriptionStore {
 }
 
 /**
+ * Outcome of one push: delivered, subscription dead (deactivated), or a
+ * transient failure (timeout, 5xx, network) worth retrying later.
+ */
+export type SendOutcome = "sent" | "dead" | "failed";
+
+/** web-push has no default timeout; keep well under the route's maxDuration. */
+export const PUSH_SEND_OPTIONS = { timeout: 10_000, TTL: 3600 } as const;
+
+/**
  * Sends one push. Endpoints outside the allowlist are never contacted and the
- * row is deactivated; 404/410 deactivate; other errors are only logged.
- * Returns true if the push was sent.
+ * row is deactivated ("dead"); 404/410 deactivate ("dead"); other errors are
+ * only logged ("failed").
  */
 export async function sendToSubscription(
   wp: Pick<WebPush, "sendNotification">,
   sub: PushSubscriptionRow,
   payload: string,
   store: SubscriptionStore
-): Promise<boolean> {
+): Promise<SendOutcome> {
   const deactivate = async () => {
     await store
       .from("push_subscriptions")
@@ -76,21 +85,23 @@ export async function sendToSubscription(
   if (!isAllowedPushEndpoint(sub.endpoint)) {
     console.warn(`[push] Disallowed endpoint host ${endpointHost(sub.endpoint)}; deactivating`);
     await deactivate();
-    return false;
+    return "dead";
   }
 
   try {
     await wp.sendNotification(
       { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-      payload
+      payload,
+      PUSH_SEND_OPTIONS
     );
-    return true;
+    return "sent";
   } catch (err: unknown) {
     const statusCode = (err as { statusCode?: number })?.statusCode;
-    if (statusCode === 404 || statusCode === 410) await deactivate();
+    const dead = statusCode === 404 || statusCode === 410;
+    if (dead) await deactivate();
     console.error(
       `[push] Send failed for ${endpointHost(sub.endpoint)} (status ${statusCode ?? "n/a"})`
     );
-    return false;
+    return dead ? "dead" : "failed";
   }
 }

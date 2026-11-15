@@ -37,7 +37,7 @@ export async function POST() {
 
   let sent = 0;
   for (const sub of subs) {
-    if (await sendToSubscription(webpush, sub, payload, supabase)) sent++;
+    if ((await sendToSubscription(webpush, sub, payload, supabase)) === "sent") sent++;
   }
 
   return NextResponse.json({ ok: true, sent });

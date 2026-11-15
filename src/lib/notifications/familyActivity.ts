@@ -63,7 +63,7 @@ async function pushToRecipients(
       .eq("is_active", true);
 
     for (const sub of subs ?? []) {
-      if (await sendToSubscription(webpush, sub, payload, supabase)) sent++;
+      if ((await sendToSubscription(webpush, sub, payload, supabase)) === "sent") sent++;
     }
   }
 

@@ -1,8 +1,7 @@
-import { getWebPush, sendToSubscription, type PushSubscriptionRow } from "@/lib/notifications/webpush";
+import { deliverAlerts } from "@/lib/notifications/deliverAlerts";
+import { getWebPush, type PushSubscriptionRow } from "@/lib/notifications/webpush";
 import { selectAlerts, type AlertPref, type SelectAlertsInput } from "@/lib/notifications/selectAlerts";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-type Admin = ReturnType<typeof createAdminClient>;
 
 /** Completed sessions older than this are not considered (wake windows max out at 4h). */
 const LAST_SESSION_LOOKBACK_MS = 24 * 60 * 60 * 1000;
@@ -117,7 +116,7 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
   const webpush = getWebPush();
   if (!webpush) return 0;
 
-  // 7. Claim alerts atomically: rows that already existed are not returned.
+  // 7. Claim alerts atomically as 'pending': rows that already existed are not returned.
   const { data: claimed, error: claimError } = await supabase
     .from("notification_events")
     .upsert(
@@ -127,51 +126,18 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
         session_id: a.sessionId,
         event_type: a.eventType,
         dedupe_key: a.dedupeKey,
-        sent_at: now.toISOString(),
-        status: "sent",
+        sent_at: null,
+        status: "pending",
       })),
       { onConflict: "dedupe_key", ignoreDuplicates: true }
     )
-    .select("id, dedupe_key");
+    .select("dedupe_key");
   if (claimError) throw new Error(claimError.message);
 
-  const claimedIds = new Map((claimed ?? []).map((r) => [r.dedupe_key as string, r.id as string]));
-  const owned = alerts.filter((a) => claimedIds.has(a.dedupeKey));
+  const claimedKeys = new Set((claimed ?? []).map((r) => r.dedupe_key as string));
+  const owned = alerts.filter((a) => claimedKeys.has(a.dedupeKey));
+  if (owned.length === 0) return 0;
 
-  // 8. Send each owned alert to all of the recipient's devices.
-  const results = await Promise.all(
-    owned.map(async (alert) => {
-      const payload = JSON.stringify({
-        title: alert.title,
-        body: alert.body,
-        icon: "/icon.svg",
-        tag: alert.tag,
-        url: "/",
-      });
-      const sent = await Promise.all(
-        subsByUser
-          .get(alert.userId)!
-          .map((sub) => sendToSubscription(webpush, sub, payload, supabase))
-      );
-      return { alert, delivered: sent.some(Boolean) };
-    })
-  );
-
-  // 9. Mark claimed alerts that reached no device (kept for dedupe, not retried).
-  const failedIds = results
-    .filter((r) => !r.delivered)
-    .map((r) => claimedIds.get(r.alert.dedupeKey)!);
-  if (failedIds.length > 0) await markFailed(supabase, failedIds);
-
-  return results.filter((r) => r.delivered).length;
-}
-
-async function markFailed(supabase: Admin, ids: string[]): Promise<void> {
-  for (const chunk of chunks(ids)) {
-    const { error } = await supabase
-      .from("notification_events")
-      .update({ status: "failed", sent_at: null })
-      .in("id", chunk);
-    if (error) console.error("[dispatch] Failed to mark undelivered alerts:", error.message);
-  }
+  // 8. Send (bounded concurrency, per-send timeout) and settle each claim.
+  return deliverAlerts({ wp: webpush, store: supabase, alerts: owned, subsByUser, now });
 }
