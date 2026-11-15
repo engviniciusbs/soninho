@@ -1,7 +1,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(51);
+select plan(60);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner a1, caregiver a2, viewer a3 | F2: owner b1 | c1,c2,c3 no family
@@ -95,6 +95,13 @@ select is(tests.try_val($$select count(*) from public.sleep_sessions where baby_
   'existing_family_access: foreign owner sees 0 sessions of B1');
 
 select tests.login_as('00000000-0000-0000-0000-0000000000a1');
+select is(tests.try_exec($$update public.babies set name='Bebe1x', avatar_emoji='👶' where id='00000000-0000-0000-0000-0000000000b1'$$),
+  'OK:1', 'owner_and_caregiver_can_update_baby_profile: owner');
+select tests.login_as('00000000-0000-0000-0000-0000000000a2');
+select is(tests.try_exec($$update public.babies set name='Bebe1y', avatar_emoji='🧸' where id='00000000-0000-0000-0000-0000000000b1'$$),
+  'OK:1', 'owner_and_caregiver_can_update_baby_profile: caregiver');
+
+select tests.login_as('00000000-0000-0000-0000-0000000000a1');
 select is(tests.try_exec($$update public.family_members set role='viewer' where user_id='00000000-0000-0000-0000-0000000000a2'$$),
   'OK:1', 'owner_can_change_member_role');
 
@@ -165,6 +172,34 @@ select is((select count(*)::int from public.family_members fm join public.babies
 select ok(exists(select 1 from pg_proc where proname='calculate_duration' and pronamespace='public'::regnamespace
                  and (coalesce(proconfig::text,'') like '%search_path=public%' or coalesce(proconfig::text,'') like '%search_path=""%')),
   'calculate_duration_search_path');
+
+-- ------------------------------------------------- removed creator (M2)
+-- B3 created by a2 inside F1; a2 is then removed from F1 (as service context).
+select tests.logout();
+insert into public.babies (id, user_id, name, birth_date, family_id) values
+  ('00000000-0000-0000-0000-0000000000b3', '00000000-0000-0000-0000-0000000000a2', 'Bebe3', '2026-01-01', '00000000-0000-0000-0000-0000000000f1');
+insert into public.sleep_sessions (id, baby_id, type, start_time) values
+  ('00000000-0000-0000-0000-0000000000e3', '00000000-0000-0000-0000-0000000000b3', 'NAP', now() - interval '1 hour');
+delete from public.family_members where user_id='00000000-0000-0000-0000-0000000000a2' and family_id='00000000-0000-0000-0000-0000000000f1';
+select tests.login_as('00000000-0000-0000-0000-0000000000a2');
+select is(tests.try_val($$select count(*) from public.babies where id='00000000-0000-0000-0000-0000000000b3'$$), '0',
+  'removed_creator_loses_access: cannot read own-created baby');
+select is(tests.try_val($$select count(*) from public.sleep_sessions where baby_id='00000000-0000-0000-0000-0000000000b3'$$), '0',
+  'removed_creator_loses_access: cannot read sleep_sessions');
+select matches(tests.try_exec($$insert into public.sleep_sessions(baby_id,type,start_time) values ('00000000-0000-0000-0000-0000000000b3','NAP',now())$$),
+  '^ERR:42501', 'removed_creator_loses_access: cannot insert sleep_session');
+select is(tests.try_exec($$update public.sleep_sessions set notes='x' where id='00000000-0000-0000-0000-0000000000e3'$$),
+  'OK:0', 'removed_creator_loses_access: cannot update sleep_session');
+select is(tests.try_exec($$delete from public.sleep_sessions where id='00000000-0000-0000-0000-0000000000e3'$$),
+  'OK:0', 'removed_creator_loses_access: cannot delete sleep_session');
+select is(tests.try_exec($$update public.babies set name='hacked' where id='00000000-0000-0000-0000-0000000000b3'$$),
+  'OK:0', 'removed_creator_loses_access: cannot update baby');
+
+-- ------------------------------------------- default privileges (I1)
+select tests.logout();
+create function public.zz_default_acl_probe() returns int language sql as 'select 1';
+select ok(not has_function_privilege('anon', 'public.zz_default_acl_probe()', 'execute'),
+  'default_privileges: new public function not executable by anon');
 
 select * from finish();
 rollback;

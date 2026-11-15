@@ -9,11 +9,18 @@
 -- blocked by the new triggers/helper filters.
 
 -- ---------------------------------------------------------------------------
--- S6 (part 1): stop granting EXECUTE on new public functions to anon by default.
--- (Explicit per-function revokes below cover PUBLIC, whose built-in default
--- cannot be removed by a per-schema ALTER DEFAULT PRIVILEGES.)
+-- S6 (part 1): functions created by postgres from now on are not executable
+-- by anon unless explicitly granted.
+--  * Global form (no IN SCHEMA): removes the built-in PUBLIC EXECUTE default for
+--    functions created by role postgres in any schema. A per-schema statement
+--    cannot do this (per-schema defaults only add to the global ones).
+--  * Per-schema form: removes the explicit
+--    "FOR ROLE postgres IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon" default.
+--    (The PUBLIC part of it is a no-op, kept verbatim from the brief.)
+-- authenticated/service_role keep their existing default grants.
 -- ---------------------------------------------------------------------------
-alter default privileges in schema public revoke execute on functions from public, anon;
+alter default privileges for role postgres revoke execute on functions from public;
+alter default privileges for role postgres in schema public revoke execute on functions from public, anon;
 
 -- ---------------------------------------------------------------------------
 -- S10: helpers ignore questions about another user when called by a user.
@@ -109,6 +116,12 @@ begin
     end if;
 
     if old.role = 'owner'
+       and (new.role <> 'owner' or new.family_id is distinct from old.family_id) then
+      -- Serialize concurrent owner demotions/removals in the same family.
+      perform 1 from families where id = old.family_id for update;
+    end if;
+
+    if old.role = 'owner'
        and (new.role <> 'owner' or new.family_id is distinct from old.family_id)
        and not exists (
          select 1 from family_members
@@ -121,6 +134,11 @@ begin
   end if;
 
   -- DELETE
+  if old.role = 'owner' then
+    -- Serialize concurrent owner demotions/removals in the same family.
+    perform 1 from families where id = old.family_id for update;
+  end if;
+
   if old.role = 'owner'
      and not exists (
        select 1 from family_members
@@ -155,12 +173,147 @@ drop policy if exists "Family owners and caregivers can update babies" on public
 create policy "Family owners and caregivers can update babies" on public.babies
   for update
   using (
-    auth.uid() = user_id
+    (family_id is null and auth.uid() = user_id)
     or user_can_write_family(auth.uid(), family_id)
   )
   with check (
     family_id is null
     or user_can_write_family(auth.uid(), family_id)
+  );
+
+-- ---------------------------------------------------------------------------
+-- M2: the creator fallback (babies.user_id = auth.uid()) only applies to babies
+-- without a family. A creator removed from the family loses access.
+-- Same policy names as production; only the fallback changes.
+-- ---------------------------------------------------------------------------
+drop policy if exists "Family members can read babies" on public.babies;
+create policy "Family members can read babies" on public.babies
+  for select using (
+    (family_id is null and auth.uid() = user_id)
+    or family_id in (select get_user_family_ids(auth.uid()))
+  );
+
+drop policy if exists "Family owners can delete babies" on public.babies;
+create policy "Family owners can delete babies" on public.babies
+  for delete using (
+    (family_id is null and auth.uid() = user_id)
+    or family_id in (select get_user_owned_family_ids(auth.uid()))
+  );
+
+do $m2$
+declare
+  t record;
+  v_read text;
+  v_write text;
+begin
+  for t in
+    select * from (values
+      ('sleep_sessions',
+       'Family members can read sessions',
+       'Caregivers and owners can insert sessions',
+       'Caregivers and owners can update sessions',
+       'Caregivers and owners can delete sessions'),
+      ('bottle_feedings',
+       'Family members can read bottle feedings',
+       'Caregivers and owners can insert bottle feedings',
+       'Caregivers and owners can update bottle feedings',
+       'Caregivers and owners can delete bottle feedings'),
+      ('breastfeeding_sessions',
+       'Family members can read breastfeeding sessions',
+       'Caregivers and owners can insert breastfeeding sessions',
+       'Caregivers and owners can update breastfeeding sessions',
+       'Caregivers and owners can delete breastfeeding sessions'),
+      ('solid_feedings',
+       'Family members can read solid feedings',
+       'Caregivers and owners can insert solid feedings',
+       'Caregivers and owners can update solid feedings',
+       'Caregivers and owners can delete solid feedings')
+    ) as v(tbl, p_read, p_ins, p_upd, p_del)
+  loop
+    v_read := format(
+      'exists (select 1 from public.babies b where b.id = %I.baby_id and '
+      '((b.family_id is null and b.user_id = auth.uid()) '
+      'or b.family_id in (select public.get_user_family_ids(auth.uid()))))', t.tbl);
+    v_write := format(
+      'exists (select 1 from public.babies b where b.id = %I.baby_id and '
+      '((b.family_id is null and b.user_id = auth.uid()) '
+      'or public.user_can_write_family(auth.uid(), b.family_id)))', t.tbl);
+
+    execute format('drop policy if exists %I on public.%I', t.p_read, t.tbl);
+    execute format('create policy %I on public.%I for select using (%s)', t.p_read, t.tbl, v_read);
+    execute format('drop policy if exists %I on public.%I', t.p_ins, t.tbl);
+    execute format('create policy %I on public.%I for insert with check (%s)', t.p_ins, t.tbl, v_write);
+    execute format('drop policy if exists %I on public.%I', t.p_upd, t.tbl);
+    execute format('create policy %I on public.%I for update using (%s)', t.p_upd, t.tbl, v_write);
+    execute format('drop policy if exists %I on public.%I', t.p_del, t.tbl);
+    execute format('create policy %I on public.%I for delete using (%s)', t.p_del, t.tbl, v_write);
+  end loop;
+end
+$m2$;
+
+drop policy if exists "Family members can read sleep activity" on public.sleep_activity_log;
+create policy "Family members can read sleep activity" on public.sleep_activity_log
+  for select using (
+    baby_id in (
+      select b.id from public.babies b
+      where b.family_id in (select get_user_family_ids(auth.uid()))
+         or (b.family_id is null and b.user_id = auth.uid())
+    )
+  );
+
+drop policy if exists "Caregivers can insert sleep activity" on public.sleep_activity_log;
+create policy "Caregivers can insert sleep activity" on public.sleep_activity_log
+  for insert with check (
+    actor_user_id = auth.uid()
+    and baby_id in (
+      select b.id from public.babies b
+      where (b.family_id is not null and user_can_write_family(auth.uid(), b.family_id))
+         or (b.family_id is null and b.user_id = auth.uid())
+    )
+  );
+
+drop policy if exists "Family members can read feeding activity" on public.feeding_activity_log;
+create policy "Family members can read feeding activity" on public.feeding_activity_log
+  for select using (
+    baby_id in (
+      select b.id from public.babies b
+      where b.family_id in (select get_user_family_ids(auth.uid()))
+         or (b.family_id is null and b.user_id = auth.uid())
+    )
+  );
+
+drop policy if exists "Caregivers can insert feeding activity" on public.feeding_activity_log;
+create policy "Caregivers can insert feeding activity" on public.feeding_activity_log
+  for insert with check (
+    actor_user_id = auth.uid()
+    and baby_id in (
+      select b.id from public.babies b
+      where (b.family_id is not null and user_can_write_family(auth.uid(), b.family_id))
+         or (b.family_id is null and b.user_id = auth.uid())
+    )
+  );
+
+drop policy if exists "Family members can read feedback" on public.nap_suggestion_feedback;
+create policy "Family members can read feedback" on public.nap_suggestion_feedback
+  for select using (
+    exists (
+      select 1 from public.babies b
+      where b.id = nap_suggestion_feedback.baby_id
+        and ((b.family_id is null and b.user_id = auth.uid())
+             or b.family_id in (select get_user_family_ids(auth.uid())))
+    )
+  );
+
+drop policy if exists "Caregivers can insert feedback" on public.nap_suggestion_feedback;
+create policy "Caregivers can insert feedback" on public.nap_suggestion_feedback
+  for insert with check (
+    user_id = auth.uid()
+    and exists (
+      select 1 from public.babies b
+      where b.id = nap_suggestion_feedback.baby_id
+        and ((b.family_id is null and b.user_id = auth.uid())
+             or user_can_write_family(auth.uid(), b.family_id))
+    )
   );
 
 -- user_id is immutable for users; family_id may only be changed by an owner of
@@ -293,7 +446,7 @@ begin
     v_inv.family_id,
     v_uid,
     v_inv.role,
-    coalesce(nullif(btrim(p_display_name), ''), v_user.raw_user_meta_data->>'full_name'),
+    left(coalesce(nullif(btrim(p_display_name), ''), v_user.raw_user_meta_data->>'full_name'), 80),
     v_user.email,
     v_inv.family_relation,
     v_inv.created_by
