@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { Clock, Milk } from "lucide-react";
 import { useFeedingSuggestion } from "@/hooks/useFeedingSuggestion";
-import { useFeedingStore } from "@/store/feedingStore";
+import { useActiveBreastTimer } from "@/store/feedingStore";
+import { useBaby } from "@/components/providers/BabyProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +25,8 @@ const confidenceConfig = {
 
 export function FeedingSuggestionCard() {
   const { data: suggestion, isLoading } = useFeedingSuggestion();
-  const { isRunning } = useFeedingStore();
+  const { activeBaby } = useBaby();
+  const isRunning = useActiveBreastTimer(activeBaby?.id) !== null;
 
   if (isRunning) return null;
   if (isLoading) return <Skeleton className="h-32 rounded-2xl" />;

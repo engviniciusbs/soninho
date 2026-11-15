@@ -34,7 +34,10 @@ export function useBaby() {
 export function BabyProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const { activeBabyId, setActiveBabyId } = useSleepStore();
+  // The selected baby is persisted in the sleep store (it does not own the
+  // timers, which are keyed by baby id).
+  const activeBabyId = useSleepStore((s) => s.activeBabyId);
+  const setActiveBabyId = useSleepStore((s) => s.setActiveBabyId);
   // Last resolved active baby. Kept so that, as before, activeBaby keeps its
   // previous value while the babies list is (temporarily) empty.
   const [lastActiveBaby, setLastActiveBaby] = useState<Baby | null>(null);

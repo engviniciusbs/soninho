@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { clampEndTime } from "./sessionTime";
 
 type Client = SupabaseClient;
 
@@ -103,10 +104,23 @@ export async function startSleepSession(
     .single();
 }
 
-export async function endSleepSession(supabase: Client, sessionId: string) {
+/** Minimal row used by the live poll (see classifyLiveSession). */
+export async function getSleepSessionStatus(supabase: Client, sessionId: string) {
   return supabase
     .from("sleep_sessions")
-    .update({ end_time: new Date().toISOString() })
+    .select("id, baby_id, start_time, end_time")
+    .eq("id", sessionId)
+    .maybeSingle();
+}
+
+/**
+ * Ends a session at `max(now, startTime)` so a phone whose clock is behind the
+ * one that started it can still stop it (end_time >= start_time constraint).
+ */
+export async function endSleepSession(supabase: Client, sessionId: string, startTime: string) {
+  return supabase
+    .from("sleep_sessions")
+    .update({ end_time: clampEndTime(startTime) })
     .eq("id", sessionId)
     .select()
     .single();

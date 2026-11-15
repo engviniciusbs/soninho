@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { clampEndTime } from "./sessionTime";
 import type {
   BottleFeeding,
   BreastfeedingSession,
@@ -140,15 +141,28 @@ export async function updateBreastfeedingSides(
     .single();
 }
 
+/** Minimal row used by the live poll (see classifyLiveSession). */
+export async function getBreastfeedingSessionStatus(supabase: Client, id: string) {
+  return supabase
+    .from("breastfeeding_sessions")
+    .select("id, baby_id, start_time, end_time")
+    .eq("id", id)
+    .maybeSingle();
+}
+
+/**
+ * Ends a session at `max(now, start_time)` so a phone whose clock is behind
+ * the one that started it can still stop it (end_time >= start_time constraint).
+ */
 export async function endBreastfeedingSession(
   supabase: Client,
   id: string,
-  data: { side_left_sec: number; side_right_sec: number; notes?: string | null }
+  data: { start_time: string; side_left_sec: number; side_right_sec: number; notes?: string | null }
 ) {
   return supabase
     .from("breastfeeding_sessions")
     .update({
-      end_time: new Date().toISOString(),
+      end_time: clampEndTime(data.start_time),
       side_left_sec: data.side_left_sec,
       side_right_sec: data.side_right_sec,
       notes: data.notes ?? null,
