@@ -40,13 +40,6 @@ export default function LoginPage() {
     router.refresh();
   }
 
-  async function handleGoogleLogin() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -123,6 +116,8 @@ export default function LoginPage() {
         <div className="flex-1 border-t border-border/50" />
       </div>
 
+      {/* Google login is disabled; its handleGoogleLogin (signInWithOAuth
+          with redirectTo /auth/callback) was removed — recover it from git. */}
       {/* <Button
         variant="outline"
         className="w-full rounded-xl h-11 border-border/50 bg-muted/30 hover:bg-muted/50"

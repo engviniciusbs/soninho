@@ -353,6 +353,7 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
               </div>
               <div className="space-y-1">
                 <label className="text-xs text-muted-foreground">Tipo de leite</label>
+                {/* eslint-disable-next-line react-hooks/incompatible-library -- reactCompiler is not enabled (next.config.ts), so "compilation skipped" has no runtime effect; RHF watch() is used intentionally (TODO(PR4): consider useWatch). */}
                 <Select value={watch("milk_type") ?? "FORMULA"} onValueChange={(v) => v && setValue("milk_type", v)}>
                   <SelectTrigger className="rounded-xl" aria-label="Tipo de leite">
                     <SelectValue />

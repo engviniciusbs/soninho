@@ -40,18 +40,21 @@ export function useSleepTimer() {
     restoreFromSession,
   } = useSleepStore();
 
-  const [elapsed, setElapsed] = useState("00:00:00");
+  // Last interval tick, tagged with the startTime it was computed for. The
+  // displayed value is derived in render: "00:00:00" while stopped and until
+  // the first tick of the current run (same UX as the previous reset-in-effect).
+  const [tick, setTick] = useState<{ startTime: string; value: string } | null>(null);
 
   useEffect(() => {
-    if (!isRunning || !startTime) {
-      setElapsed("00:00:00");
-      return;
-    }
+    if (!isRunning || !startTime) return;
     const interval = setInterval(() => {
-      setElapsed(formatElapsed(startTime));
+      setTick({ startTime, value: formatElapsed(startTime) });
     }, 1000);
     return () => clearInterval(interval);
   }, [isRunning, startTime]);
+
+  const elapsed =
+    isRunning && startTime && tick?.startTime === startTime ? tick.value : "00:00:00";
 
   // Restore timer state from Supabase on mount
   useEffect(() => {

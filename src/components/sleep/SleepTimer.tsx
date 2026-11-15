@@ -112,7 +112,7 @@ export function SleepTimer() {
   } = useSleepTimer();
 
   const { activeBaby } = useBaby();
-  const { elapsedMinutes, status, range, minutesUntilNextNap, isLoading: wwLoading } = useWakeWindow();
+  const { elapsedMinutes, status, range, minutesUntilNextNap, now: wwNow, isLoading: wwLoading } = useWakeWindow();
   const { data: ai } = useAISuggestions();
 
   const supabase = createClient();
@@ -157,7 +157,9 @@ export function SleepTimer() {
     if (ai?.windowEnd) candidates.push({ label: ai.windowEnd, emoji: "⛅", secondary: true });
 
     if (candidates.length === 0 && !wwLoading && minutesUntilNextNap > 0) {
-      const t = new Date(Date.now() + minutesUntilNextNap * 60_000);
+      // Use the wake-window hook's clock (the instant minutesUntilNextNap was
+      // computed for) instead of calling Date.now() during render.
+      const t = new Date(wwNow + minutesUntilNextNap * 60_000);
       candidates.push({ label: format(t, "HH:mm"), emoji: "☁️" });
     }
 
@@ -165,7 +167,7 @@ export function SleepTimer() {
       ...c,
       pos: polar(R_BUBBLE, BUBBLE_SLOTS[i] ?? 0),
     }));
-  }, [ai, minutesUntilNextNap, wwLoading]);
+  }, [ai, minutesUntilNextNap, wwLoading, wwNow]);
 
   /* ── Today's session dots on ring ─────────────────────────────────────── */
   const sessionDots = useMemo(() =>

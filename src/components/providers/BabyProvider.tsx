@@ -35,7 +35,9 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBabyId, setActiveBabyId } = useSleepStore();
-  const [activeBaby, setActiveBabyState] = useState<Baby | null>(null);
+  // Last resolved active baby. Kept so that, as before, activeBaby keeps its
+  // previous value while the babies list is (temporarily) empty.
+  const [lastActiveBaby, setLastActiveBaby] = useState<Baby | null>(null);
 
   // Auth-readiness guard: don't query babies until the Supabase session cookie
   // is confirmed. Without this, RLS blocks the query and React Query caches an
@@ -78,20 +80,24 @@ export function BabyProvider({ children }: { children: ReactNode }) {
   // query is running for a known user
   const isLoading = !authReady || (authReady && !!sessionUserId && isPending);
 
-  useEffect(() => {
-    if (babies.length === 0) return;
+  // Derive the active baby in render: the stored id if it is in the list,
+  // otherwise the first baby. While the list is empty, keep the last one.
+  const storedBaby = babies.find((b) => b.id === activeBabyId);
+  const resolvedBaby = babies.length === 0 ? null : (storedBaby ?? babies[0]);
+  if (resolvedBaby && resolvedBaby !== lastActiveBaby) {
+    // Adjusting state during render (react.dev "storing information from
+    // previous renders"): React re-renders immediately, no effect cascade.
+    setLastActiveBaby(resolvedBaby);
+  }
+  const activeBaby = resolvedBaby ?? lastActiveBaby;
 
-    const stored = babies.find((b) => b.id === activeBabyId);
-    if (stored) {
-      setActiveBabyState(stored);
-    } else {
-      setActiveBabyState(babies[0]);
-      setActiveBabyId(babies[0].id);
-    }
-  }, [babies, activeBabyId, setActiveBabyId]);
+  // Persist the fallback selection to the (external) zustand store.
+  const fallbackBabyId = babies.length > 0 && !storedBaby ? babies[0].id : null;
+  useEffect(() => {
+    if (fallbackBabyId) setActiveBabyId(fallbackBabyId);
+  }, [fallbackBabyId, setActiveBabyId]);
 
   function setActiveBaby(baby: Baby) {
-    setActiveBabyState(baby);
     setActiveBabyId(baby.id);
   }
 

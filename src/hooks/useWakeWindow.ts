@@ -20,6 +20,8 @@ interface WakeWindowData {
   range: WakeWindowRange;
   minutesUntilNextNap: number;
   lastSleepEnd: string | null;
+  /** Wall-clock time (ms) at which elapsedMinutes was last computed. */
+  now: number;
   isLoading: boolean;
 }
 
@@ -27,6 +29,7 @@ export function useWakeWindow(): WakeWindowData {
   const supabase = createClient();
   const { activeBaby } = useBaby();
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   const { data: lastSession, isLoading } = useQuery({
     queryKey: ["last-session", activeBaby?.id],
@@ -42,17 +45,20 @@ export function useWakeWindow(): WakeWindowData {
   const ageWeeks = activeBaby ? getBabyAge(activeBaby.birth_date).weeks : 12;
   const range = getWakeWindowRange(ageWeeks);
 
+  const lastSleepEnd = lastSession?.end_time ?? null;
+
   useEffect(() => {
-    if (!lastSession?.end_time) return;
+    if (!lastSleepEnd) return;
+    const end = new Date(lastSleepEnd).getTime();
     function update() {
-      const end = new Date(lastSession!.end_time!).getTime();
-      const now = Date.now();
-      setElapsedMinutes(Math.max(0, (now - end) / 60000));
+      const t = Date.now();
+      setNow(t);
+      setElapsedMinutes(Math.max(0, (t - end) / 60000));
     }
     update();
     const interval = setInterval(update, 30_000);
     return () => clearInterval(interval);
-  }, [lastSession?.end_time]);
+  }, [lastSleepEnd]);
 
   const status = getWakeWindowStatus(elapsedMinutes, range);
   const minutesUntilNextNap = getMinutesUntilNextNap(elapsedMinutes, range);
@@ -62,7 +68,8 @@ export function useWakeWindow(): WakeWindowData {
     status,
     range,
     minutesUntilNextNap,
-    lastSleepEnd: lastSession?.end_time ?? null,
+    lastSleepEnd,
+    now,
     isLoading,
   };
 }
