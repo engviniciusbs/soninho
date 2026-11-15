@@ -85,8 +85,8 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com/dashboard).
 2. Under **Project Settings → API**, copy the URL, the `anon key` and the `service_role key`.
-3. Create the tables — see [Database](#database-supabase). **Note:** the repository's `supabase-schema.sql` only covers `babies` and `sleep_sessions`; everything else must be created following the schema section.
-4. Under **Storage**, create a **public** bucket named `baby-avatars` (baby photos, path `<user_id>/<timestamp>.<ext>`).
+3. Create the schema from the versioned migrations in `supabase/migrations/` (tables, RLS, functions and the public `baby-avatars` storage bucket): locally run `npx supabase start`, `npx supabase db reset` and `npx supabase test db`; for your hosted project run `npx supabase link` and `npx supabase db push`. See [Database](#database-supabase).
+4. The `baby-avatars` bucket (baby photos, path `<user_id>/<timestamp>.<ext>`) is created by the migrations.
 5. Under **Authentication → URL Configuration**, add `http://localhost:3000/auth/callback` (and your production URL) to the *Redirect URLs*.
 6. (Optional) Use the template at `src/lib/email/templates/supabase-confirm-signup.html` in **Authentication → Email Templates → Confirm signup**. It uses `{{ .ConfirmationURL }}` (default flow via `/auth/callback`). The `/api/auth/confirm` route is also available if you change the link to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
@@ -200,11 +200,11 @@ email_log                  — user_id · kind · period_start · period_end · 
 
 ### Security
 
-Every table should have **Row Level Security** enabled. `supabase-schema.sql` shows the original pattern (baby owner via `auth.uid()`); with families, policies should allow access to babies in the user's families (`get_user_family_ids`) and writes only for `owner`/`caregiver` (`user_can_write_family`). Cross-user operations (crons, invite acceptance, family push) use the admin client (`service_role`).
+Every table should have **Row Level Security** enabled. the original pattern (baby owner via `auth.uid()`) is in `supabase/migrations/20260101000000_initial_schema.sql`; with families, policies should allow access to babies in the user's families (`get_user_family_ids`) and writes only for `owner`/`caregiver` (`user_can_write_family`). Cross-user operations (crons, invite acceptance, family push) use the admin client (`service_role`).
 
 The `calculate_sleep_duration` trigger fills `duration_min` and `updated_at` on `sleep_sessions`.
 
-> 💡 Recommendation: version the full schema (e.g. with `supabase db dump` or Supabase CLI migrations) — the file in the repository is currently out of date.
+> The full schema is versioned as Supabase CLI migrations in `supabase/migrations/`.
 
 ## Architecture
 
