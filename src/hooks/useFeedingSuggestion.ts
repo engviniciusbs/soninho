@@ -2,15 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { useFeedingStore } from "@/store/feedingStore";
+import { useActiveBreastTimer } from "@/store/feedingStore";
 import type { FeedingSuggestion } from "@/types";
 
 export function useFeedingSuggestion() {
   const { activeBaby } = useBaby();
-  const { isRunning, activeBabyId } = useFeedingStore();
-
-  const breastfeedingActive =
-    isRunning && (!activeBabyId || activeBabyId === activeBaby?.id);
+  const breastfeedingActive = useActiveBreastTimer(activeBaby?.id) !== null;
 
   return useQuery<FeedingSuggestion | null>({
     queryKey: ["feeding-suggestion", activeBaby?.id],

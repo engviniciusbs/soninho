@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { differenceInWeeks } from "date-fns";
 import { useAISuggestions } from "@/hooks/useAISuggestions";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
-import { useSleepStore } from "@/store/sleepStore";
+import { useActiveSleepTimer } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -32,28 +32,14 @@ const confidenceConfig = {
   },
 };
 
-function isSleepingForBaby(
-  isRunning: boolean,
-  activeBabyId: string | null,
-  babyId: string | undefined
-): boolean {
-  if (!isRunning || !babyId) return false;
-  return !activeBabyId || activeBabyId === babyId;
-}
-
 export function AISuggestionCard() {
   const { data: suggestion, isLoading, error } = useAISuggestions();
   const { minutesUntilNextNap, status } = useWakeWindow();
-  const { isRunning, activeBabyId } = useSleepStore();
   const { activeBaby } = useBaby();
   const [vote, setVote] = useState<"up" | "down" | null>(null);
   const [voting, setVoting] = useState(false);
 
-  const sleeping = isSleepingForBaby(
-    isRunning,
-    activeBabyId,
-    activeBaby?.id
-  );
+  const sleeping = useActiveSleepTimer(activeBaby?.id) !== null;
 
   async function handleVote(value: "up" | "down") {
     if (!activeBaby || !suggestion || voting || vote) return;

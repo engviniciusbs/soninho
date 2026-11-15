@@ -2,11 +2,10 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { BreastSide } from "@/types";
 
-interface BreastfeedingTimerState {
-  isRunning: boolean;
-  sessionId: string | null;
-  startTime: string | null;
-  activeBabyId: string | null;
+/** A running breastfeeding timer of one baby. */
+export interface BreastTimerEntry {
+  sessionId: string;
+  startTime: string;
   activeSide: BreastSide;
   /** Seconds accumulated before the current in-progress side interval. */
   sideLeftSec: number;
@@ -15,16 +14,17 @@ interface BreastfeedingTimerState {
   sideStartedAt: string | null;
 }
 
-interface FeedingStore extends BreastfeedingTimerState {
-  startBreastTimer: (
-    sessionId: string,
-    startTime: string,
-    babyId: string,
-    side: BreastSide
-  ) => void;
-  switchSide: (side: BreastSide, accumulatedSec: number) => void;
-  stopBreastTimer: () => void;
+export interface FeedingPersistedState {
+  timers: Record<string, BreastTimerEntry>;
+}
+
+interface FeedingStore extends FeedingPersistedState {
+  startBreastTimer: (babyId: string, sessionId: string, startTime: string, side: BreastSide) => void;
+  switchSide: (babyId: string, side: BreastSide, accumulatedSec: number) => void;
+  stopBreastTimer: (babyId: string) => void;
+  /** Sync to an existing DB session (e.g. another caregiver's): local counters are replaced. */
   restoreBreastSession: (
+    babyId: string,
     sessionId: string,
     startTime: string,
     side: BreastSide,
@@ -33,60 +33,121 @@ interface FeedingStore extends BreastfeedingTimerState {
   ) => void;
 }
 
+export const FEEDING_STORE_VERSION = 1;
+
+function str(v: unknown): string | null {
+  return typeof v === "string" && v.length > 0 ? v : null;
+}
+function secs(v: unknown): number {
+  return typeof v === "number" && Number.isFinite(v) && v > 0 ? v : 0;
+}
+
+/**
+ * persist `migrate`. Version 0 was a single global timer:
+ * `{ isRunning, sessionId, startTime, activeBabyId, activeSide, sideLeftSec,
+ * sideRightSec, sideStartedAt }`. A running v0 timer becomes
+ * `timers[activeBabyId]`; without `activeBabyId` it is dropped (the DB restore
+ * on mount brings it back for the right baby).
+ */
+export function migrateFeedingState(persisted: unknown, version: number): FeedingPersistedState {
+  const p = (persisted && typeof persisted === "object" ? persisted : {}) as Record<string, unknown>;
+
+  if (version >= FEEDING_STORE_VERSION) {
+    return {
+      timers: (p.timers && typeof p.timers === "object" ? p.timers : {}) as Record<string, BreastTimerEntry>,
+    };
+  }
+
+  const babyId = str(p.activeBabyId);
+  const sessionId = str(p.sessionId);
+  const startTime = str(p.startTime);
+  if (p.isRunning !== true || !babyId || !sessionId || !startTime) return { timers: {} };
+
+  return {
+    timers: {
+      [babyId]: {
+        sessionId,
+        startTime,
+        activeSide: p.activeSide === "RIGHT" ? "RIGHT" : "LEFT",
+        sideLeftSec: secs(p.sideLeftSec),
+        sideRightSec: secs(p.sideRightSec),
+        sideStartedAt: str(p.sideStartedAt),
+      },
+    },
+  };
+}
+
 export const useFeedingStore = create<FeedingStore>()(
   persist(
     (set) => ({
-      isRunning: false,
-      sessionId: null,
-      startTime: null,
-      activeBabyId: null,
-      activeSide: "LEFT",
-      sideLeftSec: 0,
-      sideRightSec: 0,
-      sideStartedAt: null,
+      timers: {},
 
-      startBreastTimer: (sessionId, startTime, babyId, side) =>
-        set({
-          isRunning: true,
-          sessionId,
-          startTime,
-          activeBabyId: babyId,
-          activeSide: side,
-          sideLeftSec: 0,
-          sideRightSec: 0,
-          sideStartedAt: startTime,
-        }),
-
-      switchSide: (side, accumulatedSec) =>
-        set((state) => ({
-          activeSide: side,
-          sideStartedAt: new Date().toISOString(),
-          sideLeftSec: state.activeSide === "LEFT" ? accumulatedSec : state.sideLeftSec,
-          sideRightSec: state.activeSide === "RIGHT" ? accumulatedSec : state.sideRightSec,
+      startBreastTimer: (babyId, sessionId, startTime, side) =>
+        set((s) => ({
+          timers: {
+            ...s.timers,
+            [babyId]: {
+              sessionId,
+              startTime,
+              activeSide: side,
+              sideLeftSec: 0,
+              sideRightSec: 0,
+              sideStartedAt: startTime,
+            },
+          },
         })),
 
-      stopBreastTimer: () =>
-        set({
-          isRunning: false,
-          sessionId: null,
-          startTime: null,
-          activeSide: "LEFT",
-          sideLeftSec: 0,
-          sideRightSec: 0,
-          sideStartedAt: null,
+      switchSide: (babyId, side, accumulatedSec) =>
+        set((s) => {
+          const t = s.timers[babyId];
+          if (!t) return s;
+          return {
+            timers: {
+              ...s.timers,
+              [babyId]: {
+                ...t,
+                activeSide: side,
+                sideStartedAt: new Date().toISOString(),
+                sideLeftSec: t.activeSide === "LEFT" ? accumulatedSec : t.sideLeftSec,
+                sideRightSec: t.activeSide === "RIGHT" ? accumulatedSec : t.sideRightSec,
+              },
+            },
+          };
         }),
 
-      restoreBreastSession: (sessionId, startTime, side, sideLeftSec, sideRightSec) =>
-        set({
-          isRunning: true,
-          sessionId,
-          startTime,
-          activeSide: side,
-          sideLeftSec,
-          sideRightSec,
-          sideStartedAt: new Date().toISOString(),
+      stopBreastTimer: (babyId) =>
+        set((s) => {
+          if (!(babyId in s.timers)) return s;
+          const timers = { ...s.timers };
+          delete timers[babyId];
+          return { timers };
         }),
+
+      restoreBreastSession: (babyId, sessionId, startTime, side, sideLeftSec, sideRightSec) =>
+        set((s) => ({
+          timers: {
+            ...s.timers,
+            [babyId]: {
+              sessionId,
+              startTime,
+              activeSide: side,
+              sideLeftSec,
+              sideRightSec,
+              sideStartedAt: new Date().toISOString(),
+            },
+          },
+        })),
     }),
-    { name: "soninho-feeding-timer" }
+    {
+      name: "soninho-feeding-timer",
+      version: FEEDING_STORE_VERSION,
+      migrate: migrateFeedingState,
+      partialize: (s): FeedingPersistedState => ({ timers: s.timers }),
+    }
   )
 );
+
+/** The running breastfeeding timer of `babyId`, or null. Stable reference (safe as a selector). */
+export function useActiveBreastTimer(babyId: string | null | undefined): BreastTimerEntry | null {
+  return useFeedingStore((s) => (babyId ? s.timers[babyId] ?? null : null));
+}

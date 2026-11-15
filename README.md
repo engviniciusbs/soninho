@@ -8,16 +8,16 @@ Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores regis
 
 ## Principais funcionalidades
 
-- **Timer de sono** (soneca / sono noturno) com início retroativo ("começou há 10 min"), sincronizado entre cuidadores e persistido localmente.
+- **Timer de sono** (soneca / sono noturno) com início retroativo ("começou há 10 min"), um por bebê, sincronizado entre cuidadores e persistido localmente (estado antigo é migrado v0→v1); o fim nunca fica antes do início.
 - **Janela de vigília** por idade (semáforo verde/amarelo/vermelho) e **sugestão determinística da próxima soneca** — sem LLM, mesma tabela em todo o app.
 - **Revisão pós-sono**: qualidade (1–5), como adormeceu, motivo do despertar, temperatura do quarto, clima, saco de dormir/TOG e roupa — com **recomendação de roupa** pela temperatura.
 - **Alimentação**: timer de amamentação por lado (esquerdo/direito), mamadeira (fórmula / leite materno / misto, em ml) e introdução alimentar com tags de alimentos e reação (inclusive alergia). Sugestão da próxima mamada pelo intervalo médio recente.
-- **Família compartilhada**: convite por link com papéis (`owner`, `caregiver`, `viewer`), parentesco (mãe, pai, avó, babá…), mural de recados, feed de atividade e toasts/push quando outro cuidador inicia ou encerra um sono/mamada.
+- **Família compartilhada**: convite por link (token hex de 48 caracteres; tokens base64 antigos continuam válidos; a página do convite mostra estados específicos: usado, expirado, revogado ou inexistente) com papéis (`owner`, `caregiver`, `viewer`), parentesco (mãe, pai, avó, babá…), mural de recados, feed de atividade e toasts/push quando outro cuidador inicia ou encerra um sono/mamada.
 - **Modo babá**: interface reduzida (só Início e Configurações).
 - **Análises**: gráfico de barras de sono diário, tendência de qualidade, heatmap de horários de soneca, correlação ambiente × sono, dívida de sono e radar de regressão.
-- **IA (OpenAI `gpt-4o-mini`)**: chat com consultora de sono com streaming, insights (avaliação do dia, padrões, tendências, recomendações) e análise de regressão do sono.
-- **Notificações push (Web Push/VAPID)**: "soneca chegando" e "passou da janela", com horário de silêncio e fuso horário por usuário.
-- **E-mails (Resend + React Email)**: relatório semanal automático (cron) e relatório sob demanda de 7/14/30 dias; exportação em PDF (`@react-pdf/renderer`).
+- **IA (OpenAI `gpt-4o-mini`)**: chat com consultora de sono com streaming, insights (avaliação do dia, padrões, tendências, recomendações) e análise de regressão do sono. **Cota diária de 50 chamadas por usuário** (dia de `America/Sao_Paulo`), somando chat e regressão; a sugestão de soneca é determinística e não consome cota. O chat aceita no máximo 20 mensagens de até 2000 caracteres (o cliente corta o histórico); ao estourar a cota a API responde 429 e o app mostra "Limite diário de uso da IA atingido…".
+- **Notificações push (Web Push/VAPID)**: "soneca chegando" e "passou da janela", enviados a todos os owners e caregivers com notificações ligadas (viewers não recebem), com horário de silêncio e fuso horário por usuário. Só endpoints de FCM, Mozilla, Apple e Windows são aceitos (na inscrição e no envio); inscrições inválidas ou mortas (400/404/410/413) são desativadas.
+- **E-mails (Resend + React Email)**: relatório semanal automático (cron) e relatório sob demanda de 7/14/30 dias, com dias e períodos calculados no fuso do usuário (`notification_preferences.timezone`); exportação em PDF (`@react-pdf/renderer`).
 - **Landing page pública** em `/`; usuários logados vão direto para `/app`.
 
 ---
@@ -208,6 +208,8 @@ email_log                  — user_id · kind · period_start · period_end · 
 
 ### Segurança
 
+Integridade da família: membros só entram por convite (`accept_family_invite`) ou pela RPC de criação de bebê; cada membro só edita o próprio `display_name`/`family_relation`; a família sempre mantém um owner; `end_time ≥ start_time` é garantido em sono e amamentação. A API valida toda entrada com zod, nunca vaza erros do banco e responde em PT-BR. O export CSV neutraliza prefixos de fórmula (`= + - @`), o proxy aplica os headers de cache do cookie do Supabase e o redirect para o login preserva a query string.
+
 Todas as tabelas devem ter **Row Level Security** habilitada. O padrão original (dono do bebê via `auth.uid()`) está em `supabase/migrations/20260101000000_initial_schema.sql`; com famílias, as políticas devem permitir acesso a bebês das famílias do usuário (`get_user_family_ids`) e escrita só para `owner`/`caregiver` (`user_can_write_family`). Operações que cruzam usuários (crons, aceite de convite, push para a família) usam o client admin (`service_role`).
 
 O trigger `calculate_sleep_duration` preenche `duration_min` e `updated_at` em `sleep_sessions`.
@@ -328,7 +330,7 @@ Tudo em `src/lib/` é TypeScript puro e determinístico — bom ponto de partida
 - **`sleep/environmentCorrelation.ts`** — temperatura/TOG/clima × qualidade e duração.
 - **`sleep/clothingRecommendation.ts`** — roupa recomendada por temperatura, tipo de saco e TOG.
 - **`feeding/computeFeedingSuggestion.ts`** — próxima mamada pelo intervalo médio recente; fallback por idade (`feedingIntervals.ts`).
-- **`notifications/dispatch.ts`** — para cada usuário com push ativo, fora do horário de silêncio e sem sono em andamento: envia `NAP_SOON` quando faltam `alert_before_minutes` (padrão 15) para o fim da janela e `OVERDUE` quando passou. Dedupe em `notification_events`.
+- **`notifications/dispatch.ts`** — para cada usuário com push ativo, fora do horário de silêncio e sem sono em andamento: envia `NAP_SOON` quando faltam `alert_before_minutes` (padrão 15) para o fim da janela e `OVERDUE` quando passou. Dedupe em `notification_events`. Destinatários: todos os owners e caregivers com notificações ligadas, cada um com seu horário de silêncio e fuso; consultas em lote; falha transitória é repetida no próximo tick; claims antigos são liberados após 10 min; TTL por evento.
 - **`ai/analyzeSleep.ts` + `ai/prompts.ts`** — monta o contexto de sono no fuso do navegador e usa prompts em PT-BR.
 
 ## Scripts
@@ -371,7 +373,7 @@ O projeto é feito para a **Vercel** (`vercel.json`).
 
 ### Crons
 
-`vercel.json` agenda apenas o e-mail semanal:
+`vercel.json` agenda apenas o e-mail semanal (os alertas de soneca rodam via `pg_cron`, veja abaixo):
 
 ```json
 { "crons": [{ "path": "/api/email/weekly", "schedule": "0 11 * * 1" }] }
@@ -379,10 +381,7 @@ O projeto é feito para a **Vercel** (`vercel.json`).
 
 Toda segunda às 11:00 UTC (08:00 em Brasília). Com `CRON_SECRET` definido, a Vercel envia `Authorization: Bearer <CRON_SECRET>`.
 
-**Os alertas de soneca (`/api/notifications/dispatch`) não estão agendados.** Eles precisam rodar com frequência (ex.: a cada 5 min). Opções:
-
-- Adicionar ao `vercel.json` (`"schedule": "*/5 * * * *"`) — exige plano Vercel que permita crons frequentes;
-- Ou usar um agendador externo (GitHub Actions, cron-job.org, Supabase `pg_cron` + `pg_net`, Upstash QStash):
+Os alertas de soneca (`/api/notifications/dispatch`) são agendados pelo Supabase `pg_cron` + `pg_net` a cada 5 minutos (migration `20261115120300_schedule_notification_dispatch.sql`). Para chamar manualmente:
 
 ```bash
 curl -H "Authorization: Bearer $CRON_SECRET" https://<dominio>/api/notifications/dispatch
@@ -417,7 +416,7 @@ Crie o bucket `baby-avatars` como público e permita upload para usuários auten
 - Precisa de HTTPS (ou `localhost`) e permissão do navegador. No iOS, só funciona com o app adicionado à tela inicial (iOS 16.4+).
 - Confira as três variáveis VAPID — `VAPID_CONTACT_EMAIL` deve começar com `mailto:`.
 - Use **Configurações → Notificações → Testar** (`/api/notifications/test`).
-- Lembre que o dispatch precisa de um agendador (ver [Crons](#crons)).
+- O dispatch roda por `pg_cron` a cada 5 min (ver [Crons](#crons)); confira se o job `soninho-notification-dispatch` existe.
 
 **`RESEND_API_KEY not configured` / e-mail não enviado**
 Defina a chave e verifique o domínio `soninho.baby` no Resend (ou altere `FROM` em `src/lib/email/sleepReport.ts`).

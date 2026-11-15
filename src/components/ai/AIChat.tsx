@@ -5,6 +5,7 @@ import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar } from "@/components/ui/avatar";
+import { toChatPayload, CHAT_MAX_CONTENT } from "@/lib/ai/chatSchema";
 import { Card } from "@/components/ui/card";
 import { SendHorizontal, Sparkles, User, Loader2 } from "lucide-react";
 
@@ -46,11 +47,20 @@ export function AIChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           babyId: activeBaby.id,
-          messages: newMessages,
+          messages: toChatPayload(newMessages),
         }),
       });
 
-      if (!res.ok) throw new Error("Chat request failed");
+      if (!res.ok) {
+        if (res.status === 429) {
+          const err = await res.json().catch(() => null);
+          if (err && typeof err.error === "string") {
+            setMessages((prev) => [...prev, { role: "assistant", content: err.error }]);
+            return;
+          }
+        }
+        throw new Error("Chat request failed");
+      }
 
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No reader");
@@ -201,6 +211,7 @@ export function AIChat() {
           placeholder="Faça uma pergunta sobre o sono..."
           className="rounded-xl resize-none min-h-[44px] max-h-[120px]"
           rows={1}
+          maxLength={CHAT_MAX_CONTENT}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();

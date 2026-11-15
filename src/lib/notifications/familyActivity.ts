@@ -1,16 +1,10 @@
-import * as webpush from "web-push";
+import { getWebPush, PUSH_ICON, sendToSubscription } from "@/lib/notifications/webpush";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   formatSleepActivityMessage,
   formatFeedingActivityMessage,
 } from "@/lib/family/activityMessages";
 import type { SleepType, FeedingType } from "@/types";
-
-webpush.setVapidDetails(
-  process.env.VAPID_CONTACT_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
 
 async function getFamilyRecipients(
   supabase: ReturnType<typeof createAdminClient>,
@@ -48,6 +42,9 @@ async function pushToRecipients(
   recipientIds: Set<string>,
   payload: string
 ): Promise<number> {
+  const webpush = getWebPush();
+  if (!webpush) return 0;
+
   let sent = 0;
 
   for (const userId of recipientIds) {
@@ -66,18 +63,7 @@ async function pushToRecipients(
       .eq("is_active", true);
 
     for (const sub of subs ?? []) {
-      try {
-        await webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
-          payload
-        );
-        sent++;
-      } catch {
-        // Expired subscription — ignore
-      }
+      if ((await sendToSubscription(webpush, sub, payload, supabase)) === "sent") sent++;
     }
   }
 
@@ -137,7 +123,7 @@ export async function notifyFamilySleepActivity(
   const payload = JSON.stringify({
     title,
     body,
-    icon: "/icons/icon-192.png",
+    icon: PUSH_ICON,
     tag: `family-sleep-${babyId}-${action}`,
     url: "/app",
   });
@@ -190,7 +176,7 @@ export async function notifyFamilyFeedingActivity(
   const payload = JSON.stringify({
     title: FEEDING_TITLES[feedingType],
     body,
-    icon: "/icons/icon-192.png",
+    icon: PUSH_ICON,
     tag: `family-feeding-${babyId}-${action}`,
     url: "/feeding",
   });

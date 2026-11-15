@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import {
   getFamilyForBaby,
@@ -8,7 +10,15 @@ import {
 import { insertFeedingActivityLog } from "@/lib/supabase/feedingQueries";
 import { getActorDisplayLabel } from "@/lib/family/relations";
 import { notifyFamilyFeedingActivity } from "@/lib/notifications/familyActivity";
-import type { FeedingType } from "@/types";
+import { zUuid } from "@/lib/validation/common";
+
+const bodySchema = z.object({
+  babyId: zUuid,
+  action: z.enum(["started", "stopped", "logged"]),
+  feedingType: z.enum(["BOTTLE", "BREAST", "SOLID"]),
+  referenceId: zUuid.nullish(),
+  babyName: z.string().optional(), // ignored: name is read server-side
+});
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -17,27 +27,23 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { babyId, action, feedingType, referenceId, babyName } = body as {
-    babyId: string;
-    action: "started" | "stopped" | "logged";
-    feedingType: FeedingType;
-    referenceId?: string;
-    babyName: string;
-  };
-
-  if (!babyId || !action || !feedingType || !babyName) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const parsed = bodySchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
-
-  if (!["started", "stopped", "logged"].includes(action)) {
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  }
+  const { babyId, action, feedingType, referenceId } = parsed.data;
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role || role === "viewer") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
+
+  const { data: babyRow } = await supabase
+    .from("babies")
+    .select("name")
+    .eq("id", babyId)
+    .maybeSingle();
+  const babyName = babyRow?.name ?? "o bebê";
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
   const { data: profile } = await getUserProfile(supabase, user.id);
@@ -74,7 +80,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   const pushSent = await notifyFamilyFeedingActivity({

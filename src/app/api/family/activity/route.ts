@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { dbErrorToResponse } from "@/lib/http/errors";
+import { zUuid, zLimit } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
 import {
   getSleepActivityLog,
@@ -24,12 +26,12 @@ export async function GET(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const babyId = req.nextUrl.searchParams.get("babyId");
-  const limit = Number(req.nextUrl.searchParams.get("limit") ?? "15");
-
-  if (!babyId) {
-    return NextResponse.json({ error: "babyId required" }, { status: 400 });
+  const parsedBaby = zUuid.safeParse(req.nextUrl.searchParams.get("babyId"));
+  if (!parsedBaby.success) {
+    return NextResponse.json({ error: "babyId inválido" }, { status: 400 });
   }
+  const babyId = parsedBaby.data;
+  const limit = zLimit(50, 15).parse(req.nextUrl.searchParams.get("limit"));
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -40,10 +42,10 @@ export async function GET(req: NextRequest) {
   ]);
 
   if (sleepRes.error) {
-    return NextResponse.json({ error: sleepRes.error.message }, { status: 500 });
+    return dbErrorToResponse(sleepRes.error);
   }
   if (feedingRes.error) {
-    return NextResponse.json({ error: feedingRes.error.message }, { status: 500 });
+    return dbErrorToResponse(feedingRes.error);
   }
 
   const sleepItems: UnifiedActivityItem[] = (sleepRes.data ?? []).map((row) => ({

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { zTimeZone, zUuid } from "@/lib/validation/common";
 import { differenceInWeeks } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries";
@@ -8,8 +9,8 @@ import { computeFeedingSuggestion } from "@/lib/feeding/computeFeedingSuggestion
 import type { Baby } from "@/types";
 
 const requestSchema = z.object({
-  babyId: z.string().uuid(),
-  timezone: z.string().default("America/Sao_Paulo"),
+  babyId: zUuid,
+  timezone: zTimeZone,
 });
 
 /**

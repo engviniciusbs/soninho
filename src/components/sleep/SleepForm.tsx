@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { END_BEFORE_START_MESSAGE, isEndBeforeStart, isCheckViolation } from "@/lib/validation/timeRange";
 import { cn } from "@/lib/utils";
 import { EnvironmentPicker, type EnvironmentData } from "./EnvironmentPicker";
 import {
@@ -120,7 +121,9 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
     setValue,
     watch,
     reset,
-    formState: { isSubmitting },
+    setError,
+    clearErrors,
+    formState: { isSubmitting, errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: buildFormValues(session),
@@ -168,6 +171,12 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
       `${data.end_date}T${data.end_time_input}:00`
     ).toISOString();
 
+    if (isEndBeforeStart(startTime, endTime)) {
+      setError("end_time_input", { type: "validate", message: END_BEFORE_START_MESSAGE });
+      toast.error(END_BEFORE_START_MESSAGE);
+      return;
+    }
+
     const payload = {
       type: data.type,
       start_time: startTime,
@@ -191,7 +200,7 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
         .eq("id", session.id);
 
       if (error) {
-        toast.error("Erro ao atualizar registro");
+        toast.error(isCheckViolation(error) ? END_BEFORE_START_MESSAGE : "Erro ao atualizar registro");
         return;
       }
       toast.success("Registro atualizado");
@@ -201,7 +210,7 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
         .insert({ ...payload, baby_id: activeBaby.id });
 
       if (error) {
-        toast.error("Erro ao criar registro");
+        toast.error(isCheckViolation(error) ? END_BEFORE_START_MESSAGE : "Erro ao criar registro");
         return;
       }
       toast.success("Sono registrado manualmente");
@@ -283,10 +292,16 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
               <Input
                 id="end_time_input"
                 type="time"
-                {...register("end_time_input")}
+                {...register("end_time_input", { onChange: () => clearErrors("end_time_input") })}
+                aria-invalid={!!errors.end_time_input}
                 className="rounded-xl"
                 autoComplete="off"
               />
+              {errors.end_time_input?.message && (
+                <p role="alert" className="text-xs text-destructive">
+                  {errors.end_time_input.message}
+                </p>
+              )}
             </div>
           </div>
 

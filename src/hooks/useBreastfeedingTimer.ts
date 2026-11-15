@@ -8,9 +8,14 @@ import {
   updateBreastfeedingSides,
   endBreastfeedingSession,
   getActiveBreastfeedingSession,
+  getBreastfeedingSessionStatus,
 } from "@/lib/supabase/feedingQueries";
-import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
-import { useFeedingStore } from "@/store/feedingStore";
+import {
+  classifyEndResult,
+  classifyLiveSession,
+  isUniqueViolation,
+} from "@/lib/supabase/sessionConflict";
+import { useFeedingStore, useActiveBreastTimer } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
 import { toast } from "sonner";
@@ -24,19 +29,22 @@ export function useBreastfeedingTimer() {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
-  const {
-    isRunning,
-    sessionId,
-    startTime,
-    activeSide,
-    sideLeftSec,
-    sideRightSec,
-    sideStartedAt,
-    startBreastTimer,
-    switchSide,
-    stopBreastTimer,
-    restoreBreastSession,
-  } = useFeedingStore();
+  const babyId = activeBaby?.id ?? null;
+
+  // Timers are per baby: only the shown baby's running timer is used here.
+  const timer = useActiveBreastTimer(babyId);
+  const startBreastTimer = useFeedingStore((s) => s.startBreastTimer);
+  const switchSide = useFeedingStore((s) => s.switchSide);
+  const stopBreastTimer = useFeedingStore((s) => s.stopBreastTimer);
+  const restoreBreastSession = useFeedingStore((s) => s.restoreBreastSession);
+
+  const isRunning = timer !== null;
+  const sessionId = timer?.sessionId ?? null;
+  const startTime = timer?.startTime ?? null;
+  const activeSide: BreastSide = timer?.activeSide ?? "LEFT";
+  const sideLeftSec = timer?.sideLeftSec ?? 0;
+  const sideRightSec = timer?.sideRightSec ?? 0;
+  const sideStartedAt = timer?.sideStartedAt ?? null;
 
   // Last interval tick, tagged with the side segment it was computed for.
   // While stopped (or before the first tick of a segment) the live counters
@@ -73,13 +81,17 @@ export function useBreastfeedingTimer() {
     return () => clearInterval(interval);
   }, [isRunning, sideStartedAt, activeSide, sideLeftSec, sideRightSec]);
 
-  // Restore active session on mount
+  // Restore the shown baby's open session when it has no local timer
+  // (mount, baby switch, or after a local timer was dropped).
   useEffect(() => {
-    if (!activeBaby || isRunning) return;
+    if (!babyId || isRunning) return;
+    const id = babyId;
     async function restore() {
-      const { data } = await getActiveBreastfeedingSession(supabase, activeBaby!.id);
-      if (data) {
+      const { data } = await getActiveBreastfeedingSession(supabase, id);
+      // Don't clobber a timer started locally while the request was in flight.
+      if (data && !useFeedingStore.getState().timers[id]) {
         restoreBreastSession(
+          id,
           data.id,
           data.start_time,
           (data.last_side as BreastSide) ?? "LEFT",
@@ -88,45 +100,48 @@ export function useBreastfeedingTimer() {
         );
       }
     }
-    restore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeBaby?.id]);
+    void restore();
+  }, [babyId, isRunning, supabase, restoreBreastSession]);
 
-  // Multi-caregiver sync: if another caregiver ends the session, stop locally
-  const { data: liveSession, fetchStatus } = useQuery({
-    queryKey: ["active-breastfeeding-live", activeBaby?.id],
+  // Multi-caregiver sync: poll the running session (by id) every 20s. Only an
+  // error-free response can stop the local timer; a network error keeps it.
+  const { data: live } = useQuery({
+    queryKey: ["active-breastfeeding-live", babyId, sessionId],
     queryFn: async () => {
-      if (!activeBaby) return null;
-      const { data } = await getActiveBreastfeedingSession(supabase, activeBaby.id);
-      return data ?? null;
+      const result = await getBreastfeedingSessionStatus(supabase, sessionId!);
+      return { sessionId: sessionId!, status: classifyLiveSession(result, babyId!) };
     },
-    enabled: !!activeBaby && isRunning,
+    enabled: !!babyId && !!sessionId,
     refetchInterval: 20_000,
     staleTime: 0,
   });
 
   useEffect(() => {
-    if (!isRunning || fetchStatus === "fetching") return;
-    if (liveSession === null) {
-      stopBreastTimer();
+    if (!babyId || !live || live.sessionId !== sessionId) return;
+    if (live.status === "ended") {
+      stopBreastTimer(babyId);
       queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
       queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
       toast.info("Mamada finalizada por outro cuidador(a)");
+    } else if (live.status === "mismatch") {
+      // Stale local state pointing at another baby's session: drop it.
+      stopBreastTimer(babyId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [liveSession, fetchStatus, isRunning]);
+  }, [live, babyId, sessionId, stopBreastTimer, queryClient]);
 
   const handleStart = useCallback(async (side: BreastSide = "LEFT") => {
     if (!activeBaby) {
       toast.error("Adicione um bebê primeiro nas configurações");
       return;
     }
-    const { data, error } = await startBreastfeedingSession(supabase, activeBaby.id, side);
+    const baby = activeBaby;
+    let { data, error } = await startBreastfeedingSession(supabase, baby.id, side);
     if (error && isUniqueViolation(error)) {
       // Another caregiver already has an open session: sync to it.
-      const { data: existing } = await getActiveBreastfeedingSession(supabase, activeBaby.id);
+      const { data: existing } = await getActiveBreastfeedingSession(supabase, baby.id);
       if (existing) {
         restoreBreastSession(
+          baby.id,
           existing.id,
           existing.start_time,
           (existing.last_side as BreastSide) ?? "LEFT",
@@ -136,16 +151,18 @@ export function useBreastfeedingTimer() {
         toast.success("Já existe uma mamada em andamento — sincronizada 🤱");
         return;
       }
+      // The conflicting session was closed in the meantime: try once more.
+      ({ data, error } = await startBreastfeedingSession(supabase, baby.id, side));
     }
     if (error || !data) {
       toast.error("Erro ao iniciar mamada");
       return;
     }
-    startBreastTimer(data.id, data.start_time, activeBaby.id, side);
+    startBreastTimer(baby.id, data.id, data.start_time, side);
     toast.success("Mamada iniciada 🤱");
     void recordFeedingActivity({
-      babyId: activeBaby.id,
-      babyName: activeBaby.name,
+      babyId: baby.id,
+      babyName: baby.name,
       action: "started",
       feedingType: "BREAST",
       referenceId: data.id,
@@ -153,39 +170,77 @@ export function useBreastfeedingTimer() {
   }, [activeBaby, supabase, startBreastTimer, restoreBreastSession]);
 
   const handleSwitchSide = useCallback(async (newSide: BreastSide) => {
-    if (!sessionId || newSide === activeSide) return;
+    if (!babyId || !sessionId || newSide === activeSide) return;
     const extra = sideStartedAt ? secondsSince(sideStartedAt) : 0;
     const newLeft = activeSide === "LEFT" ? sideLeftSec + extra : sideLeftSec;
     const newRight = activeSide === "RIGHT" ? sideRightSec + extra : sideRightSec;
-    switchSide(newSide, activeSide === "LEFT" ? newLeft : newRight);
+    switchSide(babyId, newSide, activeSide === "LEFT" ? newLeft : newRight);
     await updateBreastfeedingSides(supabase, sessionId, {
       side_left_sec: newLeft,
       side_right_sec: newRight,
       last_side: newSide,
     });
-  }, [sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, switchSide]);
+  }, [babyId, sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, switchSide]);
 
   const handleStop = useCallback(async () => {
+    if (!babyId) return null;
     if (!sessionId) {
-      stopBreastTimer();
+      stopBreastTimer(babyId);
       return null;
     }
     const extra = sideStartedAt ? secondsSince(sideStartedAt) : 0;
     const finalLeft = activeSide === "LEFT" ? sideLeftSec + extra : sideLeftSec;
     const finalRight = activeSide === "RIGHT" ? sideRightSec + extra : sideRightSec;
 
+    // Read the row first: its start_time is authoritative for the end-time
+    // clamp, and it tells whether another caregiver already ended it.
+    const { data: current, error: readError } = await getBreastfeedingSessionStatus(supabase, sessionId);
+    if (readError) {
+      // Network/auth failure: keep the timer, the session is still open.
+      toast.error("Erro ao finalizar a mamada. Tente novamente.");
+      return null;
+    }
+    if (current && current.baby_id !== babyId) {
+      // Stale local state pointing at another baby's session (e.g. migrated
+      // v0 state): drop this baby's timer, never end that session.
+      stopBreastTimer(babyId);
+      return null;
+    }
+    const syncEnded = (alreadyEnded: boolean) => {
+      stopBreastTimer(babyId);
+      queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
+      queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
+      if (alreadyEnded) toast.success("Mamada já estava finalizada ✨");
+    };
+    if (!current || current.end_time) {
+      syncEnded(!!current);
+      return null;
+    }
+
     const { error } = await endBreastfeedingSession(supabase, sessionId, {
+      start_time: current.start_time,
       side_left_sec: finalLeft,
       side_right_sec: finalRight,
     });
+    const outcome = classifyEndResult(error);
 
-    const endedId = sessionId;
-    stopBreastTimer();
-
-    if (error) {
-      toast.error("Sessão expirada. Faça login novamente.");
+    if (outcome === "already-ended") {
+      // Lost the race (double tap / another caregiver): no second "stopped".
+      syncEnded(true);
       return null;
     }
+    if (outcome !== "ok") {
+      // Keep the local timer: the session is still open in the DB.
+      toast.error(
+        outcome === "check"
+          ? "Erro ao finalizar a mamada. Tente novamente."
+          : "Sessão expirada. Faça login novamente."
+      );
+      return null;
+    }
+
+    const endedId = sessionId;
+    stopBreastTimer(babyId);
 
     toast.success("Mamada registrada com sucesso ✨");
     queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
@@ -202,7 +257,7 @@ export function useBreastfeedingTimer() {
     }
 
     return { endedSessionId: endedId };
-  }, [sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, stopBreastTimer, queryClient, activeBaby]);
+  }, [babyId, sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, stopBreastTimer, queryClient, activeBaby]);
 
   return {
     isRunning,

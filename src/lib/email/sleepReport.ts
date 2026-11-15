@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
-import { differenceInWeeks, parseISO, format, subDays } from "date-fns";
+import { differenceInWeeks, parseISO } from "date-fns";
+import { getReportPeriod, DEFAULT_REPORT_TIMEZONE } from "@/lib/email/reportPeriod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   getDailyTotals,
@@ -31,12 +32,13 @@ export function buildBabyStats(
     bottles: BottleFeeding[];
     breastSessions: BreastfeedingSession[];
     solids: SolidFeeding[];
-  }
+  },
+  timeZone: string = DEFAULT_REPORT_TIMEZONE
 ): WeeklyReportBabyStats {
   const ageWeeks = differenceInWeeks(new Date(), parseISO(birthDate));
   const schedule = getAgeSchedule(ageWeeks);
 
-  const daily = getDailyTotals(sessions, periodDays);
+  const daily = getDailyTotals(sessions, periodDays, timeZone);
   const daysWithData = daily.filter((d) => d.totalHours > 0);
   const denom = daysWithData.length || 1;
 
@@ -45,14 +47,14 @@ export function buildBabyStats(
   const avgNapHours =
     daysWithData.reduce((a, d) => a + d.napHours, 0) / denom;
 
-  const napCounts = getNapCountPerDay(sessions, periodDays);
+  const napCounts = getNapCountPerDay(sessions, periodDays, timeZone);
   const napDays = napCounts.filter((d) => d.count > 0);
   const napCountAvg =
     napDays.length > 0
       ? napDays.reduce((a, d) => a + d.count, 0) / napDays.length
       : 0;
 
-  const nightStretch = getLongestNightStretch(sessions, periodDays);
+  const nightStretch = getLongestNightStretch(sessions, periodDays, timeZone);
   const longestNightHours = Math.max(0, ...nightStretch.map((d) => d.hours));
 
   const adherencePct = Math.min(
@@ -89,10 +91,6 @@ export function buildBabyStats(
   };
 }
 
-function periodLabelFor(days: number, periodStart: Date, periodEnd: Date): string {
-  return `de ${format(periodStart, "dd/MM")} a ${format(periodEnd, "dd/MM")} (últimos ${days} dias)`;
-}
-
 function subjectFor(kind: "weekly" | "manual", days: number): string {
   if (kind === "weekly") return "🌙 Seu resumo de sono da semana";
   return `🌙 Seu resumo de sono — últimos ${days} dias`;
@@ -112,27 +110,64 @@ export async function sendSleepReport(params: {
   kind: "weekly" | "manual";
   dedupeKey: string;
   skipDedupe?: boolean;
+  timeZone?: string;
   babies: { id: string; name: string; birth_date: string; avatar_emoji: string | null }[];
 }): Promise<SendSleepReportResult> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://soninho.baby";
-  const now = new Date();
-  const periodStart = subDays(now, params.periodDays);
-  const periodStartStr = format(periodStart, "yyyy-MM-dd");
-  const periodEndStr = format(now, "yyyy-MM-dd");
-  const periodLabel = periodLabelFor(params.periodDays, periodStart, now);
+  const timeZone = params.timeZone || DEFAULT_REPORT_TIMEZONE;
+  const period = getReportPeriod(new Date(), params.periodDays, timeZone);
+  const periodStart = period.startUtc;
+  const periodStartStr = period.startKey;
+  const periodEndStr = period.endKey;
+  const periodLabel = period.label;
 
+  // Claim the dedupe key first (insert ... on conflict do nothing); the unique
+  // constraint makes concurrent requests race safely.
+  let claimed = false;
   if (!params.skipDedupe) {
-    const { data: existing } = await params.supabase
+    const { data: inserted, error: claimError } = await params.supabase
       .from("email_log")
-      .select("id")
-      .eq("dedupe_key", params.dedupeKey)
-      .limit(1);
+      .upsert(
+        {
+          user_id: params.userId,
+          kind: params.kind,
+          period_start: periodStartStr,
+          period_end: periodEndStr,
+          dedupe_key: params.dedupeKey,
+          status: "sent",
+          sent_at: new Date().toISOString(),
+        },
+        { onConflict: "dedupe_key", ignoreDuplicates: true }
+      )
+      .select("id");
 
-    if (existing && existing.length > 0) {
+    if (claimError) {
+      console.error("[sleep-report] claim error:", claimError);
+      return { ok: false, reason: "send_failed" };
+    }
+    if (!inserted || inserted.length === 0) {
       return { ok: false, reason: "deduped" };
     }
+    claimed = true;
   }
 
+  const releaseClaim = async () => {
+    if (!claimed) return;
+    const { error } = await params.supabase
+      .from("email_log")
+      .delete()
+      .eq("dedupe_key", params.dedupeKey);
+    if (error) console.error("[sleep-report] release claim error:", error);
+  };
+
+  try {
+    return await buildAndSend();
+  } catch (err) {
+    await releaseClaim();
+    throw err;
+  }
+
+  async function buildAndSend(): Promise<SendSleepReportResult> {
   const babyStats: WeeklyReportBabyStats[] = [];
 
   for (const baby of params.babies) {
@@ -181,12 +216,14 @@ export async function sendSleepReport(params: {
         baby.name,
         baby.avatar_emoji || "👶",
         params.periodDays,
-        feeding
+        feeding,
+        timeZone
       )
     );
   }
 
   if (babyStats.length === 0) {
+    await releaseClaim();
     return { ok: false, reason: "no_data" };
   }
 
@@ -219,20 +256,12 @@ export async function sendSleepReport(params: {
 
   if (error) {
     console.error("[sleep-report] Resend error:", error);
+    await releaseClaim();
     return { ok: false, reason: "send_failed" };
   }
 
-  await params.supabase.from("email_log").insert({
-    user_id: params.userId,
-    kind: params.kind,
-    period_start: periodStartStr,
-    period_end: periodEndStr,
-    dedupe_key: params.dedupeKey,
-    status: "sent",
-    sent_at: new Date().toISOString(),
-  });
-
   return { ok: true };
+  }
 }
 
 export function getResendClient(): Resend {

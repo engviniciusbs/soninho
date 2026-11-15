@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { dbErrorToResponse } from "@/lib/http/errors";
+import { zUuid } from "@/lib/validation/common";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
@@ -12,18 +14,29 @@ const createSchema = z.object({
   quality: z.number().int().min(1).max(5).nullable().optional(),
   notes: z.string().nullable().optional(),
   location: z.string().nullable().optional(),
+}).refine(
+  (v) => !v.end_time || new Date(v.end_time).getTime() >= new Date(v.start_time).getTime(),
+  { message: "O fim não pode ser antes do início", path: ["end_time"] }
+);
+
+const querySchema = z.object({
+  baby_id: zUuid,
+  from: z.string().datetime({ offset: true }).optional(),
+  to: z.string().datetime({ offset: true }).optional(),
 });
 
 export async function GET(request: Request) {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
-  const babyId = searchParams.get("baby_id");
-  const from = searchParams.get("from");
-  const to = searchParams.get("to");
-
-  if (!babyId) {
-    return NextResponse.json({ error: "baby_id is required" }, { status: 400 });
+  const q = querySchema.safeParse({
+    baby_id: searchParams.get("baby_id"),
+    from: searchParams.get("from") ?? undefined,
+    to: searchParams.get("to") ?? undefined,
+  });
+  if (!q.success) {
+    return NextResponse.json({ error: "Parâmetros inválidos" }, { status: 400 });
   }
+  const { baby_id: babyId, from, to } = q.data;
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,7 +56,7 @@ export async function GET(request: Request) {
   const { data, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json(data);
@@ -51,11 +64,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const supabase = await createClient();
-  const body = await request.json();
-  const parsed = createSchema.safeParse(body);
+  const parsed = createSchema.safeParse(await request.json().catch(() => null));
 
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -75,7 +87,7 @@ export async function POST(request: Request) {
     if (isUniqueViolation(error)) {
       return NextResponse.json({ error: "Já existe um sono em andamento" }, { status: 409 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json(data, { status: 201 });

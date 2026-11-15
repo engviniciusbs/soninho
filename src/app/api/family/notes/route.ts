@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { dbErrorToResponse } from "@/lib/http/errors";
+import { zUuid } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
 import {
   getFamilyForBaby,
@@ -9,6 +12,11 @@ import {
   deleteFamilyNote,
 } from "@/lib/supabase/queries";
 
+const postSchema = z.object({
+  babyId: zUuid,
+  text: z.string().trim().min(1).transform((t) => t.slice(0, 500)),
+});
+
 // GET /api/family/notes?babyId=... — list notes + family context
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -17,9 +25,10 @@ export async function GET(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const babyId = req.nextUrl.searchParams.get("babyId");
-  if (!babyId)
-    return NextResponse.json({ error: "babyId required" }, { status: 400 });
+  const parsedBaby = zUuid.safeParse(req.nextUrl.searchParams.get("babyId"));
+  if (!parsedBaby.success)
+    return NextResponse.json({ error: "babyId inválido" }, { status: 400 });
+  const babyId = parsedBaby.data;
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -31,7 +40,7 @@ export async function GET(req: NextRequest) {
 
   const { data: members } = await getFamilyMembers(supabase, family.id);
   const { data: notes, error } = await getFamilyNotes(supabase, family.id, 10);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({
     data: notes ?? [],
@@ -49,15 +58,14 @@ export async function POST(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { babyId, text } = body as { babyId?: string; text?: string };
-
-  if (!babyId || !text || !text.trim()) {
+  const parsed = postSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
     return NextResponse.json(
-      { error: "babyId and text required" },
+      { error: "babyId e texto são obrigatórios" },
       { status: 400 }
     );
   }
+  const { babyId, text } = parsed.data;
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (!role || role === "viewer") {
@@ -79,9 +87,9 @@ export async function POST(req: NextRequest) {
     family.id,
     user.id,
     authorName,
-    text.trim().slice(0, 500)
+    text
   );
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({ data });
 }
@@ -94,12 +102,13 @@ export async function DELETE(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const noteId = req.nextUrl.searchParams.get("noteId");
-  if (!noteId)
-    return NextResponse.json({ error: "noteId required" }, { status: 400 });
+  const parsedNote = zUuid.safeParse(req.nextUrl.searchParams.get("noteId"));
+  if (!parsedNote.success)
+    return NextResponse.json({ error: "noteId inválido" }, { status: 400 });
+  const noteId = parsedNote.data;
 
   const { error } = await deleteFamilyNote(supabase, noteId);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({ success: true });
 }

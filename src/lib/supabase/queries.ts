@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { clampEndTime } from "./sessionTime";
 
 type Client = SupabaseClient;
 
@@ -15,7 +16,7 @@ export async function getBaby(supabase: Client, babyId: string) {
 
 export async function createBaby(
   supabase: Client,
-  data: { user_id: string; name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
+  data: { name: string; birth_date: string; avatar_emoji?: string; avatar_url?: string | null }
 ) {
   // family + owner membership + baby are created atomically server-side
   return supabase.rpc("create_baby_with_family", {
@@ -103,11 +104,26 @@ export async function startSleepSession(
     .single();
 }
 
-export async function endSleepSession(supabase: Client, sessionId: string) {
+/** Minimal row used by the live poll (see classifyLiveSession). */
+export async function getSleepSessionStatus(supabase: Client, sessionId: string) {
   return supabase
     .from("sleep_sessions")
-    .update({ end_time: new Date().toISOString() })
+    .select("id, baby_id, start_time, end_time")
     .eq("id", sessionId)
+    .maybeSingle();
+}
+
+/**
+ * Ends a session at `max(now, startTime)` so a phone whose clock is behind the
+ * one that started it can still stop it (end_time >= start_time constraint).
+ */
+export async function endSleepSession(supabase: Client, sessionId: string, startTime: string) {
+  return supabase
+    .from("sleep_sessions")
+    .update({ end_time: clampEndTime(startTime) })
+    .eq("id", sessionId)
+    // Only an open session: 0 rows (PGRST116) means someone else ended it.
+    .is("end_time", null)
     .select()
     .single();
 }
@@ -320,7 +336,8 @@ export async function revokeFamilyInvite(
     .from("family_invites")
     .update({ revoked_at: new Date().toISOString() })
     .eq("id", inviteId)
-    .eq("family_id", familyId);
+    .eq("family_id", familyId)
+    .select("id");
 }
 
 export type InvitePreview = {
@@ -364,7 +381,8 @@ export async function removeFamilyMember(
     .from("family_members")
     .delete()
     .eq("family_id", familyId)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("id");
 }
 
 export async function updateMemberRole(
@@ -377,7 +395,8 @@ export async function updateMemberRole(
     .from("family_members")
     .update({ role })
     .eq("family_id", familyId)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("id");
 }
 
 // ── Family notes (mural / handoff) ──────────────────────────────────────────

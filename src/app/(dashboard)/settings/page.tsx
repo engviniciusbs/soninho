@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { toCsv } from "@/lib/export/csv";
 import { createBaby, updateBaby, deleteBaby, getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -144,11 +145,11 @@ export default function SettingsPage() {
     setShowBabyForm(true);
   }
 
-  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string; avatar_url: string | null }) {
+  function openEditForm(baby: { id: string; name: string; birth_date: string; avatar_emoji: string | null; avatar_url: string | null }) {
     setEditingBaby(baby.id);
     setBabyName(baby.name);
     setBabyBirthDate(baby.birth_date);
-    setBabyEmoji(baby.avatar_emoji);
+    setBabyEmoji(baby.avatar_emoji ?? "🍼");
     setBabyAvatarUrl(baby.avatar_url);
     setShowBabyForm(true);
   }
@@ -225,7 +226,6 @@ export default function SettingsPage() {
       }
 
       const { error } = await createBaby(supabase, {
-        user_id: user.id,
         name: babyName.trim(),
         birth_date: babyBirthDate,
         avatar_emoji: babyEmoji,
@@ -290,7 +290,7 @@ export default function SettingsPage() {
         s.notes ?? "",
       ]);
 
-      const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n");
+      const csv = toCsv([headers, ...rows]);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <BabyAvatar
                     avatarUrl={baby.avatar_url}
-                    emoji={baby.avatar_emoji}
+                    emoji={baby.avatar_emoji ?? "🍼"}
                     name={baby.name}
                     size="md"
                   />

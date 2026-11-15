@@ -2,19 +2,14 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { useSleepStore } from "@/store/sleepStore";
+import { useActiveSleepTimer } from "@/store/sleepStore";
 import { createClient } from "@/lib/supabase/client";
 import type { AISuggestion } from "@/types";
 
 export function useAISuggestions() {
   const { activeBaby } = useBaby();
-  const { isRunning, activeBabyId } = useSleepStore();
+  const sleepingForActiveBaby = useActiveSleepTimer(activeBaby?.id) !== null;
   const supabase = createClient();
-
-  const sleepingForActiveBaby =
-    isRunning &&
-    !!activeBaby &&
-    (!activeBabyId || activeBabyId === activeBaby.id);
 
   // Fetch the last completed session so we can key the suggestion by it.
   // When the last sleep data changes (new nap ends), we get a fresh suggestion.

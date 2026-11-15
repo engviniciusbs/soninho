@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import {
   getUserProfile,
   upsertUserProfile,
   updateMemberFamilyRelation,
 } from "@/lib/supabase/queries";
+
+const patchSchema = z.object({
+  display_name: z.string().max(100).nullish(),
+  family_relation: z.string().max(50).nullish(),
+  ui_mode: z.enum(["standard", "nanny"]).optional(),
+  syncFamilyMembers: z.boolean().optional(),
+});
 
 export async function GET() {
   const supabase = await createClient();
@@ -15,7 +24,7 @@ export async function GET() {
 
   const { data, error } = await getUserProfile(supabase, user.id);
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   return NextResponse.json({
@@ -40,22 +49,11 @@ export async function PATCH(req: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const {
-    display_name,
-    family_relation,
-    ui_mode,
-    syncFamilyMembers,
-  } = body as {
-    display_name?: string | null;
-    family_relation?: string | null;
-    ui_mode?: "standard" | "nanny";
-    syncFamilyMembers?: boolean;
-  };
-
-  if (ui_mode && ui_mode !== "standard" && ui_mode !== "nanny") {
-    return NextResponse.json({ error: "Invalid ui_mode" }, { status: 400 });
+  const parsed = patchSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
+  const { display_name, family_relation, ui_mode, syncFamilyMembers } = parsed.data;
 
   const { data, error } = await upsertUserProfile(supabase, user.id, {
     display_name,
@@ -64,7 +62,7 @@ export async function PATCH(req: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorToResponse(error);
   }
 
   if (syncFamilyMembers && family_relation !== undefined) {

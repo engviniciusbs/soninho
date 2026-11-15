@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { zUuid } from "@/lib/validation/common";
+import { dbErrorToResponse } from "@/lib/http/errors";
 import {
   createFamilyInvite,
   getActiveFamilyInvites,
@@ -8,23 +11,29 @@ import {
   revokeFamilyInvite,
 } from "@/lib/supabase/queries";
 
+const postSchema = z.object({
+  babyId: zUuid,
+  role: z.enum(["caregiver", "viewer"]),
+  familyRelation: z.string().max(40).nullish(),
+});
+
 // GET  /api/family/invite?babyId=... — list active invites for baby's family
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const babyId = req.nextUrl.searchParams.get("babyId");
-  if (!babyId) return NextResponse.json({ error: "babyId required" }, { status: 400 });
+  if (!babyId) return NextResponse.json({ error: "babyId obrigatório" }, { status: 400 });
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
-  if (role !== "owner") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (role !== "owner") return NextResponse.json({ error: "Sem permissão" }, { status: 403 });
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
   if (!family) return NextResponse.json({ data: [] });
 
   const { data, error } = await getActiveFamilyInvites(supabase, family.id);
-  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({ data });
 }
@@ -33,26 +42,21 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
-  const body = await req.json();
-  const { babyId, role, familyRelation } = body as {
-    babyId: string;
-    role: "caregiver" | "viewer";
-    familyRelation?: string | null;
-  };
-
-  if (!babyId || !role) {
-    return NextResponse.json({ error: "babyId and role required" }, { status: 400 });
+  const parsed = postSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
+  const { babyId, role, familyRelation } = parsed.data;
 
   const userRole = await getUserRoleForBaby(supabase, user.id, babyId);
   if (userRole !== "owner") {
-    return NextResponse.json({ error: "Only owners can create invites" }, { status: 403 });
+    return NextResponse.json({ error: "Apenas responsáveis podem criar convites" }, { status: 403 });
   }
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
-  if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
+  if (!family) return NextResponse.json({ error: "Família não encontrada" }, { status: 404 });
 
   const { data, error } = await createFamilyInvite(
     supabase,
@@ -61,7 +65,7 @@ export async function POST(req: NextRequest) {
     role,
     familyRelation ?? null
   );
-  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  if (error) return dbErrorToResponse(error);
 
   return NextResponse.json({ data });
 }
@@ -70,24 +74,27 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const inviteId = req.nextUrl.searchParams.get("inviteId");
   const babyId = req.nextUrl.searchParams.get("babyId");
   if (!inviteId || !babyId) {
-    return NextResponse.json({ error: "inviteId and babyId required" }, { status: 400 });
+    return NextResponse.json({ error: "inviteId e babyId obrigatórios" }, { status: 400 });
   }
 
   const role = await getUserRoleForBaby(supabase, user.id, babyId);
   if (role !== "owner") {
-    return NextResponse.json({ error: "Only owners can revoke invites" }, { status: 403 });
+    return NextResponse.json({ error: "Apenas responsáveis podem revogar convites" }, { status: 403 });
   }
 
   const { data: family } = await getFamilyForBaby(supabase, babyId);
-  if (!family) return NextResponse.json({ error: "Family not found" }, { status: 404 });
+  if (!family) return NextResponse.json({ error: "Família não encontrada" }, { status: 404 });
 
-  const { error } = await revokeFamilyInvite(supabase, inviteId, family.id);
-  if (error) return NextResponse.json({ error: "Internal error" }, { status: 500 });
+  const { data: revoked, error } = await revokeFamilyInvite(supabase, inviteId, family.id);
+  if (error) return dbErrorToResponse(error);
+  if (!revoked || revoked.length === 0) {
+    return NextResponse.json({ error: "Não encontrado" }, { status: 404 });
+  }
 
   return NextResponse.json({ success: true });
 }

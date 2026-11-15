@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { END_BEFORE_START_MESSAGE, isEndBeforeStart, isCheckViolation } from "@/lib/validation/timeRange";
 import { cn } from "@/lib/utils";
 import {
   logBottleFeeding,
@@ -134,7 +135,9 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
     setValue,
     watch,
     reset,
-    formState: { isSubmitting },
+    setError,
+    clearErrors,
+    formState: { isSubmitting, errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: buildFormValues(item),
@@ -194,6 +197,11 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
         data.end_date && data.end_time_input
           ? new Date(`${data.end_date}T${data.end_time_input}:00`).toISOString()
           : null;
+      if (endTime && isEndBeforeStart(startTime, endTime)) {
+        setError("end_time_input", { type: "validate", message: END_BEFORE_START_MESSAGE });
+        toast.error(END_BEFORE_START_MESSAGE);
+        return;
+      }
       const sideLeftSec = (parseInt(data.side_left_min || "0", 10) || 0) * 60;
       const sideRightSec = (parseInt(data.side_right_min || "0", 10) || 0) * 60;
 
@@ -205,7 +213,7 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
           side_right_sec: sideRightSec,
           notes,
         });
-        if (error) return toast.error("Erro ao atualizar mamada");
+        if (error) return toast.error(isCheckViolation(error) ? END_BEFORE_START_MESSAGE : "Erro ao atualizar mamada");
         toast.success("Mamada atualizada");
       } else {
         const { data: created, error } = await insertBreastfeedingSession(
@@ -220,7 +228,7 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
             notes,
           }
         );
-        if (error || !created) return toast.error("Erro ao registrar mamada");
+        if (error || !created) return toast.error(isCheckViolation(error) ? END_BEFORE_START_MESSAGE : "Erro ao registrar mamada");
         toast.success("Mamada registrada");
         void recordFeedingActivity({
           babyId: activeBaby.id,
@@ -323,7 +331,12 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
                   <label htmlFor="end_time_input" className="text-xs text-muted-foreground">
                     Hora fim
                   </label>
-                  <Input id="end_time_input" type="time" {...register("end_time_input")} className="rounded-xl" autoComplete="off" />
+                  <Input id="end_time_input" type="time" {...register("end_time_input", { onChange: () => clearErrors("end_time_input") })} aria-invalid={!!errors.end_time_input} className="rounded-xl" autoComplete="off" />
+                  {errors.end_time_input?.message && (
+                    <p role="alert" className="text-xs text-destructive">
+                      {errors.end_time_input.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">

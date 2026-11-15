@@ -11,6 +11,10 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
+        // The `headers` arg (Cache-Control etc.) is intentionally ignored: with
+        // next/headers cookies() there is no response object to attach them to,
+        // and the proxy (src/proxy.ts) already applies them to every response
+        // that refreshes the session cookies.
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>

@@ -1,232 +1,167 @@
-import * as webpush from "web-push";
+import {
+  alertTtlSeconds,
+  deliverAlerts,
+  sweepStalePendingClaims,
+} from "@/lib/notifications/deliverAlerts";
+import { getWebPush, type PushSubscriptionRow } from "@/lib/notifications/webpush";
+import {
+  DEFAULT_ALERT_BEFORE_MINUTES,
+  selectAlerts,
+  type AlertPref,
+  type SelectAlertsInput,
+} from "@/lib/notifications/selectAlerts";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
-import { differenceInWeeks, differenceInMinutes, parseISO } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
 
-webpush.setVapidDetails(
-  process.env.VAPID_CONTACT_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+/** Completed sessions older than this are not considered (wake windows max out at 4h). */
+const LAST_SESSION_LOOKBACK_MS = 24 * 60 * 60 * 1000;
+/** Keeps `in (...)` lists well under PostgREST URL limits. */
+const IN_CHUNK = 100;
 
-interface NotificationPayload {
-  title: string;
-  body: string;
-  icon: string;
-  tag: string;
-  url: string;
+function chunks<T>(items: T[], size = IN_CHUNK): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
+  return out;
 }
 
-function isInQuietHours(
-  now: Date,
-  timezone: string,
-  start: string, // "HH:MM"
-  end: string
-): boolean {
-  const zoned = toZonedTime(now, timezone);
-  const hh = zoned.getHours();
-  const mm = zoned.getMinutes();
-  const currentMinutes = hh * 60 + mm;
-
-  const [sh, sm] = start.split(":").map(Number);
-  const [eh, em] = end.split(":").map(Number);
-  const startMin = sh * 60 + sm;
-  const endMin = eh * 60 + em;
-
-  if (startMin <= endMin) {
-    return currentMinutes >= startMin && currentMinutes < endMin;
-  }
-  // Wraps midnight (e.g., 22:00 - 07:00)
-  return currentMinutes >= startMin || currentMinutes < endMin;
+/** Runs one query per chunk of ids (a single query for typical sizes) and concatenates rows. */
+async function selectIn<T>(
+  ids: string[],
+  run: (chunk: string[]) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>
+): Promise<T[]> {
+  if (ids.length === 0) return [];
+  const results = await Promise.all(chunks(ids).map((c) => run(c)));
+  return results.flatMap(({ data, error }) => {
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
 }
 
-export async function dispatchNotifications(): Promise<number> {
+const uniq = (xs: string[]) => [...new Set(xs)];
+
+export async function dispatchNotifications(now: Date = new Date()): Promise<number> {
   const supabase = createAdminClient();
-  const now = new Date();
-  let sentCount = 0;
 
-  // Get all users with notifications enabled
-  const { data: prefs } = await supabase
+  // 0. Release claims left 'pending' by a run that died mid-send.
+  await sweepStalePendingClaims(supabase, now);
+
+  // 1. Users with notifications enabled.
+  const { data: prefRows, error: prefError } = await supabase
     .from("notification_preferences")
-    .select("*")
+    .select("user_id, enabled, alert_before_minutes, quiet_hours_start, quiet_hours_end, timezone")
     .eq("enabled", true);
+  if (prefError) throw new Error(prefError.message);
+  const prefs = (prefRows ?? []) as AlertPref[];
+  if (prefs.length === 0) return 0;
 
-  if (!prefs || prefs.length === 0) return 0;
+  // 2. Their owner/caregiver memberships.
+  const members = await selectIn<SelectAlertsInput["members"][number]>(
+    uniq(prefs.map((p) => p.user_id)),
+    (ids) =>
+      supabase
+        .from("family_members")
+        .select("family_id, user_id, role")
+        .in("user_id", ids)
+        .in("role", ["owner", "caregiver"])
+  );
+  if (members.length === 0) return 0;
 
-  for (const pref of prefs) {
-    try {
-      if (
-        isInQuietHours(
-          now,
-          pref.timezone || "America/Sao_Paulo",
-          pref.quiet_hours_start || "22:00",
-          pref.quiet_hours_end || "07:00"
-        )
-      ) {
-        continue;
-      }
+  // 3. Babies of those families.
+  const babies = await selectIn<SelectAlertsInput["babies"][number]>(
+    uniq(members.map((m) => m.family_id)),
+    (ids) => supabase.from("babies").select("id, family_id, birth_date, name").in("family_id", ids)
+  );
+  if (babies.length === 0) return 0;
+  const babyIds = babies.map((b) => b.id);
+  const since = new Date(now.getTime() - LAST_SESSION_LOOKBACK_MS).toISOString();
 
-      // Get user's babies
-      const { data: babies } = await supabase
-        .from("babies")
-        .select("id, birth_date")
-        .eq("user_id", pref.user_id);
-
-      if (!babies || babies.length === 0) continue;
-
-      // Get user's active push subscriptions
-      const { data: subs } = await supabase
-        .from("push_subscriptions")
-        .select("endpoint, p256dh, auth")
-        .eq("user_id", pref.user_id)
-        .eq("is_active", true);
-
-      if (!subs || subs.length === 0) continue;
-
-      for (const baby of babies) {
-        // Check if baby is currently sleeping
-        const { data: activeSleep } = await supabase
-          .from("sleep_sessions")
-          .select("id")
-          .eq("baby_id", baby.id)
-          .is("end_time", null)
-          .limit(1);
-
-        if (activeSleep && activeSleep.length > 0) continue;
-
-        // Get last completed session
-        const { data: lastSession } = await supabase
-          .from("sleep_sessions")
-          .select("id, end_time")
-          .eq("baby_id", baby.id)
-          .not("end_time", "is", null)
-          .order("end_time", { ascending: false })
-          .limit(1)
-          .single();
-
-        if (!lastSession?.end_time) continue;
-
-        const ageWeeks = differenceInWeeks(now, parseISO(baby.birth_date));
-        const range = getWakeWindowRange(ageWeeks);
-        const lastEnd = parseISO(lastSession.end_time);
-        const elapsedMin = differenceInMinutes(now, lastEnd);
-        const alertBefore = pref.alert_before_minutes || 15;
-
-        // NAP_SOON: approaching wake window limit
-        const napSoonThreshold = range.maxMinutes - alertBefore;
-        if (elapsedMin >= napSoonThreshold && elapsedMin < range.maxMinutes) {
-          const dedupeKey = `${baby.id}:${lastSession.id}:NAP_SOON`;
-          const minutesLeft = range.maxMinutes - elapsedMin;
-
-          const sent = await sendIfNew(supabase, {
-            userId: pref.user_id,
-            babyId: baby.id,
-            sessionId: lastSession.id,
-            eventType: "NAP_SOON",
-            dedupeKey,
-            subscriptions: subs,
-            payload: {
-              title: "🌙 Hora da soneca chegando!",
-              body: `Faltam ~${minutesLeft} min para a janela de sono. Prepare o ambiente!`,
-              icon: "/icon.svg",
-              tag: `nap-soon-${baby.id}`,
-              url: "/",
-            },
-          });
-          if (sent) sentCount++;
-        }
-
-        // OVERDUE: past wake window
-        if (elapsedMin >= range.maxMinutes) {
-          const dedupeKey = `${baby.id}:${lastSession.id}:OVERDUE`;
-          const overMin = elapsedMin - range.maxMinutes;
-
-          const sent = await sendIfNew(supabase, {
-            userId: pref.user_id,
-            babyId: baby.id,
-            sessionId: lastSession.id,
-            eventType: "OVERDUE",
-            dedupeKey,
-            subscriptions: subs,
-            payload: {
-              title: "⚠️ Passou da janela de sono!",
-              body: `Já passou ${overMin} min da janela ideal. O bebê pode estar muito cansado.`,
-              icon: "/icon.svg",
-              tag: `overdue-${baby.id}`,
-              url: "/",
-            },
-          });
-          if (sent) sentCount++;
-        }
-      }
-    } catch (err) {
-      console.error(`[dispatch] Error for user ${pref.user_id}:`, err);
-    }
-  }
-
-  return sentCount;
-}
-
-async function sendIfNew(
-  supabase: ReturnType<typeof createAdminClient>,
-  opts: {
-    userId: string;
-    babyId: string;
-    sessionId: string;
-    eventType: string;
-    dedupeKey: string;
-    subscriptions: { endpoint: string; p256dh: string; auth: string }[];
-    payload: NotificationPayload;
-  }
-): Promise<boolean> {
-  // Check deduplication
-  const { data: existing } = await supabase
-    .from("notification_events")
-    .select("id")
-    .eq("dedupe_key", opts.dedupeKey)
-    .limit(1);
-
-  if (existing && existing.length > 0) return false;
-
-  // Send to all subscriptions
-  const payloadStr = JSON.stringify(opts.payload);
-  let anySent = false;
-
-  for (const sub of opts.subscriptions) {
-    try {
-      await webpush.sendNotification(
-        {
-          endpoint: sub.endpoint,
-          keys: { p256dh: sub.p256dh, auth: sub.auth },
-        },
-        payloadStr
-      );
-      anySent = true;
-    } catch (err: unknown) {
-      const statusCode = (err as { statusCode?: number })?.statusCode;
-      if (statusCode === 410 || statusCode === 404) {
-        // Subscription expired, deactivate
-        await supabase
+  // 4–6. Recent completed sessions, open sessions and recipients' subscriptions, in parallel.
+  const [ended, open, subs] = await Promise.all([
+    selectIn<{ id: string; baby_id: string; end_time: string }>(babyIds, (ids) =>
+      supabase
+        .from("sleep_sessions")
+        .select("id, baby_id, end_time")
+        .in("baby_id", ids)
+        .not("end_time", "is", null)
+        .gte("end_time", since)
+        .order("end_time", { ascending: false })
+    ),
+    selectIn<{ baby_id: string }>(babyIds, (ids) =>
+      supabase.from("sleep_sessions").select("baby_id").in("baby_id", ids).is("end_time", null)
+    ),
+    selectIn<PushSubscriptionRow & { user_id: string }>(
+      uniq(members.map((m) => m.user_id)),
+      (ids) =>
+        supabase
           .from("push_subscriptions")
-          .update({ is_active: false })
-          .eq("endpoint", sub.endpoint);
-      }
-      console.error(`[push] Failed for ${sub.endpoint}:`, err);
+          .select("user_id, endpoint, p256dh, auth")
+          .in("user_id", ids)
+          .eq("is_active", true)
+    ),
+  ]);
+
+  const lastEnded: SelectAlertsInput["lastEnded"] = {};
+  for (const s of ended) {
+    const current = lastEnded[s.baby_id];
+    if (!current || Date.parse(s.end_time) > Date.parse(current.endTime)) {
+      lastEnded[s.baby_id] = { sessionId: s.id, endTime: s.end_time };
     }
   }
 
-  if (anySent) {
-    await supabase.from("notification_events").insert({
-      user_id: opts.userId,
-      baby_id: opts.babyId,
-      session_id: opts.sessionId,
-      event_type: opts.eventType,
-      dedupe_key: opts.dedupeKey,
-      sent_at: new Date().toISOString(),
-      status: "sent",
-    });
+  const subsByUser = new Map<string, PushSubscriptionRow[]>();
+  for (const { user_id, ...sub } of subs) {
+    const list = subsByUser.get(user_id) ?? [];
+    list.push(sub);
+    subsByUser.set(user_id, list);
   }
 
-  return anySent;
+  // Only users with a device to receive the push claim an alert.
+  const alerts = selectAlerts({
+    now,
+    prefs,
+    members,
+    babies,
+    lastEnded,
+    activeBabyIds: new Set(open.map((s) => s.baby_id)),
+  }).filter((a) => subsByUser.has(a.userId));
+  if (alerts.length === 0) return 0;
+
+  const webpush = getWebPush();
+  if (!webpush) return 0;
+
+  // 7. Claim alerts atomically as 'pending': rows that already existed are not returned.
+  const { data: claimed, error: claimError } = await supabase
+    .from("notification_events")
+    .upsert(
+      alerts.map((a) => ({
+        user_id: a.userId,
+        baby_id: a.babyId,
+        session_id: a.sessionId,
+        event_type: a.eventType,
+        dedupe_key: a.dedupeKey,
+        // Claim time; the sweep releases claims still pending after 10 min.
+        scheduled_for: now.toISOString(),
+        sent_at: null,
+        status: "pending",
+      })),
+      { onConflict: "dedupe_key", ignoreDuplicates: true }
+    )
+    .select("dedupe_key");
+  if (claimError) throw new Error(claimError.message);
+
+  const claimedKeys = new Set((claimed ?? []).map((r) => r.dedupe_key as string));
+  const owned = alerts.filter((a) => claimedKeys.has(a.dedupeKey));
+  if (owned.length === 0) return 0;
+
+  // 8. Send (bounded concurrency, per-send timeout) and settle each claim.
+  const alertBefore = new Map(
+    prefs.map((p) => [p.user_id, p.alert_before_minutes || DEFAULT_ALERT_BEFORE_MINUTES])
+  );
+  return deliverAlerts({
+    wp: webpush,
+    store: supabase,
+    alerts: owned,
+    subsByUser,
+    now,
+    ttlFor: (a) => alertTtlSeconds(a.eventType, alertBefore.get(a.userId)!),
+  });
 }

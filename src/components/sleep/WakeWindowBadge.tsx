@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
-import { useSleepStore } from "@/store/sleepStore";
+import { useActiveSleepTimer } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { createClient } from "@/lib/supabase/client";
 import { getRecentSessions } from "@/lib/supabase/queries";
@@ -63,8 +63,11 @@ const statusConfig = {
 export function WakeWindowBadge() {
   const { elapsedMinutes, status, range, minutesUntilNextNap, isLoading } =
     useWakeWindow();
-  const { isRunning, startTime, sleepType } = useSleepStore();
   const { activeBaby } = useBaby();
+  const timer = useActiveSleepTimer(activeBaby?.id);
+  const isRunning = timer !== null;
+  const startTime = timer?.startTime ?? null;
+  const sleepType = timer?.sleepType ?? "NAP";
   const supabase = createClient();
 
   const { data: recentSessions = [] } = useQuery({

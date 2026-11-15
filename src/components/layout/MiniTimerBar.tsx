@@ -3,11 +3,17 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
-import { useSleepStore } from "@/store/sleepStore";
+import { useActiveSleepTimer } from "@/store/sleepStore";
+import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsed } from "@/lib/utils";
 
 export function MiniTimerBar() {
-  const { isRunning, startTime, sleepType } = useSleepStore();
+  const { activeBaby } = useBaby();
+  // Shows the running sleep of the baby currently selected.
+  const timer = useActiveSleepTimer(activeBaby?.id);
+  const isRunning = timer !== null;
+  const startTime = timer?.startTime ?? null;
+  const sleepType = timer?.sleepType ?? "NAP";
   const [elapsed, setElapsed] = useState("00:00:00");
 
   useEffect(() => {
