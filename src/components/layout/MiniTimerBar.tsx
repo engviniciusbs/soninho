@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useActiveSleepTimer } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { formatElapsed } from "@/lib/utils";
+import { formatElapsedSeconds } from "@/lib/utils";
+import { useSessionClock } from "@/hooks/timer/useSessionClock";
 
 export function MiniTimerBar() {
   const { activeBaby } = useBaby();
@@ -14,15 +14,9 @@ export function MiniTimerBar() {
   const isRunning = timer !== null;
   const startTime = timer?.startTime ?? null;
   const sleepType = timer?.sleepType ?? "NAP";
-  const [elapsed, setElapsed] = useState("00:00:00");
-
-  useEffect(() => {
-    if (!isRunning || !startTime) return;
-    const update = () => setElapsed(formatElapsed(startTime));
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [isRunning, startTime]);
+  // Same shared clock as the sleep timer and the wake-window badge.
+  const { elapsedSec } = useSessionClock(startTime);
+  const elapsed = elapsedSec === null ? "00:00:00" : formatElapsedSeconds(elapsedSec);
 
   const isNap = sleepType === "NAP";
   const accent = isNap ? "#f59e0b" : "#818cf8";

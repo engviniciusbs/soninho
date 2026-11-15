@@ -64,7 +64,14 @@ export function renderWithProviders(ui: ReactElement, opts: Options = {}) {
 }
 
 /** renderHook counterpart of {@link renderWithProviders}. */
-export function renderHookWithProviders<R>(hook: () => R, opts: ProviderOptions = {}) {
-  const { client, Wrapper } = createProviders(opts);
-  return { queryClient: client, ...renderHook(hook, { wrapper: Wrapper }) };
+export function renderHookWithProviders<R, P = undefined>(
+  hook: (props: P) => R,
+  opts: ProviderOptions & { initialProps?: P } = {}
+) {
+  const { initialProps, ...providers } = opts;
+  const { client, Wrapper } = createProviders(providers);
+  return {
+    queryClient: client,
+    ...renderHook(hook, { wrapper: Wrapper, initialProps }),
+  };
 }

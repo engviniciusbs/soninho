@@ -15,11 +15,15 @@ export function formatDuration(minutes: number): string {
 
 export function formatElapsed(startTime: string, now: number = Date.now()): string {
   const start = new Date(startTime).getTime();
-  const diff = Math.max(0, now - start);
+  return formatElapsedSeconds(Math.floor(Math.max(0, now - start) / 1000));
+}
 
-  const hours = Math.floor(diff / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
+/** Whole seconds as "HH:MM:SS" (hours are not capped at 24). */
+export function formatElapsedSeconds(totalSec: number): string {
+  const sec = Math.max(0, Math.floor(totalSec));
+  const hours = Math.floor(sec / 3600);
+  const minutes = Math.floor((sec % 3600) / 60);
+  const seconds = sec % 60;
 
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }

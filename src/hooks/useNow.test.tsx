@@ -75,4 +75,18 @@ describe("useNow", () => {
     expect(clear).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(0);
   });
+
+  it("disabled_does_not_subscribe", () => {
+    const { result, rerender } = renderHook(({ on }) => useNow(1000, on), {
+      initialProps: { on: false },
+    });
+    expect(result.current).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+    rerender({ on: true });
+    expect(result.current).toBe(Date.parse("2026-01-01T12:00:00.000Z"));
+    expect(vi.getTimerCount()).toBe(1);
+    rerender({ on: false });
+    expect(result.current).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });

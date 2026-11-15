@@ -59,12 +59,17 @@ function getStore(intervalMs: number): Store {
 }
 
 const getServerSnapshot = (): number | null => null;
+const subscribeNothing = () => () => {};
 
-export function useNow(intervalMs: number = 1000): number | null {
+/**
+ * @param enabled when false the hook neither subscribes nor ticks and returns
+ *   `null`, so idle consumers (e.g. no timer running) don't keep the clock alive.
+ */
+export function useNow(intervalMs: number = 1000, enabled: boolean = true): number | null {
   const store = getStore(intervalMs);
   return useSyncExternalStore(
-    store.subscribe,
-    () => store.value,
+    enabled ? store.subscribe : subscribeNothing,
+    () => (enabled ? store.value : null),
     getServerSnapshot
   );
 }
