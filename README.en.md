@@ -1,5 +1,7 @@
 # Soninho 🌙
 
+[![CI](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml/badge.svg)](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml)
+
 **English** · [Português](README.md)
 
 Baby sleep and feeding tracker for families. Parents and caregivers log naps, night sleep and feeds from their phones; Soninho computes age-based wake windows, suggests when the next nap and feed should happen, sends push alerts when the wake window is running out, and produces analytics, email reports and AI insights — all in Brazilian Portuguese.
@@ -92,7 +94,13 @@ npm install
 
 ### 3. Environment variables
 
-Create `.env.local` in the project root (`.env*` files are git-ignored):
+Copy the `.env.example` template to `.env.local` in the project root (`.env*` files are git-ignored, except `.env.example`) and fill it in:
+
+```bash
+cp .env.example .env.local
+```
+
+Example contents:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
@@ -336,15 +344,21 @@ Everything in `src/lib/` is plain, deterministic TypeScript — a good starting 
 
 ## Testing and Quality
 
-There is **no test suite yet**. Before opening a PR, run:
+```bash
+npm test            # unit tests (Vitest)
+npm run test:db     # database tests (pgTAP; needs Docker and `npx supabase db start`)
+```
+
+CI (GitHub Actions) runs lint, `tsc`, tests, build and database tests on every PR. Before opening a PR, run locally:
 
 ```bash
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
 
-Suggestion: start with unit tests (Vitest) for the pure functions in `src/lib/sleep` and `src/lib/feeding` — especially `sessionDayAllocation`, `computeNapSuggestion` and `computeFeedingSuggestion`.
+For database changes, see [docs/CONTRIBUTING-DB.md](docs/CONTRIBUTING-DB.md).
 
 ## Deployment (Vercel)
 
@@ -416,3 +430,7 @@ Check `OPENAI_API_KEY` and your account credits.
 
 **Wrong times**
 The app defaults to `America/Sao_Paulo`; the browser timezone is sent with AI/suggestion calls, and the notification timezone is stored in `notification_preferences.timezone`.
+
+## License
+
+[MIT](LICENSE) © 2026 engviniciusbs

@@ -1,5 +1,7 @@
 # Soninho 🌙
 
+[![CI](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml/badge.svg)](https://github.com/engviniciusbs/soninho/actions/workflows/ci.yml)
+
 [English](README.en.md) · **Português**
 
 Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores registram sonecas, sono noturno e mamadas pelo celular; o Soninho calcula janelas de vigília pela idade do bebê, sugere o horário da próxima soneca e mamada, avisa por push quando a janela está acabando e gera análises, relatórios por e-mail e insights com IA — tudo em português brasileiro.
@@ -92,7 +94,13 @@ npm install
 
 ### 3. Variáveis de ambiente
 
-Crie `.env.local` na raiz (arquivos `.env*` são ignorados pelo git):
+Copie o modelo `.env.example` para `.env.local` na raiz (arquivos `.env*` são ignorados pelo git, exceto o `.env.example`) e preencha:
+
+```bash
+cp .env.example .env.local
+```
+
+Exemplo do conteúdo:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
@@ -336,15 +344,21 @@ Tudo em `src/lib/` é TypeScript puro e determinístico — bom ponto de partida
 
 ## Testes e qualidade
 
-Ainda **não há suíte de testes**. Antes de abrir PR, rode:
+```bash
+npm test            # testes unitários (Vitest)
+npm run test:db     # testes do banco (pgTAP; requer Docker e `npx supabase db start`)
+```
+
+O CI (GitHub Actions) roda lint, `tsc`, testes, build e testes do banco em todo PR. Antes de abrir PR, rode localmente:
 
 ```bash
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
 
-Sugestão: começar por testes unitários (Vitest) das funções puras em `src/lib/sleep` e `src/lib/feeding` — especialmente `sessionDayAllocation`, `computeNapSuggestion` e `computeFeedingSuggestion`.
+Para mudanças no banco, veja [docs/CONTRIBUTING-DB.md](docs/CONTRIBUTING-DB.md).
 
 ## Deploy (Vercel)
 
@@ -416,3 +430,7 @@ Verifique `OPENAI_API_KEY` e os créditos da conta.
 
 **Horários errados**
 O app assume `America/Sao_Paulo` por padrão; o fuso do navegador é enviado nas chamadas de IA/sugestão e o fuso das notificações fica em `notification_preferences.timezone`.
+
+## Licença
+
+[MIT](LICENSE) © 2026 engviniciusbs
