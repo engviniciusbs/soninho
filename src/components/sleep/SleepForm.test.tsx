@@ -91,6 +91,25 @@ describe("SleepForm", () => {
     expect(stable(document.body)).toMatchSnapshot("edit");
   });
 
+  it("reopen_starts_from_fresh_values", async () => {
+    const { rerender } = await mount();
+    change("location", "colo");
+    fireEvent.click(screen.getByRole("button", { name: "Condições do ambiente" }));
+    rerender(<SleepForm open={false} onClose={onClose} session={null} />);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    vi.setSystemTime(new Date("2026-01-01T13:30:00.000Z"));
+    rerender(<SleepForm open onClose={onClose} session={null} />);
+    await screen.findByRole("dialog");
+    expect(field("location").value).toBe("");
+    expect(field("start_time_input").value).toBe("10:30");
+    expect(screen.getByRole("button", { name: "Condições do ambiente" })).toHaveAttribute("aria-expanded", "false");
+    rerender(<SleepForm open={false} onClose={onClose} session={null} />);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    rerender(<SleepForm open onClose={onClose} session={session} />);
+    await screen.findByRole("dialog");
+    expect(field("location").value).toBe("berço");
+  });
+
   it("create_submits_same_payload", async () => {
     await mount();
     change("start_time_input", "07:10");
@@ -174,8 +193,7 @@ describe("SleepForm", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // Known bug until the refactor: only the end TIME clears the error.
-  it.fails("end_date_change_clears_or_sets_range_error", async () => {
+  it("end_date_change_clears_or_sets_range_error", async () => {
     await mount();
     change("end_date", "2025-12-31");
     submit();

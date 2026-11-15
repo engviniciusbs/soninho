@@ -105,6 +105,23 @@ describe("FeedingForm", () => {
     expect(stable(document.body)).toMatchSnapshot(`edit ${type}`);
   });
 
+  it("reopen_starts_from_fresh_values", async () => {
+    const { rerender } = await mount();
+    pick("Sólidos");
+    pick("Banana");
+    rerender(<FeedingForm open={false} onClose={onClose} item={null} />);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    rerender(<FeedingForm open onClose={onClose} item={null} />);
+    await screen.findByRole("dialog");
+    expect(screen.getByRole("button", { name: "Mamadeira" })).toHaveAttribute("aria-pressed", "true");
+    rerender(<FeedingForm open={false} onClose={onClose} item={null} />);
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    rerender(<FeedingForm open onClose={onClose} item={items.SOLID} />);
+    await screen.findByRole("dialog");
+    expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
+    expect(field("notes").value).toBe("sujou");
+  });
+
   it("create_submits_same_payload", async () => {
     await mount();
     change("start_time_input", "08:00");
@@ -199,8 +216,7 @@ describe("FeedingForm", () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  // Known bug until the refactor: only the end TIME clears the error.
-  it.fails("end_date_change_clears_or_sets_range_error", async () => {
+  it("end_date_change_clears_or_sets_range_error", async () => {
     await mount();
     pick("Peito");
     change("end_date", "2025-12-31");
