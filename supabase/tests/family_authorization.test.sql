@@ -1,7 +1,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(44);
+select plan(51);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner a1, caregiver a2, viewer a3 | F2: owner b1 | c1,c2,c3 no family
@@ -110,10 +110,21 @@ select is(tests.try_val($$select status from public.get_invite_preview('tok-i3')
 select is(tests.try_val($$select status from public.get_invite_preview('tok-nope')$$), 'not_found', 'invite_preview_not_found');
 
 -- ----------------------------------------------------------- anon denials
-select matches(tests.try_exec($$select public.accept_family_invite('tok-i1', 'Anon')$$), '^ERR:42501', 'anon_cannot_accept');
-select matches(tests.try_exec($$select public.get_user_family_ids('00000000-0000-0000-0000-0000000000a1')$$), '^ERR:42501', 'anon_cannot_execute_helpers: get_user_family_ids');
-select matches(tests.try_exec($$select public.get_user_owned_family_ids('00000000-0000-0000-0000-0000000000a1')$$), '^ERR:42501', 'anon_cannot_execute_helpers: get_user_owned_family_ids');
-select matches(tests.try_exec($$select public.user_can_write_family('00000000-0000-0000-0000-0000000000a1','00000000-0000-0000-0000-0000000000f1')$$), '^ERR:42501', 'anon_cannot_execute_helpers: user_can_write_family');
+-- Privilege checks instead of direct calls: invoking a function without EXECUTE
+-- as anon segfaults supabase/postgres 17.6.1.104 when session_user=postgres
+-- (supautils hint_roles hook; affects this test runner only). Verified at the API
+-- layer that PostgREST returns 42501 for anon on these RPCs (curl /rest/v1/rpc/*).
+select ok(not has_function_privilege('anon', 'public.accept_family_invite(text,text)', 'execute'), 'anon_cannot_accept');
+select ok(not has_function_privilege('anon', 'public.get_user_family_ids(uuid)', 'execute'), 'anon_cannot_execute_helpers: get_user_family_ids');
+select ok(not has_function_privilege('anon', 'public.get_user_owned_family_ids(uuid)', 'execute'), 'anon_cannot_execute_helpers: get_user_owned_family_ids');
+select ok(not has_function_privilege('anon', 'public.user_can_write_family(uuid,uuid)', 'execute'), 'anon_cannot_execute_helpers: user_can_write_family');
+select ok(not has_function_privilege('anon', 'public.create_baby_with_family(text,date,text,text)', 'execute'), 'anon_cannot_execute: create_baby_with_family');
+select ok(has_function_privilege('anon', 'public.get_invite_preview(text)', 'execute'), 'anon_can_execute: get_invite_preview');
+select ok(has_function_privilege('authenticated', 'public.accept_family_invite(text,text)', 'execute'), 'authenticated_can_execute: accept_family_invite');
+select ok(has_function_privilege('authenticated', 'public.create_baby_with_family(text,date,text,text)', 'execute'), 'authenticated_can_execute: create_baby_with_family');
+select ok(has_function_privilege('authenticated', 'public.get_user_family_ids(uuid)', 'execute'), 'authenticated_can_execute: get_user_family_ids');
+select ok(has_function_privilege('authenticated', 'public.get_user_owned_family_ids(uuid)', 'execute'), 'authenticated_can_execute: get_user_owned_family_ids');
+select ok(has_function_privilege('authenticated', 'public.user_can_write_family(uuid,uuid)', 'execute'), 'authenticated_can_execute: user_can_write_family');
 
 -- ----------------------------------------------------------- accept invite
 select tests.login_as('00000000-0000-0000-0000-0000000000c2');
