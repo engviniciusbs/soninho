@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNow } from "@/hooks/useNow";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { getLastSleepSession } from "@/lib/supabase/queries";
@@ -28,8 +29,10 @@ interface WakeWindowData {
 export function useWakeWindow(): WakeWindowData {
   const supabase = createClient();
   const { activeBaby } = useBaby();
-  const [elapsedMinutes, setElapsedMinutes] = useState(0);
-  const [now, setNow] = useState(() => Date.now());
+  // Shared 60s clock; null only on the very first client render.
+  const tick = useNow(60_000);
+  const [initialNow] = useState(() => Date.now());
+  const now = tick ?? initialNow;
 
   const { data: lastSession, isLoading } = useQuery({
     queryKey: ["last-session", activeBaby?.id],
@@ -47,18 +50,10 @@ export function useWakeWindow(): WakeWindowData {
 
   const lastSleepEnd = lastSession?.end_time ?? null;
 
-  useEffect(() => {
-    if (!lastSleepEnd) return;
-    const end = new Date(lastSleepEnd).getTime();
-    function update() {
-      const t = Date.now();
-      setNow(t);
-      setElapsedMinutes(Math.max(0, (t - end) / 60000));
-    }
-    update();
-    const interval = setInterval(update, 30_000);
-    return () => clearInterval(interval);
-  }, [lastSleepEnd]);
+  const elapsedMinutes =
+    lastSleepEnd && tick !== null
+      ? Math.max(0, (tick - new Date(lastSleepEnd).getTime()) / 60000)
+      : 0;
 
   const status = getWakeWindowStatus(elapsedMinutes, range);
   const minutesUntilNextNap = getMinutesUntilNextNap(elapsedMinutes, range);

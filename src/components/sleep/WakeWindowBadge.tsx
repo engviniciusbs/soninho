@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { useNow } from "@/hooks/useNow";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
 import { useActiveSleepTimer } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
@@ -68,6 +69,8 @@ export function WakeWindowBadge() {
   const isRunning = timer !== null;
   const startTime = timer?.startTime ?? null;
   const sleepType = timer?.sleepType ?? "NAP";
+  const now = useNow();
+  const [initialNow] = useState(() => Date.now());
   const supabase = createClient();
 
   const { data: recentSessions = [] } = useQuery({
@@ -92,7 +95,7 @@ export function WakeWindowBadge() {
 
   // ── Sleeping state ────────────────────────────────────────────────────────
   if (isRunning && startTime) {
-    const elapsed = formatElapsed(startTime);
+    const elapsed = formatElapsed(startTime, now ?? initialNow);
     const isNight = sleepType === "NIGHT_SLEEP";
     return (
       <motion.div

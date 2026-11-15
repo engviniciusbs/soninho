@@ -13,14 +13,14 @@ import { getBabies } from "@/lib/supabase/queries";
 import { useSleepStore } from "@/store/sleepStore";
 import type { Baby } from "@/types";
 
-interface BabyContextValue {
+export interface BabyContextValue {
   babies: Baby[];
   activeBaby: Baby | null;
   setActiveBaby: (baby: Baby) => void;
   isLoading: boolean;
 }
 
-const BabyContext = createContext<BabyContextValue>({
+export const BabyContext = createContext<BabyContextValue>({
   babies: [],
   activeBaby: null,
   setActiveBaby: () => {},

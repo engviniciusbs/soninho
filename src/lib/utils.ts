@@ -13,9 +13,8 @@ export function formatDuration(minutes: number): string {
   return `${h}h ${m}min`;
 }
 
-export function formatElapsed(startTime: string): string {
+export function formatElapsed(startTime: string, now: number = Date.now()): string {
   const start = new Date(startTime).getTime();
-  const now = Date.now();
   const diff = Math.max(0, now - start);
 
   const hours = Math.floor(diff / 3600000);

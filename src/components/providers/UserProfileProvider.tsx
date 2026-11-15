@@ -10,14 +10,14 @@ import {
 } from "react";
 import type { UiMode, UserProfile } from "@/types";
 
-interface UserProfileContextValue {
+export interface UserProfileContextValue {
   profile: UserProfile | null;
   isLoading: boolean;
   isNannyMode: boolean;
   refreshProfile: () => Promise<void>;
 }
 
-const UserProfileContext = createContext<UserProfileContextValue | null>(null);
+export const UserProfileContext = createContext<UserProfileContextValue | null>(null);
 
 export function UserProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
