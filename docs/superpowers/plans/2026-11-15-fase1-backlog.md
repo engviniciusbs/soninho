@@ -2,7 +2,7 @@
 
 Itens adiados durante a execução do PR 1 (#1). Entram nos planos dos PRs 2–4.
 
-## PR 2 — Base de qualidade
+## PR 2 — Base de qualidade ✅ (concluído no #2)
 - Testes Vitest para `safeRedirectPath` (`src/lib/safeRedirect.ts`), cobrindo pelo menos:
   - Devem voltar para `/app`: `/\t/evil.com`, `/\t\\evil.com`, `//evil.com`, `/\\evil.com`, `/\r\n//evil.com`, `https://evil.com`, `@evil.com`, `""`, `null`, `/.//evil.com`, `/..//evil.com`, `/a/../..//evil.com`, `/%2e%2e//evil.com`.
   - Devem passar inalterados: `/app`, `/history?x=1`, `/invite/abc#top`, `/%2F%2Fevil.com`.
@@ -39,6 +39,20 @@ Itens adiados durante a execução do PR 1 (#1). Entram nos planos dos PRs 2–4
   - owner consegue inserir um uid arbitrário na própria família (expõe `user_profiles`);
   - membro consegue editar o próprio `email` em `family_members`.
 - **Dispatch:** notificar todos os owners e caregivers e consolidar as queries (já está no design). O aviso de segredo ausente fica silencioso em produção.
+
+### Herdado do PR 2
+- **Segurança:** em `src/proxy.ts` (e em `server.ts`), o `setAll` do `@supabase/ssr` 0.12 ignora o 2º argumento `headers` (headers anti-cache de CDN para respostas com cookie de sessão). Aplicar esses headers na resposta.
+- **Testes:** limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
+
+## PR 4 — Refatoração (herdado dos PRs 1–2)
+- `useWatch` no lugar de `watch()` em `SleepForm`/`FeedingForm`; remover os `eslint-disable` com `TODO(PR4)`.
+- Reescrever `useBreastfeedingTimer`: o `tick()` sombreia o estado, e a checagem de tick não compara os totais por lado.
+- `useWakeWindow`: o relógio fica congelado quando não há sono concluído.
+- `WakeWindowBadge`: o "Dormindo" fica ~2 s atrás do timer principal.
+- Mismatch de hidratação no balão de horário de fallback do `SleepTimer`.
+- Justificar ou remover os `eslint-disable exhaustive-deps` antigos (`SleepForm.tsx:148`, `BabyProvider.tsx:65`).
+- `react-day-picker` e `src/components/ui/calendar.tsx` não são usados: remover, ou usar na Fase 2.
+- CI: `actions/checkout` e `setup-node` v7 e fixar por SHA.
 
 ## Ações operacionais pendentes
 - Ligar **"Leaked password protection"** em Supabase → Authentication → Passwords. Não foi possível automatizar: o token da CLI fica no keyring. Pode exigir plano pago.
