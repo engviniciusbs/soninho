@@ -24,7 +24,9 @@ Tudo da lista original foi tratado: tokens hex com `encodeURIComponent`, allowli
 - Headers anti-cache do `setAll` aplicados no `proxy.ts`.
 - **Testes** ainda pendentes: limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
 
-## PR 4 — Refatoração (herdado dos PRs 1–2)
+## PR 4 — Refatoração
+- Card de regressão: marcar a chave diária também quando a IA falhar (hoje uma falha da OpenAI faz cada abertura gastar cota); erro do RPC da cota não deveria esconder o card.
+- Formulários: limpar o erro de "fim antes do início" também ao mudar a data de fim. (herdado dos PRs 1–2)
 - `useWatch` no lugar de `watch()` em `SleepForm`/`FeedingForm`; remover os `eslint-disable` com `TODO(PR4)`.
 - Reescrever `useBreastfeedingTimer`: o `tick()` sombreia o estado, e a checagem de tick não compara os totais por lado.
 - `useWakeWindow`: o relógio fica congelado quando não há sono concluído.
