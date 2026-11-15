@@ -160,7 +160,13 @@ src/types/database.ts                             # regenerado
   5. update do convite (`accepted_at = now()`, `accepted_by = auth.uid()`);
   6. `return family_id`.
 - [ ] **Step 5:** S6: para as 3 helpers e as 3 RPCs: `revoke execute … from public, anon;` e `grant execute … to authenticated;` (exceto `get_invite_preview`: grant também a `anon`). Também `alter default privileges in schema public revoke execute on functions from public, anon;`.
+- [ ] **Step 5a (S10, lead `caller-supplied-uid`):** as 3 helpers passam a ignorar consultas sobre outro usuário: `create or replace` mantendo assinatura, com corpo filtrando também `uid = auth.uid()` **quando `auth.uid()` não é nulo** (service role/cron continua funcionando). Teste pgTAP `helpers_ignore_foreign_uid`: como `…c1`, `select count(*) from get_user_family_ids('…a1')` = 0; como `…a1` → 1.
 - [ ] **Step 6:** S7: `alter function public.calculate_duration() set search_path = public;`.
+- [ ] **Step 6a (S9, achado `rls/babies/insert-update-unbound-family-id`):** substituir as políticas de INSERT e UPDATE de `babies`:
+  - INSERT `with check (auth.uid() = user_id and (family_id is null or family_id in (select get_user_owned_family_ids(auth.uid()))))`;
+  - UPDATE `using (...atual...) with check (family_id is null or user_can_write_family(auth.uid(), family_id))`, mais `user_id` imutável (trigger ou `with check (user_id = <valor antigo>)` via trigger `BEFORE UPDATE` que rejeita mudança de `user_id`/`family_id` por não-owner).
+  - Testes pgTAP (adicionar na Task 3/4): `outsider_cannot_insert_baby_into_foreign_family`, `caregiver_cannot_move_baby_to_foreign_family`.
+
 - [ ] **Step 7:** `npx supabase db reset && npx supabase test db`. Esperado: todos os testes da Task 3 PASS.
 - [ ] **Step 8:** Commit `fix(db): close family authorization holes and add invite/baby RPCs`.
 
@@ -229,6 +235,7 @@ src/types/database.ts                             # regenerado
   - `pathname.startsWith("/api/")` → só renova a sessão e devolve `supabaseResponse`, **nunca** redireciona;
   - páginas: mesmas regras de hoje (`/`, `/login`, `/register`, `/auth/*`, `/invite/*` públicos; o resto redireciona para `/login?redirect=`; logado em `/`, `/login` ou `/register` vai para `/app`; `/landing` vai para `/`).
 - [ ] **Step 3:** Varredura: `grep -L "getUser\|CRON_SECRET" src/app/api/**/route.ts`. Cada arquivo listado ganha `getUser()` → 401. As rotas de IA também checam `getUserRoleForBaby(...)` não nulo → 403. Exceção documentada: `api/family/accept/[token]` GET (preview público via RPC).
+- [ ] **Step 3a (achados `auth/login-page/unvalidated-redirect-param` e `auth/callback/next-param-origin-concat`):** criar `src/lib/safeRedirect.ts` com `safeRedirectPath(value: string | null | undefined, fallback = "/app"): string`. Aceita só strings que começam com `/`, não começam com `//` nem `/\\`, e não contêm `\r`/`\n`; caso contrário devolve o `fallback`. Usar em `src/app/(auth)/auth/callback/route.ts` (`next`) e `src/app/(auth)/login/page.tsx` (`redirect`). Sem Vitest ainda (PR 2): cobrir com um teste rápido em `node --test` em `src/lib/safeRedirect.test.mjs`? Não: manter só a verificação curl/manual aqui e registrar o teste Vitest como obrigatório no PR 2. Curl: `curl -i "localhost:3000/auth/callback?next=@evil.com"` não pode redirecionar para outro host.
 - [ ] **Step 4:** Verificação: `npm run build` (com env fictícia, ver Task 9) sem o warning de middleware depreciado. `npm run dev` + `curl -i localhost:3000/api/email/weekly` → **401 JSON** (não 307); `curl -i -H "Authorization: Bearer $CRON_SECRET" …` → 200; `curl -i localhost:3000/api/ai/suggest -X POST` → 401; `curl -i localhost:3000/app` → 307 para `/login?redirect=%2Fapp`.
 - [ ] **Step 5:** Commit `fix: migrate middleware to proxy and stop redirecting API routes`.
 
@@ -291,4 +298,19 @@ src/types/database.ts                             # regenerado
 
 ## Tasks da auditoria
 
-*(Preenchida na Task 1, Step 3.)*
+Run-1: `~/security-audit-skill/soninho/run-1/` (status `incomplete`/`validation_budget_exhausted`; 4 confirmed, 2 needs_validation, 5 leads não validados).
+
+| Achado (ID) | Sev. | Destino |
+|---|---|---|
+| `rls/babies/insert-update-unbound-family-id` | medium | **Task 4, Step 6a (S9)** |
+| `logic/invite-accept/accepted-update-blocked-by-rls-invite-reusable` | medium | coberto pela Task 4 (`accept_family_invite` atômica) + teste `accept_invite_twice_rejected` |
+| `auth/login-page/unvalidated-redirect-param` | low | **Task 8, Step 3a** (antecipado do PR 3) |
+| `auth/callback/next-param-origin-concat` (needs_validation) | — | **Task 8, Step 3a** (mesmo helper) |
+| `notifications/subscribe/unvalidated-push-endpoint-ssrf` | low | PR 3 (push) — allowlist de hosts de push |
+| `ai/chat/unbounded-messages-no-per-user-quota` (needs_validation) | — | PR 3 (cota da IA, já planejada) |
+| lead `rls/family_members/self-insert-arbitrary-family-and-role` | (high na fase 3) | coberto: S2, Task 4 |
+| lead `rls/family_invites/select-using-true` | — | coberto: S1, Task 4 |
+| lead `rls/family_members/self-update-role-unrestricted` | — | coberto: S3, Task 4 |
+| lead `rpc/security-definer-membership-helpers/caller-supplied-uid` | — | **Task 4, Step 5a (S10)** |
+| lead `storage/baby-avatars/no-server-side-type-size-enforcement` | — | coberto: bucket com `file_size_limit` 5 MB + mime types, versionado na Task 2 Step 4 |
+| deferred: CSV formula injection no export de settings | — | PR 3 (verificar e neutralizar `= + - @` no export) |
