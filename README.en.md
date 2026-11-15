@@ -43,7 +43,7 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 
 | Layer | Technology |
 | --- | --- |
-| Framework | **Next.js 16.2** (App Router, Route Handlers, Middleware) |
+| Framework | **Next.js 16.4** (App Router, Route Handlers, Proxy) |
 | UI | **React 19.3**, TypeScript 5 |
 | Styling | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
 | Components | **shadcn/ui** (`base-nova` style) on top of **Base UI** (`@base-ui/react`), `lucide-react` icons |

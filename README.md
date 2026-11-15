@@ -43,7 +43,7 @@ Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores regis
 
 | Camada | Tecnologia |
 | --- | --- |
-| Framework | **Next.js 16.2** (App Router, Route Handlers, Middleware) |
+| Framework | **Next.js 16.4** (App Router, Route Handlers, Proxy) |
 | UI | **React 19.3**, TypeScript 5 |
 | Estilo | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
 | Componentes | **shadcn/ui** (estilo `base-nova`) sobre **Base UI** (`@base-ui/react`), ícones `lucide-react` |
