@@ -1,0 +1,2300 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EnvironmentPicker > emits_changes_in_order 1`] = `
+[
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 22.5,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": null,
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 22.5,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": "flannel",
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 26,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": null,
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 26,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": "mesh",
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": null,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": null,
+      "weather_condition": "rainy",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": null,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": "fleece",
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 17,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 17,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": "fleece",
+      "weather_condition": null,
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 16.5,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": null,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 17,
+      "sleep_sack_tog": 1,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+]
+`;
+
+exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
+<div>
+  <div
+    class="space-y-5"
+  >
+    <div
+      class="flex flex-col gap-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Temperatura do quarto
+      </label>
+      <div
+        class="flex items-center gap-3"
+      >
+        <button
+          aria-label="Diminuir temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-minus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+          </svg>
+        </button>
+        <div
+          class="flex flex-1 items-center justify-center gap-1"
+        >
+          <span
+            aria-atomic="true"
+            aria-live="polite"
+            class="text-3xl font-bold tabular-nums transition-colors text-emerald-400"
+          >
+            —
+          </span>
+          <span
+            class="text-sm text-muted-foreground mt-1"
+          >
+            °C
+          </span>
+        </div>
+        <button
+          aria-label="Aumentar temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="flex gap-1.5 flex-wrap"
+      >
+        <button
+          aria-label="Definir temperatura como 18°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          18
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 20°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          20
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 22°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          22
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 24°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          24
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 26°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          26
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 28°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          28
+          °
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Clima externo
+        <span
+          class="ml-1 normal-case font-normal text-muted-foreground/50"
+        >
+          (opcional)
+        </span>
+      </label>
+      <div
+        aria-label="Condição climática"
+        class="grid grid-cols-3 gap-2"
+        role="group"
+      >
+        <button
+          aria-label="Ensolarado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sun h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+            />
+            <path
+              d="M12 2v2"
+            />
+            <path
+              d="M12 20v2"
+            />
+            <path
+              d="m4.93 4.93 1.41 1.41"
+            />
+            <path
+              d="m17.66 17.66 1.41 1.41"
+            />
+            <path
+              d="M2 12h2"
+            />
+            <path
+              d="M20 12h2"
+            />
+            <path
+              d="m6.34 17.66-1.41 1.41"
+            />
+            <path
+              d="m19.07 4.93-1.41 1.41"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ensolarado
+          </span>
+        </button>
+        <button
+          aria-label="Nublado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Nublado
+          </span>
+        </button>
+        <button
+          aria-label="Chuvoso"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud-rain h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+            />
+            <path
+              d="M16 14v6"
+            />
+            <path
+              d="M8 14v6"
+            />
+            <path
+              d="M12 16v6"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Chuvoso
+          </span>
+        </button>
+        <button
+          aria-label="Muito quente"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-thermometer h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Muito quente
+          </span>
+        </button>
+        <button
+          aria-label="Frio"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-snowflake h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m10 20-1.25-2.5L6 18"
+            />
+            <path
+              d="M10 4 8.75 6.5 6 6"
+            />
+            <path
+              d="m14 20 1.25-2.5L18 18"
+            />
+            <path
+              d="m14 4 1.25 2.5L18 6"
+            />
+            <path
+              d="m17 21-3-6h-4"
+            />
+            <path
+              d="m17 3-3 6 1.5 3"
+            />
+            <path
+              d="M2 12h6.5L10 9"
+            />
+            <path
+              d="m20 10-1.5 2 1.5 2"
+            />
+            <path
+              d="M22 12h-6.5L14 15"
+            />
+            <path
+              d="m4 10 1.5 2L4 14"
+            />
+            <path
+              d="m7 21 3-6-1.5-3"
+            />
+            <path
+              d="m7 3 3 6h4"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Frio
+          </span>
+        </button>
+        <button
+          aria-label="Ventando"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-wind h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.8 19.6A2 2 0 1 0 14 16H2"
+            />
+            <path
+              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
+            />
+            <path
+              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ventando
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Saquinho de dormir
+      </label>
+      <div
+        aria-label="Tipo de saquinho"
+        class="grid grid-cols-4 gap-1.5"
+        role="group"
+      >
+        <button
+          aria-label="Sem saquinho"
+          aria-pressed="true"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Nenhum
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Malha
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            ~0.5
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho flanelado (TOG 1–2)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Flanela
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            1–2
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho soft/fleece (TOG 2–3)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Fleece
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            2–3
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border border-dashed border-border/40 bg-card/20 px-4 py-3"
+    >
+      <p
+        class="text-xs text-muted-foreground/60 text-center"
+      >
+        Informe a temperatura do quarto para ver a sugestão de roupa
+      </p>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
+<div>
+  <div
+    class="space-y-5"
+  >
+    <div
+      class="flex flex-col gap-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Temperatura do quarto
+      </label>
+      <div
+        class="flex items-center gap-3"
+      >
+        <button
+          aria-label="Diminuir temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-minus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+          </svg>
+        </button>
+        <div
+          class="flex flex-1 items-center justify-center gap-1"
+        >
+          <span
+            aria-atomic="true"
+            aria-live="polite"
+            class="text-3xl font-bold tabular-nums transition-colors text-sky-400"
+          >
+            17.0
+          </span>
+          <span
+            class="text-sm text-muted-foreground mt-1"
+          >
+            °C
+          </span>
+        </div>
+        <button
+          aria-label="Aumentar temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="flex gap-1.5 flex-wrap"
+      >
+        <button
+          aria-label="Definir temperatura como 18°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          18
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 20°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          20
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 22°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          22
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 24°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          24
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 26°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          26
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 28°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          28
+          °
+        </button>
+        <button
+          aria-label="Limpar temperatura"
+          class="rounded-lg px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Limpar
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Clima externo
+        <span
+          class="ml-1 normal-case font-normal text-muted-foreground/50"
+        >
+          (opcional)
+        </span>
+      </label>
+      <div
+        aria-label="Condição climática"
+        class="grid grid-cols-3 gap-2"
+        role="group"
+      >
+        <button
+          aria-label="Ensolarado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sun h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+            />
+            <path
+              d="M12 2v2"
+            />
+            <path
+              d="M12 20v2"
+            />
+            <path
+              d="m4.93 4.93 1.41 1.41"
+            />
+            <path
+              d="m17.66 17.66 1.41 1.41"
+            />
+            <path
+              d="M2 12h2"
+            />
+            <path
+              d="M20 12h2"
+            />
+            <path
+              d="m6.34 17.66-1.41 1.41"
+            />
+            <path
+              d="m19.07 4.93-1.41 1.41"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ensolarado
+          </span>
+        </button>
+        <button
+          aria-label="Nublado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Nublado
+          </span>
+        </button>
+        <button
+          aria-label="Chuvoso"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud-rain h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+            />
+            <path
+              d="M16 14v6"
+            />
+            <path
+              d="M8 14v6"
+            />
+            <path
+              d="M12 16v6"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Chuvoso
+          </span>
+        </button>
+        <button
+          aria-label="Muito quente"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-thermometer h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Muito quente
+          </span>
+        </button>
+        <button
+          aria-label="Frio"
+          aria-pressed="true"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-snowflake h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m10 20-1.25-2.5L6 18"
+            />
+            <path
+              d="M10 4 8.75 6.5 6 6"
+            />
+            <path
+              d="m14 20 1.25-2.5L18 18"
+            />
+            <path
+              d="m14 4 1.25 2.5L18 6"
+            />
+            <path
+              d="m17 21-3-6h-4"
+            />
+            <path
+              d="m17 3-3 6 1.5 3"
+            />
+            <path
+              d="M2 12h6.5L10 9"
+            />
+            <path
+              d="m20 10-1.5 2 1.5 2"
+            />
+            <path
+              d="M22 12h-6.5L14 15"
+            />
+            <path
+              d="m4 10 1.5 2L4 14"
+            />
+            <path
+              d="m7 21 3-6-1.5-3"
+            />
+            <path
+              d="m7 3 3 6h4"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Frio
+          </span>
+        </button>
+        <button
+          aria-label="Ventando"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-wind h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.8 19.6A2 2 0 1 0 14 16H2"
+            />
+            <path
+              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
+            />
+            <path
+              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ventando
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Saquinho de dormir
+      </label>
+      <div
+        aria-label="Tipo de saquinho"
+        class="grid grid-cols-4 gap-1.5"
+        role="group"
+      >
+        <button
+          aria-label="Sem saquinho"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Nenhum
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Malha
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            ~0.5
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho flanelado (TOG 1–2)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Flanela
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            1–2
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho soft/fleece (TOG 2–3)"
+          aria-pressed="true"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Fleece
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            2–3
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2 overflow-hidden"
+      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
+    >
+      <div
+        class="flex items-center gap-1.5"
+      >
+        <label
+          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        >
+          TOG do saquinho
+        </label>
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-info h-3 w-3 text-muted-foreground/40"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+          />
+          <path
+            d="M12 16v-4"
+          />
+          <path
+            d="M12 8h.01"
+          />
+        </svg>
+      </div>
+      <div
+        aria-label="TOG do saquinho"
+        class="flex gap-1.5 flex-wrap"
+        role="group"
+      >
+        <button
+          aria-label="TOG 0.5"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          0.5
+        </button>
+        <button
+          aria-label="TOG 1"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          1
+        </button>
+        <button
+          aria-label="TOG 1.5"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          1.5
+        </button>
+        <button
+          aria-label="TOG 2"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          2
+        </button>
+        <button
+          aria-label="TOG 2.5"
+          aria-pressed="true"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary text-primary-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          2.5
+        </button>
+        <button
+          aria-label="TOG 3"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          3
+        </button>
+      </div>
+    </div>
+    <div
+      aria-atomic="true"
+      aria-live="polite"
+      class="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2"
+      data-motion="{"initial":{"opacity":0,"y":4},"animate":{"opacity":1,"y":0}}"
+    >
+      <div
+        class="flex items-center gap-2"
+      >
+        <div
+          class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-shirt h-3.5 w-3.5 text-primary"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"
+            />
+          </svg>
+        </div>
+        <span
+          class="text-xs font-semibold text-primary uppercase tracking-wide"
+        >
+          Sugestão de roupa
+        </span>
+      </div>
+      <div
+        class="space-y-1"
+      >
+        <p
+          class="text-xs text-muted-foreground"
+        >
+          <span
+            class="font-medium text-foreground"
+          >
+            Saquinho TOG 2.5
+          </span>
+        </p>
+        <p
+          class="text-sm font-medium text-foreground leading-snug"
+        >
+          Body manga longa + macacão
+        </p>
+      </div>
+      <div
+        class="flex items-start gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-2"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-triangle-exclamation-point lucide-alert-triangle lucide-triangle-alert h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+          />
+          <path
+            d="M12 9v4"
+          />
+          <path
+            d="M12 17h.01"
+          />
+        </svg>
+        <p
+          class="text-xs text-amber-300/90"
+        >
+          Para TOG 2.5 nesta temperatura, use como referência TOG 3
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`] = `
+<div>
+  <div
+    class="space-y-5"
+  >
+    <div
+      class="flex flex-col gap-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Temperatura do quarto
+      </label>
+      <div
+        class="flex items-center gap-3"
+      >
+        <button
+          aria-label="Diminuir temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-minus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+          </svg>
+        </button>
+        <div
+          class="flex flex-1 items-center justify-center gap-1"
+        >
+          <span
+            aria-atomic="true"
+            aria-live="polite"
+            class="text-3xl font-bold tabular-nums transition-colors text-sky-400"
+          >
+            17.0
+          </span>
+          <span
+            class="text-sm text-muted-foreground mt-1"
+          >
+            °C
+          </span>
+        </div>
+        <button
+          aria-label="Aumentar temperatura"
+          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="flex gap-1.5 flex-wrap"
+      >
+        <button
+          aria-label="Definir temperatura como 18°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          18
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 20°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          20
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 22°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          22
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 24°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          24
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 26°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          26
+          °
+        </button>
+        <button
+          aria-label="Definir temperatura como 28°C"
+          aria-pressed="false"
+          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          28
+          °
+        </button>
+        <button
+          aria-label="Limpar temperatura"
+          class="rounded-lg px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Limpar
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Clima externo
+        <span
+          class="ml-1 normal-case font-normal text-muted-foreground/50"
+        >
+          (opcional)
+        </span>
+      </label>
+      <div
+        aria-label="Condição climática"
+        class="grid grid-cols-3 gap-2"
+        role="group"
+      >
+        <button
+          aria-label="Ensolarado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-sun h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="4"
+            />
+            <path
+              d="M12 2v2"
+            />
+            <path
+              d="M12 20v2"
+            />
+            <path
+              d="m4.93 4.93 1.41 1.41"
+            />
+            <path
+              d="m17.66 17.66 1.41 1.41"
+            />
+            <path
+              d="M2 12h2"
+            />
+            <path
+              d="M20 12h2"
+            />
+            <path
+              d="m6.34 17.66-1.41 1.41"
+            />
+            <path
+              d="m19.07 4.93-1.41 1.41"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ensolarado
+          </span>
+        </button>
+        <button
+          aria-label="Nublado"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Nublado
+          </span>
+        </button>
+        <button
+          aria-label="Chuvoso"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-cloud-rain h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+            />
+            <path
+              d="M16 14v6"
+            />
+            <path
+              d="M8 14v6"
+            />
+            <path
+              d="M12 16v6"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Chuvoso
+          </span>
+        </button>
+        <button
+          aria-label="Muito quente"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-thermometer h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Muito quente
+          </span>
+        </button>
+        <button
+          aria-label="Frio"
+          aria-pressed="true"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-snowflake h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m10 20-1.25-2.5L6 18"
+            />
+            <path
+              d="M10 4 8.75 6.5 6 6"
+            />
+            <path
+              d="m14 20 1.25-2.5L18 18"
+            />
+            <path
+              d="m14 4 1.25 2.5L18 6"
+            />
+            <path
+              d="m17 21-3-6h-4"
+            />
+            <path
+              d="m17 3-3 6 1.5 3"
+            />
+            <path
+              d="M2 12h6.5L10 9"
+            />
+            <path
+              d="m20 10-1.5 2 1.5 2"
+            />
+            <path
+              d="M22 12h-6.5L14 15"
+            />
+            <path
+              d="m4 10 1.5 2L4 14"
+            />
+            <path
+              d="m7 21 3-6-1.5-3"
+            />
+            <path
+              d="m7 3 3 6h4"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Frio
+          </span>
+        </button>
+        <button
+          aria-label="Ventando"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-wind h-4 w-4"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M12.8 19.6A2 2 0 1 0 14 16H2"
+            />
+            <path
+              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
+            />
+            <path
+              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+            />
+          </svg>
+          <span
+            class="leading-tight text-center"
+          >
+            Ventando
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2"
+    >
+      <label
+        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      >
+        Saquinho de dormir
+      </label>
+      <div
+        aria-label="Tipo de saquinho"
+        class="grid grid-cols-4 gap-1.5"
+        role="group"
+      >
+        <button
+          aria-label="Sem saquinho"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Nenhum
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Malha
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            ~0.5
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho flanelado (TOG 1–2)"
+          aria-pressed="false"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Flanela
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            1–2
+          </span>
+        </button>
+        <button
+          aria-label="Saquinho soft/fleece (TOG 2–3)"
+          aria-pressed="true"
+          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <span
+            class="text-[11px] font-semibold leading-tight"
+          >
+            Fleece
+          </span>
+          <span
+            class="text-[10px] opacity-60 leading-tight"
+          >
+            TOG 
+            2–3
+          </span>
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-2 overflow-hidden"
+      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
+    >
+      <div
+        class="flex items-center gap-1.5"
+      >
+        <label
+          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        >
+          TOG do saquinho
+        </label>
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-info h-3 w-3 text-muted-foreground/40"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+          />
+          <path
+            d="M12 16v-4"
+          />
+          <path
+            d="M12 8h.01"
+          />
+        </svg>
+      </div>
+      <div
+        aria-label="TOG do saquinho"
+        class="flex gap-1.5 flex-wrap"
+        role="group"
+      >
+        <button
+          aria-label="TOG 0.5"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          0.5
+        </button>
+        <button
+          aria-label="TOG 1"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          1
+        </button>
+        <button
+          aria-label="TOG 1.5"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          1.5
+        </button>
+        <button
+          aria-label="TOG 2"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          2
+        </button>
+        <button
+          aria-label="TOG 2.5"
+          aria-pressed="true"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary text-primary-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          2.5
+        </button>
+        <button
+          aria-label="TOG 3"
+          aria-pressed="false"
+          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          3
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnvironmentPickerCompact > renders_compact_picker > calls 1`] = `
+[
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 18,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": null,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": "fleece",
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 17,
+      "sleep_sack_tog": 2.5,
+      "sleep_sack_type": null,
+      "weather_condition": "cold",
+    },
+  ],
+  [
+    {
+      "clothing_description": null,
+      "room_temp_celsius": 17,
+      "sleep_sack_tog": null,
+      "sleep_sack_type": "none",
+      "weather_condition": "cold",
+    },
+  ],
+]
+`;
+
+exports[`EnvironmentPickerCompact > renders_compact_picker > empty 1`] = `
+<div>
+  <div
+    class="space-y-3"
+  >
+    <div
+      class="flex items-center justify-between gap-2"
+    >
+      <span
+        class="text-xs text-muted-foreground"
+      >
+        Temp. do quarto
+      </span>
+      <div
+        class="flex items-center gap-2"
+      >
+        <button
+          aria-label="Diminuir temperatura"
+          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-minus h-3 w-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+          </svg>
+        </button>
+        <span
+          aria-live="polite"
+          class="w-14 text-center text-sm font-semibold tabular-nums"
+        >
+          —
+        </span>
+        <button
+          aria-label="Aumentar temperatura"
+          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus h-3 w-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+    >
+      <span
+        class="text-xs text-muted-foreground shrink-0"
+      >
+        Saquinho
+      </span>
+      <div
+        aria-label="Saquinho"
+        class="flex gap-1 flex-1"
+        role="group"
+      >
+        <button
+          aria-label="Sem saquinho"
+          aria-pressed="true"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary/20 text-primary border border-primary/30"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Nenhum
+        </button>
+        <button
+          aria-label="Saquinho de malha"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Malha
+        </button>
+        <button
+          aria-label="Saquinho flanelado"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Flanela
+        </button>
+        <button
+          aria-label="Saquinho soft/fleece"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Fleece
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`EnvironmentPickerCompact > renders_compact_picker > filled 1`] = `
+<div>
+  <div
+    class="space-y-3"
+  >
+    <div
+      class="flex items-center justify-between gap-2"
+    >
+      <span
+        class="text-xs text-muted-foreground"
+      >
+        Temp. do quarto
+      </span>
+      <div
+        class="flex items-center gap-2"
+      >
+        <button
+          aria-label="Diminuir temperatura"
+          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-minus h-3 w-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+          </svg>
+        </button>
+        <span
+          aria-live="polite"
+          class="w-14 text-center text-sm font-semibold tabular-nums"
+        >
+          17°C
+        </span>
+        <button
+          aria-label="Aumentar temperatura"
+          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus h-3 w-3"
+            fill="none"
+            height="24"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+        </button>
+        <button
+          aria-label="Limpar temperatura"
+          class="text-[10px] text-muted-foreground/50 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          type="button"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex items-center gap-2"
+    >
+      <span
+        class="text-xs text-muted-foreground shrink-0"
+      >
+        Saquinho
+      </span>
+      <div
+        aria-label="Saquinho"
+        class="flex gap-1 flex-1"
+        role="group"
+      >
+        <button
+          aria-label="Sem saquinho"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Nenhum
+        </button>
+        <button
+          aria-label="Saquinho de malha"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Malha
+        </button>
+        <button
+          aria-label="Saquinho flanelado"
+          aria-pressed="false"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Flanela
+        </button>
+        <button
+          aria-label="Saquinho soft/fleece"
+          aria-pressed="true"
+          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary/20 text-primary border border-primary/30"
+          style="touch-action: manipulation;"
+          type="button"
+        >
+          Fleece
+        </button>
+      </div>
+    </div>
+    <div
+      aria-live="polite"
+      class="overflow-hidden"
+      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
+    >
+      <div
+        class="rounded-xl bg-primary/5 border border-primary/15 px-3 py-2 flex items-start gap-2"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-shirt h-3.5 w-3.5 text-primary mt-0.5 shrink-0"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"
+          />
+        </svg>
+        <div
+          class="min-w-0"
+        >
+          <p
+            class="text-xs font-medium text-foreground leading-snug"
+          >
+            Body manga longa + macacão
+          </p>
+          <p
+            class="text-[11px] text-amber-400/80 mt-0.5 leading-snug"
+          >
+            Para TOG 2.5 nesta temperatura, use como referência TOG 3
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
