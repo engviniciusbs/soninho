@@ -36,4 +36,9 @@ describe("BabyAvatar", () => {
     expect(container.textContent).toBe("");
     expect(container.textContent).not.toMatch(EMOJI);
   });
+
+  it("home size is a real 56px circle", () => {
+    render(<BabyAvatar name="Lua" size="home" />);
+    expect(screen.getByLabelText("Lua")).toHaveClass("size-14");
+  });
 });

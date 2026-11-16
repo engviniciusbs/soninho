@@ -58,8 +58,7 @@ export function BabySwitcher() {
         <BabyAvatar
           avatarUrl={activeBaby.avatar_url}
           name={activeBaby.name}
-          size="md"
-          className="[&>span]:size-14"
+          size="home"
         />
         <span className="min-w-0 flex-1">
           <span className="block truncate font-display text-2xl leading-[1.1] font-bold text-sn-tx">

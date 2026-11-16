@@ -5,7 +5,7 @@ import { Camera } from "lucide-react";
 import { IconMoon } from "@/components/brand/icons";
 import { cn } from "@/lib/utils";
 
-type AvatarSize = "sm" | "md" | "lg";
+type AvatarSize = "sm" | "md" | "home" | "lg";
 
 interface BabyAvatarProps {
   /** URL da foto (Supabase Storage) */
@@ -15,6 +15,7 @@ interface BabyAvatarProps {
   /**
    * sm = 36px (TopBar)
    * md = 48px (listas)
+   * home = 56px (topo da home)
    * lg = 80px (formulário do bebê)
    */
   size?: AvatarSize;
@@ -29,6 +30,7 @@ interface BabyAvatarProps {
 const sizeMap: Record<AvatarSize, { box: string; px: string; initial: string; icon: number }> = {
   sm: { box: "size-9", px: "36px", initial: "text-base", icon: 18 },
   md: { box: "size-12", px: "48px", initial: "text-2xl", icon: 22 },
+  home: { box: "size-14", px: "56px", initial: "text-[26px]", icon: 26 },
   lg: { box: "size-20", px: "80px", initial: "text-4xl", icon: 34 },
 };
 

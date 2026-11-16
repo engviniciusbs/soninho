@@ -17,7 +17,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
   >
     <button
       aria-pressed="false"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -25,7 +25,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
     </button>
     <button
       aria-pressed="false"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -33,7 +33,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
     </button>
     <button
       aria-pressed="false"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -41,7 +41,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
     </button>
     <button
       aria-pressed="false"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -49,7 +49,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
     </button>
     <button
       aria-pressed="false"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -57,7 +57,7 @@ exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
     </button>
     <button
       aria-pressed="true"
-      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+      class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
       data-slot="chip"
       type="button"
     >
@@ -445,7 +445,7 @@ exports[`SleepTimer (characterization) > renders_running_session_from_store 1`] 
     >
       <button
         aria-pressed="false"
-        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
         data-slot="chip"
         type="button"
       >
@@ -453,7 +453,7 @@ exports[`SleepTimer (characterization) > renders_running_session_from_store 1`] 
       </button>
       <button
         aria-pressed="false"
-        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
         data-slot="chip"
         type="button"
       >
@@ -461,7 +461,7 @@ exports[`SleepTimer (characterization) > renders_running_session_from_store 1`] 
       </button>
       <button
         aria-pressed="false"
-        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+        class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
         data-slot="chip"
         type="button"
       >
