@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MoonOrbit } from "@/components/brand/illustrations/MoonOrbit";
 import { SunOrbit } from "@/components/brand/illustrations/SunOrbit";
 import { IconSpark } from "@/components/brand/icons";
-import { formatMinutes } from "./format";
+import { formatDuration } from "@/lib/utils";
 
 export interface NextSleepCardProps {
   kind: "NAP" | "NIGHT_SLEEP";
@@ -59,7 +59,7 @@ export function NextSleepCard({ kind, time, minutesUntil, overdue, onWhy }: Next
           time !== null &&
           minutesUntil !== null && (
             <p className="font-sans text-sm font-semibold text-sn-mu">
-              Em cerca de {formatMinutes(Math.ceil(minutesUntil))}
+              Em cerca de {formatDuration(Math.ceil(minutesUntil))}
             </p>
           )
         )}

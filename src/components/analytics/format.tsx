@@ -16,7 +16,7 @@ export function DurationFigure({ minutes }: { minutes: number }) {
   if (!text.endsWith("min")) return <>{text}</>;
   return (
     <>
-      {text.slice(0, -3)}
+      {text.slice(0, -3).trimEnd()}
       <span className="ml-px font-sans text-[0.55em] font-bold text-sn-mu">min</span>
     </>
   );

@@ -15,7 +15,7 @@ import { useNow } from "@/hooks/useNow";
 import { Card } from "@/components/ui/card";
 import { ListRow } from "@/components/ui/list-row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatMinutes } from "@/components/home/format";
+import { formatDuration } from "@/lib/utils";
 import type {
   BottleFeeding,
   BreastfeedingSession,
@@ -56,7 +56,7 @@ function describe(item: FeedingTimelineItem, at: string): { subtitle: string; va
     return {
       subtitle: sides ? `${at}, ${sides}` : at,
       value: item.endTime
-        ? formatMinutes((raw.side_left_sec + raw.side_right_sec) / 60)
+        ? formatDuration((raw.side_left_sec + raw.side_right_sec) / 60)
         : "Em andamento",
     };
   }

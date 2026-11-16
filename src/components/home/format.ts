@@ -1,12 +1,3 @@
-/** Whole minutes as "40 min", "1h 30min" or "2h" (mockup copy). */
-export function formatMinutes(total: number): string {
-  const m = Math.max(0, Math.round(total));
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  const rest = m % 60;
-  return rest === 0 ? `${h}h` : `${h}h ${rest}min`;
-}
-
 /** Wake-window bound as "3h", "1h15" or "45 min". */
 export function formatWindowBound(total: number): string {
   const m = Math.max(0, Math.round(total));

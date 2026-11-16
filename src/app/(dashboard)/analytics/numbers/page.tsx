@@ -6,6 +6,9 @@ import { StatTile } from "@/components/ui/stat-tile";
 import { IconChart, IconClock, IconMoon, IconSun, IconTrend } from "@/components/brand/icons";
 import { formatDuration } from "@/lib/utils";
 
+/** A window with nothing in it reads "Sem dados", never a 0 that looks measured (like the debt tile). */
+const NO_DATA = "Sem dados";
+
 export default function AnalyticsNumbersPage() {
   return (
     <AnalyticsDetail title="Mais números" emptyWhen="history">
@@ -14,7 +17,7 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconClock />}
             label="Sono 24h"
-            value={formatDuration(last24h.totalSleepMinutes)}
+            value={last24h.totalSleepMinutes > 0 ? formatDuration(last24h.totalSleepMinutes) : NO_DATA}
             sub={`Meta: ${formatHours(schedule.totalSleepHours)}`}
           />
           <StatTile
@@ -36,7 +39,7 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconMoon />}
             label="Média de soneca"
-            value={formatDuration(statsPeriod.avgNapDuration)}
+            value={statsPeriod.napCount > 0 ? formatDuration(statsPeriod.avgNapDuration) : NO_DATA}
             sub={`${statsPeriod.napCount} ${statsPeriod.napCount === 1 ? "soneca" : "sonecas"} em ${period} dias`}
           />
           <StatTile
@@ -48,7 +51,7 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconChart />}
             label="Maior trecho noturno"
-            value={formatDuration(last24h.longestStretch)}
+            value={last24h.longestStretch > 0 ? formatDuration(last24h.longestStretch) : NO_DATA}
             sub="Últimas 24h"
             className="col-span-2"
           />

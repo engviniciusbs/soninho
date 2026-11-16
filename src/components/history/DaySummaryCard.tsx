@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { BigNumber } from "@/components/ui/big-number";
 import { StatusPill, type StatusTone } from "@/components/ui/status-pill";
 import { SleepTimeline } from "@/components/sleep/SleepTimeline";
-import { formatMinutes } from "@/components/home/format";
+import { formatDuration } from "@/lib/utils";
 import { DAY_STATUS_LABEL, dayStatus, type DayStatus } from "@/lib/sleep/dayStatus";
 import type { SleepSession } from "@/types";
 
@@ -67,7 +67,7 @@ export function DaySummaryCard({
               <h2 id={titleId} className="font-sans text-sm font-bold text-sn-mu">
                 {title}
               </h2>
-              <BigNumber className="mt-0.5">{formatMinutes(totalMinutes)}</BigNumber>
+              <BigNumber className="mt-0.5">{formatDuration(totalMinutes)}</BigNumber>
             </div>
             {status && <StatusPill tone={TONE[status]}>{DAY_STATUS_LABEL[status]}</StatusPill>}
           </div>

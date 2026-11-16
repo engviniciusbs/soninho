@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { ListRow } from "@/components/ui/list-row";
-import { formatMinutes } from "@/components/home/format";
+import { formatDuration } from "@/lib/utils";
 import { HOW_FELL_ASLEEP_LABELS } from "@/lib/sleep/captureLabels";
 import type { SleepSession } from "@/types";
 
@@ -35,7 +35,7 @@ export function describeSleep(session: SleepSession): { title: string; subtitle:
   return {
     title: session.type === "NAP" ? "Soneca" : "Noite",
     subtitle: parts.join(", "),
-    value: minutes === null ? "Em andamento" : formatMinutes(minutes),
+    value: minutes === null ? "Em andamento" : formatDuration(minutes),
   };
 }
 

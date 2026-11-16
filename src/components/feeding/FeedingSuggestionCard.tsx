@@ -7,7 +7,7 @@ import { useBaby } from "@/components/providers/BabyProvider";
 import { Card } from "@/components/ui/card";
 import { BigNumber } from "@/components/ui/big-number";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatMinutes } from "@/components/home/format";
+import { formatDuration } from "@/lib/utils";
 import { feedingExplanation } from "@/lib/feeding/suggestionExplanation";
 
 /** "Pelo intervalo…" read in the middle of a sentence. */
@@ -56,7 +56,7 @@ export function FeedingSuggestionCard() {
           </BigNumber>
           <p className="font-sans text-sm font-semibold text-sn-mu">
             {soon
-              ? `Em cerca de ${formatMinutes(suggestion.minutesUntilSuggested)}, ${lowerFirst(explanation)}`
+              ? `Em cerca de ${formatDuration(suggestion.minutesUntilSuggested)}, ${lowerFirst(explanation)}`
               : explanation}
           </p>
         </>

@@ -21,7 +21,7 @@ import type {
   FeedingTimelineItem,
   SleepSession,
 } from "@/types";
-import { formatMinutes } from "./format";
+import { formatDuration } from "@/lib/utils";
 
 /** Enough days for the last sleep and the last 7 nights of the wake estimate. */
 const RECENT_DAYS = 8;
@@ -38,7 +38,7 @@ function feedingRow(item: FeedingTimelineItem): { subtitle: string; value?: stri
   }
   if (item.type === "BREAST") {
     const raw = item.raw as BreastfeedingSession;
-    return { subtitle: `Peito, ${at}`, value: formatMinutes((raw.side_left_sec + raw.side_right_sec) / 60) };
+    return { subtitle: `Peito, ${at}`, value: formatDuration((raw.side_left_sec + raw.side_right_sec) / 60) };
   }
   return { subtitle: `Sólidos, ${at}` };
 }
@@ -120,7 +120,7 @@ export function TodayCard({ nanny }: { nanny: boolean }) {
         <ListRow
           title="Último sono"
           subtitle={`${lastSleep.type === "NAP" ? "Soneca" : "Sono noturno"}, ${hhmm(lastSleep.start_time)} a ${hhmm(lastSleep.end_time!)}`}
-          value={formatMinutes(
+          value={formatDuration(
             (Date.parse(lastSleep.end_time!) - Date.parse(lastSleep.start_time)) / 60_000
           )}
         />

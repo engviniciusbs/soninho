@@ -7,7 +7,8 @@ import { ProgressTrack } from "@/components/ui/progress-track";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { WakeWindowStatus } from "@/lib/sleep/wakeWindows";
 import type { WakeWindowRange } from "@/types";
-import { formatMinutes, formatWindowBound } from "./format";
+import { formatWindowBound } from "./format";
+import { formatDuration } from "@/lib/utils";
 
 const STATUS: Record<WakeWindowStatus, { tone: StatusTone; label: string }> = {
   green: { tone: "ok", label: "Na janela ideal" },
@@ -57,7 +58,7 @@ export function WakeWindowCard({ elapsedMinutes, status, range, hasLastSleep, is
         <div>
           <p className="font-sans text-sm font-bold text-sn-mu">Tempo acordada</p>
           <BigNumber size="lg" className="mt-1">
-            {formatMinutes(Math.floor(elapsedMinutes))}
+            {formatDuration(Math.floor(elapsedMinutes))}
           </BigNumber>
         </div>
         <StatusPill tone={s.tone}>{s.label}</StatusPill>
