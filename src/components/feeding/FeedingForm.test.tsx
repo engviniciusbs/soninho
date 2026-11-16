@@ -83,7 +83,7 @@ describe("FeedingForm", () => {
 
   it.each(["BOTTLE", "BREAST", "SOLID"])("edit_prefills_all_fields %s", async (type) => {
     await mount(items[type]);
-    expect(screen.getByText("Editar registro")).toBeInTheDocument();
+    expect(screen.getByText("Editar alimentação")).toBeInTheDocument();
     expect(field("start_date").value).toBe("2026-01-01");
     expect(field("start_time_input").value).toBe("07:20");
     if (type === "BOTTLE") {

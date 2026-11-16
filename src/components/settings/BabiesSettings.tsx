@@ -28,11 +28,11 @@ export function BabiesSettings() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<BabyRow | null>(null);
   const [formSession, setFormSession] = useState(0);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const deleting = babies.find((b) => b.id === deleteId) ?? null;
-  // Mirrors delete_baby: the family's last baby takes the family with it.
-  const lastOfFamily =
-    !!deleting?.family_id && babies.filter((b) => b.family_id === deleting.family_id).length === 1;
+  // The baby is kept whole while the dialog is up (and while it animates out):
+  // the list refetches after the deletion and would otherwise rewrite the text.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<{ baby: BabyRow; lastOfFamily: boolean } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   function openForm(baby: BabyRow | null) {
     setEditing(baby);
@@ -40,9 +40,23 @@ export function BabiesSettings() {
     setFormOpen(true);
   }
 
-  async function handleDelete(id: string) {
-    await remove(id);
-    setDeleteId(null);
+  function askDelete(baby: BabyRow) {
+    // Mirrors delete_baby: the family's last baby takes the family with it.
+    const lastOfFamily =
+      !!baby.family_id && babies.filter((b) => b.family_id === baby.family_id).length === 1;
+    setToDelete({ baby, lastOfFamily });
+    setDeleteOpen(true);
+  }
+
+  async function handleDelete() {
+    if (!toDelete || deleting) return;
+    setDeleting(true);
+    try {
+      await remove(toDelete.baby.id);
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
+    }
   }
 
   if (isLoading) {
@@ -89,7 +103,7 @@ export function BabiesSettings() {
                           variant="icon"
                           size="icon"
                           className="text-sn-danger"
-                          onClick={() => setDeleteId(baby.id)}
+                          onClick={() => askDelete(baby)}
                           aria-label={`Excluir ${baby.name}`}
                         >
                           <IconTrash size={20} />
@@ -116,27 +130,28 @@ export function BabiesSettings() {
         session={formSession}
       />
 
-      <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="rounded-2xl">
+      <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Excluir bebê</DialogTitle>
             <DialogDescription>
-              Todos os registros de sono e alimentação de {deleting?.name ?? "este bebê"} serão
-              excluídos permanentemente.
-              {lastOfFamily &&
-                " Como é o último bebê da família, a família, os convites e os recados também serão excluídos."}{" "}
+              Todos os registros de sono e alimentação{" "}
+              {toDelete ? `de ${toDelete.baby.name}` : "deste bebê"} serão excluídos permanentemente.
+              {toDelete?.lastOfFamily &&
+                " Como é o último bebê da família, a família, os convites e os recados também serão excluídos, e as outras pessoas da família perdem o acesso."}{" "}
               Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setDeleteId(null)}>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={deleting}
+              onClick={() => setDeleteOpen(false)}
+            >
               Cancelar
             </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => deleteId && handleDelete(deleteId)}
-            >
+            <Button variant="destructive" size="sm" loading={deleting} onClick={handleDelete}>
               Excluir
             </Button>
           </DialogFooter>

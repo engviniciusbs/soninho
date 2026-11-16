@@ -1,7 +1,7 @@
 "use client"
 
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { IconAlert, IconCheck, IconInfo, IconX } from "@/components/brand/icons"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
@@ -9,27 +9,22 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme="dark"
       className="toaster group"
       icons={{
-        success: (
-          <CircleCheckIcon className="size-4" />
-        ),
-        info: (
-          <InfoIcon className="size-4" />
-        ),
-        warning: (
-          <TriangleAlertIcon className="size-4" />
-        ),
-        error: (
-          <OctagonXIcon className="size-4" />
-        ),
+        success: <IconCheck size={16} className="text-sn-ok" />,
+        info: <IconInfo size={16} className="text-sn-pr" />,
+        warning: <IconAlert size={16} className="text-sn-warn" />,
+        error: <IconX size={16} className="text-sn-danger" />,
         loading: (
-          <Loader2Icon className="size-4 animate-spin" />
+          <span
+            aria-hidden="true"
+            className="block size-4 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none"
+          />
         ),
       }}
       style={
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-bg": "var(--sn-s1)",
+          "--normal-text": "var(--sn-tx)",
+          "--normal-border": "var(--sn-bd)",
           "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }

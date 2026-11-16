@@ -179,7 +179,7 @@ describe("HistoryPage", () => {
     expect(summary.querySelector("[data-slot=status-pill]")).toBeNull();
     const list = screen.getByRole("list", { name: "Sonos do dia" });
     expect(within(list).getByRole("button", { name: /Soneca.*10:00 a 10:40, adormeceu no colo.*40 min/ })).toBeInTheDocument();
-    expect(within(list).getByRole("button", { name: /Noite.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
+    expect(within(list).getByRole("button", { name: /Sono noturno.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
     expect(list.textContent).not.toContain("·");
   });
 
@@ -203,7 +203,7 @@ describe("HistoryPage", () => {
     const list = await screen.findByRole("list", { name: "Sonos do dia" });
     const rows = within(list).getAllByRole("button");
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent("Noite");
+    expect(rows[0]).toHaveTextContent("Sono noturno");
     expect(screen.getByRole("button", { name: "Noite" })).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -228,7 +228,7 @@ describe("HistoryPage", () => {
     const list = await screen.findByRole("list", { name: "Sonos do dia" });
     fireEvent.click(within(list).getByRole("button", { name: /Soneca/ }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Editar registro")).toBeInTheDocument();
+    expect(within(dialog).getByText("Editar sono")).toBeInTheDocument();
     expect((document.getElementById("start_time_input") as HTMLInputElement).value).toBe("10:00");
     expect((document.getElementById("end_time_input") as HTMLInputElement).value).toBe("10:40");
 
@@ -280,7 +280,7 @@ describe("HistoryPage", () => {
     expect(summary).not.toHaveTextContent("0 min");
     const list = screen.getByRole("list", { name: "Sonos do dia" });
     // Still running: not editable here, the row opens the home instead.
-    const row = within(list).getByRole("link", { name: /Noite.*23:00 até agora.*Em andamento/ });
+    const row = within(list).getByRole("link", { name: /Sono noturno.*23:00 até agora.*Em andamento/ });
     expect(row).toHaveAttribute("href", "/app");
     fireEvent.click(row);
     expect(screen.queryByRole("dialog")).toBeNull();

@@ -37,3 +37,37 @@ describe("copy sweep", () => {
     expect(hits).toEqual([]);
   });
 });
+
+/** Every non-test source file under `dir` (absolute), skipping the given folder names. */
+function filesUnder(dir: string, skip: string[]): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) {
+      if (name === "__snapshots__" || skip.includes(name)) return [];
+      return filesUnder(full, skip);
+    }
+    if (!/\.tsx?$/.test(name) || /\.test\.tsx?$/.test(name)) return [];
+    return [full];
+  });
+}
+
+describe("redesign leftovers (spec #21)", () => {
+  it("no lucide-react in components or logged-in screens (landing, auth and invite stay out)", () => {
+    const files = [
+      ...filesUnder(join(SRC, "components"), ["landing"]),
+      ...filesUnder(join(SRC, "app", "(dashboard)"), []),
+    ];
+    const hits = files
+      .filter((f) => /from ["']lucide-react["']/.test(readFileSync(f, "utf8")))
+      .map((f) => relative(SRC, f));
+    expect(hits).toEqual([]);
+  });
+
+  it("the notes board is 'Recados' everywhere: no 'mural' or 'equipe' on screen", () => {
+    const hits = sourceFiles(SRC)
+      .filter((f) => !f.includes(join("lib", "supabase")))
+      .filter((f) => /\b(mural|equipe)\b/i.test(readFileSync(f, "utf8").replace(/^\s*(\/\/|\/\*|\*).*$/gm, "")))
+      .map((f) => relative(SRC, f));
+    expect(hits).toEqual([]);
+  });
+});

@@ -24,7 +24,6 @@ export function TogSelector({
             aria-label={`TOG ${formatDecimal(t)}`}
             selected={value === t}
             onClick={() => onSelect(t)}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(t); }}
           >
             {formatDecimal(t)}
           </Chip>

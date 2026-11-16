@@ -59,3 +59,21 @@ describe("BabyProfileForm sex field", () => {
     expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ id: "b1", sex: null }));
   });
 });
+
+describe("BabyProfileForm in the design system (spec #21)", () => {
+  it("every field is tied to its visible label", () => {
+    open(lia);
+    expect(screen.getByLabelText("Nome")).toHaveValue("Lia");
+    expect(screen.getByLabelText("Data de nascimento")).toHaveValue("2026-02-10");
+    const group = screen.getByRole("radiogroup", { name: "Sexo" });
+    const label = screen.getByText("Sexo");
+    expect(label).not.toHaveAttribute("aria-hidden");
+    expect(group).toHaveAttribute("aria-labelledby", label.id);
+  });
+
+  it("the title follows the pattern of the other forms", () => {
+    open(null);
+    const title = screen.getByRole("heading", { name: "Adicionar bebê" });
+    expect(title).toHaveClass("font-display");
+  });
+});

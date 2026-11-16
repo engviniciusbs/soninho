@@ -96,7 +96,7 @@ export function FamilyNoteCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mural da família</CardTitle>
+        <CardTitle>Recados da família</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {canWrite && (
@@ -106,7 +106,7 @@ export function FamilyNoteCard() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               maxLength={500}
-              placeholder="Deixe um recado para a equipe…"
+              placeholder="Deixe um recado para a família…"
               className="h-11 min-w-0 flex-1 rounded-full border border-sn-mu/70 bg-sn-s2/60 px-4 font-sans text-base text-sn-tx outline-none placeholder:text-sn-mu focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
               aria-label="Novo recado"
             />
@@ -124,8 +124,8 @@ export function FamilyNoteCard() {
 
         {data.data.length === 0 ? (
           <p className="text-base text-sn-mu">
-            Nenhum recado ainda. Use o mural para combinar a rotina entre os
-            cuidadores.
+            Nenhum recado ainda. Use os recados para combinar a rotina entre
+            quem cuida do bebê.
           </p>
         ) : (
           <ul className="space-y-3">

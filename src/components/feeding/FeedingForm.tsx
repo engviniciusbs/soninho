@@ -146,11 +146,9 @@ const FIELD = "h-11 rounded-xl border-sn-mu/70 px-3";
 export function FeedingForm({ open, onClose, item, onDelete }: FeedingFormProps) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-[22px] leading-tight font-bold text-sn-tx">
-            {item ? "Editar registro" : "Registrar mamada passada"}
-          </DialogTitle>
+          <DialogTitle>{item ? "Editar alimentação" : "Registrar mamada passada"}</DialogTitle>
         </DialogHeader>
 
         {/* The popup's content mounts on every opening, so the form starts

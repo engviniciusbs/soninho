@@ -314,3 +314,27 @@ export const IconShirt = make(
 );
 
 export const IconX = make("IconX", <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" />);
+
+export const IconCamera = make(
+  "IconCamera",
+  <>
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.5-2.5h5.4L16.2 7h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z" />
+    <circle cx="12" cy="12.75" r="3.25" />
+  </>
+);
+
+export const IconLeaf = make(
+  "IconLeaf",
+  <>
+    <path d="M5 19c0-8 4.5-13.5 14-14 .5 9.5-5 14-12 14H5Z" />
+    <path d="M5 19c3-4 6-6.5 9.5-8.5" />
+  </>
+);
+
+export const IconInfo = make(
+  "IconInfo",
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 11v5.5M12 7.5v.01" />
+  </>
+);

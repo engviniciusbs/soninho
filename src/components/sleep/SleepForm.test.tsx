@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { renderWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
@@ -77,18 +78,21 @@ describe("SleepForm", () => {
 
   it("edit_prefills_all_fields", async () => {
     await mount(session);
-    expect(screen.getByText("Editar registro")).toBeInTheDocument();
+    expect(screen.getByText("Editar sono")).toBeInTheDocument();
     expect(field("start_date").value).toBe("2025-12-31");
     expect(field("start_time_input").value).toBe("20:30");
     expect(field("end_date").value).toBe("2026-01-01");
     expect(field("end_time_input").value).toBe("06:15");
-    expect(field("location").value).toBe("berço");
     expect(field("notes").value).toBe("acordou uma vez");
     // Closed selects show the label of the value (`items` mapping).
     expect(
-      within(screen.getByLabelText("Tipo de sono")).getByRole("radio", { name: "Noite" })
+      within(screen.getByLabelText("Tipo de sono")).getByRole("radio", { name: "Noturno" })
     ).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByLabelText("Qualidade do sono")).toHaveTextContent("4 de 5");
+    expect(
+      within(screen.getByRole("radiogroup", { name: "Qualidade do sono" })).getByRole("radio", {
+        name: "4 de 5 estrelas",
+      })
+    ).toHaveAttribute("aria-checked", "true");
     expect(screen.getByLabelText("Como adormeceu")).toHaveTextContent("No colo");
     expect(screen.getByLabelText("Motivo do despertar")).toHaveTextContent("Fome");
     expect(screen.getByText("1 preenchido")).toBeInTheDocument();
@@ -97,28 +101,27 @@ describe("SleepForm", () => {
 
   it("reopen_starts_from_fresh_values", async () => {
     const { rerender } = await mount();
-    change("location", "colo");
+    change("notes", "rascunho");
     fireEvent.click(screen.getByRole("button", { name: "Condições do ambiente" }));
     rerender(<SleepForm open={false} onClose={onClose} session={null} />);
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     vi.setSystemTime(new Date("2026-01-01T13:30:00.000Z"));
     rerender(<SleepForm open onClose={onClose} session={null} />);
     await screen.findByRole("dialog");
-    expect(field("location").value).toBe("");
+    expect(field("notes").value).toBe("");
     expect(field("start_time_input").value).toBe("10:30");
     expect(screen.getByRole("button", { name: "Condições do ambiente" })).toHaveAttribute("aria-expanded", "false");
     rerender(<SleepForm open={false} onClose={onClose} session={null} />);
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     rerender(<SleepForm open onClose={onClose} session={session} />);
     await screen.findByRole("dialog");
-    expect(field("location").value).toBe("berço");
+    expect(field("notes").value).toBe("acordou uma vez");
   });
 
   it("create_submits_same_payload", async () => {
     await mount();
     change("start_time_input", "07:10");
     change("end_time_input", "08:40");
-    change("location", "carrinho");
     submit();
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(sb.chains).toEqual([
@@ -136,7 +139,6 @@ describe("SleepForm", () => {
                 how_fell_asleep: null,
                 wake_reason: null,
                 notes: null,
-                location: "carrinho",
                 room_temp_celsius: null,
                 weather_condition: null,
                 sleep_sack_type: null,
@@ -170,11 +172,12 @@ describe("SleepForm", () => {
           how_fell_asleep: "colo",
           wake_reason: "fome",
           notes: null,
-          location: "berço",
           room_temp_celsius: 22,
         }),
       ],
     ]);
+    // The free "Local" field left the form: an edit keeps the stored column.
+    expect(sb.chains[0].ops[0][1][0]).not.toHaveProperty("location");
     expect(sb.chains[0].ops[1]).toEqual(["eq", ["id", "s-1"]]);
   });
 
@@ -233,6 +236,48 @@ describe("SleepForm", () => {
     // ...and making it invalid again sets it, without submitting.
     change("end_date", "2025-12-30");
     expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
+  });
+
+  describe("redesign leftovers and keyboard (spec #21, #22)", () => {
+    it("Enter on 'Condições do ambiente' opens the section once", async () => {
+      await mount();
+      const toggle = screen.getByRole("button", { name: "Condições do ambiente" });
+      toggle.focus();
+      await userEvent.keyboard("{Enter}");
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
+      expect(screen.getByText("Temperatura do quarto")).toBeInTheDocument();
+    });
+
+    it("has no free 'Local' field (it duplicated 'Como adormeceu?')", async () => {
+      await mount(session);
+      expect(field("location")).toBeNull();
+      expect(screen.queryByText("Local")).toBeNull();
+    });
+
+    it("quality uses the stars: tapping the checked star clears it", async () => {
+      await mount(session);
+      fireEvent.click(screen.getByRole("radio", { name: "4 de 5 estrelas" }));
+      submit();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(sb.chains[0].ops[0][1][0]).toMatchObject({ quality: null });
+    });
+
+    it("the selects can be cleared with 'Não informar'", async () => {
+      await mount(session);
+      const placeholders = {
+        "Como adormeceu": "Como adormeceu? (opcional)",
+        "Motivo do despertar": "Por que acordou? (opcional)",
+      };
+      for (const [name, placeholder] of Object.entries(placeholders)) {
+        fireEvent.click(screen.getByLabelText(name));
+        const options = await screen.findAllByRole("option", { name: "Não informar" });
+        await userEvent.click(options[options.length - 1]);
+        await waitFor(() => expect(screen.getByLabelText(name)).toHaveTextContent(placeholder));
+      }
+      submit();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(sb.chains[0].ops[0][1][0]).toMatchObject({ how_fell_asleep: null, wake_reason: null });
+    });
   });
 
   describe("refreshes the sleep screens (spec #14)", () => {

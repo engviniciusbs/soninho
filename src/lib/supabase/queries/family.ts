@@ -166,7 +166,7 @@ export async function updateMemberRole(
     .select("id");
 }
 
-// ── Family notes (mural / handoff) ──────────────────────────────────────────
+// ── Family notes (recados / handoff) ──────────────────────────────────────────
 
 export async function getFamilyNotes(
   supabase: Client,

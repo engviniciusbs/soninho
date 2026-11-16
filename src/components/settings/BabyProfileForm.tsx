@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -41,6 +41,9 @@ const SEX_OPTIONS: SegmentedOption<SexChoice>[] = [
   { value: "N", label: "Não informar" },
 ];
 
+const LABEL = "font-sans text-sm font-bold text-sn-mu";
+const FIELD = "h-11 rounded-xl border-sn-mu/70 px-3";
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -54,7 +57,7 @@ interface Props {
 export function BabyProfileForm({ open, onOpenChange, baby, session }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-2xl max-w-md">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{baby ? "Editar bebê" : "Adicionar bebê"}</DialogTitle>
         </DialogHeader>
@@ -66,6 +69,9 @@ export function BabyProfileForm({ open, onOpenChange, baby, session }: Props) {
 
 function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const nameId = useId();
+  const sexLabelId = useId();
+  const birthId = useId();
   const { save, uploadAvatar, isSaving, isUploading } = useBabySettings();
   const {
     control,
@@ -108,7 +114,7 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
     <>
       <div className="space-y-4">
         {/* Avatar upload area */}
-        <div className="flex flex-col items-center gap-2 py-2">
+        <div className="flex flex-col items-center gap-2 py-1">
           <BabyAvatar
             avatarUrl={avatarUrl}
             name={name}
@@ -117,17 +123,19 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
             uploading={isUploading}
             onUploadClick={() => fileInputRef.current?.click()}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="font-sans text-sm font-semibold text-sn-mu">
             {avatarUrl ? "Toque para alterar a foto" : "Toque para adicionar uma foto"}
           </p>
           {avatarUrl && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="xs"
+              className="text-sn-danger hover:bg-sn-danger/10"
               onClick={() => setValue("avatar_url", null)}
-              className="text-xs text-destructive hover:underline"
             >
               Remover foto
-            </button>
+            </Button>
           )}
           <input
             ref={fileInputRef}
@@ -143,21 +151,27 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
           />
         </div>
 
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => (
-            <Input
-              placeholder="Nome do bebê"
-              value={field.value}
-              onChange={field.onChange}
-              className="rounded-xl"
-              autoComplete="off"
-            />
-          )}
-        />
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground" aria-hidden="true">
+          <label htmlFor={nameId} className={LABEL}>
+            Nome
+          </label>
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <Input
+                id={nameId}
+                placeholder="Nome do bebê"
+                value={field.value}
+                onChange={field.onChange}
+                className={FIELD}
+                autoComplete="off"
+              />
+            )}
+          />
+        </div>
+        <div className="space-y-1">
+          <p id={sexLabelId} className={LABEL}>
             Sexo
           </p>
           <Controller
@@ -165,7 +179,7 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
             name="sex"
             render={({ field }) => (
               <SegmentedControl
-                aria-label="Sexo"
+                aria-labelledby={sexLabelId}
                 size="sm"
                 options={SEX_OPTIONS}
                 value={field.value}
@@ -175,27 +189,30 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
           />
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Data de nascimento</label>
+          <label htmlFor={birthId} className={LABEL}>
+            Data de nascimento
+          </label>
           <Controller
             control={control}
             name="birth_date"
             render={({ field }) => (
               <Input
+                id={birthId}
                 type="date"
                 value={field.value}
                 onChange={field.onChange}
-                className="rounded-xl"
+                className={FIELD}
               />
             )}
           />
         </div>
       </div>
-      <DialogFooter className="gap-2">
-        <Button variant="outline" onClick={onDone} className="rounded-xl">
+      <DialogFooter>
+        <Button type="button" variant="secondary" size="sm" onClick={onDone}>
           Cancelar
         </Button>
-        <Button onClick={onSubmit} disabled={saving || isUploading} className="rounded-xl">
-          {saving ? "Salvando..." : "Salvar"}
+        <Button type="button" size="sm" onClick={onSubmit} loading={saving} disabled={isUploading}>
+          Salvar
         </Button>
       </DialogFooter>
     </>

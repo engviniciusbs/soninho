@@ -5,7 +5,7 @@ export const FAMILY_RELATIONS = [
   { value: "avo", label: "Avô" },
   { value: "ava", label: "Avó" },
   { value: "irmao", label: "Irmão" },
-  { value: "irma", label: "Irma" },
+  { value: "irma", label: "Irmã" },
   { value: "tio", label: "Tio" },
   { value: "tia", label: "Tia" },
   { value: "padrinho", label: "Padrinho" },
@@ -40,6 +40,6 @@ export function getActorDisplayLabel(
 
 export const PERMISSION_ROLE_LABELS = {
   owner: "Administrador(a)",
-  caregiver: "Pode registrar sono",
+  caregiver: "Pode registrar sono e alimentação",
   viewer: "Só visualizar",
 } as const;

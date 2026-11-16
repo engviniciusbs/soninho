@@ -325,7 +325,7 @@ describe("FeedingPage", () => {
     const today = await screen.findByRole("region", { name: "Hoje" });
     fireEvent.click(within(today).getByRole("button", { name: /Mamadeira.*06:30.*180 ml/ }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Editar registro")).toBeInTheDocument();
+    expect(within(dialog).getByText("Editar alimentação")).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: "Excluir" }));
     expect(deleteBottleFeeding).not.toHaveBeenCalled();
     await act(async () => {

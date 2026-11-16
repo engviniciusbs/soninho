@@ -27,7 +27,6 @@ export function WeatherSelector({
               aria-pressed={isActive}
               aria-label={label}
               onClick={() => onSelect(wv)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(wv); }}
               className={cn(TILE, isActive ? TILE_ON : TILE_OFF)}
             >
               <Icon size={20} className={isActive ? "text-sn-pr" : undefined} />

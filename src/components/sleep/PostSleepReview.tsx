@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Star } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,11 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
+import { StarRating } from "@/components/ui/star-rating";
 import { createClient } from "@/lib/supabase/client";
 import { updateSleepSession } from "@/lib/supabase/queries/sleep";
 import { howFellAsleepOptions, wakeReasonOptions } from "@/lib/sleep/captureLabels";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { HowFellAsleep, WakeReason } from "@/types";
 
@@ -36,6 +35,7 @@ export function PostSleepReview({
   const supabase = createClient();
   const queryClient = useQueryClient();
   const sex = useBaby().activeBaby?.sex;
+  const qualityLabelId = useId();
 
   const [quality, setQuality] = useState<number | null>(null);
   const [howFellAsleep, setHowFellAsleep] = useState<HowFellAsleep | null>(null);
@@ -87,9 +87,9 @@ export function PostSleepReview({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border-sn-bd bg-sn-s1">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-[22px] font-bold">Como foi o sono?</DialogTitle>
+          <DialogTitle>Como foi o sono?</DialogTitle>
           <DialogDescription>
             Opcional. Esses detalhes ajudam a IA a entender o padrão do bebê.
           </DialogDescription>
@@ -98,31 +98,15 @@ export function PostSleepReview({
         <div className="space-y-5 pt-1">
           {/* Quality */}
           <div className="space-y-2">
-            <p className="font-sans text-sm font-bold text-sn-mu">Qualidade do sono</p>
-            <div className="flex items-center gap-0.5">
-              {[1, 2, 3, 4, 5].map((q) => {
-                const active = quality != null && q <= quality;
-                return (
-                  <button
-                    key={q}
-                    type="button"
-                    onClick={() => setQuality(q === quality ? null : q)}
-                    aria-label={`${q} de 5 estrelas`}
-                    aria-pressed={active}
-                    className="grid size-11 cursor-pointer place-items-center rounded-full outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
-                  >
-                    <Star
-                      className={cn(
-                        "size-7",
-                        active ? "fill-sn-pr text-sn-pr" : "text-sn-mu"
-                      )}
-                      strokeWidth={1.8}
-                      aria-hidden="true"
-                    />
-                  </button>
-                );
-              })}
-            </div>
+            <p id={qualityLabelId} className="font-sans text-sm font-bold text-sn-mu">
+              Qualidade do sono
+            </p>
+            <StarRating
+              label="Qualidade do sono"
+              labelledBy={qualityLabelId}
+              value={quality}
+              onChange={setQuality}
+            />
           </div>
 
           {/* How fell asleep */}

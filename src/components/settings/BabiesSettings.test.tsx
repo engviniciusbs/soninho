@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BabyContext, type BabyContextValue } from "@/components/providers/BabyProvider";
 import { renderWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
 import type { Baby } from "@/types";
@@ -60,11 +62,50 @@ describe("BabiesSettings", () => {
     ).toBeInTheDocument();
     // Lia is the only baby of fam-F: the family goes too.
     expect(screen.getByText(/a família, os convites e os recados também/i)).toBeInTheDocument();
+    expect(screen.getByText(/as outras pessoas da família perdem o acesso/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
     await vi.waitFor(() =>
       expect(sb.find("rpc:delete_baby")[0]?.ops).toEqual([["rpc", [{ p_baby_id: "b-1" }]]])
     );
     expect(sb.find("babies", "delete")).toHaveLength(0);
+  });
+
+  it("a double click on Excluir deletes once: the button is busy while it runs", async () => {
+    setup([lia, theo]);
+    fireEvent.click(await screen.findByRole("button", { name: "Excluir Lia" }));
+    const confirm = await screen.findByRole("button", { name: "Excluir" });
+    fireEvent.click(confirm);
+    expect(confirm).toBeDisabled();
+    expect(confirm).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(confirm);
+    await vi.waitFor(() => expect(sb.find("rpc:delete_baby")).toHaveLength(1));
+    await new Promise((r) => setTimeout(r, 0));
+    expect(sb.find("rpc:delete_baby")).toHaveLength(1);
+  });
+
+  it("the dialog keeps the baby it opened for when the list changes under it", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const ctx = (babies: Baby[]): BabyContextValue => ({
+      babies,
+      activeBaby: babies[0] ?? null,
+      setActiveBaby: () => {},
+      isLoading: false,
+    });
+    const tree = (babies: Baby[]) => (
+      <QueryClientProvider client={client}>
+        <BabyContext.Provider value={ctx(babies)}>
+          <BabiesSettings />
+        </BabyContext.Provider>
+      </QueryClientProvider>
+    );
+    const { rerender } = render(tree([lia, theo]));
+    fireEvent.click(await screen.findByRole("button", { name: "Excluir Lia" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(/alimentação de Lia/);
+    // Lia leaves the list (the deletion refetched it) while the dialog closes.
+    rerender(tree([theo]));
+    expect(dialog).toHaveTextContent(/alimentação de Lia/);
+    expect(dialog).not.toHaveTextContent(/este bebê/);
   });
 });

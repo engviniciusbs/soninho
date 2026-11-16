@@ -43,7 +43,7 @@ export function describeSleep(
     session.duration_min ??
     (session.end_time ? (Date.parse(session.end_time) - Date.parse(session.start_time)) / 60_000 : null);
   return {
-    title: session.type === "NAP" ? "Soneca" : "Noite",
+    title: session.type === "NAP" ? "Soneca" : "Sono noturno",
     subtitle: parts.join(", "),
     value: minutes === null ? "Em andamento" : formatDuration(minutes),
   };

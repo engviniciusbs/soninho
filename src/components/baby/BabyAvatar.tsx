@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Camera } from "lucide-react";
-import { IconMoon } from "@/components/brand/icons";
+import { IconCamera, IconMoon } from "@/components/brand/icons";
 import { cn } from "@/lib/utils";
 
 type AvatarSize = "sm" | "md" | "home" | "lg";
@@ -106,7 +105,7 @@ export function BabyAvatar({
           className={cn(
             circle,
             "group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none",
-            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr",
             "disabled:cursor-not-allowed disabled:opacity-50"
           )}
         >
@@ -115,7 +114,7 @@ export function BabyAvatar({
             aria-hidden="true"
             className="absolute inset-0 flex items-center justify-center rounded-full bg-sn-bg/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
           >
-            <Camera className="size-5 text-sn-tx" strokeWidth={1.8} />
+            <IconCamera size={20} className="text-sn-tx" />
           </span>
         </button>
       ) : avatarUrl ? (
