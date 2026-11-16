@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import {
@@ -12,6 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
 import { createClient } from "@/lib/supabase/client";
 import { updateSleepSession } from "@/lib/supabase/queries/sleep";
 import {
@@ -88,42 +88,39 @@ export function PostSleepReview({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border-sn-bd bg-sn-s1">
         <DialogHeader>
-          <DialogTitle>Como foi o sono?</DialogTitle>
+          <DialogTitle className="font-display text-[22px] font-bold">Como foi o sono?</DialogTitle>
           <DialogDescription>
-            Opcional — esses detalhes ajudam a IA a entender melhor o padrão do
-            bebê.
+            Opcional. Esses detalhes ajudam a IA a entender o padrão do bebê.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 pt-1">
           {/* Quality */}
           <div className="space-y-2">
-            <p className="text-sm font-medium">Qualidade do sono</p>
-            <div className="flex items-center gap-1.5">
+            <p className="font-sans text-sm font-bold text-sn-mu">Qualidade do sono</p>
+            <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((q) => {
                 const active = quality != null && q <= quality;
                 return (
-                  <motion.button
+                  <button
                     key={q}
                     type="button"
-                    whileTap={{ scale: 0.85 }}
                     onClick={() => setQuality(q === quality ? null : q)}
                     aria-label={`${q} de 5 estrelas`}
                     aria-pressed={active}
-                    className="rounded-lg p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="grid size-11 cursor-pointer place-items-center rounded-full outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
                   >
                     <Star
                       className={cn(
-                        "h-7 w-7 transition-colors",
-                        active
-                          ? "fill-amber-400 text-amber-400"
-                          : "text-muted-foreground/40"
+                        "size-7",
+                        active ? "fill-sn-pr text-sn-pr" : "text-sn-mu"
                       )}
+                      strokeWidth={1.8}
                       aria-hidden="true"
                     />
-                  </motion.button>
+                  </button>
                 );
               })}
             </div>
@@ -131,28 +128,18 @@ export function PostSleepReview({
 
           {/* How fell asleep */}
           <div className="space-y-2">
-            <p className="text-sm font-medium">Como adormeceu?</p>
+            <p className="font-sans text-sm font-bold text-sn-mu">Como adormeceu?</p>
             <div className="flex flex-wrap gap-2">
               {HOW_FELL_ASLEEP_OPTIONS.map((opt) => {
                 const active = howFellAsleep === opt.value;
                 return (
-                  <button
+                  <Chip
                     key={opt.value}
-                    type="button"
-                    onClick={() =>
-                      setHowFellAsleep(active ? null : opt.value)
-                    }
-                    aria-pressed={active}
-                    className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      active
-                        ? "bg-primary text-primary-foreground"
-                        : "surface-soft text-muted-foreground hover:text-foreground"
-                    )}
+                    selected={active}
+                    onClick={() => setHowFellAsleep(active ? null : opt.value)}
                   >
-                    <span aria-hidden="true">{opt.emoji}</span>
                     {opt.label}
-                  </button>
+                  </Chip>
                 );
               })}
             </div>
@@ -161,28 +148,18 @@ export function PostSleepReview({
           {/* Wake reason — night sleep only */}
           {isNight && (
             <div className="space-y-2">
-              <p className="text-sm font-medium">Por que acordou?</p>
+              <p className="font-sans text-sm font-bold text-sn-mu">Por que acordou?</p>
               <div className="flex flex-wrap gap-2">
                 {WAKE_REASON_OPTIONS.map((opt) => {
                   const active = wakeReason === opt.value;
                   return (
-                    <button
+                    <Chip
                       key={opt.value}
-                      type="button"
-                      onClick={() =>
-                        setWakeReason(active ? null : opt.value)
-                      }
-                      aria-pressed={active}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                        active
-                          ? "bg-primary text-primary-foreground"
-                          : "surface-soft text-muted-foreground hover:text-foreground"
-                      )}
+                      selected={active}
+                      onClick={() => setWakeReason(active ? null : opt.value)}
                     >
-                      <span aria-hidden="true">{opt.emoji}</span>
                       {opt.label}
-                    </button>
+                    </Chip>
                   );
                 })}
               </div>
@@ -193,18 +170,18 @@ export function PostSleepReview({
             <Button
               type="button"
               variant="ghost"
+              size="md"
               onClick={handleClose}
-              className="rounded-xl"
             >
               Pular
             </Button>
             <Button
               type="button"
+              size="md"
               onClick={handleSave}
-              disabled={saving}
-              className="rounded-xl"
+              loading={saving}
             >
-              {saving ? "Salvando…" : "Salvar"}
+              Salvar
             </Button>
           </div>
         </div>

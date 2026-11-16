@@ -473,7 +473,7 @@ exports[`SleepForm > edit_prefills_all_fields > edit 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -1000,7 +1000,7 @@ exports[`SleepForm > renders_create > create 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>

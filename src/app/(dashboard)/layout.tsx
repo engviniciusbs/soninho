@@ -26,7 +26,7 @@ export default function DashboardLayout({
               {/* Coluna de uso: ~480px, centralizada também no desktop (spec §8.2). */}
               <div className="mx-auto w-full max-w-[480px] px-4 pb-32 md:pb-12">
                 {/* Seletor de bebê e sono em andamento ficam presos no topo ao rolar. */}
-                <div className="sticky top-0 z-30 -mx-4 bg-sn-bg px-4 pb-3">
+                <div className="sticky top-0 z-30 -mx-4 bg-sn-bg px-4 pb-3 empty:hidden">
                   <TopBar />
                   <MiniTimerBar />
                 </div>

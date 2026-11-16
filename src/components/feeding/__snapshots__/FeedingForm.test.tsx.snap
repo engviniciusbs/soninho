@@ -354,7 +354,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -731,7 +731,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -1219,7 +1219,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -1586,7 +1586,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -1960,7 +1960,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>
@@ -2429,7 +2429,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
         <span
           class="sr-only"
         >
-          Close
+          Fechar
         </span>
       </button>
     </div>

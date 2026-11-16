@@ -1,0 +1,435 @@
+// @vitest-environment jsdom
+import "@testing-library/jest-dom/vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactElement } from "react";
+import { createFakeSupabase, type FakeSupabase } from "@/test/fakeSupabase";
+import { BabyContext, type BabyContextValue } from "@/components/providers/BabyProvider";
+import {
+  UserProfileContext,
+  type UserProfileContextValue,
+} from "@/components/providers/UserProfileProvider";
+import { EMPTY_SLEEP_DRAFT, SLEEP_STORE_VERSION, useSleepStore } from "@/store/sleepStore";
+import type { AISuggestion, Baby, FeedingTimelineItem, SleepSession } from "@/types";
+import AppHomePage from "@/app/(dashboard)/app/page";
+
+const holder = vi.hoisted(() => ({
+  client: null as unknown,
+  ai: undefined as unknown,
+  lastSession: null as unknown,
+  recent: {} as Record<string, unknown[]>,
+  feedings: {} as Record<string, unknown[]>,
+  regression: null as unknown,
+  notes: null as unknown,
+  toasts: vi.fn(),
+}));
+
+vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
+vi.mock("@/lib/supabase/queries/sleep", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/supabase/queries/sleep")>()),
+  getLastSleepSession: vi.fn(async () => ({ data: holder.lastSession, error: null })),
+  getRecentSessions: vi.fn(async (_c: unknown, babyId: string) => ({
+    data: holder.recent[babyId] ?? [],
+    error: null,
+  })),
+}));
+vi.mock("@/lib/supabase/feedingQueries", () => ({
+  getFeedingTimeline: vi.fn(async (_c: unknown, babyId: string) => ({
+    data: holder.feedings[babyId] ?? [],
+    error: null,
+  })),
+}));
+vi.mock("@/hooks/useAISuggestions", () => ({
+  useAISuggestions: () => ({ data: holder.ai }),
+}));
+vi.mock("@/hooks/useRegression", () => ({
+  useRegression: () => ({ data: holder.regression, isLoading: false }),
+}));
+vi.mock("@/hooks/useFamilyActivityToasts", () => ({
+  useFamilyActivityToasts: (enabled: boolean) => holder.toasts(enabled),
+}));
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/app",
+  useRouter: () => ({ push: () => {}, refresh: () => {} }),
+}));
+vi.mock("sonner", () => ({
+  toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
+
+const TABLE = "sleep_sessions";
+// 09:00 in America/Sao_Paulo.
+const NOW = new Date("2026-01-01T12:00:00.000Z");
+const helena = { id: "baby-h", name: "Helena", birth_date: "2025-04-01" } as Baby;
+const otto = { id: "baby-o", name: "Otto", birth_date: "2025-09-01" } as Baby;
+let fake: FakeSupabase;
+
+function session(over: Partial<SleepSession>): SleepSession {
+  return {
+    id: Math.random().toString(36).slice(2),
+    baby_id: helena.id,
+    type: "NAP",
+    start_time: "",
+    end_time: null,
+    ...over,
+  } as SleepSession;
+}
+
+function nights(babyId: string, count: number): SleepSession[] {
+  return Array.from({ length: count }, (_, i) =>
+    session({
+      baby_id: babyId,
+      type: "NIGHT_SLEEP",
+      // Night i: 19:30 local of Dec (30 - i) → 06:10 local of Dec (31 - i).
+      start_time: `2025-12-${String(30 - i).padStart(2, "0")}T19:30:00-03:00`,
+      end_time: `2025-12-${String(31 - i).padStart(2, "0")}T06:10:00-03:00`,
+    })
+  );
+}
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(NOW);
+  fake = createFakeSupabase();
+  holder.client = fake.client;
+  holder.ai = undefined;
+  holder.regression = null;
+  holder.notes = null;
+  holder.recent = {};
+  holder.feedings = {};
+  holder.toasts.mockClear();
+  holder.lastSession = {
+    id: "prev",
+    end_time: new Date(NOW.getTime() - 30 * 60_000).toISOString(),
+  };
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (url: string) => {
+      if (String(url).startsWith("/api/family/notes") && holder.notes) {
+        return new Response(JSON.stringify(holder.notes));
+      }
+      return new Response(null, { status: 404 });
+    })
+  );
+  localStorage.clear();
+  useSleepStore.setState({ timers: {}, draft: { ...EMPTY_SLEEP_DRAFT } });
+});
+
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+  vi.unstubAllGlobals();
+  vi.clearAllMocks();
+});
+
+async function flush(ms = 0) {
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(ms);
+  });
+}
+
+function tree(baby: Partial<BabyContextValue>, nanny: boolean, client: QueryClient): ReactElement {
+  const babyValue: BabyContextValue = {
+    babies: [helena, otto],
+    activeBaby: helena,
+    setActiveBaby: () => {},
+    isLoading: false,
+    ...baby,
+  };
+  const profile: UserProfileContextValue = {
+    profile: null,
+    isLoading: false,
+    isNannyMode: nanny,
+    refreshProfile: async () => {},
+  };
+  return (
+    <BabyContext.Provider value={babyValue}>
+      <UserProfileContext.Provider value={profile}>
+        <QueryClientProvider client={client}>
+          <AppHomePage />
+        </QueryClientProvider>
+      </UserProfileContext.Provider>
+    </BabyContext.Provider>
+  );
+}
+
+async function mount(opts: { baby?: Partial<BabyContextValue>; nanny?: boolean } = {}) {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const view = render(tree(opts.baby ?? {}, opts.nanny ?? false, client));
+  await flush();
+  return {
+    ...view,
+    rerenderWith: async (baby: Partial<BabyContextValue>) => {
+      view.rerender(tree(baby, opts.nanny ?? false, client));
+      await flush();
+    },
+  };
+}
+
+async function click(el: HTMLElement) {
+  fireEvent.click(el);
+  await flush();
+}
+
+function seedRunning(babyId: string, type: "NAP" | "NIGHT_SLEEP", elapsedSec: number) {
+  const startTime = new Date(NOW.getTime() - elapsedSec * 1000).toISOString();
+  fake.seed(TABLE, { id: "s-1", baby_id: babyId, type, start_time: startTime });
+  useSleepStore.setState({
+    timers: { [babyId]: { ...EMPTY_SLEEP_DRAFT, sleepType: type, sessionId: "s-1", startTime } },
+  });
+}
+
+const nightAi = {
+  kind: "NIGHT_SLEEP",
+  suggestedNapTime: "09:30",
+  windowStart: "09:20",
+  windowEnd: "09:50",
+  reasoning: "Ela costuma dormir neste horário.",
+  confidence: "high",
+  minutesUntilSuggested: 30,
+} as AISuggestion;
+
+describe("Home", () => {
+  it("awake_night_next_shows_moon_time_and_start_night", async () => {
+    holder.ai = nightAi;
+    await mount();
+
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("Sono noturno")).toBeInTheDocument();
+    expect(within(hero).getByText("09:30")).toBeInTheDocument();
+    expect(within(hero).getByText("Em cerca de 30 min")).toBeInTheDocument();
+    expect(within(hero).getByTestId("art-moon")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Por que esse horário?" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Iniciar sono noturno" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: "Noturno" })).toHaveAttribute("aria-checked", "true");
+    expect(holder.toasts).toHaveBeenCalledWith(true);
+  });
+
+  it("awake_nap_next_shows_sun_and_start_nap", async () => {
+    holder.ai = { ...nightAi, kind: "NAP" };
+    await mount();
+
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("Soneca")).toBeInTheDocument();
+    expect(within(hero).getByTestId("art-sun")).toBeInTheDocument();
+    expect(within(hero).queryByTestId("art-moon")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Iniciar soneca" })).toBeInTheDocument();
+  });
+
+  it("why_sheet_shows_reasoning_and_line_icon_feedback", async () => {
+    holder.ai = nightAi;
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    const sheet = screen.getByRole("dialog");
+    expect(within(sheet).getByText("Ela costuma dormir neste horário.")).toBeInTheDocument();
+    expect(within(sheet).getByText("Horário sugerido: 09:20 a 09:50")).toBeInTheDocument();
+    expect(within(sheet).getByRole("button", { name: "Não útil" })).toBeInTheDocument();
+    await click(within(sheet).getByRole("button", { name: "Útil" }));
+    const calls = (fetch as unknown as { mock: { calls: [string, RequestInit][] } }).mock.calls;
+    const vote = calls.find(([url]) => url === "/api/suggestions/feedback");
+    expect(JSON.parse(String(vote?.[1].body))).toMatchObject({
+      babyId: helena.id,
+      vote: "up",
+      suggestedTime: "09:30",
+    });
+    expect(within(sheet).getByText("Obrigado pelo feedback!")).toBeInTheDocument();
+  });
+
+  it("start_night_calls_handleStart_and_shows_sleeping", async () => {
+    holder.ai = nightAi;
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Iniciar sono noturno" }));
+    await flush();
+
+    const rows = fake.rows(TABLE);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].type).toBe("NIGHT_SLEEP");
+    expect(screen.getByText("Sono noturno em andamento")).toBeInTheDocument();
+  });
+
+  it("running_shows_ring_and_acordou_stops", async () => {
+    seedRunning(helena.id, "NAP", 754);
+    await mount();
+
+    expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    expect(screen.getByText("00:12:34")).toBeInTheDocument();
+    expect(screen.getByText("Desde 08:47")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Previsão de sono" })).not.toBeInTheDocument();
+
+    await click(screen.getByRole("button", { name: "Acordou" }));
+    await flush();
+
+    expect(fake.rows(TABLE)[0].end_time).not.toBeNull();
+    expect(screen.getByText("Como foi o sono?")).toBeInTheDocument();
+  });
+
+  it("notes_written_during_sleep_are_saved_to_the_session", async () => {
+    seedRunning(helena.id, "NAP", 600);
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    fireEvent.change(screen.getByLabelText("Notas sobre o sono"), {
+      target: { value: "Acordou e voltou a dormir" },
+    });
+    await click(screen.getByRole("button", { name: "Salvar nota" }));
+    await flush();
+
+    expect(fake.rows(TABLE)[0].notes).toBe("Acordou e voltou a dormir");
+  });
+
+  it("persisted_v1_timer_rehydrates_as_sleeping", async () => {
+    const startTime = new Date(NOW.getTime() - 3600_000).toISOString();
+    fake.seed(TABLE, { id: "s-old", baby_id: helena.id, type: "NIGHT_SLEEP", start_time: startTime });
+    localStorage.setItem(
+      "soninho-timer",
+      JSON.stringify({
+        state: {
+          activeBabyId: helena.id,
+          timers: {
+            [helena.id]: {
+              ...EMPTY_SLEEP_DRAFT,
+              sleepType: "NIGHT_SLEEP",
+              sessionId: "s-old",
+              startTime,
+            },
+          },
+          draft: { ...EMPTY_SLEEP_DRAFT },
+        },
+        version: SLEEP_STORE_VERSION,
+      })
+    );
+    useSleepStore.setState({ timers: {} });
+    await useSleepStore.persist.rehydrate();
+    await mount();
+
+    expect(screen.getByText("Sono noturno em andamento")).toBeInTheDocument();
+    expect(screen.getByText("01:00:00")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Acordou" })).toBeInTheDocument();
+  });
+
+  it("wake_estimate_hidden_with_fewer_than_3_nights", async () => {
+    holder.recent[helena.id] = nights(helena.id, 2);
+    seedRunning(helena.id, "NIGHT_SLEEP", 600);
+    await mount();
+
+    expect(screen.getByText("Sono noturno em andamento")).toBeInTheDocument();
+    expect(screen.getByText("Última mamada")).toBeInTheDocument();
+    expect(screen.queryByText("Estimativa de despertar")).not.toBeInTheDocument();
+  });
+
+  it("wake_estimate_shown_with_3_nights", async () => {
+    holder.recent[helena.id] = nights(helena.id, 3);
+    seedRunning(helena.id, "NIGHT_SLEEP", 600);
+    await mount();
+
+    expect(screen.getByText("Estimativa de despertar")).toBeInTheDocument();
+    expect(screen.getByText("~06:10")).toBeInTheDocument();
+  });
+
+  it("today_card_shows_last_sleep_and_last_feeding", async () => {
+    holder.recent[helena.id] = [
+      session({ start_time: "2026-01-01T07:09:00-03:00", end_time: "2026-01-01T07:49:00-03:00" }),
+    ];
+    holder.feedings[helena.id] = [
+      {
+        id: "f1",
+        type: "BOTTLE",
+        startTime: "2026-01-01T06:30:00-03:00",
+        endTime: null,
+        summary: "",
+        raw: { volume_ml: 180 },
+      } as unknown as FeedingTimelineItem,
+    ];
+    await mount();
+
+    const today = screen.getByRole("region", { name: "Hoje" });
+    expect(within(today).getByText("Último sono")).toBeInTheDocument();
+    expect(within(today).getByText("Soneca, 07:09 a 07:49")).toBeInTheDocument();
+    expect(within(today).getByText("40 min")).toBeInTheDocument();
+    expect(within(today).getByText("Mamadeira, 06:30")).toBeInTheDocument();
+    expect(within(today).getByText("180 ml")).toBeInTheDocument();
+    expect(within(today).getByRole("link", { name: /Ver registro/ })).toHaveAttribute(
+      "href",
+      "/history"
+    );
+  });
+
+  it("regression_notice_only_when_detected", async () => {
+    holder.regression = { detected: false, summary: "Tudo calmo" };
+    const first = await mount();
+    expect(screen.queryByRole("link", { name: /Ver análise/ })).not.toBeInTheDocument();
+    first.unmount();
+
+    holder.regression = { detected: true, summary: "Sono caiu nas últimas noites" };
+    await mount();
+    expect(screen.getByRole("link", { name: /Ver análise/ })).toHaveAttribute(
+      "href",
+      "/analytics/regression"
+    );
+  });
+
+  it("nanny_sees_notes_but_no_insights_or_history_link", async () => {
+    holder.ai = nightAi;
+    holder.regression = { detected: true, summary: "Sono caiu" };
+    holder.notes = {
+      data: [
+        {
+          id: "n1",
+          baby_id: helena.id,
+          author_id: "u1",
+          author_name: "Ana",
+          body: "Ela comeu bem no almoço",
+          created_at: "2026-01-01T11:00:00.000Z",
+        },
+      ],
+      memberCount: 2,
+      currentUserRole: "caregiver",
+      currentUserId: "u2",
+    };
+    await mount({ nanny: true });
+
+    expect(screen.getByText("Ela comeu bem no almoço")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ver todos" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Ver registro/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Por que esse horário?" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Tempo acordada")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Ver análise/ })).not.toBeInTheDocument();
+    // The prediction itself stays.
+    expect(screen.getByRole("region", { name: "Previsão de sono" })).toBeInTheDocument();
+  });
+
+  it("switching_baby_updates_name_avatar_and_today", async () => {
+    holder.recent[helena.id] = [
+      session({ start_time: "2026-01-01T07:09:00-03:00", end_time: "2026-01-01T07:49:00-03:00" }),
+    ];
+    holder.recent[otto.id] = [
+      session({
+        baby_id: otto.id,
+        start_time: "2026-01-01T06:00:00-03:00",
+        end_time: "2026-01-01T07:30:00-03:00",
+      }),
+    ];
+    const view = await mount();
+    expect(screen.getByText("Helena")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Helena" })).toHaveTextContent("H");
+    expect(screen.getByText("Soneca, 07:09 a 07:49")).toBeInTheDocument();
+
+    await view.rerenderWith({ activeBaby: otto });
+
+    expect(screen.getByText("Otto")).toBeInTheDocument();
+    expect(screen.queryByText("Helena")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Otto" })).toHaveTextContent("O");
+    expect(screen.getByText("Soneca, 06:00 a 07:30")).toBeInTheDocument();
+    expect(screen.getByText("1h 30min")).toBeInTheDocument();
+  });
+
+  it("no_babies_invites_to_more_babies", async () => {
+    await mount({ baby: { babies: [], activeBaby: null } });
+    expect(screen.getByRole("link", { name: /Adicionar bebê/ })).toHaveAttribute(
+      "href",
+      "/more/babies"
+    );
+  });
+});

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
@@ -16,12 +16,14 @@ import { IconLogout } from "@/components/brand/icons";
 
 /**
  * Faixa do topo: só o seletor de bebê e o sair. A marca fica na Sidebar
- * (desktop) e, na home, dentro da própria página (Tarefa 7); as outras
- * páginas têm o título em `PageTitle`.
+ * (desktop) e, na home, dentro da própria página; as outras páginas têm o
+ * título em `PageTitle`. Na home (`/app`) ela some: a página tem a marca, o
+ * relógio e o seletor de bebê. Sair fica em Mais › Perfil.
  */
 export function TopBar() {
   const { babies, activeBaby, setActiveBaby } = useBaby();
   const router = useRouter();
+  const pathname = usePathname();
   const supabase = createClient();
 
   async function handleLogout() {
@@ -29,6 +31,8 @@ export function TopBar() {
     router.push("/login");
     router.refresh();
   }
+
+  if (pathname === "/app") return null;
 
   return (
     <header className="flex h-16 items-center justify-end gap-2">
@@ -42,7 +46,7 @@ export function TopBar() {
         >
           <SelectTrigger
             aria-label="Trocar de bebê"
-            className="h-11 min-w-[120px] gap-2 rounded-full border-sn-bd bg-sn-s1 pr-3 pl-1 font-sans text-[15px] font-bold text-sn-tx data-[size=default]:h-11 dark:bg-sn-s1 dark:hover:bg-sn-s2"
+            className="h-11 min-w-[120px] gap-2 rounded-full border-sn-bd bg-sn-s1 pr-3 pl-1 font-sans text-[15px] font-bold text-sn-tx data-[size=default]:h-11 dark:bg-sn-s1 dark:hover:bg-sn-s2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:translate-y-px disabled:opacity-55"
           >
             <SelectValue>
               <span className="flex items-center gap-2">

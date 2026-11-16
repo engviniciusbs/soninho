@@ -185,3 +185,21 @@ export const IconDownload = make(
   "IconDownload",
   <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" />
 );
+
+export const IconThumbUp = make(
+  "IconThumbUp",
+  <path d="M7.5 10.5v9h-3v-9h3ZM7.5 10.5l3.6-6.3a1.6 1.6 0 0 1 3 .9l-.6 3.9h5a1.5 1.5 0 0 1 1.5 1.8l-1.4 7a1.5 1.5 0 0 1-1.5 1.2H7.5" />
+);
+
+export const IconThumbDown = make(
+  "IconThumbDown",
+  <path d="M16.5 13.5v-9h3v9h-3ZM16.5 13.5l-3.6 6.3a1.6 1.6 0 0 1-3-.9l.6-3.9h-5A1.5 1.5 0 0 1 4 13.2l1.4-7A1.5 1.5 0 0 1 6.9 5h9.6" />
+);
+
+export const IconAlert = make(
+  "IconAlert",
+  <>
+    <path d="M12 4 21 19.5H3L12 4Z" />
+    <path d="M12 10v4M12 17v.01" />
+  </>
+);

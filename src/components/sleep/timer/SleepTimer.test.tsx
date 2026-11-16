@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { renderWithProviders } from "@/test/render";
+import { stable } from "@/test/dom";
 import { createFakeSupabase, type FakeSupabase } from "@/test/fakeSupabase";
 import { BabyContext, type BabyContextValue } from "@/components/providers/BabyProvider";
 import { EMPTY_SLEEP_DRAFT, useSleepStore } from "@/store/sleepStore";
@@ -90,23 +91,23 @@ describe("SleepTimer (characterization)", () => {
     const { container } = await mount();
 
     expect(screen.getByRole("button", { name: "Iniciar soneca" })).toBeInTheDocument();
-    expect(screen.getByText("toque para iniciar")).toBeInTheDocument();
-    expect(screen.getByText("próxima soneca")).toBeInTheDocument();
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("Soneca")).toBeInTheDocument();
     // 30 min awake of a 75 min window (6–8 weeks) → 45 min left.
-    expect(screen.getByText("45 min")).toBeInTheDocument();
-    // Fallback bubble: 09:00 + 45 min.
-    expect(screen.getByText("09:45")).toBeInTheDocument();
-    const group = screen.getByRole("group", { name: "Tipo de sono" });
+    expect(within(hero).getByText("Em cerca de 45 min")).toBeInTheDocument();
+    // Fallback time: 09:00 + 45 min.
+    expect(within(hero).getByText("09:45")).toBeInTheDocument();
+    const group = screen.getByRole("radiogroup", { name: "Tipo de sono" });
     expect(group).toHaveTextContent("Soneca");
     expect(group).toHaveTextContent("Noturno");
-    expect(screen.getByRole("button", { name: /Soneca/, pressed: true })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Opções avançadas" })).toHaveAttribute(
+    expect(screen.getByRole("radio", { name: /Soneca/, checked: true })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Começou antes?" })).toHaveAttribute(
       "aria-expanded",
       "false"
     );
     expect(screen.queryByLabelText("Notas sobre o sono")).not.toBeInTheDocument();
 
-    expect(container.firstChild).toMatchSnapshot();
+    expect(stable(container.firstChild as Element)).toMatchSnapshot();
   });
 
   it("renders_ai_window_bubbles", async () => {
@@ -118,37 +119,42 @@ describe("SleepTimer (characterization)", () => {
     } as Partial<AISuggestion>;
     await mount();
 
-    expect(screen.getByText("09:40")).toBeInTheDocument();
-    expect(screen.getByText("10:00")).toBeInTheDocument();
-    expect(screen.getByText("10:20")).toBeInTheDocument();
+    // The hero shows the suggested time; the window is in "Por que esse horário?".
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("10:00")).toBeInTheDocument();
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    expect(screen.getByText("Janela ideal: 09:40 a 10:20")).toBeInTheDocument();
   });
 
   it("renders_running_session_from_store", async () => {
     seedRunning(754);
     const { container } = await mount();
 
-    expect(screen.getByRole("button", { name: "Parar sono" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Acordou" })).toBeInTheDocument();
     expect(screen.getByText("00:12:34")).toBeInTheDocument();
-    expect(screen.getByText("SONECA")).toBeInTheDocument();
-    expect(screen.getByText("parar")).toBeInTheDocument();
-    expect(screen.getByLabelText("Notas sobre o sono")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Soneca/, pressed: true })).toBeDisabled();
-    expect(screen.getByRole("button", { name: /Noturno/ })).toBeDisabled();
+    expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    expect(screen.getByText("Desde 08:47")).toBeInTheDocument();
+    // The type can't change while running: the selector is gone.
+    expect(screen.queryByRole("radiogroup", { name: "Tipo de sono" })).not.toBeInTheDocument();
 
-    expect(container.firstChild).toMatchSnapshot();
+    expect(stable(container.firstChild as Element)).toMatchSnapshot();
 
     await flush(1000);
     expect(screen.getByText("00:12:35")).toBeInTheDocument();
+
+    // Notes are behind "Anotar algo" while running.
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    expect(screen.getByLabelText("Notas sobre o sono")).toBeInTheDocument();
   });
 
   it("backdate_chip_starts_with_offset", async () => {
     await mount();
 
-    await click(screen.getByRole("button", { name: "Opções avançadas" }));
+    await click(screen.getByRole("button", { name: "Começou antes?" }));
     expect(screen.getByText("Iniciou há quanto tempo?")).toBeInTheDocument();
     await click(screen.getByRole("button", { name: "10 min" }));
     expect(screen.getByRole("button", { name: "10 min" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("desde 08:50")).toBeInTheDocument();
+    expect(screen.getByText("Começou às 08:50")).toBeInTheDocument();
 
     await click(screen.getByRole("button", { name: "Iniciar soneca" }));
     await flush();
@@ -156,28 +162,33 @@ describe("SleepTimer (characterization)", () => {
     const rows = fake.rows(TABLE);
     expect(rows).toHaveLength(1);
     expect(rows[0].start_time).toBe(new Date(NOW.getTime() - 10 * 60_000).toISOString());
-    expect(screen.getByRole("button", { name: "Parar sono" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Acordou" })).toBeInTheDocument();
   });
 
   it("renders_advanced_controls", async () => {
     await mount();
 
-    await click(screen.getByRole("button", { name: "Opções avançadas" }));
+    await click(screen.getByRole("button", { name: "Começou antes?" }));
     await click(screen.getByRole("button", { name: "Horário" }));
     expect(screen.getByRole("button", { name: "Horário" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByLabelText("Às:")).toHaveValue("09:00");
-    expect(screen.getByText("desde 09:00")).toBeInTheDocument();
-    expect(screen.getByText("Condições do ambiente")).toBeInTheDocument();
+    expect(screen.getByText("Começou às 09:00")).toBeInTheDocument();
 
-    const panel = screen.getByText("Iniciou há quanto tempo?").parentElement?.parentElement;
-    expect(panel).toMatchSnapshot();
+    const panel = screen.getByRole("group", { name: "Iniciou há quanto tempo?" });
+    expect(stable(panel)).toMatchSnapshot();
+
+    // The environment is set during the sleep (spec §8.3): "Ambiente" chip.
+    seedRunning(600);
+    await flush();
+    await click(screen.getByRole("button", { name: "Ambiente" }));
+    expect(screen.getByText("Condições do ambiente")).toBeInTheDocument();
   });
 
   it("stop_opens_post_sleep_review", async () => {
     seedRunning(600);
     await mount();
 
-    await click(screen.getByRole("button", { name: "Parar sono" }));
+    await click(screen.getByRole("button", { name: "Acordou" }));
     await flush();
 
     expect(fake.rows(TABLE)[0].end_time).not.toBeNull();
