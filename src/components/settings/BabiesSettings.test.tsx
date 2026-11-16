@@ -8,7 +8,10 @@ import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordin
 import type { Baby } from "@/types";
 import { BabiesSettings } from "./BabiesSettings";
 
-const holder = vi.hoisted(() => ({ client: null as unknown }));
+const holder = vi.hoisted(() => ({ client: null as unknown, canWrite: true }));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
+}));
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 vi.mock("@/components/settings/BabyProfileForm", () => ({ BabyProfileForm: () => null }));
@@ -18,6 +21,7 @@ const theo = { id: "b-2", name: "Theo", birth_date: "2024-05-01", family_id: "fa
 let sb: RecordingSupabase;
 
 beforeEach(() => {
+  holder.canWrite = true;
   sb = createRecordingSupabase();
   holder.client = sb.client;
   // The signed-in user owns only fam-F; in fam-G they are a caregiver.
@@ -43,6 +47,17 @@ describe("BabiesSettings", () => {
     expect(await screen.findByRole("button", { name: "Excluir Lia" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Excluir Theo" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /^Editar/ })).toHaveLength(2);
+  });
+
+  it("viewer_sees_no_edit_pencil_for_the_babies_of_that_family", async () => {
+    // Only views the active baby's family (fam-F); fam-G is another family.
+    holder.canWrite = false;
+    const lua = { ...lia, id: "b-3", name: "Lua" } as Baby;
+    setup([lia, lua, theo]);
+    await screen.findByText("Theo");
+    expect(screen.queryByRole("button", { name: "Editar Lia" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Editar Lua" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Editar Theo" })).toBeInTheDocument();
   });
 
   it("caregiver_sees_no_delete_button", async () => {

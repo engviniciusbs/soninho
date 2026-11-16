@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useBabySettings } from "@/hooks/settings/useBabySettings";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { BabyProfileForm } from "@/components/settings/BabyProfileForm";
@@ -24,7 +25,12 @@ import { formatLocalDate } from "@/lib/dates/localDate";
 /** Babies list (Mais › Bebês) with the add, edit, photo and delete dialogs. */
 export function BabiesSettings() {
   const { babies, remove, canDelete } = useBabySettings();
-  const { isLoading } = useBaby();
+  const { isLoading, activeBaby } = useBaby();
+  // A confirmed viewer of the active baby's family edits none of its babies
+  // (fails open, like the other write controls; RLS is the real guard).
+  const { canWrite } = useCanWrite();
+  const canEdit = (baby: BabyRow) =>
+    canWrite || !activeBaby?.family_id || baby.family_id !== activeBaby.family_id;
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<BabyRow | null>(null);
   const [formSession, setFormSession] = useState(0);
@@ -90,14 +96,16 @@ export function BabiesSettings() {
                   subtitle={`Nascimento: ${formatLocalDate(baby.birth_date)}`}
                   value={
                     <span className="flex gap-1">
-                      <Button
-                        variant="icon"
-                        size="icon"
-                        onClick={() => openForm(baby)}
-                        aria-label={`Editar ${baby.name}`}
-                      >
-                        <IconPen size={20} />
-                      </Button>
+                      {canEdit(baby) && (
+                        <Button
+                          variant="icon"
+                          size="icon"
+                          onClick={() => openForm(baby)}
+                          aria-label={`Editar ${baby.name}`}
+                        >
+                          <IconPen size={20} />
+                        </Button>
+                      )}
                       {canDelete(baby) && (
                         <Button
                           variant="icon"
