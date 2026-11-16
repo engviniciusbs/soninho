@@ -96,7 +96,7 @@ export default function AppHomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Link href="/settings">
+          <Link href="/more/babies">
             <Button size="lg" className="rounded-full px-8">
               <Baby className="mr-2 h-4 w-4" aria-hidden="true" />
               Adicionar bebê

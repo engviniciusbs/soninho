@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { FamilyMember } from "@/types";
 import {
@@ -42,14 +41,11 @@ export function FamilySettings({ babyId, currentUserId }: FamilySettingsProps) {
   const isOwner = team.currentUserRole === "owner";
 
   return (
-    <Card className="border-border/60 bg-card/50 backdrop-blur">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base font-semibold">
-          <Users className="w-4 h-4 text-primary" />
-          Equipe Família
-        </CardTitle>
-        <CardDescription>
-          Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
+        <CardTitle>Quem acompanha</CardTitle>
+        <CardDescription className="text-base font-normal">
+          Convide pai, mãe, avós, babá e quem mais cuida do bebê, cada um com seu papel na família.
         </CardDescription>
       </CardHeader>
 

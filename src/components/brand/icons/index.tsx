@@ -168,3 +168,20 @@ export const IconLogout = make(
   "IconLogout",
   <path d="M14 4.5H6.5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1H14M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" />
 );
+
+export const IconTrash = make(
+  "IconTrash",
+  <path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6" />
+);
+
+export const IconSend = make("IconSend", <path d="M4 11.5 20 4l-5.5 16-3-6.5L4 11.5ZM11.5 13.5 20 4" />);
+
+export const IconRefresh = make(
+  "IconRefresh",
+  <path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.5 4.5v4.2h-4.2" />
+);
+
+export const IconDownload = make(
+  "IconDownload",
+  <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" />
+);

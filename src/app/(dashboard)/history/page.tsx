@@ -18,11 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Clock, Moon, Sun, FileDown, Loader2 } from "lucide-react";
+import { Plus, Clock, Moon, Sun } from "lucide-react";
 import { format, startOfDay, subDays, isToday, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { formatDuration } from "@/lib/utils";
-import { toast } from "sonner";
 import type { SleepSession } from "@/types";
 
 export default function HistoryPage() {
@@ -32,7 +31,6 @@ export default function HistoryPage() {
   const [editSession, setEditSession] = useState<SleepSession | null>(null);
   const [filterType, setFilterType] = useState<string>("ALL");
   const [daysBack, setDaysBack] = useState(7);
-  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   const from = subDays(startOfDay(new Date()), daysBack);
   const to = new Date();
@@ -73,45 +71,6 @@ export default function HistoryPage() {
     [sessions]
   );
 
-  async function handleGeneratePdf() {
-    if (!activeBaby) return;
-    const completed = sessions.filter((s) => s.duration_min != null);
-    if (completed.length === 0) {
-      toast.info("Nenhum registro no período para gerar o relatório");
-      return;
-    }
-    setGeneratingPdf(true);
-    try {
-      const [{ pdf }, { SleepReportPdf, buildSleepReportData }] =
-        await Promise.all([
-          import("@react-pdf/renderer"),
-          import("@/lib/report/SleepReportPdf"),
-        ]);
-
-      const data = buildSleepReportData(
-        sessions,
-        { name: activeBaby.name, birth_date: activeBaby.birth_date },
-        daysBack
-      );
-
-      const blob = await pdf(<SleepReportPdf data={data} />).toBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `soninho-relatorio-${activeBaby.name}-${new Date()
-        .toISOString()
-        .split("T")[0]}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("Relatório gerado!");
-    } catch (err) {
-      console.error("[pdf] generation failed:", err);
-      toast.error("Erro ao gerar o relatório");
-    } finally {
-      setGeneratingPdf(false);
-    }
-  }
-
   const todayStats = useMemo(() => {
     const completed = todaySessions.filter((s) => s.duration_min != null);
     const totalMin = completed.reduce((a, s) => a + (s.duration_min ?? 0), 0);
@@ -133,19 +92,6 @@ export default function HistoryPage() {
         subtitle="Histórico de sonecas e noites"
         actions={
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={handleGeneratePdf}
-              disabled={generatingPdf}
-              className="rounded-full gap-2 px-4"
-            >
-              {generatingPdf ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <FileDown className="h-4 w-4" aria-hidden="true" />
-              )}
-              <span className="hidden sm:inline">Relatório (PDF)</span>
-            </Button>
             <Button
               onClick={() => {
                 setEditSession(null);

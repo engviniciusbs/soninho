@@ -1,12 +1,16 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ComponentType } from "react";
 import { cleanup, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { renderWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
 import type { Baby } from "@/types";
-import SettingsPage from "./page";
+import BabiesPage from "./babies/page";
+import FamilyPage from "./family/page";
+import NotificationsPage from "./notifications/page";
+import ReportsPage from "./reports/page";
 
 const holder = vi.hoisted(() => ({
   client: null as unknown,
@@ -26,13 +30,20 @@ vi.mock("@/components/settings/FamilySettings", () => ({
 vi.mock("@/components/settings/UserProfileSettings", () => ({
   UserProfileSettings: () => <div data-testid="user-profile" />,
 }));
+vi.mock("@/components/family/FamilyNoteCard", () => ({
+  FamilyNoteCard: () => <div data-testid="family-notes" />,
+}));
+// The PDF card (moved from /history) runs its own sleep_sessions query.
+vi.mock("@/components/settings/SleepReportPdfCard", () => ({
+  SleepReportPdfCard: () => <div data-testid="pdf-report" />,
+}));
 
 const NOW = new Date("2026-01-01T12:00:00.000Z");
 const baby = {
   id: "baby-1",
   name: "Lia",
   birth_date: "2025-11-01",
-  avatar_emoji: "🦊",
+  avatar_emoji: "\u{1F98A}",
   avatar_url: null,
 } as Baby;
 const PREFS = {
@@ -76,12 +87,13 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-async function mount() {
+/** Renders one Mais detail page (each former settings tab is its own route now). */
+async function mount(Page: ComponentType = BabiesPage) {
   const user = userEvent.setup();
-  const view = renderWithProviders(<SettingsPage />, {
+  const view = renderWithProviders(<Page />, {
     baby: { activeBaby: baby, babies: [baby] },
   });
-  await screen.findByTestId("family");
+  await settle();
   return { user, ...view };
 }
 
@@ -105,12 +117,10 @@ function stable(node: Element): Element {
   return clone;
 }
 
-async function openTab(user: ReturnType<typeof userEvent.setup>, name: string) {
-  await user.click(screen.getByRole("tab", { name }));
-  await waitFor(() =>
-    expect(screen.getByRole("tab", { name })).toHaveAttribute("aria-selected", "true")
-  );
-  await settle();
+/** Leaves the current page and opens another, as the Mais list does. */
+async function openPage(Page: ComponentType) {
+  cleanup();
+  return mount(Page);
 }
 
 /** Waits out base-ui's transient enter/exit markers (cleared on the next frame). */
@@ -120,25 +130,28 @@ async function settle() {
   );
 }
 
-describe("SettingsPage", () => {
-  it("switches_tabs", async () => {
-    const { user, container } = await mount();
-    await settle();
+describe("Mais detail pages (former settings tabs)", () => {
+  it("renders_each_page", async () => {
+    let { container } = await mount(BabiesPage);
     expect(screen.getByText("Lia")).toBeInTheDocument();
-    expect(screen.getByTestId("family")).toHaveAttribute("data-user", "user-1");
-    expect(screen.getByTestId("family")).toHaveAttribute("data-baby", "baby-1");
     expect(stable(container)).toMatchSnapshot("general");
 
-    await openTab(user, "Notificações");
+    ({ container } = await openPage(FamilyPage));
+    await screen.findByTestId("family");
+    expect(screen.getByTestId("family")).toHaveAttribute("data-user", "user-1");
+    expect(screen.getByTestId("family")).toHaveAttribute("data-baby", "baby-1");
+    expect(stable(container)).toMatchSnapshot("family");
+
+    ({ container } = await openPage(NotificationsPage));
     expect(screen.queryByText("Bebês")).not.toBeInTheDocument();
     await screen.findByText("Desativado"); // weekly email loaded from prefs
     expect(stable(container)).toMatchSnapshot("notifications");
 
-    await openTab(user, "Ferramentas");
+    ({ container } = await openPage(ReportsPage));
     expect(screen.getByText("Exportar dados")).toBeInTheDocument();
     expect(stable(container)).toMatchSnapshot("tools");
 
-    await openTab(user, "Geral");
+    await openPage(BabiesPage);
     expect(screen.getByText("Bebês")).toBeInTheDocument();
   });
 
@@ -159,7 +172,7 @@ describe("SettingsPage", () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê atualizado"));
     expect(sb.find("babies", "update").map((c) => c.ops)).toEqual([
       [
-        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null }]],
+        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "\u{1F98A}", avatar_url: null }]],
         ["eq", ["id", "baby-1"]],
         ["select", []],
         ["single", []],
@@ -182,7 +195,7 @@ describe("SettingsPage", () => {
     await user.click(screen.getByRole("button", { name: "Salvar" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê adicionado"));
     expect(sb.find("rpc:create_baby_with_family").map((c) => c.ops)).toEqual([
-      [["rpc", [{ p_name: "Theo", p_birth_date: "2026-01-01", p_avatar_emoji: "🍼", p_avatar_url: null }]]],
+      [["rpc", [{ p_name: "Theo", p_birth_date: "2026-01-01", p_avatar_emoji: "\u{1F37C}", p_avatar_url: null }]]],
     ]);
   });
 
@@ -218,8 +231,7 @@ describe("SettingsPage", () => {
   });
 
   it("saves_notification_prefs_same_payload", async () => {
-    const { user } = await mount();
-    await openTab(user, "Notificações");
+    const { user } = await mount(NotificationsPage);
     await screen.findByText("Desativado");
     expect(sb.find("notification_preferences", "maybeSingle").map((c) => c.ops)).toEqual([
       [["select", ["*"]], ["eq", ["user_id", "user-1"]], ["maybeSingle", []]],
@@ -319,8 +331,7 @@ describe("SettingsPage", () => {
       expect(this.href).toBe("blob:csv");
     });
 
-    const { user } = await mount();
-    await openTab(user, "Ferramentas");
+    const { user } = await mount(ReportsPage);
     await user.click(screen.getByRole("button", { name: "Exportar CSV" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Dados exportados com sucesso"));
 
@@ -339,8 +350,7 @@ describe("SettingsPage", () => {
   });
 
   it("request_report_same_request", async () => {
-    const { user } = await mount();
-    await openTab(user, "Ferramentas");
+    const { user } = await mount(ReportsPage);
     await user.click(screen.getByRole("button", { name: "30 dias" }));
     await user.click(screen.getByRole("button", { name: "Enviar relatório agora" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Relatório enviado para a@b.c"));

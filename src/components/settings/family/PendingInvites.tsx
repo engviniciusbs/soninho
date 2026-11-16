@@ -19,7 +19,7 @@ export function PendingInvites({ invites, onRevoke }: PendingInvitesProps) {
     <div className="space-y-2">
       <button
         onClick={() => setShowInvites(!showInvites)}
-        className="flex items-center gap-1 text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors"
+        className="flex min-h-11 w-full cursor-pointer items-center gap-1.5 rounded-xl text-sm font-bold text-sn-mu outline-none hover:text-sn-tx focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
       >
         <UserPlus className="w-3.5 h-3.5" />
         Convites pendentes ({invites.length})
@@ -58,12 +58,13 @@ export function PendingInvites({ invites, onRevoke }: PendingInvitesProps) {
                   </span>
                 </div>
                 <Button
-                  variant="ghost"
+                  variant="icon"
                   size="icon"
-                  className="w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  className="shrink-0 text-sn-mu hover:text-sn-danger"
                   onClick={() => onRevoke(invite.id)}
+                  aria-label="Cancelar convite"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="size-4" aria-hidden="true" />
                 </Button>
               </div>
             ))}

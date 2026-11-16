@@ -1,28 +1,32 @@
 "use client";
 
-import { useBaby } from "@/components/providers/BabyProvider";
-import { AIChat } from "@/components/ai/AIChat";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { IconRefresh } from "@/components/brand/icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Sparkles, MessageCircle } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 
 type InsightSection = "todayAssessment" | "patternRecognition" | "weeklyTrends" | "recommendations";
 
 const SECTION_LABELS: Record<InsightSection, string> = {
-  todayAssessment: "Avaliação de Hoje",
-  patternRecognition: "Padrões Identificados",
-  weeklyTrends: "Tendências da Semana",
+  todayAssessment: "Avaliação de hoje",
+  patternRecognition: "Padrões identificados",
+  weeklyTrends: "Tendências da semana",
   recommendations: "Recomendações",
 };
 
-async function fetchInsight(
-  babyId: string,
-  section: InsightSection
-): Promise<string> {
+type InsightTab = "today" | "patterns" | "recommendations";
+
+/** The four analyses of the old /ai-insights page, grouped in three tabs. */
+const TABS: { value: InsightTab; label: string; sections: InsightSection[] }[] = [
+  { value: "today", label: "Hoje", sections: ["todayAssessment"] },
+  { value: "patterns", label: "Padrões", sections: ["patternRecognition", "weeklyTrends"] },
+  { value: "recommendations", label: "Recomendações", sections: ["recommendations"] },
+];
+
+async function fetchInsight(babyId: string, section: InsightSection): Promise<string> {
   const res = await fetch("/api/ai/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -81,13 +85,7 @@ function getPromptForSection(section: InsightSection): string {
   return prompts[section];
 }
 
-function InsightCard({
-  section,
-  babyId,
-}: {
-  section: InsightSection;
-  babyId: string;
-}) {
+function InsightCard({ section, babyId }: { section: InsightSection; babyId: string }) {
   const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["insight", babyId, section],
@@ -97,100 +95,60 @@ function InsightCard({
   });
 
   return (
-    <Card className="rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-primary" />
-          {SECTION_LABELS[section]}
-        </CardTitle>
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
+        <CardTitle>{SECTION_LABELS[section]}</CardTitle>
         <Button
-          variant="ghost"
+          variant="icon"
           size="icon"
-          className="h-8 w-8 rounded-lg"
+          className="-my-2 -mr-2"
           onClick={() =>
             queryClient.invalidateQueries({
               queryKey: ["insight", babyId, section],
             })
           }
+          disabled={isLoading}
           aria-label="Regenerar"
         >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+          <IconRefresh size={20} />
         </Button>
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full rounded" />
-            <Skeleton className="h-4 w-4/5 rounded" />
-            <Skeleton className="h-4 w-3/5 rounded" />
+          <div className="space-y-2.5" role="status" aria-label="Gerando análise">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-3/5" />
           </div>
         ) : error ? (
-          <p className="text-sm text-muted-foreground">
-            Não foi possível gerar esta análise. Tente novamente.
+          <p className="text-base text-sn-mu">
+            Não foi possível gerar esta análise. Toque em regenerar para tentar de novo.
           </p>
         ) : (
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{data}</p>
+          <p className="text-base leading-relaxed whitespace-pre-wrap text-sn-tx">{data}</p>
         )}
       </CardContent>
     </Card>
   );
 }
 
-export default function AIInsightsPage() {
-  const { activeBaby } = useBaby();
-
-  if (!activeBaby) {
-    return (
-      <div className="flex flex-col items-center gap-4 pt-12">
-        <Sparkles className="h-10 w-10 text-muted-foreground/50" />
-        <p className="text-muted-foreground">
-          Adicione um bebê para ver as análises da IA.
-        </p>
-      </div>
-    );
-  }
+/** Mais › Resumos da IA: tabs Hoje, Padrões and Recomendações. */
+export function AIInsights({ babyId }: { babyId: string }) {
+  const [tab, setTab] = useState<InsightTab>("today");
+  const current = TABS.find((t) => t.value === tab) ?? TABS[0];
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        eyebrow="Inteligência"
-        title="IA Insights"
-        subtitle="Análises e conversa sobre o sono do bebê"
+    <div className="flex flex-col gap-3.5">
+      <SegmentedControl
+        aria-label="Resumo"
+        size="sm"
+        value={tab}
+        onChange={setTab}
+        options={TABS.map(({ value, label }) => ({ value, label }))}
       />
-
-      <Tabs defaultValue="insights" className="w-full">
-        <TabsList className="rounded-xl w-full">
-          <TabsTrigger value="insights" className="rounded-lg flex-1 gap-2">
-            <Sparkles className="h-4 w-4" />
-            Análise
-          </TabsTrigger>
-          <TabsTrigger value="chat" className="rounded-lg flex-1 gap-2">
-            <MessageCircle className="h-4 w-4" />
-            Chat
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="insights" className="space-y-4 mt-4">
-          {(
-            [
-              "todayAssessment",
-              "patternRecognition",
-              "weeklyTrends",
-              "recommendations",
-            ] as InsightSection[]
-          ).map((section) => (
-            <InsightCard
-              key={section}
-              section={section}
-              babyId={activeBaby.id}
-            />
-          ))}
-        </TabsContent>
-
-        <TabsContent value="chat" className="mt-4 h-[calc(100vh-280px)]">
-          <AIChat />
-        </TabsContent>
-      </Tabs>
+      {current.sections.map((section) => (
+        <InsightCard key={section} section={section} babyId={babyId} />
+      ))}
     </div>
   );
 }

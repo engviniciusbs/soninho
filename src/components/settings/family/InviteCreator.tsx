@@ -12,6 +12,12 @@ import {
 import { FAMILY_RELATIONS, getFamilyRelationLabel } from "@/lib/family/relations";
 import { ROLE_LABELS } from "./roles";
 
+/** Labels for `<SelectValue>`, which otherwise shows the raw value. */
+const RELATION_ITEMS = [
+  { value: "none", label: "Não especificar" },
+  ...FAMILY_RELATIONS.map((r) => ({ value: r.value, label: r.label })),
+];
+
 type InviteRole = "caregiver" | "viewer";
 
 interface InviteCreatorProps {
@@ -46,28 +52,28 @@ export function InviteCreator({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+      <p className="text-sm font-bold text-sn-mu">
         Convidar
       </p>
 
       {/* Role selector */}
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2">
         {(["caregiver", "viewer"] as const).map((r) => (
           <button
             key={r}
+            type="button"
             onClick={() => onRoleChange(r)}
-            className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer ${
+            aria-pressed={role === r}
+            className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-left text-base font-bold whitespace-nowrap outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr ${
               role === r
-                ? r === "caregiver"
-                  ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
-                  : "bg-slate-500/20 border-slate-500/50 text-slate-300"
-                : "bg-muted/30 border-border/40 text-muted-foreground hover:bg-muted/50"
+                ? "border-sn-pr bg-sn-pr/15 text-sn-tx"
+                : "border-sn-bd bg-sn-s2/50 text-sn-mu hover:text-sn-tx"
             }`}
           >
             {r === "caregiver" ? (
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="size-4" aria-hidden="true" />
             ) : (
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="size-4" aria-hidden="true" />
             )}
             {ROLE_LABELS[r]}
           </button>
@@ -75,14 +81,15 @@ export function InviteCreator({
       </div>
 
       <div className="space-y-1.5">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm font-bold text-sn-mu">
           Papel na família (opcional no convite)
         </p>
         <Select
+          items={RELATION_ITEMS}
           value={relation || "none"}
           onValueChange={(v) => onRelationChange(!v || v === "none" ? "" : v)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="h-11 w-full rounded-xl border-sn-mu/70 text-base">
             <SelectValue placeholder="Ex.: Avó, Babá…" />
           </SelectTrigger>
           <SelectContent>
