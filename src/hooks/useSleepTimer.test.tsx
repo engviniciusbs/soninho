@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup } from "@testing-library/react";
 import { toast } from "sonner";
+import { focusManager } from "@tanstack/react-query";
 import { renderHookWithProviders } from "@/test/render";
 import { createFakeSupabase, type FakeSupabase } from "@/test/fakeSupabase";
 import { EMPTY_SLEEP_DRAFT, useSleepStore } from "@/store/sleepStore";
@@ -143,5 +144,68 @@ describe("useSleepTimer (characterization)", () => {
     expect(result.current.isRunning).toBe(false);
     expect(useSleepStore.getState().timers[baby.id]).toBeUndefined();
     expect(toast.info).toHaveBeenCalledWith("Sono finalizado por outro cuidador(a)");
+  });
+
+  describe("adopting a sleep started on another phone (spec #14)", () => {
+    afterEach(() => {
+      focusManager.setFocused(undefined);
+    });
+
+    function seedOtherCaregiver() {
+      fake.seed(TABLE, {
+        id: "other-caregiver",
+        baby_id: baby.id,
+        type: "NIGHT_SLEEP",
+        start_time: "2026-01-01T11:55:00.000Z",
+      });
+    }
+
+    it("without a local timer, the 30 s poll adopts the open session", async () => {
+      const { result } = renderHookWithProviders(() => useSleepTimer(), {
+        baby: { activeBaby: baby, babies: [baby] },
+      });
+      await flush();
+      expect(result.current.isRunning).toBe(false);
+
+      seedOtherCaregiver();
+      await flush(29_000);
+      expect(result.current.isRunning).toBe(false);
+      await flush(1_000);
+
+      expect(result.current.isRunning).toBe(true);
+      expect(result.current.sleepType).toBe("NIGHT_SLEEP");
+      expect(useSleepStore.getState().timers[baby.id]?.sessionId).toBe("other-caregiver");
+      // Adopting only reads: nothing is written.
+      expect(fake.rows(TABLE)).toHaveLength(1);
+      expect(activityCalls("started")).toHaveLength(0);
+    });
+
+    it("does not poll while the page is hidden, and catches up when it shows", async () => {
+      const { result } = renderHookWithProviders(() => useSleepTimer(), {
+        baby: { activeBaby: baby, babies: [baby] },
+      });
+      await flush();
+      act(() => focusManager.setFocused(false));
+
+      seedOtherCaregiver();
+      await flush(90_000);
+      expect(result.current.isRunning).toBe(false);
+
+      act(() => focusManager.setFocused(true));
+      await flush();
+      expect(result.current.isRunning).toBe(true);
+    });
+
+    it("a session ended by someone else is not adopted again", async () => {
+      const { result } = await mountRunning();
+      fake.rows(TABLE)[0].end_time = "2026-01-01T12:00:10.000Z";
+
+      await flush(20_000);
+      expect(result.current.isRunning).toBe(false);
+      await flush(60_000);
+
+      expect(result.current.isRunning).toBe(false);
+      expect(toast.info).toHaveBeenCalledTimes(1);
+    });
   });
 });

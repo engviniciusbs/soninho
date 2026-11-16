@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { END_BEFORE_START_MESSAGE, isEndBeforeStart, isCheckViolation } from "@/lib/validation/timeRange";
 import { cn } from "@/lib/utils";
 import { deleteSleepSession } from "@/lib/supabase/queries/sleep";
+import { invalidateSleepQueries } from "@/lib/query/invalidateSleep";
 import { EnvironmentPicker, type EnvironmentData } from "./EnvironmentPicker";
 import {
   HOW_FELL_ASLEEP_OPTIONS,
@@ -185,7 +186,8 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
       return;
     }
     toast.success("Registro excluído");
-    queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+    // The deleted sleep may be the last one: refresh forecast and wake window too.
+    void invalidateSleepQueries(queryClient, session.baby_id);
     onClose();
   }
 
@@ -271,7 +273,8 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
       toast.success("Sono registrado manualmente");
     }
 
-    queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+    // Lists, forecast, wake window and regression all derive from sleeps.
+    void invalidateSleepQueries(queryClient, activeBaby.id);
     onClose();
   }
 

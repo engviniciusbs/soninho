@@ -35,8 +35,10 @@ export function useAISuggestions() {
 
   return useQuery<AISuggestion | null>({
     // Query key includes the last session anchor so the suggestion is stable
-    // until actual sleep data changes.
-    queryKey: ["ai-suggestion", "v2", activeBaby?.id, lastSessionKey],
+    // until actual sleep data changes. The baby id comes right after the name
+    // so invalidateSleepQueries can target one baby; "v3" = response with
+    // absolute (ISO) times.
+    queryKey: ["ai-suggestion", activeBaby?.id, "v3", lastSessionKey],
     queryFn: async () => {
       if (!activeBaby) return null;
       const res = await fetch("/api/ai/suggest", {
@@ -54,7 +56,10 @@ export function useAISuggestions() {
     },
     enabled:
       !!activeBaby && lastSessionKey !== undefined && !sleepingForActiveBaby,
-    staleTime: 60 * 60 * 1000, // 1 hour — same last-sleep data = same suggestion
+    // 1 hour: same last-sleep data = same suggestion. The countdown and
+    // "overdue" are computed on the client from suggestedAtIso, so a cached
+    // suggestion never freezes the home.
+    staleTime: 60 * 60 * 1000,
     gcTime: 2 * 60 * 60 * 1000, // keep in cache 2 hours
     refetchOnWindowFocus: false,
     refetchOnMount: false, // don't re-fetch on every component mount

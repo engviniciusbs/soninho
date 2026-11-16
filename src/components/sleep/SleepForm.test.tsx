@@ -11,6 +11,8 @@ import { SleepForm } from "./SleepForm";
 const holder = vi.hoisted(() => ({ client: null as unknown }));
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
+const invalidate = vi.hoisted(() => vi.fn(async () => {}));
+vi.mock("@/lib/query/invalidateSleep", () => ({ invalidateSleepQueries: invalidate }));
 
 const NOW = new Date("2026-01-01T12:00:00.000Z"); // 09:00 in America/Sao_Paulo
 const MSG = "O fim não pode ser antes do início";
@@ -231,5 +233,34 @@ describe("SleepForm", () => {
     // ...and making it invalid again sets it, without submitting.
     change("end_date", "2025-12-30");
     expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
+  });
+
+  describe("refreshes the sleep screens (spec #14)", () => {
+    it("create invalidates the sleep queries of the baby", async () => {
+      await mount();
+      change("start_time_input", "07:10");
+      change("end_time_input", "08:40");
+      submit();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(invalidate).toHaveBeenCalledTimes(1);
+      expect(invalidate).toHaveBeenCalledWith(expect.anything(), "baby-1");
+    });
+
+    it("edit invalidates the sleep queries of the baby", async () => {
+      await mount(session);
+      submit();
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(invalidate).toHaveBeenCalledTimes(1);
+      expect(invalidate).toHaveBeenCalledWith(expect.anything(), "baby-1");
+    });
+
+    it("delete invalidates the sleep queries of the baby", async () => {
+      await mount(session);
+      fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+      fireEvent.click(screen.getByRole("button", { name: "Confirmar exclusão" }));
+      await waitFor(() => expect(onClose).toHaveBeenCalled());
+      expect(invalidate).toHaveBeenCalledTimes(1);
+      expect(invalidate).toHaveBeenCalledWith(expect.anything(), "baby-1");
+    });
   });
 });

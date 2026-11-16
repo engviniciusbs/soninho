@@ -206,6 +206,10 @@ const nightAi = {
   reasoning: "Ela costuma dormir neste horário.",
   confidence: "high",
   minutesUntilSuggested: 30,
+  // The instant the home counts down to with its own clock (09:30 local).
+  suggestedAtIso: "2026-01-01T12:30:00.000Z",
+  windowStartIso: "2026-01-01T12:20:00.000Z",
+  windowEndIso: "2026-01-01T12:50:00.000Z",
 } as AISuggestion;
 
 describe("Home", () => {

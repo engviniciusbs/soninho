@@ -1,14 +1,9 @@
 import { addMinutes, differenceInWeeks, parse } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
-import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
+import { getWakeWindowRange, wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
 import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
 import type { AISuggestion, SleepSession, SleepType } from "@/types";
 import { parseLocalDate } from "@/lib/dates/localDate";
-
-function roundToNearest5Minutes(d: Date): Date {
-  const step = 5 * 60 * 1000;
-  return new Date(Math.round(d.getTime() / step) * step);
-}
 
 function minutesUntilClock(
   clock: string,
@@ -80,6 +75,8 @@ function buildReasoning(params: {
   return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Sugestão de horário alinhada ao centro dessa faixa.`;
 }
 
+const NO_INSTANTS = { suggestedAtIso: null, windowStartIso: null, windowEndIso: null };
+
 /**
  * Next-sleep suggestion aligned with {@link getWakeWindowRange} (same table as WakeWindowBadge).
  * Infers nap vs. night sleep from schedule, time of day, and recent history.
@@ -106,6 +103,7 @@ export function computeNapSuggestion(params: {
         "Sem um sono concluído recente, não dá para estimar a janela. Registre o fim da última soneca ou do sono noturno.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      ...NO_INSTANTS,
     };
   }
 
@@ -119,6 +117,7 @@ export function computeNapSuggestion(params: {
       reasoning: "Data do último sono inválida. Verifique o registro.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      ...NO_INSTANTS,
     };
   }
 
@@ -127,17 +126,7 @@ export function computeNapSuggestion(params: {
 
   const windowStartAt = addMinutes(anchor, range.minMinutes);
   const windowEndAt = addMinutes(anchor, range.maxMinutes);
-  const midpointAt = addMinutes(
-    anchor,
-    Math.round((range.minMinutes + range.maxMinutes) / 2)
-  );
-  let midpointRounded = roundToNearest5Minutes(midpointAt);
-  if (midpointRounded.getTime() < windowStartAt.getTime()) {
-    midpointRounded = windowStartAt;
-  }
-  if (midpointRounded.getTime() > windowEndAt.getTime()) {
-    midpointRounded = windowEndAt;
-  }
+  const midpointRounded = new Date(wakeWindowMidpoint(anchor.getTime(), range));
 
   const windowStart = formatInTimeZone(windowStartAt, tz, "HH:mm");
   const windowEnd = formatInTimeZone(windowEndAt, tz, "HH:mm");
@@ -195,5 +184,10 @@ export function computeNapSuggestion(params: {
     reasoning,
     confidence,
     minutesUntilSuggested,
+    // The ideal instant (the window's middle), the same whenever it is asked:
+    // the client counts down to it and calls it overdue once it has passed.
+    suggestedAtIso: midpointRounded.toISOString(),
+    windowStartIso: windowStartAt.toISOString(),
+    windowEndIso: windowEndAt.toISOString(),
   };
 }

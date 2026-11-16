@@ -9,8 +9,9 @@ import { stable } from "@/test/dom";
 import { createFakeSupabase, type FakeSupabase } from "@/test/fakeSupabase";
 import { BabyContext, type BabyContextValue } from "@/components/providers/BabyProvider";
 import { EMPTY_SLEEP_DRAFT, useSleepStore } from "@/store/sleepStore";
-import { getMinutesUntilNextNap, getWakeWindowRange } from "@/lib/sleep/wakeWindows";
+import { getWakeWindowRange, wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
 import type { AISuggestion, Baby } from "@/types";
+import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
 import { SleepTimer } from "../SleepTimer";
 
 const holder = vi.hoisted(() => ({
@@ -93,10 +94,10 @@ describe("SleepTimer (characterization)", () => {
     expect(screen.getByRole("button", { name: "Iniciar soneca" })).toBeInTheDocument();
     const hero = screen.getByRole("region", { name: "Previsão de sono" });
     expect(within(hero).getByText("Soneca")).toBeInTheDocument();
-    // 30 min awake of a 75 min window (6–8 weeks) → 45 min left.
-    expect(within(hero).getByText("Em cerca de 45 min")).toBeInTheDocument();
-    // Fallback time: 09:00 + 45 min.
-    expect(within(hero).getByText("09:45")).toBeInTheDocument();
+    // No suggestion: the middle of the 60–75 min window (6–8 weeks), as the
+    // suggestion does: 08:30 + 68 min = 09:38, rounded to 09:40.
+    expect(within(hero).getByText("Em cerca de 40 min")).toBeInTheDocument();
+    expect(within(hero).getByText("09:40")).toBeInTheDocument();
     const group = screen.getByRole("radiogroup", { name: "Tipo de sono" });
     expect(group).toHaveTextContent("Soneca");
     expect(group).toHaveTextContent("Noturno");
@@ -116,6 +117,7 @@ describe("SleepTimer (characterization)", () => {
       suggestedNapTime: "10:00",
       windowEnd: "10:20",
       kind: "NAP",
+      suggestedAtIso: "2026-01-01T13:00:00.000Z", // 10:00 local
     } as Partial<AISuggestion>;
     await mount();
 
@@ -224,8 +226,8 @@ describe("SleepTimer (characterization)", () => {
     // After mount the bubble shows the next-sleep time.
     renderWithProviders(<SleepTimer />, { baby: babyCtx });
     await flush();
-    const minutes = getMinutesUntilNextNap(0, getWakeWindowRange(12));
-    const expected = format(new Date(NOW.getTime() + minutes * 60_000), "HH:mm");
+    // No last sleep: the middle of the window counted from now.
+    const expected = format(new Date(wakeWindowMidpoint(NOW.getTime(), getWakeWindowRange(12))), "HH:mm");
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
 
@@ -261,6 +263,86 @@ describe("SleepTimer (characterization)", () => {
       await mount();
 
       expect(screen.getByRole("radio", { name: /Soneca/, checked: true })).toBeInTheDocument();
+    });
+  });
+
+  describe("live next-sleep forecast (spec #2)", () => {
+    it("the same suggestion counts down with the clock and turns overdue", async () => {
+      vi.setSystemTime(new Date("2026-01-01T13:00:00.000Z")); // 10:00 local
+      holder.lastSession = { id: "prev", end_time: "2026-01-01T12:30:00.000Z" };
+      holder.ai = {
+        kind: "NAP",
+        windowStart: "11:00",
+        suggestedNapTime: "11:30",
+        windowEnd: "12:00",
+        minutesUntilSuggested: 90,
+        suggestedAtIso: "2026-01-01T14:30:00.000Z", // 11:30 local
+        windowStartIso: "2026-01-01T14:00:00.000Z",
+        windowEndIso: "2026-01-01T15:00:00.000Z",
+      } as Partial<AISuggestion>;
+      await mount();
+
+      const hero = screen.getByRole("region", { name: "Previsão de sono" });
+      expect(within(hero).getByText("11:30")).toBeInTheDocument();
+      expect(within(hero).getByText("Em cerca de 1h 30min")).toBeInTheDocument();
+
+      await flush(60 * 60_000); // 11:00
+      expect(within(hero).getByText("Em cerca de 30 min")).toBeInTheDocument();
+
+      await flush(45 * 60_000); // 11:45
+      expect(within(hero).getByText("Agora")).toBeInTheDocument();
+      expect(within(hero).getByText("Já passou do horário previsto")).toBeInTheDocument();
+      expect(within(hero).queryByText(/Em cerca de/)).not.toBeInTheDocument();
+    });
+
+    it("the fallback without a suggestion also turns overdue with the clock", async () => {
+      await mount();
+      const hero = screen.getByRole("region", { name: "Previsão de sono" });
+      expect(within(hero).getByText("09:40")).toBeInTheDocument();
+
+      await flush(41 * 60_000); // 09:41
+      expect(within(hero).getByText("Agora")).toBeInTheDocument();
+      expect(within(hero).getByText("Já passou do horário previsto")).toBeInTheDocument();
+    });
+
+    it("a sleep started on another phone shows up within 30 s", async () => {
+      await mount();
+      expect(screen.getByRole("button", { name: "Iniciar soneca" })).toBeInTheDocument();
+
+      fake.seed(TABLE, {
+        id: "other",
+        baby_id: baby.id,
+        type: "NAP",
+        start_time: new Date(NOW.getTime() - 5 * 60_000).toISOString(),
+      });
+      await flush(30_000);
+
+      expect(screen.getByRole("button", { name: "Acordou" })).toBeInTheDocument();
+      expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    });
+
+    it("waking at 02:00 after an 18:30 night: at 02:05 the next sleep is the night, live", async () => {
+      const now = new Date("2026-01-01T05:05:00.000Z"); // 02:05 local
+      vi.setSystemTime(now);
+      const lastEnd = "2026-01-01T05:00:00.000Z"; // 02:00 local
+      holder.lastSession = { id: "night", end_time: lastEnd, type: "NIGHT_SLEEP" };
+      holder.ai = computeNapSuggestion({
+        birthDateIso: baby.birth_date,
+        lastSleepEndIso: lastEnd,
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: "America/Sao_Paulo",
+        now,
+      });
+      await mount();
+
+      const hero = screen.getByRole("region", { name: "Previsão de sono" });
+      expect(within(hero).getByText("Sono noturno")).toBeInTheDocument();
+      expect(screen.getByRole("radio", { name: /Noturno/, checked: true })).toBeInTheDocument();
+      // 60–75 min window from 02:00: 03:10, counted down by the clock.
+      expect(within(hero).getByText("03:10")).toBeInTheDocument();
+      expect(within(hero).getByText("Em cerca de 1h 5min")).toBeInTheDocument();
+      await flush(30 * 60_000);
+      expect(within(hero).getByText("Em cerca de 35 min")).toBeInTheDocument();
     });
   });
 });

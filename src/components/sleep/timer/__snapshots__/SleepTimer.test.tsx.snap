@@ -183,13 +183,13 @@ exports[`SleepTimer (characterization) > renders_idle_state 1`] = `
         class="block font-display font-bold text-sn-tx tabular-nums text-[60px] leading-none my-1.5 tracking-[-0.02em]"
         data-slot="big-number"
       >
-        09:45
+        09:40
       </span>
       <p
         class="font-sans text-sm font-semibold text-sn-mu"
       >
         Em cerca de 
-        45 min
+        40 min
       </p>
       <button
         class="-mx-2 mt-1.5 inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full px-2 font-sans text-[13px] font-bold text-sn-pr outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out motion-reduce:transition-none hover:bg-sn-pr/10 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"

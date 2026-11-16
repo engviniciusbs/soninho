@@ -42,3 +42,19 @@ export function getMinutesUntilNextNap(
 ): number {
   return Math.max(0, range.maxMinutes - elapsedMinutes);
 }
+
+const FIVE_MIN_MS = 5 * 60_000;
+
+/**
+ * The predicted next-sleep instant (epoch ms): the middle of the wake window
+ * counted from `anchorMs` (the end of the last sleep), rounded to 5 minutes
+ * and kept inside the window. Shared by the server suggestion and the home's
+ * fallback so both point at the same moment.
+ */
+export function wakeWindowMidpoint(anchorMs: number, range: WakeWindowRange): number {
+  const start = anchorMs + range.minMinutes * 60_000;
+  const end = anchorMs + range.maxMinutes * 60_000;
+  const mid = anchorMs + Math.round((range.minMinutes + range.maxMinutes) / 2) * 60_000;
+  const rounded = Math.round(mid / FIVE_MIN_MS) * FIVE_MIN_MS;
+  return Math.min(end, Math.max(start, rounded));
+}

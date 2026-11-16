@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
 import { useAISuggestions } from "@/hooks/useAISuggestions";
+import { wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
 import { useNow } from "@/hooks/useNow";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { useActiveSleepTimer } from "@/store/sleepStore";
@@ -27,7 +28,6 @@ import type { EnvironmentData } from "./EnvironmentPicker";
 import { PostSleepReview } from "./PostSleepReview";
 import { useBackdate } from "./timer/useBackdate";
 
-const ASAP = "Assim que possível";
 /** Local hours in which the type selector may follow a NAP suggestion: [05:00, 19:00). */
 const AUTO_SWITCH_FROM_HOUR = 5;
 const AUTO_SWITCH_UNTIL_HOUR = 19;
@@ -54,7 +54,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   const { activeBaby } = useBaby();
   const timer = useActiveSleepTimer(activeBaby?.id);
   const {
-    elapsedMinutes, status, range, minutesUntilNextNap, lastSleepEnd, isLoading: wwLoading,
+    elapsedMinutes, status, range, lastSleepEnd, isLoading: wwLoading,
   } = useWakeWindow();
   const { data: ai } = useAISuggestions();
   // Same 60s clock as the wake window; null on the server and the first
@@ -226,21 +226,26 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
     for (const k of candidates) edited.current.delete(k);
   }
 
-  /* ── Next sleep: the AI suggestion, else the wake-window fallback ── */
+  /* ── Next sleep: the AI suggestion, else the wake-window fallback ──
+   * Both give an absolute instant; "em X min" and "overdue" come from the
+   * 60 s clock, so the card keeps moving while the suggestion is cached. */
   const kind = ai?.kind ?? "NAP";
+  let targetMs: number | null = null;
+  if (ai?.suggestedAtIso) {
+    targetMs = Date.parse(ai.suggestedAtIso);
+  } else if (!wwLoading && now !== null) {
+    // The middle of the wake window, as the suggestion: from the end of the
+    // last sleep, or from now when there is none.
+    const anchor = lastSleepEnd ? Date.parse(lastSleepEnd) : now;
+    targetMs = wakeWindowMidpoint(anchor, range);
+  }
   let time: string | null = null;
   let minutesUntil: number | null = null;
   let overdue = false;
-  if (ai) {
-    // Time and "overdue" both come from the suggestion itself.
-    const aiMinutes = ai.minutesUntilSuggested ?? minutesUntilNextNap;
-    overdue = ai.suggestedNapTime === ASAP || aiMinutes <= 0;
-    time = overdue ? "Agora" : ai.suggestedNapTime;
-    minutesUntil = overdue ? null : aiMinutes;
-  } else if (!wwLoading && now !== null) {
-    overdue = minutesUntilNextNap <= 0;
-    time = overdue ? "Agora" : format(new Date(now + minutesUntilNextNap * 60_000), "HH:mm");
-    minutesUntil = overdue ? null : minutesUntilNextNap;
+  if (targetMs !== null && now !== null) {
+    overdue = targetMs <= now;
+    time = overdue ? "Agora" : format(new Date(targetMs), "HH:mm");
+    minutesUntil = overdue ? null : (targetMs - now) / 60_000;
   }
 
   return (

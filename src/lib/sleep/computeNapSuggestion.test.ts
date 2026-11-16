@@ -83,6 +83,9 @@ describe("computeNapSuggestion", () => {
         "Sem um sono concluído recente, não dá para estimar a janela. Registre o fim da última soneca ou do sono noturno.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      suggestedAtIso: null,
+      windowStartIso: null,
+      windowEndIso: null,
     });
   });
 
@@ -169,6 +172,36 @@ describe("computeNapSuggestion", () => {
       });
       expect(r.kind).toBe("NIGHT_SLEEP");
       expect(r.minutesUntilSuggested).toBe(205);
+    });
+  });
+
+  describe("absolute times for the client clock (spec #2)", () => {
+    const base = {
+      birthDateIso,
+      lastSleepEndIso: "2026-05-24T12:00:00Z", // 09:00 local, 75-90 min window
+      timezone: tz,
+    };
+
+    it("returns the suggested time and the window as ISO instants", () => {
+      const r = computeNapSuggestion({ ...base, now: new Date("2026-05-24T12:30:00Z") });
+      expect(r).toMatchObject({
+        suggestedAtIso: "2026-05-24T13:25:00.000Z", // 10:25 local
+        windowStartIso: "2026-05-24T13:15:00.000Z",
+        windowEndIso: "2026-05-24T13:30:00.000Z",
+      });
+    });
+
+    it("the instant does not depend on when it was asked", () => {
+      const early = computeNapSuggestion({ ...base, now: new Date("2026-05-24T12:30:00Z") });
+      const late = computeNapSuggestion({ ...base, now: new Date("2026-05-24T13:27:00Z") });
+      const overdue = computeNapSuggestion({ ...base, now: new Date("2026-05-24T14:00:00Z") });
+      expect(late.suggestedAtIso).toBe(early.suggestedAtIso);
+      expect(overdue.suggestedAtIso).toBe(early.suggestedAtIso);
+    });
+
+    it("no history -> no instants", () => {
+      const r = computeNapSuggestion({ ...base, lastSleepEndIso: null });
+      expect(r.suggestedAtIso).toBeNull();
     });
   });
 });
