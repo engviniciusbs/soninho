@@ -143,9 +143,8 @@
   --color-sn-night: var(--sn-night);
   --color-sn-danger: var(--sn-danger);
 
-  /* Legacy names still read by screens not yet redesigned; they now resolve to the palette. */
+  /* Legacy names still read by the auth layout; they resolve to the palette. */
   --color-lavender: var(--sn-pr);
-  --color-sky-sleep: var(--sn-night);
   --color-indigo: var(--sn-night);
 
   --ease-sn-out: var(--sn-ease-out);
@@ -210,7 +209,7 @@
   letter-spacing: -0.02em;
 }
 
-/* ── Utility classes ────────────────────────────────────────────── */
+/* ── Auth and invite utilities ──────────────────────────────────── */
 
 .glow-primary {
   box-shadow:
@@ -223,37 +222,6 @@
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--sn-bd);
-}
-
-/* ── Editorial surface system ───────────────────────────────────── */
-/* Solid, consistent surfaces used across the dashboard. Calm by default
-   (no neon glow). Elevation comes from a soft, low shadow + hairline border. */
-.surface {
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow:
-    0 1px 2px color-mix(in oklab, var(--sn-shade) 25%, transparent),
-    0 8px 24px -16px color-mix(in oklab, var(--sn-shade) 55%, transparent);
-}
-
-.surface-muted {
-  background: color-mix(in oklab, var(--sn-s1) 55%, transparent);
-  border: 1px solid var(--border);
-}
-
-/* Subtle interactive surface for chips / list rows */
-.surface-soft {
-  background: color-mix(in oklab, var(--muted) 45%, transparent);
-  border: 1px solid var(--border);
-}
-
-/* Tabular display numerals (timers, stats) */
-.num-display {
-  font-family: var(--sn-font-display);
-  font-variation-settings: "SOFT" 50;
-  font-feature-settings: "tnum", "ss01";
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
 }
 
 /* Accent wordmark text (auth and invite): solid lavender, no gradient. */
