@@ -1,0 +1,204 @@
+// @vitest-environment jsdom
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
+import { formatInTimeZone } from "date-fns-tz";
+import { renderWithProviders } from "@/test/render";
+import type { Baby, SleepSession } from "@/types";
+import { deleteSleepSession, getSleepSessions } from "@/lib/supabase/queries/sleep";
+import { WeekStrip } from "./WeekStrip";
+import HistoryPage from "@/app/(dashboard)/history/page";
+
+const holder = vi.hoisted(() => ({
+  sessions: [] as unknown[],
+  search: "",
+}));
+
+vi.mock("@/lib/supabase/client", () => ({ createClient: () => ({}) }));
+vi.mock("@/lib/supabase/queries/sleep", () => ({
+  getSleepSessions: vi.fn(async () => ({ data: holder.sessions, error: null })),
+  deleteSleepSession: vi.fn(async () => ({ error: null })),
+}));
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(holder.search),
+  usePathname: () => "/history",
+  useRouter: () => ({ push: () => {}, replace: () => {}, refresh: () => {} }),
+}));
+vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
+
+const TZ = "America/Sao_Paulo";
+// Thursday, 1 Jan 2026, 09:00 in America/Sao_Paulo.
+const NOW = new Date("2026-01-01T12:00:00.000Z");
+// About 30 weeks old: 14h a day expected.
+const baby = { id: "baby-1", name: "Lia", birth_date: "2025-06-01" } as Baby;
+
+function sleep(id: string, type: "NAP" | "NIGHT_SLEEP", start: string, end: string | null, extra: Partial<SleepSession> = {}) {
+  return {
+    id,
+    baby_id: "baby-1",
+    type,
+    start_time: start,
+    end_time: end,
+    duration_min: end ? Math.round((Date.parse(end) - Date.parse(start)) / 60_000) : null,
+    quality: null,
+    how_fell_asleep: null,
+    wake_reason: null,
+    notes: null,
+    location: null,
+    room_temp_celsius: null,
+    weather_condition: null,
+    sleep_sack_type: null,
+    sleep_sack_tog: null,
+    clothing_description: null,
+    ...extra,
+  } as unknown as SleepSession;
+}
+
+// 10:00 to 10:40 local, fell asleep in arms.
+const nap = sleep("nap-1", "NAP", "2026-01-01T13:00:00.000Z", "2026-01-01T13:40:00.000Z", { how_fell_asleep: "colo" });
+// 22:00 on Dec 31 to 06:00 on Jan 1 local.
+const night = sleep("night-1", "NIGHT_SLEEP", "2026-01-01T01:00:00.000Z", "2026-01-01T09:00:00.000Z");
+
+function mount(ui: React.ReactElement) {
+  return renderWithProviders(ui, { baby: { activeBaby: baby, babies: [baby] } });
+}
+
+const key = (d: Date) => formatInTimeZone(d, TZ, "yyyy-MM-dd");
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(NOW);
+  holder.sessions = [];
+  holder.search = "";
+  window.history.replaceState(null, "", "/history");
+});
+
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+  vi.clearAllMocks();
+});
+
+describe("WeekStrip", () => {
+  it("shows_the_7_days_ending_today_and_selects_on_tap", () => {
+    const onSelect = vi.fn();
+    mount(<WeekStrip selected={NOW} onSelect={onSelect} timeZone={TZ} />);
+    const days = within(screen.getByRole("group", { name: "Escolher o dia" })).getAllByRole("button");
+    // Up to 30 days back by scrolling; the last 7 end today.
+    expect(days).toHaveLength(30);
+    expect(days.slice(-7).map((d) => d.textContent)).toEqual([
+      "sex26",
+      "sáb27",
+      "dom28",
+      "seg29",
+      "ter30",
+      "qua31",
+      "hoje1",
+    ]);
+    const today = days[days.length - 1];
+    expect(today).toHaveAttribute("aria-current", "date");
+    expect(today).toHaveAccessibleName("Hoje, 1 de janeiro");
+    expect(days.filter((d) => d.hasAttribute("aria-current"))).toHaveLength(1);
+
+    fireEvent.click(days[days.length - 6]);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(key(onSelect.mock.calls[0][0])).toBe("2025-12-27");
+  });
+
+  it("marks_the_selected_day_as_current", () => {
+    mount(<WeekStrip selected={new Date("2025-12-29T15:00:00.000Z")} onSelect={() => {}} timeZone={TZ} />);
+    const current = screen.getByRole("button", { current: "date" });
+    expect(current).toHaveTextContent("seg29");
+  });
+});
+
+describe("HistoryPage", () => {
+  it("empty_day_shows_the_empty_state_without_a_status", async () => {
+    mount(<HistoryPage />);
+    expect(await screen.findByText("Nenhum sono registrado neste dia")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adicionar sono" })).toBeInTheDocument();
+    expect(document.querySelector("[data-slot=status-pill]")).toBeNull();
+    expect(screen.queryByText("Dentro do esperado")).toBeNull();
+    expect(screen.queryByText(/^0/)).toBeNull();
+    expect(screen.getByRole("heading", { level: 1, name: "Registro" })).toBeInTheDocument();
+  });
+
+  it("shows_the_day_total_status_and_the_sessions", async () => {
+    holder.sessions = [nap, night];
+    mount(<HistoryPage />);
+    const summary = await screen.findByRole("region", { name: "Sono no dia" });
+    // 40 min of nap + 6h of the night that fell on this day.
+    expect(summary).toHaveTextContent("6h 40min");
+    expect(within(summary).getByText("Abaixo do esperado")).toBeInTheDocument();
+    const list = screen.getByRole("list", { name: "Sonos do dia" });
+    expect(within(list).getByRole("button", { name: /Soneca.*10:00 a 10:40, adormeceu no colo.*40 min/ })).toBeInTheDocument();
+    expect(within(list).getByRole("button", { name: /Noite.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
+    expect(list.textContent).not.toContain("·");
+  });
+
+  it("filtro_sonecas_lists_only_naps", async () => {
+    holder.sessions = [nap, night];
+    mount(<HistoryPage />);
+    const list = await screen.findByRole("list", { name: "Sonos do dia" });
+    expect(within(list).getAllByRole("button")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", { name: "Sonecas" }));
+    expect(screen.getByRole("button", { name: "Sonecas" })).toHaveAttribute("aria-pressed", "true");
+    const rows = within(screen.getByRole("list", { name: "Sonos do dia" })).getAllByRole("button");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent("Soneca");
+    expect(window.location.search).toBe("?tipo=sonecas");
+  });
+
+  it("tipo_noite_from_the_url_lists_only_nights", async () => {
+    holder.search = "tipo=noite";
+    holder.sessions = [nap, night];
+    mount(<HistoryPage />);
+    const list = await screen.findByRole("list", { name: "Sonos do dia" });
+    const rows = within(list).getAllByRole("button");
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toHaveTextContent("Noite");
+    expect(screen.getByRole("button", { name: "Noite" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("dia_from_the_url_picks_the_day_and_tapping_a_day_writes_it", async () => {
+    holder.search = "dia=2025-12-30";
+    mount(<HistoryPage />);
+    expect(await screen.findByRole("button", { current: "date" })).toHaveTextContent("ter30");
+    await screen.findByText("Nenhum sono registrado neste dia");
+    // Fetched from the day before, so a night that began then is included.
+    const [, , from, to] = vi.mocked(getSleepSessions).mock.calls.at(-1)!;
+    expect(from.toISOString()).toBe("2025-12-29T03:00:00.000Z");
+    expect(to.toISOString()).toBe("2025-12-31T02:59:59.999Z");
+
+    fireEvent.click(screen.getByRole("button", { name: "domingo, 28 de dezembro" }));
+    expect(screen.getByRole("button", { current: "date" })).toHaveTextContent("dom28");
+    expect(window.location.search).toBe("?dia=2025-12-28");
+  });
+
+  it("tapping_a_row_opens_the_form_to_edit_and_delete_it", async () => {
+    holder.sessions = [nap, night];
+    mount(<HistoryPage />);
+    const list = await screen.findByRole("list", { name: "Sonos do dia" });
+    fireEvent.click(within(list).getByRole("button", { name: /Soneca/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("Editar registro")).toBeInTheDocument();
+    expect((document.getElementById("start_time_input") as HTMLInputElement).value).toBe("10:00");
+    expect((document.getElementById("end_time_input") as HTMLInputElement).value).toBe("10:40");
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Excluir" }));
+    expect(deleteSleepSession).not.toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.click(within(dialog).getByRole("button", { name: "Confirmar exclusão" }));
+    });
+    expect(deleteSleepSession).toHaveBeenCalledWith(expect.anything(), "nap-1");
+  });
+
+  it("adicionar_sono_on_a_past_day_starts_on_that_day", async () => {
+    holder.search = "dia=2025-12-30";
+    mount(<HistoryPage />);
+    fireEvent.click(await screen.findByRole("button", { name: "Adicionar sono" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByText("Registrar sono passado")).toBeInTheDocument();
+    expect((document.getElementById("start_date") as HTMLInputElement).value).toBe("2025-12-30");
+    expect((document.getElementById("end_date") as HTMLInputElement).value).toBe("2025-12-30");
+  });
+});

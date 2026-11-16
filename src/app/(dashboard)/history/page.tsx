@@ -1,49 +1,100 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { differenceInWeeks } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { createClient } from "@/lib/supabase/client";
 import { getSleepSessions } from "@/lib/supabase/queries/sleep";
+import { allocateSessionToLocalDays, lastDayKeysInTimeZone } from "@/lib/sleep/sessionDayAllocation";
+import { getAgeSchedule } from "@/lib/sleep/schedules";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { useNow } from "@/hooks/useNow";
+import { WeekStrip, WEEK_STRIP_DAYS } from "@/components/history/WeekStrip";
+import { DaySummaryCard } from "@/components/history/DaySummaryCard";
 import { SleepCard } from "@/components/sleep/SleepCard";
 import { SleepForm } from "@/components/sleep/SleepForm";
-import { PageHeader } from "@/components/ui/page-header";
-import { StatTile } from "@/components/ui/stat-tile";
+import { PageTitle } from "@/components/ui/page-title";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Chip } from "@/components/ui/chip";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Clock, Moon, Sun } from "lucide-react";
-import { format, startOfDay, subDays, isToday, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { formatDuration } from "@/lib/utils";
+import { IconPlus } from "@/components/brand/icons";
 import type { SleepSession } from "@/types";
 
-export default function HistoryPage() {
-  const { activeBaby } = useBaby();
+type Filter = "todos" | "sonecas" | "noite";
+
+const FILTERS: { value: Filter; label: string; type?: SleepSession["type"] }[] = [
+  { value: "todos", label: "Todos" },
+  { value: "sonecas", label: "Sonecas", type: "NAP" },
+  { value: "noite", label: "Noite", type: "NIGHT_SLEEP" },
+];
+
+const EMPTY_FILTER: Record<Exclude<Filter, "todos">, string> = {
+  sonecas: "Nenhuma soneca neste dia.",
+  noite: "Nenhuma noite neste dia.",
+};
+
+/** One value of the query string: shown at once when picked, then read back from the URL. */
+function useUrlParam(name: string): [string | null, (value: string | null) => void] {
+  const param = useSearchParams().get(name);
+  const [picked, setPicked] = useState<{ param: string | null; value: string | null } | null>(null);
+  const value = picked && picked.param === param ? picked.value : param;
+
+  function set(next: string | null) {
+    setPicked({ param, value: next });
+    const url = new URL(window.location.href);
+    if (next === null) url.searchParams.delete(name);
+    else url.searchParams.set(name, next);
+    window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+  }
+
+  return [value, set];
+}
+
+function timeZoneNow(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/** The chosen day (`?dia=AAAA-MM-DD`, today when absent or out of the strip) and the filter (`?tipo=`). */
+function DayView() {
+  const { activeBaby, isLoading: babyLoading } = useBaby();
   const supabase = createClient();
+  const timeZone = timeZoneNow();
+  const now = useNow(60_000);
+  const [diaParam, setDia] = useUrlParam("dia");
+  const [tipoParam, setTipo] = useUrlParam("tipo");
   const [showForm, setShowForm] = useState(false);
   const [editSession, setEditSession] = useState<SleepSession | null>(null);
-  const [filterType, setFilterType] = useState<string>("ALL");
-  const [daysBack, setDaysBack] = useState(7);
 
-  const from = subDays(startOfDay(new Date()), daysBack);
-  const to = new Date();
+  const keys = lastDayKeysInTimeZone(WEEK_STRIP_DAYS, timeZone, new Date());
+  const todayKey = keys[keys.length - 1];
+  const dayKey = diaParam && keys.includes(diaParam) ? diaParam : todayKey;
+  const filter = FILTERS.find((f) => f.value === tipoParam) ?? FILTERS[0];
 
-  const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ["sleep-sessions", activeBaby?.id, daysBack],
+  // Day bounds in the device timezone (23 or 25 hours on a DST change).
+  const { dayStart, dayEnd, fetchFrom } = useMemo(() => {
+    const start = fromZonedTime(`${dayKey}T00:00:00`, timeZone);
+    const at = (deltaHours: number) =>
+      formatInTimeZone(new Date(start.getTime() + deltaHours * 3_600_000), timeZone, "yyyy-MM-dd");
+    return {
+      dayStart: start,
+      dayEnd: fromZonedTime(`${at(36)}T00:00:00`, timeZone),
+      fetchFrom: fromZonedTime(`${at(-12)}T00:00:00`, timeZone),
+    };
+  }, [dayKey, timeZone]);
+
+  // From the day before, so a night that began then is included.
+  const { data: fetched = [], isLoading } = useQuery({
+    queryKey: ["sleep-sessions", activeBaby?.id, "day", dayKey],
     queryFn: async (): Promise<SleepSession[]> => {
       if (!activeBaby) return [];
       const { data, error } = await getSleepSessions(
         supabase,
         activeBaby.id,
-        from,
-        to
+        fetchFrom,
+        new Date(dayEnd.getTime() - 1)
       );
       if (error) throw error;
       return (data ?? []) as SleepSession[];
@@ -51,162 +102,103 @@ export default function HistoryPage() {
     enabled: !!activeBaby,
   });
 
-  const filtered = useMemo(() => {
-    if (filterType === "ALL") return sessions;
-    return sessions.filter((s) => s.type === filterType);
-  }, [sessions, filterType]);
+  // The sleeps that touch the day, earliest first.
+  const sessions = useMemo(() => {
+    const from = dayStart.getTime();
+    const to = dayEnd.getTime();
+    return fetched
+      .filter((s) => {
+        const start = Date.parse(s.start_time);
+        const end = s.end_time ? Date.parse(s.end_time) : (now ?? start);
+        return start < to && end > from;
+      })
+      .sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
+  }, [fetched, dayStart, dayEnd, now]);
 
-  const grouped = useMemo(() => {
-    const groups: Record<string, SleepSession[]> = {};
-    for (const s of filtered) {
-      const day = format(new Date(s.start_time), "yyyy-MM-dd");
-      if (!groups[day]) groups[day] = [];
-      groups[day].push(s);
-    }
-    return groups;
-  }, [filtered]);
-
-  const todaySessions = useMemo(
-    () => sessions.filter((s) => isToday(new Date(s.start_time))),
-    [sessions]
+  const totalMinutes = useMemo(
+    () =>
+      sessions
+        .flatMap((s) => allocateSessionToLocalDays(s, timeZone))
+        .filter((a) => a.dayKey === dayKey)
+        .reduce((sum, a) => sum + a.napMinutes + a.nightMinutes, 0),
+    [sessions, timeZone, dayKey]
   );
 
-  const todayStats = useMemo(() => {
-    const completed = todaySessions.filter((s) => s.duration_min != null);
-    const totalMin = completed.reduce((a, s) => a + (s.duration_min ?? 0), 0);
-    const naps = completed.filter((s) => s.type === "NAP");
-    const longest = completed.length
-      ? Math.max(...completed.map((s) => s.duration_min ?? 0))
-      : 0;
-    return {
-      totalSleep: totalMin,
-      napCount: naps.length,
-      longestStretch: longest,
-    };
-  }, [todaySessions]);
+  const targetHours = activeBaby
+    ? getAgeSchedule(differenceInWeeks(new Date(), new Date(activeBaby.birth_date))).totalSleepHours
+    : 0;
+
+  const listed = filter.type ? sessions.filter((s) => s.type === filter.type) : sessions;
+
+  function openForm(session: SleepSession | null) {
+    setEditSession(session);
+    setShowForm(true);
+  }
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto md:mx-0">
-      <PageHeader
-        title="Registro de sono"
-        subtitle="Histórico de sonecas e noites"
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => {
-                setEditSession(null);
-                setShowForm(true);
-              }}
-              className="rounded-full gap-2 px-5"
-            >
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              Adicionar
-            </Button>
-          </div>
-        }
+    <>
+      <WeekStrip
+        selected={dayStart}
+        timeZone={timeZone}
+        onSelect={(d) => {
+          const k = formatInTimeZone(d, timeZone, "yyyy-MM-dd");
+          setDia(k === todayKey ? null : k);
+        }}
       />
 
-      {/* Today summary */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatTile
-          icon={<Clock className="h-4 w-4" />}
-          label="Total de sono"
-          value={formatDuration(todayStats.totalSleep)}
-          sub="Hoje"
-        />
-        <StatTile
-          icon={<Sun className="h-4 w-4" />}
-          label="Sonecas"
-          value={todayStats.napCount}
-          sub="Hoje"
-        />
-        <StatTile
-          icon={<Moon className="h-4 w-4" />}
-          label="Maior trecho"
-          value={formatDuration(todayStats.longestStretch)}
-          sub="Hoje"
-        />
-      </div>
+      <div className="flex flex-col gap-3">
+        {babyLoading || isLoading ? (
+          <DayFallback />
+        ) : (
+          <>
+            <DaySummaryCard
+              totalMinutes={totalMinutes}
+              targetHours={targetHours}
+              sessions={sessions}
+              dayStart={dayStart}
+              dayEnd={dayEnd}
+              now={now}
+            />
 
-      {/* Filters */}
-      <div className="flex gap-2">
-        <Select value={filterType} onValueChange={(v) => v && setFilterType(v)}>
-          <SelectTrigger className="w-[140px] rounded-xl">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">Todos</SelectItem>
-            <SelectItem value="NAP">
-              <span className="flex items-center gap-1">
-                <Sun className="h-3 w-3" /> Sonecas
-              </span>
-            </SelectItem>
-            <SelectItem value="NIGHT_SLEEP">
-              <span className="flex items-center gap-1">
-                <Moon className="h-3 w-3" /> Noturno
-              </span>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={daysBack.toString()}
-          onValueChange={(v) => v && setDaysBack(parseInt(v))}
-        >
-          <SelectTrigger className="w-[140px] rounded-xl">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">7 dias</SelectItem>
-            <SelectItem value="14">14 dias</SelectItem>
-            <SelectItem value="30">30 dias</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Grouped sessions */}
-      {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
-          ))}
-        </div>
-      ) : Object.keys(grouped).length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-12 text-center">
-          <Clock className="h-10 w-10 text-muted-foreground/50" />
-          <p className="text-muted-foreground">
-            Nenhum registro encontrado neste período
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {Object.entries(grouped)
-            .sort(([a], [b]) => b.localeCompare(a))
-            .map(([day, daySessions]) => (
-              <div key={day} className="space-y-2">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider sticky top-0 bg-background/90 backdrop-blur-sm py-1 z-10">
-                  {isToday(parseISO(day))
-                    ? "Hoje"
-                    : format(parseISO(day), "EEEE, d 'de' MMMM", {
-                        locale: ptBR,
-                      })}
-                </h3>
-                <div className="space-y-2">
-                  {daySessions.map((session) => (
-                    <SleepCard
-                      key={session.id}
-                      session={session}
-                      onEdit={(s) => {
-                        setEditSession(s);
-                        setShowForm(true);
-                      }}
-                    />
+            {sessions.length > 0 && (
+              <>
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por tipo">
+                  {FILTERS.map((f) => (
+                    <Chip
+                      key={f.value}
+                      selected={f.value === filter.value}
+                      onClick={() => setTipo(f.value === "todos" ? null : f.value)}
+                    >
+                      {f.label}
+                    </Chip>
                   ))}
                 </div>
-              </div>
-            ))}
-        </div>
-      )}
+
+                <Card className="gap-0 px-[18px] py-2">
+                  {listed.length === 0 ? (
+                    <p className="py-2 font-sans text-[15px] font-semibold text-sn-mu">
+                      {EMPTY_FILTER[filter.value as Exclude<Filter, "todos">]}
+                    </p>
+                  ) : (
+                    <ul aria-label="Sonos do dia" className="divide-y divide-sn-bd">
+                      {listed.map((s) => (
+                        <li key={s.id}>
+                          <SleepCard session={s} onEdit={openForm} />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Card>
+              </>
+            )}
+          </>
+        )}
+
+        <Button variant="secondary" className="w-full" onClick={() => openForm(null)}>
+          <IconPlus size={20} />
+          Adicionar sono
+        </Button>
+      </div>
 
       <SleepForm
         open={showForm}
@@ -215,7 +207,35 @@ export default function HistoryPage() {
           setEditSession(null);
         }}
         session={editSession}
+        day={dayKey === todayKey ? undefined : dayKey}
       />
+    </>
+  );
+}
+
+function DayFallback() {
+  return (
+    <div aria-busy="true" className="flex flex-col gap-3">
+      <Skeleton className="h-[136px] w-full rounded-[24px]" />
+      <Skeleton className="h-[180px] w-full rounded-[24px]" />
+    </div>
+  );
+}
+
+export default function HistoryPage() {
+  return (
+    <div>
+      <PageTitle>Registro</PageTitle>
+      <Suspense
+        fallback={
+          <div aria-busy="true" className="flex flex-col gap-3">
+            <Skeleton className="h-[62px] w-full rounded-2xl" />
+            <DayFallback />
+          </div>
+        }
+      >
+        <DayView />
+      </Suspense>
     </div>
   );
 }

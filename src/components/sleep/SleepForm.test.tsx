@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { toast } from "sonner";
 import { renderWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
@@ -82,11 +82,13 @@ describe("SleepForm", () => {
     expect(field("end_time_input").value).toBe("06:15");
     expect(field("location").value).toBe("berço");
     expect(field("notes").value).toBe("acordou uma vez");
-    // Closed base-ui selects render the raw value (no `items` mapping).
-    expect(screen.getByLabelText("Tipo de sono")).toHaveTextContent("NIGHT_SLEEP");
-    expect(screen.getByLabelText("Qualidade do sono")).toHaveTextContent("4");
-    expect(screen.getByLabelText("Como adormeceu")).toHaveTextContent("colo");
-    expect(screen.getByLabelText("Motivo do despertar")).toHaveTextContent("fome");
+    // Closed selects show the label of the value (`items` mapping).
+    expect(
+      within(screen.getByLabelText("Tipo de sono")).getByRole("radio", { name: "Noite" })
+    ).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByLabelText("Qualidade do sono")).toHaveTextContent("4 de 5");
+    expect(screen.getByLabelText("Como adormeceu")).toHaveTextContent("No colo");
+    expect(screen.getByLabelText("Motivo do despertar")).toHaveTextContent("Fome");
     expect(screen.getByText("1 preenchido")).toBeInTheDocument();
     expect(stable(document.body)).toMatchSnapshot("edit");
   });
