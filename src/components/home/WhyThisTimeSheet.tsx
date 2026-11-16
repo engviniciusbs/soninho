@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { IconThumbDown, IconThumbUp } from "@/components/brand/icons";
 import type { AISuggestion, Baby, WakeWindowRange } from "@/types";
 import { formatWindowBound } from "./format";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 export interface WhyThisTimeSheetProps {
   open: boolean;
@@ -70,7 +71,7 @@ function SuggestionBody({ suggestion, baby }: { suggestion: AISuggestion; baby: 
           suggestedTime: suggestion.suggestedNapTime ?? null,
           windowStart: suggestion.windowStart ?? null,
           windowEnd: suggestion.windowEnd ?? null,
-          ageWeeks: differenceInWeeks(new Date(), new Date(baby.birth_date)),
+          ageWeeks: differenceInWeeks(new Date(), parseLocalDate(baby.birth_date)),
         }),
       });
     } catch {

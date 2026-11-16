@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IconPlus } from "@/components/brand/icons";
 import type { SleepSession } from "@/types";
 import { withProvisionalEnd } from "@/lib/sleep/provisional";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 type Filter = "todos" | "sonecas" | "noite";
 
@@ -128,7 +129,7 @@ function DayView() {
   );
 
   const targetHours = activeBaby
-    ? getAgeSchedule(differenceInWeeks(new Date(), new Date(activeBaby.birth_date))).totalSleepHours
+    ? getAgeSchedule(differenceInWeeks(new Date(), parseLocalDate(activeBaby.birth_date))).totalSleepHours
     : 0;
 
   const listed = filter.type ? sessions.filter((s) => s.type === filter.type) : sessions;

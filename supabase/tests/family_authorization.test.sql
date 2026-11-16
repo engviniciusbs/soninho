@@ -31,7 +31,7 @@ insert into public.sleep_sessions (id, baby_id, type, start_time, end_time) valu
 -- --------------------------------------------- function existence (RED guard)
 select has_function('public', 'get_invite_preview', array['text'], 'get_invite_preview(text) exists');
 select has_function('public', 'accept_family_invite', array['text','text'], 'accept_family_invite(text,text) exists');
-select has_function('public', 'create_baby_with_family', array['text','date','text','text'], 'create_baby_with_family(...) exists');
+select has_function('public', 'create_baby_with_family', array['text','date','text','text','uuid'], 'create_baby_with_family(...) exists');
 
 -- ------------------------------------------------------------ invites RLS
 select tests.login_anon();
@@ -125,10 +125,10 @@ select ok(not has_function_privilege('anon', 'public.accept_family_invite(text,t
 select ok(not has_function_privilege('anon', 'public.get_user_family_ids(uuid)', 'execute'), 'anon_cannot_execute_helpers: get_user_family_ids');
 select ok(not has_function_privilege('anon', 'public.get_user_owned_family_ids(uuid)', 'execute'), 'anon_cannot_execute_helpers: get_user_owned_family_ids');
 select ok(not has_function_privilege('anon', 'public.user_can_write_family(uuid,uuid)', 'execute'), 'anon_cannot_execute_helpers: user_can_write_family');
-select ok(not has_function_privilege('anon', 'public.create_baby_with_family(text,date,text,text)', 'execute'), 'anon_cannot_execute: create_baby_with_family');
+select ok(not has_function_privilege('anon', 'public.create_baby_with_family(text,date,text,text,uuid)', 'execute'), 'anon_cannot_execute: create_baby_with_family');
 select ok(has_function_privilege('anon', 'public.get_invite_preview(text)', 'execute'), 'anon_can_execute: get_invite_preview');
 select ok(has_function_privilege('authenticated', 'public.accept_family_invite(text,text)', 'execute'), 'authenticated_can_execute: accept_family_invite');
-select ok(has_function_privilege('authenticated', 'public.create_baby_with_family(text,date,text,text)', 'execute'), 'authenticated_can_execute: create_baby_with_family');
+select ok(has_function_privilege('authenticated', 'public.create_baby_with_family(text,date,text,text,uuid)', 'execute'), 'authenticated_can_execute: create_baby_with_family');
 select ok(has_function_privilege('authenticated', 'public.get_user_family_ids(uuid)', 'execute'), 'authenticated_can_execute: get_user_family_ids');
 select ok(has_function_privilege('authenticated', 'public.get_user_owned_family_ids(uuid)', 'execute'), 'authenticated_can_execute: get_user_owned_family_ids');
 select ok(has_function_privilege('authenticated', 'public.user_can_write_family(uuid,uuid)', 'execute'), 'authenticated_can_execute: user_can_write_family');

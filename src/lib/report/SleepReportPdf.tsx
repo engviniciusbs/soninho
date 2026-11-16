@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer";
-import { differenceInWeeks, parseISO, format } from "date-fns";
+import { differenceInWeeks, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { SleepSession } from "@/types";
 import {
@@ -15,6 +15,7 @@ import {
 } from "@/lib/sleep/statistics";
 import { computeEnvironmentCorrelation } from "@/lib/sleep/environmentCorrelation";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 export interface SleepReportData {
   babyName: string;
@@ -43,7 +44,7 @@ export function buildSleepReportData(
   baby: { name: string; birth_date: string },
   periodDays: number
 ): SleepReportData {
-  const ageWeeks = differenceInWeeks(new Date(), parseISO(baby.birth_date));
+  const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(baby.birth_date));
   const schedule = getAgeSchedule(ageWeeks);
 
   const daily = getDailyTotals(sessions, periodDays);
@@ -78,7 +79,7 @@ export function buildSleepReportData(
 
   return {
     babyName: baby.name,
-    birthDate: format(parseISO(baby.birth_date), "dd/MM/yyyy"),
+    birthDate: format(parseLocalDate(baby.birth_date), "dd/MM/yyyy"),
     ageLabel: schedule.ageLabel,
     periodDays,
     periodLabel: `${periodStart} – ${periodEnd}`,

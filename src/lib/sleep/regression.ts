@@ -2,6 +2,7 @@ import { differenceInWeeks } from "date-fns";
 import type { SleepSession } from "@/types";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
 import { buildDailySleepTotals } from "@/lib/sleep/sessionDayAllocation";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 export interface SleepDebt {
   /** Recommended total sleep per day (hours) for the baby's age. */
@@ -85,7 +86,7 @@ export function detectRegression(
   sessions: SleepSession[],
   recentDays: number = 5
 ): RegressionResult {
-  const ageWeeks = differenceInWeeks(new Date(), new Date(birthDateIso));
+  const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(birthDateIso));
   const ageWindow =
     REGRESSION_WINDOWS.find(
       (w) => ageWeeks >= w.minWeeks && ageWeeks <= w.maxWeeks

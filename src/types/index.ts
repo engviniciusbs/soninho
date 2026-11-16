@@ -1,6 +1,11 @@
 import type { Database } from "./database";
 
-export type Baby = Database["public"]["Tables"]["babies"]["Row"];
+/** babies.sex: 'F' (menina), 'M' (menino) or null (não informado). */
+export type BabySex = "F" | "M";
+
+export type Baby = Omit<Database["public"]["Tables"]["babies"]["Row"], "sex"> & {
+  sex: BabySex | null;
+};
 export type BabyInsert = Database["public"]["Tables"]["babies"]["Insert"];
 export type BabyUpdate = Database["public"]["Tables"]["babies"]["Update"];
 

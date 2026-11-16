@@ -10,6 +10,7 @@ import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
 import type { Baby, SleepSession } from "@/types";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 const requestSchema = z.object({
   babyId: zUuid,
@@ -56,8 +57,8 @@ export async function POST(request: Request) {
     );
     const sessions = (sessionsData ?? []) as SleepSession[];
 
-    const ageWeeks = differenceInWeeks(new Date(), new Date(baby.birth_date));
-    const ageMonths = differenceInMonths(new Date(), new Date(baby.birth_date));
+    const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(baby.birth_date));
+    const ageMonths = differenceInMonths(new Date(), parseLocalDate(baby.birth_date));
     const regression = detectRegression(baby.birth_date, sessions);
     const debt = computeSleepDebt(sessions, ageWeeks, 7);
     const schedule = getAgeSchedule(ageWeeks);

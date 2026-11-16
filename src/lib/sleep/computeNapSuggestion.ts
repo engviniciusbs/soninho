@@ -3,6 +3,7 @@ import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
 import { inferNextSleepKind } from "@/lib/sleep/inferNextSleepKind";
 import type { AISuggestion, SleepSession, SleepType } from "@/types";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 function roundToNearest5Minutes(d: Date): Date {
   const step = 5 * 60 * 1000;
@@ -121,7 +122,7 @@ export function computeNapSuggestion(params: {
     };
   }
 
-  const ageWeeks = differenceInWeeks(now, new Date(params.birthDateIso));
+  const ageWeeks = differenceInWeeks(now, parseLocalDate(params.birthDateIso));
   const range = getWakeWindowRange(ageWeeks);
 
   const windowStartAt = addMinutes(anchor, range.minMinutes);

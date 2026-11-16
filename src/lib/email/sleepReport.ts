@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
-import { differenceInWeeks, parseISO } from "date-fns";
+import { differenceInWeeks } from "date-fns";
 import { getReportPeriod, DEFAULT_REPORT_TIMEZONE } from "@/lib/email/reportPeriod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
@@ -20,6 +20,7 @@ import type {
   BreastfeedingSession,
   SolidFeeding,
 } from "@/types";
+import { parseLocalDate } from "@/lib/dates/localDate";
 const FROM = "Soninho <sono@soninho.baby>";
 
 export function buildBabyStats(
@@ -35,7 +36,7 @@ export function buildBabyStats(
   },
   timeZone: string = DEFAULT_REPORT_TIMEZONE
 ): WeeklyReportBabyStats {
-  const ageWeeks = differenceInWeeks(new Date(), parseISO(birthDate));
+  const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(birthDate));
   const schedule = getAgeSchedule(ageWeeks);
 
   const daily = getDailyTotals(sessions, periodDays, timeZone);

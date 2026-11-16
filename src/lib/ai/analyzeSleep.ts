@@ -6,6 +6,7 @@ import {
 } from "date-fns";
 import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 import type { Baby, SleepSession } from "@/types";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 /**
  * Builds a human-readable sleep context string for the AI prompt.
@@ -20,7 +21,7 @@ export function buildSleepContext(
   timezone: string = "America/Sao_Paulo",
   feedbackSummary?: string | null
 ): string {
-  const birth = new Date(baby.birth_date);
+  const birth = parseLocalDate(baby.birth_date);
   // "now" in the user's local timezone
   const nowUtc = new Date();
   const nowLocal = toZonedTime(nowUtc, timezone);

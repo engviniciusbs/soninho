@@ -23,16 +23,30 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "babies": {
+            "ai_usage": {
                   Row: {
-                    "avatar_emoji": string | null,"avatar_url": string | null,"birth_date": string,"created_at": string | null,"family_id": string | null,"id": string,"name": string,"user_id": string
+                    "count": number,"day": string,"user_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "avatar_emoji"?: string | null,"avatar_url"?: string | null,"birth_date": string,"created_at"?: string | null,"family_id"?: string | null,"id"?: string,"name": string,"user_id": string
+                    "count"?: number,"day": string,"user_id": string
                   }
                   Update: {
-                    "avatar_emoji"?: string | null,"avatar_url"?: string | null,"birth_date"?: string,"created_at"?: string | null,"family_id"?: string | null,"id"?: string,"name"?: string,"user_id"?: string
+                    "count"?: number,"day"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"babies": {
+                  Row: {
+                    "avatar_emoji": string | null,"avatar_url": string | null,"birth_date": string,"created_at": string | null,"family_id": string | null,"id": string,"name": string,"sex": string | null,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "avatar_emoji"?: string | null,"avatar_url"?: string | null,"birth_date": string,"created_at"?: string | null,"family_id"?: string | null,"id"?: string,"name": string,"sex"?: string | null,"user_id": string
+                  }
+                  Update: {
+                    "avatar_emoji"?: string | null,"avatar_url"?: string | null,"birth_date"?: string,"created_at"?: string | null,"family_id"?: string | null,"id"?: string,"name"?: string,"sex"?: string | null,"user_id"?: string
                   }
                   Relationships: [
                     {
@@ -65,14 +79,14 @@ isOneToOne: false
                   ]
                 },"breastfeeding_sessions": {
                   Row: {
-                    "baby_id": string,"created_at": string,"duration_min": number | null,"end_time": string | null,"id": string,"last_side": string | null,"notes": string | null,"side_left_sec": number,"side_right_sec": number,"start_time": string,"updated_at": string
+                    "baby_id": string,"created_at": string,"duration_min": number | null,"end_time": string | null,"id": string,"last_side": string | null,"notes": string | null,"side_left_sec": number,"side_right_sec": number,"side_started_at": string | null,"start_time": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "baby_id": string,"created_at"?: string,"duration_min"?: number | null,"end_time"?: string | null,"id"?: string,"last_side"?: string | null,"notes"?: string | null,"side_left_sec"?: number,"side_right_sec"?: number,"start_time": string,"updated_at"?: string
+                    "baby_id": string,"created_at"?: string,"duration_min"?: number | null,"end_time"?: string | null,"id"?: string,"last_side"?: string | null,"notes"?: string | null,"side_left_sec"?: number,"side_right_sec"?: number,"side_started_at"?: string | null,"start_time": string,"updated_at"?: string
                   }
                   Update: {
-                    "baby_id"?: string,"created_at"?: string,"duration_min"?: number | null,"end_time"?: string | null,"id"?: string,"last_side"?: string | null,"notes"?: string | null,"side_left_sec"?: number,"side_right_sec"?: number,"start_time"?: string,"updated_at"?: string
+                    "baby_id"?: string,"created_at"?: string,"duration_min"?: number | null,"end_time"?: string | null,"id"?: string,"last_side"?: string | null,"notes"?: string | null,"side_left_sec"?: number,"side_right_sec"?: number,"side_started_at"?: string | null,"start_time"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -366,8 +380,11 @@ isOneToOne: false
             "accept_family_invite":
 { Args: { "p_display_name"?: string,"p_token": string }; Returns: string
                            },
+"consume_ai_quota":
+{ Args: { "p_limit": number }; Returns: boolean
+                           },
 "create_baby_with_family":
-{ Args: { "p_avatar_emoji"?: string,"p_avatar_url"?: string,"p_birth_date": string,"p_name": string }; Returns: {
+{ Args: { "p_avatar_emoji"?: string,"p_avatar_url"?: string,"p_birth_date": string,"p_family_id"?: string,"p_name": string }; Returns: {
               "avatar_emoji": string | null,
 "avatar_url": string | null,
 "birth_date": string,
@@ -375,6 +392,7 @@ isOneToOne: false
 "family_id": string | null,
 "id": string,
 "name": string,
+"sex": string | null,
 "user_id": string
             }
                           SetofOptions: {
@@ -383,6 +401,9 @@ isOneToOne: false
         isOneToOne: true
         isSetofReturn: false
       } },
+"delete_baby":
+{ Args: { "p_baby_id": string }; Returns: undefined
+                           },
 "get_invite_preview":
 { Args: { "p_token": string }; Returns: {
               "expires_at": string,"family_name": string,"family_relation": string,"inviter_name": string,"role": string,"status": string

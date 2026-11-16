@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Baby as BabyRow } from "@/types";
+import { formatLocalDate } from "@/lib/dates/localDate";
 
 /** Babies list (Mais › Bebês) with the add, edit, photo and delete dialogs. */
 export function BabiesSettings() {
@@ -68,7 +69,7 @@ export function BabiesSettings() {
                 <ListRow
                   icon={<BabyAvatar avatarUrl={baby.avatar_url} name={baby.name} size="sm" />}
                   title={baby.name}
-                  subtitle={`Nascimento: ${new Date(baby.birth_date).toLocaleDateString("pt-BR")}`}
+                  subtitle={`Nascimento: ${formatLocalDate(baby.birth_date)}`}
                   value={
                     <span className="flex gap-1">
                       <Button
