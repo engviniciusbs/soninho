@@ -52,7 +52,8 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
     : 12;
   const schedule = getAgeSchedule(ageWeeks);
 
-  const last24h = useMemo(() => getLast24hStats(sessions), [sessions]);
+  // Overlap with the last 24 h, the sleep in progress included up to now.
+  const last24h = useMemo(() => getLast24hStats(sessions, new Date()), [sessions]);
 
   const periodSessions = useMemo(() => {
     const cutoff = subDays(new Date(), period);
@@ -65,7 +66,12 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
   );
 
   const sleepDebt = useMemo(
-    () => computeSleepDebt(sessions, ageWeeks, period),
+    // Only complete local days: today, still running, would read as a debt.
+    () =>
+      computeSleepDebt(sessions, ageWeeks, period, {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        now: new Date(),
+      }),
     [sessions, ageWeeks, period]
   );
 

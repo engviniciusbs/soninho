@@ -17,7 +17,7 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconClock />}
             label="Sono 24h"
-            value={last24h.totalSleepMinutes > 0 ? formatDuration(last24h.totalSleepMinutes) : NO_DATA}
+            value={last24h.totalMinutes > 0 ? formatDuration(last24h.totalMinutes) : NO_DATA}
             sub={`Meta: ${formatHours(schedule.totalSleepHours)}`}
           />
           <StatTile
@@ -51,7 +51,9 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconChart />}
             label="Maior trecho noturno"
-            value={last24h.longestStretch > 0 ? formatDuration(last24h.longestStretch) : NO_DATA}
+            value={
+              last24h.longestNightMinutes > 0 ? formatDuration(last24h.longestNightMinutes) : NO_DATA
+            }
             sub="Últimas 24h"
             className="col-span-2"
           />

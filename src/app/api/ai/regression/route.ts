@@ -57,10 +57,14 @@ export async function POST(request: Request) {
     );
     const sessions = (sessionsData ?? []) as SleepSession[];
 
-    const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(baby.birth_date));
-    const ageMonths = differenceInMonths(new Date(), parseLocalDate(baby.birth_date));
-    const regression = detectRegression(baby.birth_date, sessions);
-    const debt = computeSleepDebt(sessions, ageWeeks, 7);
+    // Days are the family's local days (the server runs in UTC): today, still
+    // running, is left out, and a sleep in progress counts up to now.
+    const now = new Date();
+    const days = { timeZone: parsed.data.timezone, now };
+    const ageWeeks = differenceInWeeks(now, parseLocalDate(baby.birth_date));
+    const ageMonths = differenceInMonths(now, parseLocalDate(baby.birth_date));
+    const regression = detectRegression(baby.birth_date, sessions, 5, days);
+    const debt = computeSleepDebt(sessions, ageWeeks, 7, days);
     const schedule = getAgeSchedule(ageWeeks);
 
     const base = {

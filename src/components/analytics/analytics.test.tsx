@@ -42,7 +42,7 @@ function fakeData(overrides: Record<string, unknown> = {}) {
     refetch: vi.fn(),
     ageWeeks: 24,
     schedule: { totalSleepHours: 14 },
-    last24h: { totalSleepMinutes: 760, napCount: 3, avgNapDuration: 50, longestStretch: 400 },
+    last24h: { totalMinutes: 760, longestNightMinutes: 400 },
     statsPeriod: { totalSleepMinutes: 5000, napCount: 17, avgNapDuration: 52, longestStretch: 600 },
     sleepDebt: { targetHours: 14, avgHours: 12.5, debtHours: 1.5, daysAnalyzed: 6 },
     envCorrelation: { temperature: [bucket], sleepSackTog: [], weather: [], bestTemperature: bucket },
@@ -132,7 +132,7 @@ describe("AnalyticsPage", () => {
       sessions: [],
       periodSessions: [],
       periodSummary: { daysWithData: 0, avgSleepMinutes: null, avgNapsPerDay: null, longestNightMinutes: null },
-      last24h: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
+      last24h: { totalMinutes: 0, longestNightMinutes: 0 },
       dailyTotals: [{ date: "15/11", totalHours: 0, napHours: 0, nightHours: 0 }],
     });
     const { container } = mount(<AnalyticsPage />);
@@ -226,7 +226,7 @@ describe("Analytics detail pages", () => {
 
   it("numbers_with_an_empty_window_read_sem_dados_not_zero", () => {
     holder.data = fakeData({
-      last24h: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
+      last24h: { totalMinutes: 0, longestNightMinutes: 0 },
       statsPeriod: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
     });
     mount(<NumbersPage />);

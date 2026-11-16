@@ -1,6 +1,7 @@
 import { addDays, format, max, min, startOfDay, subDays, eachDayOfInterval } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import type { SleepSession } from "@/types";
+import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 export type DaySleepAllocation = {
   /** Local calendar day (yyyy-MM-dd) */
@@ -203,4 +204,23 @@ function buildDailySleepTotalsInTimeZone(
       nightHours: parseFloat((nightMin / 60).toFixed(1)),
     };
   });
+}
+
+/**
+ * Sleep per local day for the `days` complete days before today in
+ * `timeZone` (today, still running, is left out). A sleep still running counts
+ * up to `now` ({@link withProvisionalEnd}), so a night that crossed midnight
+ * fills the day it started on. Used by the sleep debt and the regression.
+ */
+export function buildCompleteDailySleepTotals(
+  sessions: SleepSession[],
+  days: number,
+  timeZone: string,
+  now: Date = new Date()
+): DaySleepTotals[] {
+  const counted = sessions.map((s) => withProvisionalEnd(s, now));
+  const yesterday = new Date(
+    fromZonedTime(`${formatInTimeZone(now, timeZone, "yyyy-MM-dd")}T00:00:00`, timeZone).getTime() - 1
+  );
+  return buildDailySleepTotalsInTimeZone(counted, days, timeZone, yesterday);
 }

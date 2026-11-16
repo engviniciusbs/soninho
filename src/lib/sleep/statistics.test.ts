@@ -8,6 +8,7 @@ import {
   getOverallStats,
 } from "@/lib/sleep/statistics";
 import { makeSession } from "@/lib/sleep/__fixtures__/session";
+import { regularBaby, spAt } from "@/lib/sleep/__fixtures__/regularBaby";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -133,20 +134,48 @@ describe("getOverallStats", () => {
 });
 
 describe("getLast24hStats", () => {
-  it("only includes completed sessions that started within 24h of now", () => {
-    // now = 2026-05-24T12:00Z; cutoff = 2026-05-23T12:00Z
+  it("counts each sleep by its overlap with the last 24h, the running one up to now", () => {
+    // now = 2026-05-24T12:00Z; window = 2026-05-23T12:00Z .. now
     const inside = makeSession({
       type: "NAP",
-      start_time: "2026-05-23T12:00:00Z", // exactly at cutoff -> included
+      start_time: "2026-05-23T12:00:00Z", // exactly at the window start
       end_time: "2026-05-23T13:00:00Z", // 60
     });
-    const outside = makeSession({
+    const straddling = makeSession({
       type: "NAP",
-      start_time: "2026-05-23T11:59:00Z",
-      end_time: "2026-05-23T13:00:00Z",
+      start_time: "2026-05-23T11:00:00Z", // started 1h before the window
+      end_time: "2026-05-23T13:00:00Z", // only 60 of its 120 min count
     });
-    const open = makeSession({ type: "NAP", start_time: "2026-05-24T11:00:00Z" });
-    const r = getLast24hStats([inside, outside, open, nap24]);
-    expect(r).toMatchObject({ totalSleepMinutes: 120, napCount: 2, longestStretch: 60 });
+    const old = makeSession({
+      type: "NAP",
+      start_time: "2026-05-23T09:00:00Z",
+      end_time: "2026-05-23T11:00:00Z", // ended before the window: 0
+    });
+    const open = makeSession({ type: "NAP", start_time: "2026-05-24T11:00:00Z" }); // 60 so far
+    const r = getLast24hStats([inside, straddling, old, open]);
+    expect(r).toEqual({ totalMinutes: 180, longestNightMinutes: 0 });
+  });
+});
+
+describe("getLast24hStats: overlap with the last 24 h", () => {
+  it("at 19:00 with the night running since 18:30, Sono 24h is about 13h30", () => {
+    const now = spAt("2026-11-16", "19:00");
+    vi.setSystemTime(now);
+    const sessions = regularBaby("2026-11-16", 3, { todayNaps: true, runningSince: "18:30" });
+    const r = getLast24hStats(sessions, now);
+    expect(Math.abs(r.totalMinutes - 810)).toBeLessThanOrEqual(15);
+    // Last night 18:30–06:00, whole: it ended inside the window.
+    expect(r.longestNightMinutes).toBe(690);
+  });
+
+  it("the longest night ignores naps", () => {
+    const now = spAt("2026-11-16", "19:00");
+    vi.setSystemTime(now);
+    const longNap = makeSession({
+      type: "NAP",
+      start_time: spAt("2026-11-16", "12:00").toISOString(),
+      end_time: spAt("2026-11-16", "15:00").toISOString(),
+    });
+    expect(getLast24hStats([longNap], now)).toEqual({ totalMinutes: 180, longestNightMinutes: 0 });
   });
 });
