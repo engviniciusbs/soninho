@@ -9,18 +9,18 @@ import { useBaby } from "@/components/providers/BabyProvider";
 export const canWriteKey = (babyId: string | undefined) => ["family-role", babyId] as const;
 
 /**
- * Whether the signed-in user may record for the active baby: owner or
- * caregiver of its family (`family_members`). A viewer ("Só visualizar"),
- * no role, or no session can only see. While the role loads, `canWrite` is
- * false, so write controls never flash for a viewer. RLS enforces the same
- * rule on the server (`user_can_write_family`); this only hides the controls.
+ * Whether the write controls show for the active baby. Fails open: they hide
+ * only when the role is known to be "viewer" ("Só visualizar"). While the
+ * role loads, when the query fails, or when no role comes back (the helper
+ * also returns null on a read error), an owner or caregiver must never get a
+ * read-only screen. RLS is the real guard (`user_can_write_family`).
  */
 export function useCanWrite(): { canWrite: boolean; isLoading: boolean } {
   const { activeBaby } = useBaby();
   const babyId = activeBaby?.id;
   const [supabase] = useState(() => createClient());
 
-  const { data: role, isPending } = useQuery({
+  const { data: role, isPending, isError } = useQuery({
     queryKey: canWriteKey(babyId),
     queryFn: async () => {
       const {
@@ -34,6 +34,6 @@ export function useCanWrite(): { canWrite: boolean; isLoading: boolean } {
     staleTime: 60_000,
   });
 
-  const isLoading = !!babyId && isPending;
-  return { canWrite: !isLoading && (role === "owner" || role === "caregiver"), isLoading };
+  const isLoading = !!babyId && isPending && !isError;
+  return { canWrite: isError || role !== "viewer", isLoading };
 }

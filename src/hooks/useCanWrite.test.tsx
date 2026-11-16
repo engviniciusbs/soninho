@@ -58,25 +58,23 @@ describe("useCanWrite", () => {
     expect(result.current.canWrite).toBe(false);
   });
 
-  it("sem papel na família não registra", async () => {
+  it("enquanto carrega mostra os controles (falha aberta)", () => {
+    holder.role = "viewer";
+    const { result } = run();
+    expect(result.current).toEqual({ canWrite: true, isLoading: true });
+  });
+
+  it("erro na consulta do papel mostra os controles", async () => {
+    vi.mocked(getUserRoleForBaby).mockRejectedValueOnce(new Error("offline"));
+    const { result } = run();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.canWrite).toBe(true);
+  });
+
+  it("papel desconhecido (null, inclusive falha de leitura no helper) mostra os controles", async () => {
     holder.role = null;
     const { result } = run();
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.canWrite).toBe(false);
-  });
-
-  it("enquanto carrega não libera a escrita", () => {
-    holder.role = "owner";
-    const { result } = run();
-    expect(result.current).toEqual({ canWrite: false, isLoading: true });
-  });
-
-  it("sem sessão não registra", async () => {
-    holder.userId = null;
-    holder.role = "owner";
-    const { result } = run();
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.canWrite).toBe(false);
-    expect(getUserRoleForBaby).not.toHaveBeenCalled();
+    expect(result.current.canWrite).toBe(true);
   });
 });
