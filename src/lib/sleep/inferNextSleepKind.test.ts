@@ -237,6 +237,34 @@ describe("inferNextSleepKind", () => {
       ).toBe("NIGHT_SLEEP");
     });
 
+    it("woke at 04:45, now 07:30 (the hold ends at 07:00) -> NAP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:45:00Z", // 04:45 local
+            now: new Date("2026-05-24T10:30:00Z"), // 07:30 local
+            windowStartHour: 7.75,
+            windowEndHour: 8,
+          })
+        )
+      ).toBe("NAP");
+    });
+
+    it("woke at 04:45, now 06:30 (before 07:00) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:45:00Z", // 04:45 local
+            now: new Date("2026-05-24T09:30:00Z"), // 06:30 local
+            windowStartHour: 7.75,
+            windowEndHour: 8,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
     it("night ended at 05:00 (morning) -> NAP", () => {
       expect(
         inferNextSleepKind(
