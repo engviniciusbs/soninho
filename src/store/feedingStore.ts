@@ -20,7 +20,8 @@ export interface FeedingPersistedState {
 
 interface FeedingStore extends FeedingPersistedState {
   startBreastTimer: (babyId: string, sessionId: string, startTime: string, side: BreastSide) => void;
-  switchSide: (babyId: string, side: BreastSide, accumulatedSec: number) => void;
+  /** `sideStartedAt` defaults to now; pass the instant written to the DB. */
+  switchSide: (babyId: string, side: BreastSide, accumulatedSec: number, sideStartedAt?: string) => void;
   stopBreastTimer: (babyId: string) => void;
   /** Sync to an existing DB session (e.g. another caregiver's): local counters are replaced. */
   restoreBreastSession: (
@@ -29,7 +30,9 @@ interface FeedingStore extends FeedingPersistedState {
     startTime: string,
     side: BreastSide,
     sideLeftSec: number,
-    sideRightSec: number
+    sideRightSec: number,
+    /** Start of the side in progress (the row's `side_started_at`); defaults to now. */
+    sideStartedAt?: string
   ) => void;
 }
 
@@ -97,7 +100,7 @@ export const useFeedingStore = create<FeedingStore>()(
           },
         })),
 
-      switchSide: (babyId, side, accumulatedSec) =>
+      switchSide: (babyId, side, accumulatedSec, sideStartedAt) =>
         set((s) => {
           const t = s.timers[babyId];
           if (!t) return s;
@@ -107,7 +110,7 @@ export const useFeedingStore = create<FeedingStore>()(
               [babyId]: {
                 ...t,
                 activeSide: side,
-                sideStartedAt: new Date().toISOString(),
+                sideStartedAt: sideStartedAt ?? new Date().toISOString(),
                 sideLeftSec: t.activeSide === "LEFT" ? accumulatedSec : t.sideLeftSec,
                 sideRightSec: t.activeSide === "RIGHT" ? accumulatedSec : t.sideRightSec,
               },
@@ -123,7 +126,7 @@ export const useFeedingStore = create<FeedingStore>()(
           return { timers };
         }),
 
-      restoreBreastSession: (babyId, sessionId, startTime, side, sideLeftSec, sideRightSec) =>
+      restoreBreastSession: (babyId, sessionId, startTime, side, sideLeftSec, sideRightSec, sideStartedAt) =>
         set((s) => ({
           timers: {
             ...s.timers,
@@ -133,7 +136,7 @@ export const useFeedingStore = create<FeedingStore>()(
               activeSide: side,
               sideLeftSec,
               sideRightSec,
-              sideStartedAt: new Date().toISOString(),
+              sideStartedAt: sideStartedAt ?? new Date().toISOString(),
             },
           },
         })),

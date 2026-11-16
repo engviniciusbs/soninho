@@ -89,12 +89,14 @@ export async function startBreastfeedingSession(
   side: BreastSide,
   startTimeIso?: string
 ) {
+  const start = startTimeIso ?? new Date().toISOString();
   return supabase
     .from("breastfeeding_sessions")
     .insert({
       baby_id: babyId,
-      start_time: startTimeIso ?? new Date().toISOString(),
+      start_time: start,
       last_side: side,
+      side_started_at: start,
     })
     .select()
     .single();
@@ -128,24 +130,38 @@ export async function insertBreastfeedingSession(
     .single();
 }
 
+/**
+ * Live-timer side switch: stored totals plus the start of the new side. Only
+ * an open session is touched; `updated: false` (with no error) means another
+ * caregiver already ended it and nothing was written.
+ */
 export async function updateBreastfeedingSides(
   supabase: Client,
   id: string,
-  data: { side_left_sec: number; side_right_sec: number; last_side: BreastSide }
-) {
-  return supabase
+  data: {
+    side_left_sec: number;
+    side_right_sec: number;
+    last_side: BreastSide;
+    side_started_at: string;
+  }
+): Promise<{ error: { code?: string; message: string } | null; updated: boolean }> {
+  const { data: row, error } = await supabase
     .from("breastfeeding_sessions")
     .update(data)
     .eq("id", id)
-    .select()
-    .single();
+    .is("end_time", null)
+    .select("id")
+    .maybeSingle();
+  return { error: error ?? null, updated: !error && !!row };
 }
 
-/** Minimal row used by the live poll (see classifyLiveSession). */
+/** Row used by the live poll (see classifyLiveSession) and by the stop totals. */
 export async function getBreastfeedingSessionStatus(supabase: Client, id: string) {
   return supabase
     .from("breastfeeding_sessions")
-    .select("id, baby_id, start_time, end_time")
+    .select(
+      "id, baby_id, start_time, end_time, last_side, side_left_sec, side_right_sec, side_started_at, updated_at"
+    )
     .eq("id", id)
     .maybeSingle();
 }

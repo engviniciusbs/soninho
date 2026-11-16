@@ -6,6 +6,7 @@ import { renderHookWithProviders } from "@/test/render";
 import { createFakeSupabase, type FakeSupabase } from "@/test/fakeSupabase";
 import { useFeedingStore } from "@/store/feedingStore";
 import type { Baby } from "@/types";
+import { updateBreastfeedingSides } from "@/lib/supabase/feedingQueries";
 import { useBreastfeedingTimer } from "./useBreastfeedingTimer";
 
 const holder = vi.hoisted(() => ({ client: null as unknown }));
@@ -127,6 +128,8 @@ describe("useBreastfeedingTimer (characterization)", () => {
       last_side: "RIGHT",
       side_left_sec: 30,
       side_right_sec: 12,
+      // The right side was (re)started just now, so 12 s is its whole total.
+      side_started_at: "2026-01-01T12:00:00.000Z",
     });
     await act(() => result.current.handleStart("LEFT"));
     await flush();
@@ -169,5 +172,198 @@ describe("useBreastfeedingTimer (characterization)", () => {
     expect(result.current.isRunning).toBe(false);
     expect(useFeedingStore.getState().timers[baby.id]).toBeUndefined();
     expect(toast.info).toHaveBeenCalledWith("Mamada finalizada por outro cuidador(a)");
+  });
+});
+
+describe("useBreastfeedingTimer: two phones (side_started_at)", () => {
+  it("phone B restores mid-side and stops with the right totals", async () => {
+    // Phone A: starts on the left at 10:00 and switches to the right at 10:12.
+    vi.setSystemTime(new Date("2026-01-01T10:00:00.000Z"));
+    const a = await mountRunning();
+    const id = fake.rows(TABLE)[0].id;
+    expect(fake.rows(TABLE)[0].side_started_at).toBe("2026-01-01T10:00:00.000Z");
+    await flush(12 * 60_000);
+    await act(() => a.result.current.handleSwitchSide("RIGHT"));
+    expect(fake.rows(TABLE)[0]).toMatchObject({
+      side_left_sec: 720,
+      side_right_sec: 0,
+      last_side: "RIGHT",
+      side_started_at: "2026-01-01T10:12:00.000Z",
+    });
+    a.unmount();
+
+    // Phone B: no local timer, opens the app at 10:15.
+    useFeedingStore.setState({ timers: {} });
+    await act(async () => {
+      vi.setSystemTime(new Date("2026-01-01T10:15:00.000Z"));
+    });
+    const b = mount();
+    await flush();
+    expect(b.result.current.isRunning).toBe(true);
+    expect(b.result.current.activeSide).toBe("RIGHT");
+    expect(b.result.current.liveLeftSec).toBe(720);
+    expect(b.result.current.liveRightSec).toBe(180);
+
+    await flush(5 * 60_000);
+    let out: unknown;
+    await act(async () => {
+      out = await b.result.current.handleStop();
+    });
+    expect(out).toEqual({ endedSessionId: id });
+    expect(fake.rows(TABLE)[0]).toMatchObject({
+      end_time: expect.any(String),
+      side_left_sec: 720,
+      side_right_sec: 480,
+    });
+  });
+
+  it("updating the sides after another phone ended the session changes nothing", async () => {
+    fake.seed(TABLE, {
+      id: "ended",
+      baby_id: baby.id,
+      start_time: "2026-01-01T11:00:00.000Z",
+      end_time: "2026-01-01T11:20:00.000Z",
+      last_side: "LEFT",
+      side_left_sec: 1200,
+      side_right_sec: 0,
+      side_started_at: "2026-01-01T11:00:00.000Z",
+    });
+    const res = await updateBreastfeedingSides(fake.client as never, "ended", {
+      side_left_sec: 5,
+      side_right_sec: 7,
+      last_side: "RIGHT",
+      side_started_at: "2026-01-01T12:00:00.000Z",
+    });
+    expect(res).toEqual({ error: null, updated: false });
+    expect(fake.rows(TABLE)[0]).toMatchObject({
+      side_left_sec: 1200,
+      side_right_sec: 0,
+      last_side: "LEFT",
+      side_started_at: "2026-01-01T11:00:00.000Z",
+    });
+  });
+
+  it("switching after another phone ended the session drops the local timer", async () => {
+    const { result } = await mountRunning();
+    const row = fake.rows(TABLE)[0];
+    await flush(3000);
+    // Ended elsewhere with its own totals, before this phone's poll noticed.
+    Object.assign(row, { end_time: "2026-01-01T12:00:02.000Z", side_left_sec: 2 });
+
+    await act(() => result.current.handleSwitchSide("RIGHT"));
+
+    expect(fake.rows(TABLE)[0]).toMatchObject({ side_left_sec: 2, last_side: "LEFT" });
+    expect(result.current.isRunning).toBe(false);
+    expect(toast.info).toHaveBeenCalledWith("Mamada finalizada por outro cuidador(a)");
+  });
+
+  it("a failed side update keeps the previous side and warns", async () => {
+    const { result } = await mountRunning();
+    await flush(3000);
+    fake.setError(TABLE, "update", { message: "Failed to fetch" });
+
+    await act(() => result.current.handleSwitchSide("RIGHT"));
+
+    expect(toast.error).toHaveBeenCalledWith("Erro ao trocar o lado. Tente novamente.");
+    expect(result.current.isRunning).toBe(true);
+    expect(result.current.activeSide).toBe("LEFT");
+    expect(result.current.liveLeftSec).toBe(3);
+    expect(fake.rows(TABLE)[0]).toMatchObject({ last_side: "LEFT", side_left_sec: 0 });
+  });
+
+  it("an open row from before the deploy (no side_started_at) restores from updated_at", async () => {
+    // Old app: started 11:40 on the left, switched to the right at 11:45.
+    fake.seed(TABLE, {
+      id: "old-open",
+      baby_id: baby.id,
+      start_time: "2026-01-01T11:40:00.000Z",
+      updated_at: "2026-01-01T11:45:00.000Z",
+      last_side: "RIGHT",
+      side_left_sec: 300,
+      side_right_sec: 0,
+    });
+    const { result } = mount();
+    await flush();
+    expect(result.current.liveLeftSec).toBe(300);
+    expect(result.current.liveRightSec).toBe(900);
+
+    await flush(60_000);
+    await act(async () => {
+      await result.current.handleStop();
+    });
+    expect(fake.rows(TABLE)[0]).toMatchObject({ side_left_sec: 300, side_right_sec: 960 });
+  });
+
+  it("an open row without side_started_at nor updated_at counts from start_time", async () => {
+    fake.seed(TABLE, {
+      id: "old-open",
+      baby_id: baby.id,
+      start_time: "2026-01-01T11:50:00.000Z",
+      last_side: "LEFT",
+    });
+    const { result } = mount();
+    await flush();
+    expect(result.current.liveLeftSec).toBe(600);
+    await act(async () => {
+      await result.current.handleStop();
+    });
+    expect(fake.rows(TABLE)[0]).toMatchObject({ side_left_sec: 600, side_right_sec: 0 });
+  });
+
+  it("a timer persisted by the old app (restored at open time) stops with the DB totals", async () => {
+    // Old app on this phone restored the session at 11:58 and counted from there.
+    fake.seed(TABLE, {
+      id: "old-open",
+      baby_id: baby.id,
+      start_time: "2026-01-01T11:30:00.000Z",
+      updated_at: "2026-01-01T11:30:00.000Z",
+      last_side: "LEFT",
+    });
+    useFeedingStore.setState({
+      timers: {
+        [baby.id]: {
+          sessionId: "old-open",
+          startTime: "2026-01-01T11:30:00.000Z",
+          activeSide: "LEFT",
+          sideLeftSec: 0,
+          sideRightSec: 0,
+          sideStartedAt: "2026-01-01T11:58:00.000Z",
+        },
+      },
+    });
+    const { result } = mount();
+    await flush();
+    expect(result.current.liveLeftSec).toBe(1800);
+    await act(async () => {
+      await result.current.handleStop();
+    });
+    expect(fake.rows(TABLE)[0]).toMatchObject({ side_left_sec: 1800, side_right_sec: 0 });
+  });
+
+  it("a persisted timer without sideStartedAt stops with the DB totals", async () => {
+    fake.seed(TABLE, {
+      id: "old-open",
+      baby_id: baby.id,
+      start_time: "2026-01-01T11:50:00.000Z",
+      last_side: "LEFT",
+    });
+    useFeedingStore.setState({
+      timers: {
+        [baby.id]: {
+          sessionId: "old-open",
+          startTime: "2026-01-01T11:50:00.000Z",
+          activeSide: "LEFT",
+          sideLeftSec: 0,
+          sideRightSec: 0,
+          sideStartedAt: null,
+        },
+      },
+    });
+    const { result } = mount();
+    await flush();
+    await act(async () => {
+      await result.current.handleStop();
+    });
+    expect(fake.rows(TABLE)[0]).toMatchObject({ side_left_sec: 600, side_right_sec: 0 });
   });
 });
