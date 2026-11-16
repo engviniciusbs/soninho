@@ -124,6 +124,23 @@ describe("signOutEverywhere", () => {
     expect(holder.signOut).toHaveBeenCalled();
   });
 
+  it("sem rede, a inscrição do navegador é cancelada mesmo assim", async () => {
+    fetchMock.mockRejectedValueOnce(new Error("offline"));
+    await signOutEverywhere();
+    expect(unsubscribe).toHaveBeenCalled();
+    expect(holder.signOut).toHaveBeenCalled();
+  });
+
+  it("DELETE que estoura os 5 s também cancela a inscrição do navegador", async () => {
+    vi.spyOn(AbortSignal, "timeout").mockImplementation(() => AbortSignal.abort());
+    fetchMock.mockImplementationOnce(async (_url: string, init?: RequestInit) => {
+      if (init?.signal?.aborted) throw new Error("aborted");
+      return new Response("{}");
+    });
+    await signOutEverywhere();
+    expect(unsubscribe).toHaveBeenCalled();
+  });
+
   it("limpa os timers locais e o gate de regressão", async () => {
     await signOutEverywhere();
     expect(localStorage.getItem("soninho-timer")).toBeNull();

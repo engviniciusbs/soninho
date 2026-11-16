@@ -53,19 +53,26 @@ export async function subscribeToPush(): Promise<boolean> {
   return res.ok;
 }
 
-/** Deactivates the row (needs the session) and drops the browser subscription. */
+/**
+ * Deactivates the row (needs the session) and drops the browser subscription.
+ * The browser side is dropped whatever the DELETE does (offline, timeout):
+ * the device must not keep receiving pushes after leaving. The DELETE error
+ * still propagates.
+ */
 async function cancelSubscription(
   subscription: PushSubscription,
   signal?: AbortSignal
 ): Promise<void> {
-  await fetch("/api/notifications/subscribe", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ endpoint: subscription.endpoint }),
-    signal,
-  });
-
-  await subscription.unsubscribe();
+  try {
+    await fetch("/api/notifications/subscribe", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ endpoint: subscription.endpoint }),
+      signal,
+    });
+  } finally {
+    await subscription.unsubscribe();
+  }
 }
 
 export async function unsubscribeFromPush(): Promise<boolean> {
