@@ -88,7 +88,7 @@ describe("FeedingForm", () => {
     expect(field("start_time_input").value).toBe("07:20");
     if (type === "BOTTLE") {
       expect(field("volume_ml").value).toBe("90");
-      expect(screen.getByLabelText("Tipo de leite")).toHaveTextContent("BREAST_MILK");
+      expect(screen.getByLabelText("Tipo de leite")).toHaveTextContent("Leite materno");
       expect(field("notes").value).toBe("morna");
     } else if (type === "BREAST") {
       expect(field("end_date").value).toBe("2026-01-01");
@@ -97,9 +97,9 @@ describe("FeedingForm", () => {
       expect(field("side_right_min").value).toBe("7");
       expect(field("notes").value).toBe("calma");
     } else {
-      expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Remover Kiwi" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Banana" })).toHaveAttribute("aria-pressed", "true");
-      expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("LIKED");
+      expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("Gostou");
       expect(field("notes").value).toBe("sujou");
     }
     expect(stable(document.body)).toMatchSnapshot(`edit ${type}`);
@@ -118,7 +118,7 @@ describe("FeedingForm", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     rerender(<FeedingForm open onClose={onClose} item={items.SOLID} />);
     await screen.findByRole("dialog");
-    expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remover Kiwi" })).toBeInTheDocument();
     expect(field("notes").value).toBe("sujou");
   });
 
@@ -255,5 +255,45 @@ describe("FeedingForm", () => {
     // ...and making it invalid again sets it, without submitting.
     change("end_date", "2025-12-30");
     expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
+  });
+
+  it("save_and_delete_do_not_run_at_the_same_time", async () => {
+    const pending = new Promise<boolean>(() => {});
+    const onDelete = vi.fn(() => pending);
+    renderWithProviders(
+      <FeedingForm open onClose={onClose} item={items.BOTTLE} onDelete={onDelete} />,
+      { baby: { activeBaby: baby, babies: [baby] } }
+    );
+    await screen.findByRole("dialog");
+    await settle();
+
+    // Deleting: "Atualizar" waits.
+    fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar exclusão" }));
+    await waitFor(() => expect(onDelete).toHaveBeenCalled());
+    expect(screen.getByRole("button", { name: "Atualizar" })).toBeDisabled();
+  });
+
+  it("excluir_waits_while_the_update_is_saving", async () => {
+    // The update never answers, so the form stays submitting.
+    sb.respond(() => new Promise(() => {}) as never);
+    renderWithProviders(
+      <FeedingForm open onClose={onClose} item={items.BOTTLE} onDelete={vi.fn(async () => true)} />,
+      { baby: { activeBaby: baby, babies: [baby] } }
+    );
+    await screen.findByRole("dialog");
+    await settle();
+
+    submit();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Excluir" })).toBeDisabled());
+  });
+
+  it("a_custom_food_tag_is_removed_by_its_own_close_button", async () => {
+    await mount(items.SOLID);
+    fireEvent.click(screen.getByRole("button", { name: "Remover Kiwi" }));
+    expect(screen.queryByRole("button", { name: "Remover Kiwi" })).toBeNull();
+    expect(screen.queryByText("Kiwi")).toBeNull();
+    // Banana stays picked.
+    expect(screen.getByRole("button", { name: "Banana" })).toHaveAttribute("aria-pressed", "true");
   });
 });

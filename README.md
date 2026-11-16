@@ -9,11 +9,12 @@ Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores regis
 ## Principais funcionalidades
 
 - **Timer de sono** (soneca / sono noturno) com início retroativo ("começou há 10 min"), um por bebê, sincronizado entre cuidadores e persistido localmente (estado antigo é migrado v0→v1); o fim nunca fica antes do início.
-- **Janela de vigília** por idade (semáforo verde/amarelo/vermelho) e **sugestão determinística da próxima soneca** — sem LLM, mesma tabela em todo o app.
+- **Janela de vigília** por idade (com o status da janela: "Na janela ideal", "Quase na hora" ou "Passou da janela") e **sugestão determinística da próxima soneca** — sem LLM, mesma tabela em todo o app.
 - **Revisão pós-sono**: qualidade (1–5), como adormeceu, motivo do despertar, temperatura do quarto, clima, saco de dormir/TOG e roupa — com **recomendação de roupa** pela temperatura.
 - **Alimentação**: timer de amamentação por lado (esquerdo/direito), mamadeira (fórmula / leite materno / misto, em ml) e introdução alimentar com tags de alimentos e reação (inclusive alergia). Sugestão da próxima mamada pelo intervalo médio recente.
-- **Família compartilhada**: convite por link (token hex de 48 caracteres; tokens base64 antigos continuam válidos; a página do convite mostra estados específicos: usado, expirado, revogado ou inexistente) com papéis (`owner`, `caregiver`, `viewer`), parentesco (mãe, pai, avó, babá…), mural de recados, feed de atividade e toasts/push quando outro cuidador inicia ou encerra um sono/mamada.
-- **Modo babá**: interface reduzida (só Início e Configurações).
+- **Família compartilhada**: convite por link (token hex de 48 caracteres; tokens base64 antigos continuam válidos; a página do convite mostra estados específicos: usado, expirado, revogado ou inexistente) com papéis (`owner`, `caregiver`, `viewer`), parentesco (mãe, pai, avó, babá…), mural de recados e toasts/push quando outro cuidador inicia ou encerra um sono/mamada.
+- **Modo babá**: interface reduzida (só Início e Mais › Perfil).
+- **Visual**: tema escuro único (azul-noite e lavanda), Fraunces nos títulos e números, Nunito no texto; menu de cinco abas (Início, Comida, Registro, Análise, Mais).
 - **Análises**: gráfico de barras de sono diário, tendência de qualidade, heatmap de horários de soneca, correlação ambiente × sono, dívida de sono e radar de regressão.
 - **IA (OpenAI `gpt-4o-mini`)**: chat com consultora de sono com streaming, insights (avaliação do dia, padrões, tendências, recomendações) e análise de regressão do sono. **Cota diária de 50 chamadas por usuário** (dia de `America/Sao_Paulo`), somando chat e regressão; a sugestão de soneca é determinística e não consome cota. O chat aceita no máximo 20 mensagens de até 2000 caracteres (o cliente corta o histórico); ao estourar a cota a API responde 429 e o app mostra "Limite diário de uso da IA atingido…".
 - **Notificações push (Web Push/VAPID)**: "soneca chegando" e "passou da janela", enviados a todos os owners e caregivers com notificações ligadas (viewers não recebem), com horário de silêncio e fuso horário por usuário. Só endpoints de FCM, Mozilla, Apple e Windows são aceitos (na inscrição e no envio); inscrições inválidas ou mortas (400/404/410/413) são desativadas.
@@ -45,7 +46,7 @@ Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores regis
 | --- | --- |
 | Framework | **Next.js 16.4** (App Router, Route Handlers, Proxy) |
 | UI | **React 19.3**, TypeScript 5 |
-| Estilo | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
+| Estilo | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`; fontes Fraunces e Nunito (`next/font`), só tema escuro |
 | Componentes | **shadcn/ui** (estilo `base-nova`) sobre **Base UI** (`@base-ui/react`), ícones `lucide-react` |
 | Animação | `framer-motion` |
 | Estado cliente | **Zustand** (com `persist` → `localStorage`) |
@@ -224,22 +225,22 @@ O trigger `calculate_sleep_duration` preenche `duration_min` e `updated_at` em `
 src/
 ├── middleware.ts              # Sessão Supabase + regras de redirect/autorização
 ├── app/
-│   ├── layout.tsx             # Fontes, metadata, tema
+│   ├── layout.tsx             # Fontes, metadata, tema escuro fixo
 │   ├── page.tsx               # Landing pública (/)
 │   ├── (auth)/                # /login, /register, /auth/callback (troca code→sessão)
 │   ├── (dashboard)/           # Área logada (layout com Sidebar/BottomNav/providers)
 │   │   ├── app/               #   Início: timer, janela de vigília, sugestões, recados
 │   │   ├── feeding/           #   Alimentação
 │   │   ├── history/           #   Registro (histórico)
-│   │   ├── analytics/         #   Análise (gráficos)
-│   │   ├── ai-insights/       #   Insights e chat com IA
-│   │   └── settings/          #   Bebê, perfil, família, notificações, ferramentas
+│   │   ├── analytics/         #   Análise (gráficos) e detalhes em /analytics/{numbers,trends,environment,naps,quality,regression}
+│   │   └── more/              #   Mais: lista e rotas /more/{babies,family,notifications,reports,ai,profile}
+│   │                          #   (/settings e /ai-insights redirecionam para cá; src/lib/redirects.ts)
 │   ├── invite/[token]/        # Página pública de aceite de convite
 │   └── api/                   # Route Handlers (ver "Rotas da API")
 ├── components/
 │   ├── ui/                    # Primitivos shadcn/Base UI
 │   ├── sleep/                 # SleepTimer em timer/*, seletores de ambiente em environment/*
-│   ├── settings/              # GeneralTab, NotificationsTab, ToolsTab, BabyProfileForm, PushNotificationsCard; family/* (convites, membros)
+│   ├── settings/              # Telas do Mais: BabiesSettings, FamilySettings, NotificationsTab, ToolsSettings, UserProfileSettings…; family/* (convites, membros)
 │   ├── forms/                 # DateTimeRangeFields + useTimeRangeValidation (compartilhados por SleepForm/FeedingForm)
 │   ├── landing/               # Landing; sections/* (Hero, Proof, Closing…)
 │   ├── feeding/ family/ ai/ charts/ baby/ brand/
@@ -297,7 +298,7 @@ Componente ──(TanStack Query / fetch)──▶ Route Handler /api/* ──�
 | `caregiver` | registrar sono/alimentação e recados |
 | `viewer` | apenas visualizar |
 
-`ui_mode = 'nanny'` (Modo babá) limita a navegação a `/app` e `/settings` (`NannyRouteGuard` + `getNavLinks`).
+`ui_mode = 'nanny'` (Modo babá) limita a navegação a `/app` e `/more`, onde só aparece o Perfil (`NannyRouteGuard` + `getNavLinks`).
 
 ## Rotas da API
 

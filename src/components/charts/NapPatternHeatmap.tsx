@@ -7,55 +7,46 @@ interface Props {
   data: { dayOfWeek: number; hour: number; count: number }[];
 }
 
+/** Naps by weekday and start hour: a lavender cell, stronger with more naps, on the track colour. */
 export function NapPatternHeatmap({ data }: Props) {
   const maxCount = Math.max(1, ...data.map((d) => d.count));
-
-  function getOpacity(dayOfWeek: number, hour: number) {
-    const entry = data.find(
-      (d) => d.dayOfWeek === dayOfWeek && d.hour === hour
-    );
-    if (!entry) return 0;
-    return 0.2 + (entry.count / maxCount) * 0.8;
-  }
+  const countAt = (dayOfWeek: number, hour: number) =>
+    data.find((d) => d.dayOfWeek === dayOfWeek && d.hour === hour)?.count ?? 0;
 
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-[400px]">
-        <div className="grid gap-1" style={{ gridTemplateColumns: `60px repeat(${HOURS.length}, 1fr)` }}>
-          <div />
-          {HOURS.map((h) => (
-            <div
-              key={h}
-              className="text-[10px] text-muted-foreground text-center"
-            >
-              {h}h
-            </div>
-          ))}
-
-          {DAYS.map((day, dayIdx) => (
-            <div key={day} className="contents">
-              <div className="text-xs text-muted-foreground flex items-center">
-                {day}
-              </div>
-              {HOURS.map((hour) => (
-                <div
-                  key={`${dayIdx}-${hour}`}
-                  className="aspect-square rounded-sm"
-                  style={{
-                    backgroundColor: `rgba(196, 181, 253, ${getOpacity(dayIdx, hour)})`,
-                    minHeight: 16,
-                  }}
-                  title={`${day} ${hour}h: ${
-                    data.find(
-                      (d) => d.dayOfWeek === dayIdx && d.hour === hour
-                    )?.count ?? 0
-                  } sonecas`}
-                />
-              ))}
-            </div>
-          ))}
+    <div
+      className="grid gap-[3px]"
+      style={{ gridTemplateColumns: `2.25rem repeat(${HOURS.length}, minmax(0, 1fr))` }}
+    >
+      <div />
+      {HOURS.map((h) => (
+        <div key={h} className="text-center font-sans text-xs font-semibold text-sn-mu tabular-nums">
+          {h % 3 === 0 ? `${h}h` : ""}
         </div>
-      </div>
+      ))}
+
+      {DAYS.map((day, dayIdx) => (
+        <div key={day} className="contents">
+          <div className="flex items-center font-sans text-[13px] font-semibold text-sn-mu">{day}</div>
+          {HOURS.map((hour) => {
+            const count = countAt(dayIdx, hour);
+            return (
+              <div
+                key={`${dayIdx}-${hour}`}
+                className="relative aspect-square min-h-4 overflow-hidden rounded-[3px] bg-sn-s2"
+                title={`${day} ${hour}h: ${count} ${count === 1 ? "soneca" : "sonecas"}`}
+              >
+                {count > 0 && (
+                  <span
+                    className="absolute inset-0 bg-sn-pr"
+                    style={{ opacity: 0.2 + (count / maxCount) * 0.8 }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

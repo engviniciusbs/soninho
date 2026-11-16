@@ -77,6 +77,15 @@ export async function getSleepSessionStatus(supabase: Client, sessionId: string)
     .maybeSingle();
 }
 
+/** Environment and notes of one session (read when editing a running sleep). */
+export async function getSleepSessionDetails(supabase: Client, sessionId: string) {
+  return supabase
+    .from("sleep_sessions")
+    .select("id, notes, room_temp_celsius, weather_condition, sleep_sack_type, sleep_sack_tog")
+    .eq("id", sessionId)
+    .maybeSingle();
+}
+
 /**
  * Ends a session at `max(now, startTime)` so a phone whose clock is behind the
  * one that started it can still stop it (end_time >= start_time constraint).

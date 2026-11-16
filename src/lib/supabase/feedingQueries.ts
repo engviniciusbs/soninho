@@ -309,9 +309,9 @@ function bottleSummary(f: BottleFeeding): string {
     f.milk_type === "FORMULA"
       ? "fórmula"
       : f.milk_type === "BREAST_MILK"
-        ? "leite ordenhado"
+        ? "leite materno"
         : "misto";
-  return `${f.volume_ml}ml · ${type}`;
+  return `${f.volume_ml}ml, ${type}`;
 }
 
 function breastSummary(f: BreastfeedingSession): string {

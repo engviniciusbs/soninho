@@ -32,7 +32,7 @@ export async function POST() {
     body: "As notificações estão funcionando! Você receberá alertas sobre sonecas.",
     icon: PUSH_ICON,
     tag: "test-notification",
-    url: "/settings",
+    url: "/more/notifications",
   });
 
   let sent = 0;

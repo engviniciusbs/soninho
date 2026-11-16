@@ -22,95 +22,19 @@ exports[`LandingPage > renders_landing_sections 1`] = `
         >
           <svg
             aria-hidden="true"
-            class="shrink-0"
+            class="shrink-0 text-sn-pr"
+            fill="none"
+            focusable="false"
             height="30"
             role="img"
-            viewBox="0 0 32 32"
+            stroke="currentColor"
+            stroke-linejoin="round"
+            stroke-width="1.8"
+            viewBox="0 0 24 24"
             width="30"
           >
-            <defs>
-              <lineargradient
-                gradientUnits="userSpaceOnUse"
-                id="soninho-moon-_r_0_"
-                x1="6"
-                x2="26"
-                y1="4"
-                y2="28"
-              >
-                <stop
-                  stop-color="#e9d5ff"
-                />
-                <stop
-                  offset="0.45"
-                  stop-color="#c4b5fd"
-                />
-                <stop
-                  offset="1"
-                  stop-color="#6366f1"
-                />
-              </lineargradient>
-              <lineargradient
-                gradientUnits="userSpaceOnUse"
-                id="soninho-orbit-_r_0_"
-                x1="0"
-                x2="32"
-                y1="24"
-                y2="24"
-              >
-                <stop
-                  stop-color="#818cf8"
-                  stop-opacity="0"
-                />
-                <stop
-                  offset="0.5"
-                  stop-color="#818cf8"
-                  stop-opacity="0.55"
-                />
-                <stop
-                  offset="1"
-                  stop-color="#818cf8"
-                  stop-opacity="0"
-                />
-              </lineargradient>
-            </defs>
-            <rect
-              fill="#080e1a"
-              height="32"
-              rx="9"
-              width="32"
-            />
             <path
-              d="M5 23.5C10.5 27.5 21.5 27.5 27 23.5"
-              fill="none"
-              stroke="url(#soninho-orbit-_r_0_)"
-              stroke-linecap="round"
-              stroke-width="1.25"
-            />
-            <circle
-              cx="14.25"
-              cy="16"
-              fill="url(#soninho-moon-_r_0_)"
-              r="9.25"
-            />
-            <circle
-              cx="20.75"
-              cy="15.25"
-              fill="#080e1a"
-              r="8.1"
-            />
-            <ellipse
-              cx="11"
-              cy="12"
-              fill="white"
-              fill-opacity="0.35"
-              rx="2.2"
-              ry="1.4"
-              transform="rotate(-28 11 12)"
-            />
-            <path
-              d="M24.5 7.5l0.55 1.35 1.45 0.1-1.1 0.95 0.35 1.4-1.25-0.75-1.25 0.75 0.35-1.4-1.1-0.95 1.45-0.1z"
-              fill="#fde68a"
-              fill-opacity="0.95"
+              d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"
             />
           </svg>
           <span

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp, Trash2, UserPlus } from "lucide-react";
+import { IconChevronDown, IconChevronUp, IconTrash, IconUserPlus } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
+import { StatusPill } from "@/components/ui/status-pill";
 import { getFamilyRelationLabel } from "@/lib/family/relations";
 import type { FamilyInvite, FamilyRole } from "@/types";
-import { ROLE_BADGE_CLASSES, ROLE_LABELS } from "./roles";
+import { ROLE_LABELS } from "./roles";
 
 interface PendingInvitesProps {
   invites: FamilyInvite[];
@@ -19,14 +20,14 @@ export function PendingInvites({ invites, onRevoke }: PendingInvitesProps) {
     <div className="space-y-2">
       <button
         onClick={() => setShowInvites(!showInvites)}
-        className="flex items-center gap-1 text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors"
+        className="flex min-h-11 w-full cursor-pointer items-center gap-1.5 rounded-xl text-sm font-bold text-sn-mu outline-none hover:text-sn-tx focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
       >
-        <UserPlus className="w-3.5 h-3.5" />
+        <IconUserPlus size={16} />
         Convites pendentes ({invites.length})
         {showInvites ? (
-          <ChevronUp className="w-3 h-3 ml-auto" />
+          <IconChevronUp size={16} className="ml-auto" />
         ) : (
-          <ChevronDown className="w-3 h-3 ml-auto" />
+          <IconChevronDown size={16} className="ml-auto" />
         )}
       </button>
 
@@ -48,22 +49,23 @@ export function PendingInvites({ invites, onRevoke }: PendingInvitesProps) {
                     Expira em{" "}
                     {new Date(invite.expires_at).toLocaleDateString("pt-BR")}
                   </p>
-                  <span
-                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs border mt-0.5 ${ROLE_BADGE_CLASSES[invite.role as FamilyRole]}`}
-                  >
-                    {ROLE_LABELS[invite.role as FamilyRole]}
-                    {invite.family_relation
-                      ? ` · ${getFamilyRelationLabel(invite.family_relation)}`
-                      : ""}
-                  </span>
+                  <p className="mt-1 flex flex-wrap items-center gap-2">
+                    <StatusPill tone="attention">{ROLE_LABELS[invite.role as FamilyRole]}</StatusPill>
+                    {invite.family_relation && (
+                      <span className="font-sans text-sm font-semibold text-sn-mu">
+                        {getFamilyRelationLabel(invite.family_relation)}
+                      </span>
+                    )}
+                  </p>
                 </div>
                 <Button
-                  variant="ghost"
+                  variant="icon"
                   size="icon"
-                  className="w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  className="shrink-0 text-sn-mu hover:text-sn-danger"
                   onClick={() => onRevoke(invite.id)}
+                  aria-label="Cancelar convite"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <IconTrash size={18} />
                 </Button>
               </div>
             ))}

@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Trash2, Users } from "lucide-react";
+import { IconTrash, IconUsers } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
+import { StatusPill } from "@/components/ui/status-pill";
 import { getFamilyRelationLabel } from "@/lib/family/relations";
 import type { FamilyMember, FamilyRole } from "@/types";
-import { ROLE_BADGE_CLASSES, ROLE_ICONS, ROLE_LABELS } from "./roles";
+import { ROLE_ICONS, ROLE_LABELS } from "./roles";
 
 function getInitials(name: string | null, email: string | null): string {
   const source = name ?? email ?? "?";
@@ -34,7 +35,7 @@ export function MembersList({
 }: MembersListProps) {
   return (
     <div className="space-y-2">
-      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+      <p className="text-sm font-bold text-sn-mu">
         Membros
       </p>
 
@@ -47,7 +48,7 @@ export function MembersList({
       ) : (
         <div className="space-y-2">
           {members.map((member) => {
-            const RoleIcon = ROLE_ICONS[member.role as FamilyRole] ?? Users;
+            const RoleIcon = ROLE_ICONS[member.role as FamilyRole] ?? IconUsers;
             const isMe = member.user_id === currentUserId;
             const isThisOwner = member.role === "owner";
 
@@ -56,7 +57,7 @@ export function MembersList({
                 key={member.id}
                 initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
               >
                 {/* Avatar */}
                 <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-sm font-semibold text-primary shrink-0">
@@ -81,23 +82,22 @@ export function MembersList({
                   )}
                 </div>
 
-                {/* Role badge */}
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${ROLE_BADGE_CLASSES[member.role as FamilyRole]}`}
-                >
-                  <RoleIcon className="w-3 h-3" />
+                {/* Role badge: lavender for every role; the label says which. */}
+                <StatusPill tone="attention" className="shrink-0">
+                  <RoleIcon size={14} />
                   {ROLE_LABELS[member.role as FamilyRole]}
-                </span>
+                </StatusPill>
 
                 {/* Remove button (owner removes others; others may leave) */}
                 {((isOwner && !isThisOwner) || (!isOwner && isMe && !isThisOwner)) && (
                   <Button
-                    variant="ghost"
+                    variant="icon"
                     size="icon"
-                    className="w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                    className="shrink-0 text-sn-mu hover:text-sn-danger"
                     onClick={() => onRemove(member)}
+                    aria-label={isMe ? "Sair da família" : "Remover membro"}
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <IconTrash size={18} />
                   </Button>
                 )}
               </motion.div>

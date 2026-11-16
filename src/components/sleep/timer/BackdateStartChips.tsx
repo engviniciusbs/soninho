@@ -1,91 +1,68 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Clock } from "lucide-react";
+import { useId } from "react";
+import { Chip } from "@/components/ui/chip";
+import { IconClock } from "@/components/brand/icons";
 import { OFFSETS } from "./useBackdate";
 
 interface BackdateStartChipsProps {
   offset: number;
   useCustom: boolean;
   customTime: string;
-  /** Active chip color (current sleep type). */
-  color: string;
+  /** Resolved back-dated start ("HH:mm"), or null to start now. */
+  startLabel: string | null;
   onSelectOffset: (minutes: number) => void;
   onSelectCustom: () => void;
   onCustomTimeChange: (time: string) => void;
 }
 
-/** "Iniciou há quanto tempo?" chips plus the custom start-time input. */
+/** "Começou antes?": offset chips plus the custom start-time input. */
 export function BackdateStartChips({
-  offset, useCustom, customTime, color,
+  offset, useCustom, customTime, startLabel,
   onSelectOffset, onSelectCustom, onCustomTimeChange,
 }: BackdateStartChipsProps) {
+  const headingId = useId();
   return (
-    <div>
-      <p className="mb-2 text-center text-[10px] font-medium tracking-widest uppercase text-white/25">
+    <div role="group" aria-labelledby={headingId} className="flex flex-col items-center gap-3">
+      <p id={headingId} className="font-sans text-sm font-bold text-sn-mu">
         Iniciou há quanto tempo?
       </p>
-      <div className="flex flex-wrap justify-center gap-1.5">
-        {OFFSETS.map(({ label, value }) => {
-          const act = !useCustom && offset === value;
-          return (
-            <button
-              key={value}
-              onClick={() => onSelectOffset(value)}
-              aria-pressed={act}
-              className={[
-                "rounded-full px-3 py-1 text-xs font-semibold transition-all",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                act
-                  ? "text-white"
-                  : "border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55",
-              ].join(" ")}
-              style={act ? { backgroundColor: color } : undefined}
-            >
-              {label}
-            </button>
-          );
-        })}
-
-        <button
-          onClick={onSelectCustom}
-          aria-pressed={useCustom}
-          className={[
-            "flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            useCustom
-              ? "text-white"
-              : "border border-white/10 text-white/35 hover:border-white/20",
-          ].join(" ")}
-          style={useCustom ? { backgroundColor: color } : undefined}
-        >
-          <Clock className="h-3 w-3" aria-hidden />
+      <div className="flex flex-wrap justify-center gap-2">
+        {OFFSETS.map(({ label, value }) => (
+          <Chip
+            key={value}
+            selected={!useCustom && offset === value}
+            onClick={() => onSelectOffset(value)}
+          >
+            {label}
+          </Chip>
+        ))}
+        <Chip selected={useCustom} onClick={onSelectCustom}>
+          <IconClock size={14} />
           Horário
-        </button>
+        </Chip>
       </div>
 
-      <AnimatePresence>
-        {useCustom && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden mt-2 flex items-center justify-center gap-2"
-          >
-            <label htmlFor="backdate-time" className="text-xs text-white/30">
-              Às:
-            </label>
-            <input
-              id="backdate-time"
-              type="time"
-              value={customTime}
-              onChange={(e) => onCustomTimeChange(e.target.value)}
-              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-ring"
-              style={{ colorScheme: "dark" }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {useCustom && (
+        <div className="flex items-center justify-center gap-2">
+          <label htmlFor="backdate-time" className="font-sans text-sm font-semibold text-sn-mu">
+            Às:
+          </label>
+          <input
+            id="backdate-time"
+            type="time"
+            value={customTime}
+            onChange={(e) => onCustomTimeChange(e.target.value)}
+            className="h-11 rounded-full border border-sn-bd bg-sn-s2 px-4 font-sans text-base font-bold text-sn-tx tabular-nums outline-none [color-scheme:dark] active:border-sn-pr disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+          />
+        </div>
+      )}
+
+      {startLabel && (
+        <p className="font-sans text-sm font-semibold text-sn-tx tabular-nums">
+          Começou às {startLabel}
+        </p>
+      )}
     </div>
   );
 }

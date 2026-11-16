@@ -6,11 +6,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * The app's one duration format: whole minutes as "40 min", "1h 30min" or
+ * "2h" (mockup copy). Rounds first, so 119.6 min is "2h", never "1h 60min".
+ */
 export function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
-  if (h === 0) return `${m}min`;
-  return `${h}h ${m}min`;
+  const m = Math.max(0, Math.round(minutes));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const rest = m % 60;
+  return rest === 0 ? `${h}h` : `${h}h ${rest}min`;
 }
 
 export function formatElapsed(startTime: string, now: number = Date.now()): string {

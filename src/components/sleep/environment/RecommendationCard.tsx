@@ -1,11 +1,10 @@
-import { motion } from "framer-motion";
-import { AlertTriangle, Shirt } from "lucide-react";
+import { IconAlert, IconShirt } from "@/components/brand/icons";
 import {
   getClothingRecommendation,
   type SleepSackType,
 } from "@/lib/sleep/clothingRecommendation";
 
-// ─── Recommendation card ──────────────────────────────────────────────────────
+// ─── Recommendation (a tinted well, not a card: it sits in a sheet or a form) ─
 export function RecommendationCard({
   temp,
   sackType,
@@ -19,46 +18,26 @@ export function RecommendationCard({
 
   if (!rec) {
     return (
-      <div className="rounded-xl border border-dashed border-border/40 bg-card/20 px-4 py-3">
-        <p className="text-xs text-muted-foreground/60 text-center">
-          Informe a temperatura do quarto para ver a sugestão de roupa
-        </p>
-      </div>
+      <p className="rounded-2xl bg-sn-s2/40 px-4 py-3 text-center font-sans text-[15px] font-semibold text-sn-mu">
+        Informe a temperatura do quarto para ver a sugestão de roupa
+      </p>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 4 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      <div className="flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20">
-          <Shirt className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-        </div>
-        <span className="text-xs font-semibold text-primary uppercase tracking-wide">
-          Sugestão de roupa
-        </span>
-      </div>
-
-      <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{rec.sleepSack}</span>
-        </p>
-        <p className="text-sm font-medium text-foreground leading-snug">
-          {rec.layers}
-        </p>
-      </div>
-
+    <div className="space-y-2 rounded-2xl bg-sn-s2/60 p-4" aria-live="polite" aria-atomic="true">
+      <p className="flex items-center gap-2 font-sans text-sm font-bold text-sn-pr">
+        <IconShirt size={18} />
+        Sugestão de roupa
+      </p>
+      <p className="font-sans text-[15px] font-bold text-sn-tx">{rec.sleepSack}</p>
+      <p className="font-sans text-base leading-snug text-sn-tx">{rec.layers}</p>
       {rec.warning && (
-        <div className="flex items-start gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-2">
-          <AlertTriangle className="h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400" aria-hidden="true" />
-          <p className="text-xs text-amber-300/90">{rec.warning}</p>
-        </div>
+        <p className="flex items-start gap-2 rounded-xl bg-sn-warn/10 px-3 py-2 font-sans text-[15px] font-semibold text-sn-warn">
+          <IconAlert size={18} className="mt-0.5 shrink-0" />
+          {rec.warning}
+        </p>
       )}
-    </motion.div>
+    </div>
   );
 }

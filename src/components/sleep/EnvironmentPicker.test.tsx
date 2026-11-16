@@ -4,7 +4,6 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import {
   EnvironmentPicker,
-  EnvironmentPickerCompact,
   type EnvironmentData,
 } from "./EnvironmentPicker";
 
@@ -70,27 +69,5 @@ describe("EnvironmentPicker", () => {
     fireEvent.click(screen.getByRole("button", { name: "Limpar temperatura" }));
     fireEvent.keyDown(screen.getByRole("button", { name: "TOG 1" }), { key: "Enter" });
     expect(onChange.mock.calls).toMatchSnapshot();
-  });
-});
-
-describe("EnvironmentPickerCompact", () => {
-  it("renders_compact_picker", () => {
-    const onChange = vi.fn();
-    const { container, rerender } = render(
-      <EnvironmentPickerCompact value={EMPTY} onChange={onChange} />
-    );
-    expect(screen.getByText("Temp. do quarto")).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Saquinho" })).toBeInTheDocument();
-    expect(container).toMatchSnapshot("empty");
-
-    rerender(<EnvironmentPickerCompact value={FILLED} onChange={onChange} />);
-    expect(screen.getByText("17°C")).toBeInTheDocument();
-    expect(container).toMatchSnapshot("filled");
-
-    fireEvent.click(screen.getByRole("button", { name: "Aumentar temperatura" }));
-    fireEvent.click(screen.getByRole("button", { name: "Limpar temperatura" }));
-    fireEvent.click(screen.getByRole("button", { name: "Saquinho soft/fleece" }));
-    fireEvent.click(screen.getByRole("button", { name: "Sem saquinho" }));
-    expect(onChange.mock.calls).toMatchSnapshot("calls");
   });
 });

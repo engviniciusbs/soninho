@@ -1,33 +1,37 @@
+import type { ComponentType } from "react";
 import {
-  Home,
-  Milk,
-  List,
-  BarChart3,
-  Sparkles,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
+  IconBottle,
+  IconChart,
+  IconHome,
+  IconList,
+  IconMore,
+  type IconProps,
+} from "@/components/brand/icons";
 
 export interface NavLink {
   href: string;
   label: string;
-  icon: LucideIcon;
-  mobileLabel?: string;
+  icon: ComponentType<IconProps>;
 }
 
+/** As 5 abas do menu (spec §8.2), na mesma ordem no mobile e no desktop. */
 export const ALL_NAV_LINKS: NavLink[] = [
-  { href: "/app", label: "Início", icon: Home },
-  { href: "/feeding", label: "Alimentação", icon: Milk, mobileLabel: "Comida" },
-  { href: "/history", label: "Registro", icon: List },
-  { href: "/analytics", label: "Análise", icon: BarChart3 },
-  { href: "/ai-insights", label: "IA Insights", icon: Sparkles, mobileLabel: "IA" },
-  { href: "/settings", label: "Configurações", icon: Settings, mobileLabel: "Config" },
+  { href: "/app", label: "Início", icon: IconHome },
+  { href: "/feeding", label: "Comida", icon: IconBottle },
+  { href: "/history", label: "Registro", icon: IconList },
+  { href: "/analytics", label: "Análise", icon: IconChart },
+  { href: "/more", label: "Mais", icon: IconMore },
 ];
 
-/** Modo babá: só início (timer + recados) e configurações. */
+const NANNY_TABS = new Set(["/app", "/more"]);
+
+/** Modo babá: só Início (timer e recados) e Mais (onde ela vê só o Perfil). */
 export function getNavLinks(nannyMode: boolean): NavLink[] {
   if (!nannyMode) return ALL_NAV_LINKS;
-  return ALL_NAV_LINKS.filter(
-    (l) => l.href === "/app" || l.href === "/settings"
-  );
+  return ALL_NAV_LINKS.filter((l) => NANNY_TABS.has(l.href));
+}
+
+/** A aba fica ativa na própria rota e nas subrotas dela (`/more/family` acende Mais). */
+export function isNavLinkActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(href + "/");
 }

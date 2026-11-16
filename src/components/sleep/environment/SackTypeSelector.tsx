@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SACK_LABELS, type SleepSackType } from "@/lib/sleep/clothingRecommendation";
-import { SACK_OPTIONS } from "./options";
+import { FIELD_LABEL, SACK_OPTIONS, TILE, TILE_OFF, TILE_ON } from "./options";
 
 // ─── Sleep sack type ──────────────────────────────────────────────────────────
 export function SackTypeSelector({
@@ -12,14 +12,8 @@ export function SackTypeSelector({
 }) {
   return (
     <div className="space-y-2">
-      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        Saquinho de dormir
-      </label>
-      <div
-        role="group"
-        aria-label="Tipo de saquinho"
-        className="grid grid-cols-4 gap-1.5"
-      >
+      <p className={FIELD_LABEL}>Saquinho de dormir</p>
+      <div role="group" aria-label="Tipo de saquinho" className="grid grid-cols-4 gap-2">
         {SACK_OPTIONS.map(({ value: sv, shortLabel, tog }) => {
           const isActive = value === sv || (!value && sv === "none");
           return (
@@ -30,18 +24,10 @@ export function SackTypeSelector({
               aria-label={`${SACK_LABELS[sv]}${tog ? ` (TOG ${tog})` : ""}`}
               onClick={() => onSelect(sv)}
               onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(sv); }}
-              className={cn(
-                "flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                isActive
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-              )}
-              style={{ touchAction: "manipulation" }}
+              className={cn(TILE, "px-1", isActive ? TILE_ON : TILE_OFF)}
             >
-              <span className="text-[11px] font-semibold leading-tight">{shortLabel}</span>
-              {tog && (
-                <span className="text-[10px] opacity-60 leading-tight">TOG {tog}</span>
-              )}
+              <span className="text-[13px] leading-tight font-bold">{shortLabel}</span>
+              {tog && <span className="text-xs leading-tight font-semibold text-sn-mu">TOG {tog}</span>}
             </button>
           );
         })}

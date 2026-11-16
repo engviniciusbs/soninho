@@ -1,0 +1,195 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,SOFT,wght@9..144,50,600;9..144,50,700&family=Nunito:wght@500;600;700;800&display=swap');
+  :root{
+    --sn-bg:#0D0F24; --sn-bg-glow:#181B42; --sn-s1:#15183A; --sn-s2:#1F2350; --sn-bd:#2C3168;
+    --sn-tx:#F4F2FF; --sn-mu:#A3A0CC; --sn-pr:#BCAEF7; --sn-pr-ink:#16132F; --sn-ok:#86E7C4; --sn-warn:#F4CB86;
+    --sn-sun:#FFD48A; --sn-sun-glow:rgba(255,212,138,.28); --sn-moon-glow:rgba(188,174,247,.35);
+    --sn-display:"Fraunces",Georgia,serif; --sn-body:"Nunito",system-ui,sans-serif;
+  }
+  .wrap{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .col{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .cap{font:700 14px var(--sn-body);color:#b9b6dc}
+  .ph{width:360px;background:radial-gradient(130% 55% at 50% -5%,var(--sn-bg-glow) 0%,var(--sn-bg) 62%);color:var(--sn-tx);
+      border-radius:38px;border:1px solid #23275a;padding:20px 18px 0;font-family:var(--sn-body);box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden}
+  .ph *{box-sizing:border-box}
+  .ph svg{display:block}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .brand{display:flex;gap:10px;align-items:center;font:700 22px var(--sn-display);font-variation-settings:"SOFT" 50}
+  .clock{font:600 15px var(--sn-body);color:var(--sn-mu)}
+  .baby{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .av{width:56px;height:56px;border-radius:50%;background:var(--sn-s1);border:1px solid var(--sn-bd);display:grid;place-items:center}
+  .bn{font:700 24px/1.1 var(--sn-display);font-variation-settings:"SOFT" 50}
+  .ba{font:600 14px var(--sn-body);color:var(--sn-mu);margin-top:2px}
+  .chev{margin-left:auto;color:var(--sn-mu)}
+  .card{background:rgba(21,24,58,.72);border:1px solid var(--sn-bd);border-radius:24px;padding:18px;margin-bottom:12px}
+  .lbl{font:700 14px var(--sn-body);color:var(--sn-mu)}
+  .hero{position:relative;overflow:hidden;min-height:168px}
+  .hero .kind{font:700 22px var(--sn-display);font-variation-settings:"SOFT" 50;margin-top:4px}
+  .hero .time{font:700 60px/1 var(--sn-display);font-variation-settings:"SOFT" 50;letter-spacing:-.02em;margin:6px 0 6px;font-feature-settings:"tnum"}
+  .hero .sub{font:600 14px var(--sn-body);color:var(--sn-mu)}
+  .hero .art{position:absolute;right:4px;top:20px}
+  .why{display:inline-flex;gap:6px;align-items:center;margin-top:12px;font:700 13px var(--sn-body);color:var(--sn-pr)}
+  .row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .big{font:700 32px/1.1 var(--sn-display);font-variation-settings:"SOFT" 50;margin-top:4px}
+  .pill{font:800 12px var(--sn-body);padding:6px 12px;border-radius:999px;border:1px solid rgba(134,231,196,.5);color:var(--sn-ok);background:rgba(134,231,196,.08);white-space:nowrap}
+  .bar{position:relative;height:8px;border-radius:99px;background:var(--sn-s2);margin:16px 0 10px}
+  .bar i{position:absolute;left:0;top:0;bottom:0;width:72%;border-radius:99px;background:var(--sn-ok)}
+  .bar b{position:absolute;left:61%;top:-5px;bottom:-5px;width:2px;background:var(--sn-tx);border-radius:2px;opacity:.8}
+  .hint{font:600 13px var(--sn-body);color:var(--sn-mu)}
+  .seg{display:flex;background:var(--sn-s1);border:1px solid var(--sn-bd);border-radius:999px;padding:5px;margin:4px 0 12px}
+  .seg span{flex:1;display:flex;gap:9px;justify-content:center;align-items:center;padding:12px 0;border-radius:999px;font:700 16px var(--sn-body);color:var(--sn-tx)}
+  .seg .on{background:var(--sn-pr);color:var(--sn-pr-ink)}
+  .cta{width:100%;display:flex;gap:10px;justify-content:center;align-items:center;border:0;border-radius:999px;padding:18px;font:800 18px var(--sn-body);background:var(--sn-pr);color:var(--sn-pr-ink)}
+  .cta.alt{background:transparent;color:var(--sn-tx);border:1.5px solid var(--sn-pr)}
+  .ghost{display:flex;gap:8px;justify-content:center;align-items:center;font:700 15px var(--sn-body);color:var(--sn-pr);margin:14px 0 16px}
+  .list .head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--sn-bd);margin-bottom:12px}
+  .list .h{font:700 18px var(--sn-body)}
+  .list .link{display:flex;gap:4px;align-items:center;font:700 14px var(--sn-body);color:var(--sn-pr)}
+  .list .item{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
+  .list .item + .item{margin-top:8px}
+  .list .what{font:600 14px var(--sn-body);color:var(--sn-mu)}
+  .list .what strong{color:var(--sn-tx);font-weight:700;display:block}
+  .list .val{font:800 16px var(--sn-body)}
+  .ring{width:220px;height:220px;margin:8px auto 12px;border-radius:50%;display:grid;place-items:center;
+      background:conic-gradient(var(--sn-pr) 0 62%,var(--sn-s2) 62% 100%);position:relative}
+  .ring::after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--sn-bg)}
+  .ring div{position:relative;z-index:1;text-align:center}
+  .ring .t{font:700 42px/1 var(--sn-display);font-variation-settings:"SOFT" 50;font-feature-settings:"tnum"}
+  .ring .k{font:600 13px var(--sn-body);color:var(--sn-mu);margin-top:8px}
+  .chips{display:flex;gap:8px;justify-content:center;margin:0 0 14px}
+  .chip{font:700 13px var(--sn-body);padding:8px 13px;border-radius:999px;background:var(--sn-s2);border:1px solid var(--sn-bd)}
+  .nav{display:flex;justify-content:space-around;border-top:1px solid var(--sn-bd);margin:8px -18px 0;padding:12px 4px 16px;background:rgba(13,15,36,.94)}
+  .nav span{display:flex;flex-direction:column;align-items:center;gap:6px;font:700 13px var(--sn-body);color:var(--sn-tx);min-width:56px}
+  .nav .on{color:var(--sn-pr)}
+  .nav .on::after{content:"";width:28px;height:4px;border-radius:9px;background:var(--sn-pr);margin-top:2px}
+  .notes{max-width:1000px;margin:22px auto 0;font:15px/1.55 var(--sn-body);color:#d3d1ea}
+  .notes b{color:#fff}
+</style>
+
+<!-- shared icon sprites -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></g></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5-12-7.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7Z" fill="currentColor"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1v-9.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-bottle" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M10 2.5h4v3h-4z"/><path d="M9 5.5h6l1.5 3V20a1.5 1.5 0 0 1-1.5 1.5H9A1.5 1.5 0 0 1 7.5 20V8.5L9 5.5Z"/><path d="M7.5 12h9" stroke-linecap="round"/></g></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".9" fill="currentColor"/><circle cx="4.5" cy="12" r=".9" fill="currentColor"/><circle cx="4.5" cy="18" r=".9" fill="currentColor"/></g></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4v16h16"/><path d="M8.5 16v-5M12.5 16V8M16.5 16v-3"/></g></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></g></symbol>
+    <symbol id="art-moon" viewBox="0 0 140 120">
+      <ellipse cx="72" cy="62" rx="62" ry="30" transform="rotate(-28 72 62)" fill="none" stroke="currentColor" stroke-opacity=".55" stroke-width="1.4" stroke-dasharray="3 5"/>
+      <path d="M98 74a30 30 0 1 1-23-47 24 24 0 1 0 23 47Z" fill="currentColor" style="filter:drop-shadow(0 0 16px var(--sn-moon-glow))"/>
+      <path d="M112 22c.5 4 2.5 6 6.5 6.5-4 .5-6 2.5-6.5 6.5-.5-4-2.5-6-6.5-6.5 4-.5 6-2.5 6.5-6.5Z" fill="currentColor"/>
+      <path d="M26 92c.4 3 1.8 4.4 4.8 4.8-3 .4-4.4 1.8-4.8 4.8-.4-3-1.8-4.4-4.8-4.8 3-.4 4.4-1.8 4.8-4.8Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="art-sun" viewBox="0 0 140 120">
+      <ellipse cx="72" cy="62" rx="62" ry="30" transform="rotate(-28 72 62)" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.4" stroke-dasharray="3 5"/>
+      <circle cx="74" cy="58" r="24" fill="currentColor" style="filter:drop-shadow(0 0 18px var(--sn-sun-glow))"/>
+      <g stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M74 22v-6M74 100v-6M38 58h-6M116 58h-6M48.5 32.5l-4-4M103.5 87.5l-4-4M48.5 83.5l-4 4M103.5 28.5l-4 4"/></g>
+      <path d="M116 96c.4 3 1.8 4.4 4.8 4.8-3 .4-4.4 1.8-4.8 4.8-.4-3-1.8-4.4-4.8-4.8 3-.4 4.4-1.8 4.8-4.8Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h2>Home v2: lua/sol, fonte, botões e menu do seu mockup</h2>
+<p class="subtitle">Três estados da mesma tela. A ilustração acompanha o tipo do próximo sono: lua para noturno, sol para soneca.</p>
+
+<div class="wrap">
+
+  <div class="col"><div class="cap">Acordado, próximo é noturno</div>
+  <div class="ph">
+    <div class="top"><div class="brand"><svg width="26" height="26" style="color:var(--sn-pr)"><use href="#i-moon"/></svg>Soninho</div><span class="clock">17:20</span></div>
+    <div class="baby"><div class="av"><svg width="30" height="30" style="color:var(--sn-pr)"><use href="#i-moon"/></svg></div><div><div class="bn">Helena</div><div class="ba">9 meses</div></div><svg class="chev" width="22" height="22"><use href="#i-chev"/></svg></div>
+    <div class="card hero">
+      <div class="lbl">Previsão de sono</div>
+      <div class="kind">Sono noturno</div>
+      <div class="time">17:50</div>
+      <div class="sub">Em cerca de 30 min</div>
+      <div class="why"><svg width="14" height="14"><use href="#i-spark"/></svg>Por que esse horário?</div>
+      <svg class="art" width="140" height="120" style="color:var(--sn-pr)"><use href="#art-moon"/></svg>
+    </div>
+    <div class="card">
+      <div class="row"><div><div class="lbl">Tempo acordada</div><div class="big">3h 31min</div></div><span class="pill">Na janela ideal</span></div>
+      <div class="bar"><i></i><b></b></div>
+      <div class="hint">Janela de vigília: 3h a 4h</div>
+    </div>
+    <div class="seg"><span><svg width="22" height="22"><use href="#i-sun"/></svg>Soneca</span><span class="on"><svg width="20" height="20"><use href="#i-moon"/></svg>Noturno</span></div>
+    <button class="cta"><svg width="22" height="22"><use href="#i-play"/></svg>Iniciar sono noturno</button>
+    <div class="ghost"><svg width="20" height="20"><use href="#i-clock"/></svg>Começou antes?</div>
+    <div class="card list">
+      <div class="head"><span class="h">Hoje</span><span class="link">Ver registro<svg width="16" height="16"><use href="#i-chev"/></svg></span></div>
+      <div class="item"><div class="what"><strong>Último sono</strong>Soneca, 13:09 a 13:49</div><span class="val">40 min</span></div>
+      <div class="item"><div class="what"><strong>Última mamada</strong>Mamadeira, 15:30</div><span class="val">180 ml</span></div>
+    </div>
+    <div class="nav">
+      <span class="on"><svg width="26" height="26"><use href="#i-home"/></svg>Início</span>
+      <span><svg width="26" height="26"><use href="#i-bottle"/></svg>Comida</span>
+      <span><svg width="26" height="26"><use href="#i-list"/></svg>Registro</span>
+      <span><svg width="26" height="26"><use href="#i-chart"/></svg>Análise</span>
+      <span><svg width="26" height="26"><use href="#i-more"/></svg>Mais</span>
+    </div>
+  </div></div>
+
+  <div class="col"><div class="cap">Acordado, próximo é soneca</div>
+  <div class="ph">
+    <div class="top"><div class="brand"><svg width="26" height="26" style="color:var(--sn-pr)"><use href="#i-moon"/></svg>Soninho</div><span class="clock">10:05</span></div>
+    <div class="baby"><div class="av"><svg width="30" height="30" style="color:var(--sn-pr)"><use href="#i-moon"/></svg></div><div><div class="bn">Helena</div><div class="ba">9 meses</div></div><svg class="chev" width="22" height="22"><use href="#i-chev"/></svg></div>
+    <div class="card hero">
+      <div class="lbl">Previsão de sono</div>
+      <div class="kind">Soneca</div>
+      <div class="time">10:40</div>
+      <div class="sub">Em cerca de 35 min</div>
+      <div class="why"><svg width="14" height="14"><use href="#i-spark"/></svg>Por que esse horário?</div>
+      <svg class="art" width="140" height="120" style="color:var(--sn-sun)"><use href="#art-sun"/></svg>
+    </div>
+    <div class="card">
+      <div class="row"><div><div class="lbl">Tempo acordada</div><div class="big">2h 50min</div></div><span class="pill">Na janela ideal</span></div>
+      <div class="bar"><i style="width:60%"></i><b></b></div>
+      <div class="hint">Janela de vigília: 3h a 4h</div>
+    </div>
+    <div class="seg"><span class="on"><svg width="22" height="22"><use href="#i-sun"/></svg>Soneca</span><span><svg width="20" height="20"><use href="#i-moon"/></svg>Noturno</span></div>
+    <button class="cta"><svg width="22" height="22"><use href="#i-play"/></svg>Iniciar soneca</button>
+    <div class="ghost"><svg width="20" height="20"><use href="#i-clock"/></svg>Começou antes?</div>
+    <div class="nav">
+      <span class="on"><svg width="26" height="26"><use href="#i-home"/></svg>Início</span>
+      <span><svg width="26" height="26"><use href="#i-bottle"/></svg>Comida</span>
+      <span><svg width="26" height="26"><use href="#i-list"/></svg>Registro</span>
+      <span><svg width="26" height="26"><use href="#i-chart"/></svg>Análise</span>
+      <span><svg width="26" height="26"><use href="#i-more"/></svg>Mais</span>
+    </div>
+  </div></div>
+
+  <div class="col"><div class="cap">Dormindo</div>
+  <div class="ph">
+    <div class="top"><div class="brand"><svg width="26" height="26" style="color:var(--sn-pr)"><use href="#i-moon"/></svg>Soninho</div><span class="clock">19:02</span></div>
+    <div class="baby"><div class="av"><svg width="30" height="30" style="color:var(--sn-pr)"><use href="#i-moon"/></svg></div><div><div class="bn">Helena</div><div class="ba">9 meses</div></div><svg class="chev" width="22" height="22"><use href="#i-chev"/></svg></div>
+    <div class="card" style="text-align:center">
+      <div class="lbl">Sono noturno em andamento</div>
+      <div class="ring"><div><div class="t">1:12:08</div><div class="k">Desde 17:50</div></div></div>
+      <div class="chips"><span class="chip">22°C</span><span class="chip">TOG 1.0</span><span class="chip">Ambiente</span></div>
+      <button class="cta alt"><svg width="20" height="20"><use href="#i-stop"/></svg>Acordou</button>
+    </div>
+    <div class="card list">
+      <div class="head"><span class="h">Hoje</span><span class="link">Ver registro<svg width="16" height="16"><use href="#i-chev"/></svg></span></div>
+      <div class="item"><div class="what"><strong>Estimativa de despertar</strong>Média das últimas noites</div><span class="val">~06:10</span></div>
+      <div class="item"><div class="what"><strong>Última mamada</strong>Mamadeira, 17:30</div><span class="val">180 ml</span></div>
+    </div>
+    <div class="nav">
+      <span class="on"><svg width="26" height="26"><use href="#i-home"/></svg>Início</span>
+      <span><svg width="26" height="26"><use href="#i-bottle"/></svg>Comida</span>
+      <span><svg width="26" height="26"><use href="#i-list"/></svg>Registro</span>
+      <span><svg width="26" height="26"><use href="#i-chart"/></svg>Análise</span>
+      <span><svg width="26" height="26"><use href="#i-more"/></svg>Mais</span>
+    </div>
+  </div></div>
+</div>
+
+<div class="notes">
+  <p><b>Do seu mockup:</b> menu inferior com ícones de linha grandes, rótulo embaixo e barrinha sob o ativo; lua com órbita pontilhada e estrelas (e sol na mesma linguagem para soneca); Fraunces pesada nos títulos e números e Nunito no texto; botões em pílula (seletor Soneca/Noturno e botão lavanda cheio com ícone de play).</p>
+  <p><b>Mantido da v1:</b> “Por que esse horário?” no lugar do card de IA, estado “dormindo” com anel e botão “Acordou”, e o card “Hoje” juntando último sono e última mamada. A faixa do dia em blocos saiu da home e vai para Registro.</p>
+</div>

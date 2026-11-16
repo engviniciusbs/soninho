@@ -4,21 +4,20 @@ import { useState, useRef, useEffect } from "react";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar } from "@/components/ui/avatar";
 import { toChatPayload, CHAT_MAX_CONTENT } from "@/lib/ai/chatSchema";
-import { Card } from "@/components/ui/card";
-import { SendHorizontal, Sparkles, User, Loader2 } from "lucide-react";
+import { IconSend, IconSpark } from "@/components/brand/icons";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+/** Suggested questions: a short button label; the full question is what gets sent. */
 const QUICK_QUESTIONS = [
-  "Por que minha bebê acorda cedo demais?",
-  "Esse horário de sono é normal para a idade dela?",
-  "Como prolongar as sonecas?",
-  "Qual deve ser o horário de dormir hoje à noite?",
+  { label: "Por que acorda tão cedo?", question: "Por que minha bebê acorda cedo demais?" },
+  { label: "Horário normal para a idade?", question: "Esse horário de sono é normal para a idade dela?" },
+  { label: "Como prolongar as sonecas?", question: "Como prolongar as sonecas?" },
+  { label: "Que horas dormir hoje?", question: "Qual deve ser o horário de dormir hoje à noite?" },
 ];
 
 export function AIChat() {
@@ -26,10 +25,13 @@ export function AIChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
+  // Keeps the newest message in view by scrolling the list itself, not the
+  // page (scrollIntoView would also scroll the page under the header).
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const list = listRef.current;
+    if (list && messages.length > 0) list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
   async function sendMessage(content: string) {
@@ -121,33 +123,35 @@ export function AIChat() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4">
+      <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto overscroll-contain pb-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center gap-6 pt-8 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-              <Sparkles className="h-8 w-8 text-primary" />
-            </div>
+          <div className="flex flex-col items-center gap-5 pt-6 text-center">
+            <span
+              aria-hidden="true"
+              className="grid size-16 place-items-center rounded-full bg-sn-s2 text-sn-pr"
+            >
+              <IconSpark size={30} />
+            </span>
             <div className="space-y-2">
-              <h2 className="text-lg font-bold">Pergunte sobre o sono</h2>
-              <p className="text-sm text-muted-foreground max-w-sm">
+              <h2 className="font-display text-xl font-bold text-sn-tx">Pergunte sobre o sono</h2>
+              <p className="max-w-sm text-base text-sn-mu">
                 Tenho acesso aos dados de sono do seu bebê e posso ajudar
                 com dúvidas sobre rotina, janelas de vigília e dicas.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-2 max-w-md">
-              {QUICK_QUESTIONS.map((q) => (
-                <Button
-                  key={q}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-xl text-xs"
-                  onClick={() => sendMessage(q)}
+            <div className="flex w-full flex-col gap-2">
+              {QUICK_QUESTIONS.map(({ label, question }) => (
+                <button
+                  key={question}
+                  type="button"
+                  className="min-h-11 cursor-pointer rounded-2xl border border-sn-bd bg-sn-s1 px-4 py-2.5 text-left font-sans text-[15px] font-bold whitespace-nowrap text-sn-tx outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out hover:border-sn-pr/60 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr disabled:pointer-events-none disabled:opacity-55"
+                  onClick={() => sendMessage(question)}
                   disabled={isStreaming}
                 >
-                  {q}
-                </Button>
+                  {label}
+                </button>
               ))}
             </div>
           </div>
@@ -156,60 +160,62 @@ export function AIChat() {
         {messages.map((msg, i) => (
           <div
             key={i}
-            className={`flex gap-3 ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             {msg.role === "assistant" && (
-              <Avatar className="h-8 w-8 shrink-0 bg-primary/10 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-primary" />
-              </Avatar>
+              <span
+                aria-hidden="true"
+                className="grid size-8 shrink-0 place-items-center rounded-full bg-sn-s2 text-sn-pr"
+              >
+                <IconSpark size={16} />
+              </span>
             )}
-            <Card
-              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+            <div
+              className={`max-w-[82%] rounded-[20px] px-4 py-3 ${
                 msg.role === "user"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card"
+                  ? "rounded-br-md bg-sn-pr text-sn-pr-ink"
+                  : "rounded-bl-md border border-sn-bd bg-sn-s1 text-sn-tx"
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap leading-relaxed">
+              <p className="text-base leading-relaxed whitespace-pre-wrap">
                 {msg.content}
                 {isStreaming &&
                   i === messages.length - 1 &&
                   msg.role === "assistant" && (
-                    <span className="inline-block w-2 h-4 bg-current animate-pulse ml-0.5" />
+                    <span aria-hidden="true" className="ml-0.5 inline-block h-4 w-2 animate-pulse bg-current" />
                   )}
               </p>
-            </Card>
-            {msg.role === "user" && (
-              <Avatar className="h-8 w-8 shrink-0 bg-secondary flex items-center justify-center">
-                <User className="h-4 w-4" />
-              </Avatar>
-            )}
+            </div>
           </div>
         ))}
 
         {isStreaming && messages[messages.length - 1]?.content === "" && (
-          <div className="flex gap-3">
-            <Avatar className="h-8 w-8 shrink-0 bg-primary/10 flex items-center justify-center">
-              <Sparkles className="h-4 w-4 text-primary" />
-            </Avatar>
-            <Card className="rounded-2xl px-4 py-3 bg-card">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </Card>
+          <div className="flex gap-2.5">
+            <span
+              aria-hidden="true"
+              className="grid size-8 shrink-0 place-items-center rounded-full bg-sn-s2 text-sn-pr"
+            >
+              <IconSpark size={16} />
+            </span>
+            <div className="rounded-[20px] rounded-bl-md border border-sn-bd bg-sn-s1 px-4 py-3">
+              <span className="sr-only">Escrevendo resposta</span>
+              <span
+                aria-hidden="true"
+                className="block size-4 animate-spin rounded-full border-2 border-sn-mu border-r-transparent"
+              />
+            </div>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="flex gap-2 pt-4 border-t border-border">
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 border-t border-sn-bd pt-3">
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Faça uma pergunta sobre o sono..."
-          className="rounded-xl resize-none min-h-[44px] max-h-[120px]"
+          aria-label="Sua pergunta"
+          className="max-h-[120px] min-h-11 resize-none rounded-[22px] border-sn-mu/70 bg-sn-s1 px-4 py-2.5 text-base"
           rows={1}
           maxLength={CHAT_MAX_CONTENT}
           onKeyDown={(e) => {
@@ -222,11 +228,10 @@ export function AIChat() {
         <Button
           type="submit"
           size="icon"
-          className="rounded-xl shrink-0 h-[44px] w-[44px]"
           disabled={isStreaming || !input.trim()}
           aria-label="Enviar mensagem"
         >
-          <SendHorizontal className="h-5 w-5" />
+          <IconSend size={20} />
         </Button>
       </form>
     </div>

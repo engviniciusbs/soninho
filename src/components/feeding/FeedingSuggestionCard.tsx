@@ -1,89 +1,66 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Clock, Milk } from "lucide-react";
+import { useId } from "react";
 import { useFeedingSuggestion } from "@/hooks/useFeedingSuggestion";
 import { useActiveBreastTimer } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { Card } from "@/components/ui/card";
+import { BigNumber } from "@/components/ui/big-number";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { formatDuration } from "@/lib/utils";
+import { feedingExplanation } from "@/lib/feeding/suggestionExplanation";
 
-const confidenceConfig = {
-  high: {
-    label: "Boa previsão",
-    className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-  },
-  medium: {
-    label: "Estimativa",
-    className: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-  },
-  low: {
-    label: "Poucos dados",
-    className: "bg-sky-500/15 text-sky-400 border-sky-500/20",
-  },
-};
+/** "Pelo intervalo…" read in the middle of a sentence. */
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
 
+/** "Próxima mamada" (mockup `.hero` on Comida): the time, how soon, and where it came from. */
 export function FeedingSuggestionCard() {
+  const labelId = useId();
   const { data: suggestion, isLoading } = useFeedingSuggestion();
   const { activeBaby } = useBaby();
   const isRunning = useActiveBreastTimer(activeBaby?.id) !== null;
 
   if (isRunning) return null;
-  if (isLoading) return <Skeleton className="h-32 rounded-2xl" />;
-  if (!suggestion || !suggestion.suggestedTime) return null;
+  if (isLoading) {
+    return (
+      <Card aria-busy="true" aria-label="Carregando próxima mamada" className="gap-0 px-[18px]">
+        <Skeleton className="h-4 w-28 rounded-lg" />
+        <Skeleton className="my-1.5 h-12 w-32 rounded-xl" />
+        <Skeleton className="h-4 w-60 rounded-lg" />
+      </Card>
+    );
+  }
+  // No answer from the API: the card stays out, as before.
+  if (!suggestion) return null;
 
-  const isOverdue = suggestion.suggestedTime === "Assim que possível";
-  const confidence = confidenceConfig[suggestion.confidence];
+  const empty = !suggestion.suggestedTime;
+  const overdue = suggestion.suggestedTime === "Assim que possível";
+  const explanation = empty ? "" : feedingExplanation(suggestion);
+  const soon = !overdue && suggestion.minutesUntilSuggested > 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="rounded-2xl border border-sky-500/20 bg-sky-500/6 p-4"
-    >
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/15">
-          <Milk className="h-5 w-5 text-sky-400" aria-hidden="true" />
-        </div>
-
-        <div className="flex-1 min-w-0 space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold">
-              {isOverdue ? "Hora da próxima mamada" : "Próxima mamada"}
-            </span>
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-[11px] font-medium border",
-                confidence.className
-              )}
-            >
-              {confidence.label}
-            </span>
-          </div>
-
-          <div
-            className={cn(
-              "flex items-center gap-2",
-              isOverdue ? "text-amber-400" : "text-sky-400"
-            )}
-          >
-            <Clock className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span className="num-display text-xl font-semibold tabular-nums">
-              {isOverdue ? "Agora" : suggestion.suggestedTime}
-            </span>
-            {!isOverdue && suggestion.minutesUntilSuggested > 0 && (
-              <span className="text-xs text-muted-foreground font-medium">
-                (~{suggestion.minutesUntilSuggested} min)
-              </span>
-            )}
-          </div>
-
-          <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-            {suggestion.reasoning}
+    <Card role="region" aria-labelledby={labelId} className="gap-0 px-[18px]">
+      <p id={labelId} className="font-sans text-sm font-bold text-sn-mu">
+        Próxima mamada
+      </p>
+      {empty ? (
+        <p className="mt-1.5 font-sans text-base font-semibold text-sn-tx">
+          Registre a primeira mamada para ver aqui o horário da próxima.
+        </p>
+      ) : (
+        <>
+          <BigNumber className="my-1.5 text-[48px] leading-none tracking-[-0.02em]">
+            {overdue ? "Agora" : suggestion.suggestedTime}
+          </BigNumber>
+          <p className="font-sans text-sm font-semibold text-sn-mu">
+            {soon
+              ? `Em cerca de ${formatDuration(suggestion.minutesUntilSuggested)}, ${lowerFirst(explanation)}`
+              : explanation}
           </p>
-        </div>
-      </div>
-    </motion.div>
+        </>
+      )}
+    </Card>
   );
 }

@@ -1,16 +1,109 @@
+/* Hallmark · shape: app screen · genre: atmospheric · theme: brand · redesign: full
+ * paper: oklch(18% 0.043 277) · accent: oklch(79% 0.103 293) · display: Fraunces · body: Nunito
+ * nav: bottom bar of five tabs, five-item sidebar on desktop · signature: the sleep prediction card with the moon or the sun · states: loading, empty, error, sleeping, awake
+ * axes: dark/roman-serif/chromatic-lavender · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R4 V4 · weakest: P, a calm night palette is a tone more than an argument; the moon and sun carry the claim that the next sleep is the one number that matters */
+/* Hallmark · waive 80 · MoonOrbit and SunOrbit, inline svg of the moon and sun on an orbit · moon and sun of the sleep prediction card, aprovado pelo autor no mockup */
+/* Hallmark · waive 29 · lavender glow on the moon, gold on the sun, one dark radial bloom atop the body · moon glow and the radial bloom on the body, aprovado pelo autor no mockup */
+/* Hallmark · waive 39b · the baby row is one button holding the 56px avatar, name and age · the baby row above the sleep prediction card on the app screen, aprovado pelo autor no mockup */
+/* Hallmark · dismissed 41 · --sn-pr-ink is only ever text on --sn-pr (9.0:1), never on the dark paper */
+/* Hallmark · dropped /settings, /ai-insights · viraram /more e /more/ai (as abas antigas viraram rotas em /more), com redirect em src/lib/redirects.ts */
+/* Hallmark · dropped form 1, mural da família · o mural de recados (FamilyNoteCard) saiu da home para /more/family, spec 8.10 */
+/* Hallmark · dropped linha do tempo · a SleepTimeline saiu da home e vive no Registro, um dia por vez */
+/* Hallmark · dropped lua · o nome do bebê virou o botão de troca de bebê no topo da home (spec 8.2), não um título */
+/* Hallmark · dropped #base-ui-_r_5_-hidden-input, setPeriod(p.value) · o Select de período da Análise virou SegmentedControl em ?periodo= */
+/* Hallmark · dropped _R_n5esndpknelb_, _R_175esndpknelb_, setDaysBack, setFilterType, de novembro · os Selects de dias e tipo do Registro viraram a faixa de dias e os chips ?tipo=, um dia por vez */
+/* Hallmark · dropped invalidateQueries, handleGeneratePdf, setEditItem, setEditSession · os handlers moveram das páginas para AIInsights, SleepReportPdfCard e openForm de cada tela */
+/* Hallmark · reworded "mamadeiras, peito e sólidos" to "comida" · nome da aba na navegação nova */
+/* Hallmark · reworded "últimos registros" to "hoje" · a lista de Comida mostra só o dia, como no mockup */
+/* Hallmark · reworded "registro de sono" to "registro" · nome da aba na navegação nova */
+/* Hallmark · reworded "análise de sono" to "análise" · nome da aba na navegação nova */
+/* Hallmark · dropped #profile-display-name, _R_2aal5esndpknelb_, _R_2eal5esndpknelb_, _r_4_ · a aba Geral de /settings virou rotas: o nome em /more/profile e os Selects de papel em /more/family */
+/* Hallmark · reworded "configurações" to "mais" · /settings virou a lista Mais */
+/* Hallmark · reworded "ia insights" to "resumos da ia" · /ai-insights virou /more/ai */
+/* Nota: o FAIL kept "1 field with no name on /app" é o campo do mural (form 1, acima); o linter não aceita no carimbo um campo sem nome */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Tokens (only dark; values from spec §8.1) ──────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* Soninho palette */
+  --sn-bg: #0d0f24;
+  --sn-bg-glow: #181b42;
+  --sn-s1: #15183a;
+  --sn-card: rgba(21, 24, 58, 0.72);
+  --sn-s2: #1f2350;
+  --sn-bd: #2c3168;
+  --sn-tx: #f4f2ff;
+  --sn-mu: #a3a0cc;
+  --sn-pr: #bcaef7;
+  --sn-pr-ink: #16132f;
+  --sn-ok: #86e7c4;
+  --sn-warn: #f4cb86;
+  --sn-sun: #ffd48a;
+  --sn-night: #6c63c9;
+  --sn-danger: #f87171;
+  --sn-shade: #05061a;
+  --sn-moon-glow: rgba(188, 174, 247, 0.35);
+  --sn-sun-glow: rgba(255, 212, 138, 0.28);
+
+  /* Faces (loaded by next/font in src/app/layout.tsx) */
+  --sn-font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --sn-font-body: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+
+  /* Motion */
+  --sn-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --sn-dur-micro: 120ms;
+  --sn-dur-short: 220ms;
+
+  /* shadcn tokens, pointing at the palette */
+  --background: var(--sn-bg);
+  --foreground: var(--sn-tx);
+  --card: var(--sn-card);
+  --card-foreground: var(--sn-tx);
+  --popover: var(--sn-s1);
+  --popover-foreground: var(--sn-tx);
+  --primary: var(--sn-pr);
+  --primary-foreground: var(--sn-pr-ink);
+  --secondary: var(--sn-s2);
+  --secondary-foreground: var(--sn-tx);
+  --muted: var(--sn-s2);
+  --muted-foreground: var(--sn-mu);
+  --accent: var(--sn-s2);
+  --accent-foreground: var(--sn-tx);
+  --destructive: var(--sn-danger);
+  --border: var(--sn-bd);
+  --input: var(--sn-bd);
+  --ring: var(--sn-pr);
+  --chart-1: var(--sn-pr);
+  --chart-2: var(--sn-night);
+  --chart-3: var(--sn-ok);
+  --chart-4: var(--sn-warn);
+  --chart-5: var(--sn-sun);
+  --radius: 0.875rem;
+  --sidebar: var(--sn-bg);
+  --sidebar-foreground: var(--sn-tx);
+  --sidebar-primary: var(--sn-pr);
+  --sidebar-primary-foreground: var(--sn-pr-ink);
+  --sidebar-accent: var(--sn-s2);
+  --sidebar-accent-foreground: var(--sn-tx);
+  --sidebar-border: var(--sn-bd);
+  --sidebar-ring: var(--sn-pr);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-nunito);
+  --font-sans: var(--sn-font-body);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-nunito);
-  --font-display: var(--font-fraunces);
+  --font-heading: var(--sn-font-body);
+  --font-display: var(--sn-font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -47,86 +140,41 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
-  --color-lavender: #c4b5fd;
-  --color-sky-sleep: #93c5fd;
-  --color-indigo: #6366f1;
-  --color-navy: #0f172a;
+
+  /* Soninho utilities: bg-sn-s1, text-sn-mu, text-sn-pr, bg-sn-night… */
+  --color-sn-bg: var(--sn-bg);
+  --color-sn-bg-glow: var(--sn-bg-glow);
+  --color-sn-s1: var(--sn-s1);
+  --color-sn-card: var(--sn-card);
+  --color-sn-s2: var(--sn-s2);
+  --color-sn-bd: var(--sn-bd);
+  --color-sn-tx: var(--sn-tx);
+  --color-sn-mu: var(--sn-mu);
+  --color-sn-pr: var(--sn-pr);
+  --color-sn-pr-ink: var(--sn-pr-ink);
+  --color-sn-ok: var(--sn-ok);
+  --color-sn-warn: var(--sn-warn);
+  --color-sn-sun: var(--sn-sun);
+  --color-sn-night: var(--sn-night);
+  --color-sn-danger: var(--sn-danger);
+
+  /* Legacy names still read by the auth layout; they resolve to the palette. */
+  --color-lavender: var(--sn-pr);
+  --color-indigo: var(--sn-night);
+
+  --ease-sn-out: var(--sn-ease-out);
 }
 
-/* Dark mode first — Soninho nighttime palette */
-:root {
-  color-scheme: dark;
-  --background: #080e1a;
-  --foreground: #e2e8f0;
-  --card: #111827;
-  --card-foreground: #e2e8f0;
-  --popover: #111827;
-  --popover-foreground: #e2e8f0;
-  --primary: #818cf8;
-  --primary-foreground: #ffffff;
-  --secondary: #1e293b;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #e2e8f0;
-  --destructive: #f87171;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: #1e293b;
-  --ring: #818cf8;
-  --chart-1: #818cf8;
-  --chart-2: #c4b5fd;
-  --chart-3: #93c5fd;
-  --chart-4: #a78bfa;
-  --chart-5: #6ee7b7;
-  --radius: 0.875rem;
-  --sidebar: #080e1a;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #818cf8;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1e293b;
-  --sidebar-accent-foreground: #e2e8f0;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #818cf8;
+@theme {
+  --animate-sn-float: sn-float 6s ease-in-out infinite;
+
+  @keyframes sn-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
 }
 
-.light {
-  color-scheme: light;
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #6366f1;
-  --chart-1: #6366f1;
-  --chart-2: #8b5cf6;
-  --chart-3: #3b82f6;
-  --chart-4: #818cf8;
-  --chart-5: #a78bfa;
-  --radius: 0.875rem;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #6366f1;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #6366f1;
-}
-
-/* ── Keyframe animations ────────────────────────────────────────────── */
+/* ── Keyframe animations (landing and auth) ─────────────────────────── */
 
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
@@ -136,21 +184,6 @@
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(129, 140, 248, 0.3), 0 0 40px rgba(129, 140, 248, 0.1); }
-  50% { box-shadow: 0 0 35px rgba(129, 140, 248, 0.6), 0 0 70px rgba(129, 140, 248, 0.2); }
-}
-
-@keyframes orbit {
-  from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
 }
 
 @keyframes breathe {
@@ -171,7 +204,7 @@
 /* ── Landing-only utilities ─────────────────────────────────────── */
 .lp-noise {
   background-image:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--sn-tx) 2%, transparent) 0%, transparent 60%),
     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   background-repeat: repeat;
   mix-blend-mode: overlay;
@@ -182,90 +215,36 @@
   background-repeat: repeat;
 }
 
+/* Fraunces, soft: titles, the baby's name and figures. Always tabular. */
 .font-display {
-  font-family: var(--font-display), Georgia, "Times New Roman", serif;
   font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 50;
   font-feature-settings: "ss01", "ss02";
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
-/* ── Utility classes ────────────────────────────────────────────── */
+/* ── Auth and invite utilities ──────────────────────────────────── */
 
 .glow-primary {
-  box-shadow: 0 0 25px rgba(129, 140, 248, 0.45), 0 0 50px rgba(129, 140, 248, 0.15);
-}
-
-.glow-primary-strong {
-  box-shadow: 0 0 40px rgba(129, 140, 248, 0.65), 0 0 80px rgba(129, 140, 248, 0.25), 0 0 120px rgba(129, 140, 248, 0.1);
-}
-
-.glow-red {
-  box-shadow: 0 0 25px rgba(248, 113, 113, 0.45), 0 0 50px rgba(248, 113, 113, 0.15);
+  box-shadow:
+    0 0 25px color-mix(in oklab, var(--sn-pr) 45%, transparent),
+    0 0 50px color-mix(in oklab, var(--sn-pr) 15%, transparent);
 }
 
 .glass {
-  background: rgba(17, 24, 39, 0.7);
+  background: var(--sn-card);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--sn-bd);
 }
 
-.glass-light {
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ── Editorial surface system ───────────────────────────────────── */
-/* Solid, consistent surfaces used across the dashboard. Calm by default
-   (no neon glow). Elevation comes from a soft, low shadow + hairline border. */
-.surface {
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.25),
-    0 8px 24px -16px rgba(0, 0, 0, 0.55);
-}
-
-.surface-muted {
-  background: color-mix(in oklab, var(--card) 55%, transparent);
-  border: 1px solid var(--border);
-}
-
-/* Subtle interactive surface for chips / list rows */
-.surface-soft {
-  background: color-mix(in oklab, var(--muted) 45%, transparent);
-  border: 1px solid var(--border);
-}
-
-/* Tabular display numerals (timers, stats) */
-.num-display {
-  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  font-feature-settings: "tnum", "ss01";
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
-}
-
+/* Accent wordmark text (auth and invite): solid lavender, no gradient. */
 .shimmer-text {
-  background: linear-gradient(
-    90deg,
-    #818cf8 0%,
-    #c4b5fd 25%,
-    #93c5fd 50%,
-    #c4b5fd 75%,
-    #818cf8 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
+  color: var(--sn-pr);
 }
 
 .animate-twinkle { animation: twinkle 2s ease-in-out infinite; }
-.animate-float { animation: float 4s ease-in-out infinite; }
-.animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
 .animate-breathe { animation: breathe 4s ease-in-out infinite; }
 
 /* touch-action for all interactive elements */
@@ -276,17 +255,16 @@ button, a, [role="button"] {
 /* Custom scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(129, 140, 248, 0.3); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(129, 140, 248, 0.5); }
+::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--sn-pr) 30%, transparent); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in oklab, var(--sn-pr) 50%, transparent); }
 
-/* Reduced motion */
+/* Reduced motion: every animation and transition stops, inline ones included. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-twinkle,
-  .animate-float,
-  .animate-glow-pulse,
-  .animate-breathe,
-  .shimmer-text {
-    animation: none;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -294,11 +272,28 @@ button, a, [role="button"] {
   * {
     @apply border-border outline-ring/50;
   }
+  html,
   body {
-    @apply bg-background text-foreground;
-    -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
   }
   html {
     @apply font-sans;
+    scrollbar-color: var(--sn-s2) var(--sn-bg);
+  }
+  body {
+    @apply text-foreground;
+    background-color: var(--sn-bg);
+    background-image: radial-gradient(130% 55vh at 50% -5vh, var(--sn-bg-glow) 0%, var(--sn-bg) 62%);
+    background-repeat: no-repeat;
+    caret-color: var(--sn-pr);
+    -webkit-tap-highlight-color: transparent;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--sn-pr) 30%, transparent);
+    color: var(--sn-tx);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
   }
 }

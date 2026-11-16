@@ -1,5 +1,17 @@
-import { Minus, Plus } from "lucide-react";
+import { useId } from "react";
+import { IconMinus, IconPlus } from "@/components/brand/icons";
+import { Button } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
+import { FIELD_LABEL } from "./options";
+
+/** Colour of the reading, from the tokens; the number itself carries the meaning. */
+function tempTone(temp: number): string {
+  if (temp >= 28) return "text-sn-danger";
+  if (temp >= 24) return "text-sn-warn";
+  if (temp >= 20) return "text-sn-ok";
+  return "text-sn-pr";
+}
 
 // ─── Temperature stepper ──────────────────────────────────────────────────────
 export function TempStepper({
@@ -9,87 +21,70 @@ export function TempStepper({
   value: number | null;
   onChange: (v: number | null) => void;
 }) {
+  const labelId = useId();
   const temp = value ?? 22;
 
-  const tempColor =
-    temp >= 28 ? "text-orange-400" :
-    temp >= 24 ? "text-amber-400" :
-    temp >= 20 ? "text-emerald-400" :
-    temp >= 16 ? "text-sky-400" :
-    "text-indigo-400";
-
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-2">
+      <p id={labelId} className={FIELD_LABEL}>
         Temperatura do quarto
-      </label>
+      </p>
       <div className="flex items-center gap-3">
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon"
           aria-label="Diminuir temperatura"
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(Math.max(10, temp - 0.5)); }}
           onClick={() => onChange(Math.max(10, temp - 0.5))}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style={{ touchAction: "manipulation" }}
         >
-          <Minus className="h-4 w-4" aria-hidden="true" />
-        </button>
+          <IconMinus size={20} />
+        </Button>
 
-        <div className="flex flex-1 items-center justify-center gap-1">
+        <div className="flex flex-1 items-baseline justify-center gap-1">
           <span
-            className={cn("text-3xl font-bold tabular-nums transition-colors", tempColor)}
+            className={cn("font-display text-[34px] leading-none font-bold tabular-nums", value === null ? "text-sn-mu" : tempTone(temp))}
             aria-live="polite"
             aria-atomic="true"
           >
             {value === null ? "—" : temp.toFixed(1)}
           </span>
-          <span className="text-sm text-muted-foreground mt-1">°C</span>
+          <span className="font-sans text-base font-bold text-sn-mu">°C</span>
         </div>
 
-        <button
-          type="button"
+        <Button
+          variant="secondary"
+          size="icon"
           aria-label="Aumentar temperatura"
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(Math.min(40, temp + 0.5)); }}
           onClick={() => onChange(Math.min(40, temp + 0.5))}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style={{ touchAction: "manipulation" }}
         >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-        </button>
+          <IconPlus size={20} />
+        </Button>
       </div>
 
       {/* Quick presets */}
-      <div className="flex gap-1.5 flex-wrap">
+      <div className="flex flex-wrap gap-2">
         {[18, 20, 22, 24, 26, 28].map((t) => (
-          <button
+          <Chip
             key={t}
-            type="button"
             aria-label={`Definir temperatura como ${t}°C`}
-            aria-pressed={value === t}
+            selected={value === t}
             onClick={() => onChange(t)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(t); }}
-            className={cn(
-              "rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              value === t
-                ? "bg-primary text-primary-foreground"
-                : "border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-            )}
-            style={{ touchAction: "manipulation" }}
           >
             {t}°
-          </button>
+          </Chip>
         ))}
         {value !== null && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="xs"
             aria-label="Limpar temperatura"
             onClick={() => onChange(null)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(null); }}
-            className="rounded-lg px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            style={{ touchAction: "manipulation" }}
           >
             Limpar
-          </button>
+          </Button>
         )}
       </div>
     </div>

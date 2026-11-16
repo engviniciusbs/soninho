@@ -1,0 +1,1060 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Mais detail pages (former settings tabs) > renders_each_page > family 1`] = `
+<div>
+  <div>
+    <div
+      class="mt-0.5 mb-3.5 flex items-center gap-2"
+      data-slot="detail-header"
+    >
+      <a
+        aria-label="Voltar"
+        class="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-sn-tx outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out hover:bg-sn-s2 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+        href="/more"
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+          width="24"
+        >
+          <path
+            d="m15 5-7 7 7 7"
+          />
+        </svg>
+      </a>
+      <h1
+        class="min-w-0 truncate font-display text-2xl leading-tight font-bold text-sn-tx"
+      >
+        Família
+      </h1>
+    </div>
+    <div
+      class="flex flex-col gap-3.5"
+    >
+      <div
+        data-baby="baby-1"
+        data-testid="family"
+        data-user="user-1"
+      />
+      <div
+        data-testid="family-notes"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Mais detail pages (former settings tabs) > renders_each_page > general 1`] = `
+<div>
+  <div>
+    <div
+      class="mt-0.5 mb-3.5 flex items-center gap-2"
+      data-slot="detail-header"
+    >
+      <a
+        aria-label="Voltar"
+        class="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-sn-tx outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out hover:bg-sn-s2 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+        href="/more"
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+          width="24"
+        >
+          <path
+            d="m15 5-7 7 7 7"
+          />
+        </svg>
+      </a>
+      <h1
+        class="min-w-0 truncate font-display text-2xl leading-tight font-bold text-sn-tx"
+      >
+        Bebês
+      </h1>
+    </div>
+    <div
+      class="group/card flex flex-col overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] gap-0 px-3.5 py-1"
+      data-size="default"
+      data-slot="card"
+    >
+      <ul
+        class="divide-y divide-sn-bd"
+      >
+        <li>
+          <div
+            class="flex min-h-11 w-full items-center gap-3.5 px-1 py-3 text-left"
+            data-slot="list-row"
+          >
+            <span
+              aria-hidden="true"
+              class="grid size-[38px] shrink-0 place-items-center rounded-xl bg-sn-s2 text-sn-pr [&_svg:not([class*='size-'])]:size-5"
+            >
+              <div
+                class="relative inline-flex shrink-0"
+                style="touch-action: manipulation;"
+              >
+                <span
+                  aria-label="Lia"
+                  class="relative block shrink-0 overflow-hidden rounded-full size-9"
+                  role="img"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="flex size-full items-center justify-center bg-sn-pr font-display font-semibold text-sn-pr-ink text-base leading-none"
+                  >
+                    L
+                  </span>
+                </span>
+              </div>
+            </span>
+            <span
+              class="flex min-w-0 flex-1 flex-col"
+            >
+              <span
+                class="truncate font-sans text-[15px] font-bold text-sn-tx"
+              >
+                Lia
+              </span>
+              <span
+                class="truncate font-sans text-[13px] font-semibold text-sn-mu"
+              >
+                Nascimento: 31/10/2025
+              </span>
+            </span>
+            <span
+              class="shrink-0 font-sans text-base font-extrabold text-sn-tx tabular-nums"
+            >
+              <span
+                class="flex gap-1"
+              >
+                <button
+                  aria-label="Editar"
+                  class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0"
+                  data-slot="button"
+                  tabindex="0"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    fill="none"
+                    focusable="false"
+                    height="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+                    viewBox="0 0 24 24"
+                    width="20"
+                  >
+                    <path
+                      d="M4 20h4L19 9l-4-4L4 16v4Z"
+                    />
+                  </svg>
+                </button>
+                <button
+                  aria-label="Excluir"
+                  class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 text-sn-danger"
+                  data-slot="button"
+                  tabindex="0"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    fill="none"
+                    focusable="false"
+                    height="20"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.8"
+                    viewBox="0 0 24 24"
+                    width="20"
+                  >
+                    <path
+                      d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <button
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-12 gap-2 px-5 text-base mt-4 w-full"
+      data-slot="button"
+      tabindex="0"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        fill="none"
+        focusable="false"
+        height="24"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.8"
+        viewBox="0 0 24 24"
+        width="24"
+      >
+        <path
+          d="M12 5v14M5 12h14"
+        />
+      </svg>
+      Adicionar
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Mais detail pages (former settings tabs) > renders_each_page > notifications 1`] = `
+<div>
+  <div>
+    <div
+      class="mt-0.5 mb-3.5 flex items-center gap-2"
+      data-slot="detail-header"
+    >
+      <a
+        aria-label="Voltar"
+        class="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-sn-tx outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out hover:bg-sn-s2 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+        href="/more"
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+          width="24"
+        >
+          <path
+            d="m15 5-7 7 7 7"
+          />
+        </svg>
+      </a>
+      <h1
+        class="min-w-0 truncate font-display text-2xl leading-tight font-bold text-sn-tx"
+      >
+        Notificações
+      </h1>
+    </div>
+    <div
+      class="flex flex-col gap-3.5"
+    >
+      <div
+        class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
+        data-size="default"
+        data-slot="card"
+      >
+        <div
+          class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+          data-slot="card-header"
+        >
+          <div
+            class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
+            data-slot="card-title"
+          >
+            Alertas de soneca
+          </div>
+        </div>
+        <div
+          class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-5"
+          data-slot="card-content"
+        >
+          <div
+            class="flex items-center justify-between gap-4"
+          >
+            <div
+              class="space-y-1"
+            >
+              <p
+                class="text-base font-bold text-sn-tx"
+              >
+                Notificações ativadas
+              </p>
+              <p
+                class="text-base text-sn-mu"
+              >
+                Você receberá alertas sobre sonecas e janelas de sono.
+              </p>
+            </div>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                fill="none"
+                focusable="false"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+                width="24"
+              >
+                <path
+                  d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 2h-15l1.5-2ZM10 20.5h4"
+                />
+              </svg>
+              Desativar
+            </button>
+          </div>
+          <fieldset
+            class="space-y-2 border-t border-sn-bd pt-4"
+          >
+            <legend
+              class="float-left mb-2 w-full text-sm font-bold text-sn-mu"
+            >
+              Alertar antes da soneca (minutos)
+            </legend>
+            <div
+              class="clear-left flex gap-2"
+            >
+              <button
+                aria-pressed="false"
+                class="flex h-11 min-w-12 flex-1 cursor-pointer items-center justify-center rounded-full font-sans text-base font-bold tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-s2 text-sn-tx hover:bg-sn-s2/70"
+                type="button"
+              >
+                5
+              </button>
+              <button
+                aria-pressed="true"
+                class="flex h-11 min-w-12 flex-1 cursor-pointer items-center justify-center rounded-full font-sans text-base font-bold tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-pr text-sn-pr-ink"
+                type="button"
+              >
+                10
+              </button>
+              <button
+                aria-pressed="false"
+                class="flex h-11 min-w-12 flex-1 cursor-pointer items-center justify-center rounded-full font-sans text-base font-bold tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-s2 text-sn-tx hover:bg-sn-s2/70"
+                type="button"
+              >
+                15
+              </button>
+              <button
+                aria-pressed="false"
+                class="flex h-11 min-w-12 flex-1 cursor-pointer items-center justify-center rounded-full font-sans text-base font-bold tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-s2 text-sn-tx hover:bg-sn-s2/70"
+                type="button"
+              >
+                20
+              </button>
+            </div>
+          </fieldset>
+          <div
+            class="space-y-2"
+          >
+            <p
+              class="text-sm font-bold text-sn-mu"
+            >
+              Horário silencioso (sem notificações)
+            </p>
+            <div
+              class="flex items-center gap-2"
+            >
+              <input
+                aria-label="Início do horário silencioso"
+                class="min-w-0 border bg-transparent px-2.5 py-1 transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 w-32 rounded-xl border-sn-mu/70 text-base tabular-nums"
+                data-slot="input"
+                id="base-ui-id1"
+                type="time"
+                value="21:00"
+              />
+              <span
+                class="text-base text-sn-mu"
+              >
+                até
+              </span>
+              <input
+                aria-label="Fim do horário silencioso"
+                class="min-w-0 border bg-transparent px-2.5 py-1 transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 w-32 rounded-xl border-sn-mu/70 text-base tabular-nums"
+                data-slot="input"
+                id="base-ui-id2"
+                type="time"
+                value="06:30"
+              />
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-between gap-4 border-t border-sn-bd pt-4"
+          >
+            <div
+              class="space-y-1"
+            >
+              <p
+                class="text-base font-bold text-sn-tx"
+              >
+                Envio automático
+              </p>
+              <p
+                class="text-sm text-sn-mu"
+              >
+                Receber alertas a cada 5 minutos quando necessário
+              </p>
+            </div>
+            <button
+              aria-checked="false"
+              aria-label="Envio automático"
+              class="relative h-7 w-12 shrink-0 cursor-pointer rounded-full outline-none after:absolute after:-inset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr disabled:cursor-not-allowed disabled:opacity-55 bg-sn-s2"
+              data-slot="switch"
+              role="switch"
+              type="button"
+            >
+              <span
+                aria-hidden="true"
+                class="absolute top-1 left-1 size-5 rounded-full transition-transform duration-(--sn-dur-micro) ease-sn-out translate-x-0 bg-sn-tx"
+              />
+            </button>
+          </div>
+          <div
+            class="flex gap-2"
+          >
+            <button
+              class="group/button relative inline-flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4 flex-1"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Salvar preferências
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                fill="none"
+                focusable="false"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+                width="24"
+              >
+                <path
+                  d="M4 11.5 20 4l-5.5 16-3-6.5L4 11.5ZM11.5 13.5 20 4"
+                />
+              </svg>
+              Testar
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
+        data-size="default"
+        data-slot="card"
+      >
+        <div
+          class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+          data-slot="card-header"
+        >
+          <div
+            class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
+            data-slot="card-title"
+          >
+            Relatório semanal por e-mail
+          </div>
+        </div>
+        <div
+          class="px-[18px] group-data-[size=sm]/card:px-3.5"
+          data-slot="card-content"
+        >
+          <div
+            class="flex items-center justify-between gap-4"
+          >
+            <div
+              class="space-y-1"
+            >
+              <p
+                class="text-base font-bold text-sn-tx"
+              >
+                Desativado
+              </p>
+              <p
+                class="text-base text-sn-mu"
+              >
+                Receba toda segunda-feira um resumo do sono da semana: total por dia, média de soneca, maior trecho noturno e aderência à meta.
+              </p>
+            </div>
+            <button
+              aria-checked="false"
+              aria-label="Relatório semanal por e-mail"
+              class="relative h-7 w-12 shrink-0 cursor-pointer rounded-full outline-none after:absolute after:-inset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr disabled:cursor-not-allowed disabled:opacity-55 bg-sn-s2"
+              data-slot="switch"
+              role="switch"
+              type="button"
+            >
+              <span
+                aria-hidden="true"
+                class="absolute top-1 left-1 size-5 rounded-full transition-transform duration-(--sn-dur-micro) ease-sn-out translate-x-0 bg-sn-tx"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Mais detail pages (former settings tabs) > renders_each_page > tools 1`] = `
+<div>
+  <div>
+    <div
+      class="mt-0.5 mb-3.5 flex items-center gap-2"
+      data-slot="detail-header"
+    >
+      <a
+        aria-label="Voltar"
+        class="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-sn-tx outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out hover:bg-sn-s2 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+        href="/more"
+      >
+        <svg
+          aria-hidden="true"
+          fill="none"
+          focusable="false"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+          width="24"
+        >
+          <path
+            d="m15 5-7 7 7 7"
+          />
+        </svg>
+      </a>
+      <h1
+        class="min-w-0 truncate font-display text-2xl leading-tight font-bold text-sn-tx"
+      >
+        Relatórios e exportar
+      </h1>
+    </div>
+    <div
+      class="flex flex-col gap-3.5"
+    >
+      <div
+        data-testid="pdf-report"
+      />
+      <div
+        class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
+        data-size="default"
+        data-slot="card"
+      >
+        <div
+          class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+          data-slot="card-header"
+        >
+          <div
+            class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
+            data-slot="card-title"
+          >
+            Relatório por e-mail
+          </div>
+        </div>
+        <div
+          class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-4"
+          data-slot="card-content"
+        >
+          <p
+            class="text-base text-sn-mu"
+          >
+            Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono total por dia, média de soneca, maior trecho noturno, aderência à meta e melhor ambiente, para todos os bebês da conta.
+          </p>
+          <div
+            class="space-y-2"
+          >
+            <p
+              class="text-sm font-bold text-sn-mu"
+            >
+              Período
+            </p>
+            <div
+              class="flex gap-2"
+            >
+              <button
+                aria-pressed="true"
+                class="flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full px-3 font-sans text-base font-bold whitespace-nowrap tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-pr text-sn-pr-ink"
+                type="button"
+              >
+                7
+                 dias
+              </button>
+              <button
+                aria-pressed="false"
+                class="flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full px-3 font-sans text-base font-bold whitespace-nowrap tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-s2 text-sn-tx hover:bg-sn-s2/70"
+                type="button"
+              >
+                14
+                 dias
+              </button>
+              <button
+                aria-pressed="false"
+                class="flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full px-3 font-sans text-base font-bold whitespace-nowrap tabular-nums outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr bg-sn-s2 text-sn-tx hover:bg-sn-s2/70"
+                type="button"
+              >
+                30
+                 dias
+              </button>
+            </div>
+          </div>
+          <button
+            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-12 gap-2 px-5 text-base w-full"
+            data-slot="button"
+            tabindex="0"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              fill="none"
+              focusable="false"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <path
+                d="M4 11.5 20 4l-5.5 16-3-6.5L4 11.5ZM11.5 13.5 20 4"
+              />
+            </svg>
+            Enviar relatório agora
+          </button>
+          <p
+            class="text-sm text-sn-mu"
+          >
+            Limite de uma solicitação por período a cada hora. O e-mail vai para o endereço da sua conta.
+          </p>
+        </div>
+      </div>
+      <div
+        class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
+        data-size="default"
+        data-slot="card"
+      >
+        <div
+          class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+          data-slot="card-header"
+        >
+          <div
+            class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
+            data-slot="card-title"
+          >
+            Exportar dados
+          </div>
+        </div>
+        <div
+          class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-4"
+          data-slot="card-content"
+        >
+          <p
+            class="text-base text-sn-mu"
+          >
+            Exporte todos os registros de sono do bebê ativo em formato CSV.
+          </p>
+          <button
+            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-12 gap-2 px-5 text-base w-full"
+            data-slot="button"
+            tabindex="0"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              fill="none"
+              focusable="false"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+              width="24"
+            >
+              <path
+                d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"
+              />
+            </svg>
+            Exportar CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > edit form 1`] = `
+<div
+  aria-labelledby="base-ui-id2"
+  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md"
+  data-base-ui-focusable=""
+  data-open=""
+  data-slot="dialog-content"
+  id="id1"
+  role="dialog"
+  style="--nested-dialogs: 0;"
+  tabindex="-1"
+>
+  <div
+    class="flex flex-col gap-2"
+    data-slot="dialog-header"
+  >
+    <h2
+      class="font-heading text-base leading-none font-medium"
+      data-slot="dialog-title"
+      id="base-ui-id2"
+    >
+      Editar bebê
+    </h2>
+  </div>
+  <div
+    class="space-y-4"
+  >
+    <div
+      class="flex flex-col items-center gap-2 py-2"
+    >
+      <div
+        class="relative inline-flex shrink-0"
+        style="touch-action: manipulation;"
+      >
+        <button
+          aria-label="Alterar foto de Lia"
+          class="relative block shrink-0 overflow-hidden rounded-full size-20 group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+        >
+          <span
+            aria-hidden="true"
+            class="flex size-full items-center justify-center bg-sn-pr font-display font-semibold text-sn-pr-ink text-4xl leading-none"
+          >
+            L
+          </span>
+          <span
+            aria-hidden="true"
+            class="absolute inset-0 flex items-center justify-center rounded-full bg-sn-bg/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-camera size-5 text-sn-tx"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"
+              />
+              <circle
+                cx="12"
+                cy="13"
+                r="3"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+      <p
+        class="text-xs text-muted-foreground"
+      >
+        Toque para adicionar uma foto
+      </p>
+      <input
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        aria-label="Selecionar foto do bebê"
+        class="sr-only"
+        type="file"
+      />
+    </div>
+    <input
+      autocomplete="off"
+      class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+      data-slot="input"
+      id="base-ui-id3"
+      placeholder="Nome do bebê"
+      value="Lia"
+    />
+    <div
+      class="space-y-1"
+    >
+      <label
+        class="text-xs text-muted-foreground"
+      >
+        Data de nascimento
+      </label>
+      <input
+        class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+        data-slot="input"
+        id="base-ui-id4"
+        type="date"
+        value="2025-11-01"
+      />
+    </div>
+  </div>
+  <div
+    class="-mx-4 -mb-4 flex flex-col-reverse rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end gap-2"
+    data-slot="dialog-footer"
+  >
+    <button
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
+      data-slot="button"
+      tabindex="0"
+      type="button"
+    >
+      Cancelar
+    </button>
+    <button
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
+      data-slot="button"
+      tabindex="0"
+      type="button"
+    >
+      Salvar
+    </button>
+  </div>
+  <button
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+    data-slot="dialog-close"
+    tabindex="0"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-x"
+      fill="none"
+      height="24"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M18 6 6 18"
+      />
+      <path
+        d="m6 6 12 12"
+      />
+    </svg>
+    <span
+      class="sr-only"
+    >
+      Fechar
+    </span>
+  </button>
+</div>
+`;
+
+exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > form with photo 1`] = `
+<div
+  aria-labelledby="base-ui-id2"
+  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md"
+  data-base-ui-focusable=""
+  data-open=""
+  data-slot="dialog-content"
+  id="id1"
+  role="dialog"
+  style="--nested-dialogs: 0;"
+  tabindex="-1"
+>
+  <div
+    class="flex flex-col gap-2"
+    data-slot="dialog-header"
+  >
+    <h2
+      class="font-heading text-base leading-none font-medium"
+      data-slot="dialog-title"
+      id="base-ui-id2"
+    >
+      Adicionar bebê
+    </h2>
+  </div>
+  <div
+    class="space-y-4"
+  >
+    <div
+      class="flex flex-col items-center gap-2 py-2"
+    >
+      <div
+        class="relative inline-flex shrink-0"
+        style="touch-action: manipulation;"
+      >
+        <button
+          aria-label="Alterar foto de Bebê"
+          class="relative block shrink-0 overflow-hidden rounded-full size-20 border border-sn-bd group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+          type="button"
+        >
+          <img
+            alt="Bebê"
+            class="object-cover"
+            data-nimg="fill"
+            decoding="async"
+            sizes="80px"
+            src="/_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=3840&q=75"
+            srcset="/_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=32&q=75 32w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=48&q=75 48w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=64&q=75 64w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=96&q=75 96w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=128&q=75 128w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=256&q=75 256w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=384&q=75 384w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=640&q=75 640w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=750&q=75 750w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=828&q=75 828w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=1080&q=75 1080w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=1200&q=75 1200w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=1920&q=75 1920w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=2048&q=75 2048w, /_next/image?url=https%3A%2F%2Fcdn.test%2Fbaby-avatars%2Fuser-1%2F1767268800000.webp&w=3840&q=75 3840w"
+            style="position: absolute; height: 100%; width: 100%; inset: 0px; color: transparent;"
+          />
+          <span
+            aria-hidden="true"
+            class="absolute inset-0 flex items-center justify-center rounded-full bg-sn-bg/60 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-camera size-5 text-sn-tx"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.8"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"
+              />
+              <circle
+                cx="12"
+                cy="13"
+                r="3"
+              />
+            </svg>
+          </span>
+        </button>
+      </div>
+      <p
+        class="text-xs text-muted-foreground"
+      >
+        Toque para alterar a foto
+      </p>
+      <button
+        class="text-xs text-destructive hover:underline"
+        type="button"
+      >
+        Remover foto
+      </button>
+      <input
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        aria-label="Selecionar foto do bebê"
+        class="sr-only"
+        type="file"
+      />
+    </div>
+    <input
+      autocomplete="off"
+      class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+      data-slot="input"
+      id="base-ui-id3"
+      placeholder="Nome do bebê"
+      value=""
+    />
+    <div
+      class="space-y-1"
+    >
+      <label
+        class="text-xs text-muted-foreground"
+      >
+        Data de nascimento
+      </label>
+      <input
+        class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+        data-slot="input"
+        id="base-ui-id4"
+        type="date"
+        value=""
+      />
+    </div>
+  </div>
+  <div
+    class="-mx-4 -mb-4 flex flex-col-reverse rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end gap-2"
+    data-slot="dialog-footer"
+  >
+    <button
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
+      data-slot="button"
+      tabindex="0"
+      type="button"
+    >
+      Cancelar
+    </button>
+    <button
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
+      data-slot="button"
+      tabindex="0"
+      type="button"
+    >
+      Salvar
+    </button>
+  </div>
+  <button
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+    data-slot="dialog-close"
+    tabindex="0"
+    type="button"
+  >
+    <svg
+      aria-hidden="true"
+      class="lucide lucide-x"
+      fill="none"
+      height="24"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      width="24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M18 6 6 18"
+      />
+      <path
+        d="m6 6 12 12"
+      />
+    </svg>
+    <span
+      class="sr-only"
+    >
+      Fechar
+    </span>
+  </button>
+</div>
+`;

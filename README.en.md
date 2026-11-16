@@ -9,11 +9,12 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 ## Key Features
 
 - **Sleep timer** (nap / night sleep) with back-dated start ("started 10 min ago"), one per baby, synced across caregivers and persisted locally (old persisted state is migrated v0→v1); the end time is never before the start.
-- **Wake window** by age (green/yellow/red indicator) and a **deterministic next-nap suggestion** — no LLM, one shared table across the whole app.
+- **Wake window** by age (with the window status: "Na janela ideal", "Quase na hora" or "Passou da janela") and a **deterministic next-nap suggestion** — no LLM, one shared table across the whole app.
 - **Post-sleep review**: quality (1–5), how the baby fell asleep, wake reason, room temperature, weather, sleep sack/TOG and clothing — with a **clothing recommendation** based on temperature.
 - **Feeding**: per-side breastfeeding timer (left/right), bottle (formula / breast milk / mixed, in ml) and solid food logging with food tags and reaction (including allergic reactions). Next-feed suggestion based on the recent average interval.
-- **Shared family**: link invites (48-char hex tokens; old base64 tokens still work; the invite page shows specific states: used, expired, revoked or not found) with roles (`owner`, `caregiver`, `viewer`), family relation (mother, father, grandmother, nanny…), a notes board, an activity feed, and toasts/push when another caregiver starts or stops a sleep/feed.
-- **Nanny mode**: reduced interface (Home and Settings only).
+- **Shared family**: link invites (48-char hex tokens; old base64 tokens still work; the invite page shows specific states: used, expired, revoked or not found) with roles (`owner`, `caregiver`, `viewer`), family relation (mother, father, grandmother, nanny…), a notes board, and toasts/push when another caregiver starts or stops a sleep/feed.
+- **Nanny mode**: reduced interface (Home and More › Profile only).
+- **Look**: a single dark theme (night blue and lavender), Fraunces for titles and figures, Nunito for text; a five-tab menu (Início, Comida, Registro, Análise, Mais).
 - **Analytics**: daily sleep bar chart, quality trend, nap-time heatmap, environment × sleep correlation, sleep debt and a regression radar.
 - **AI (OpenAI `gpt-4o-mini`)**: streaming chat with a sleep consultant, insights (today's assessment, patterns, trends, recommendations) and sleep regression analysis. **Daily quota of 50 calls per user** (`America/Sao_Paulo` day), shared by chat and regression; the nap suggestion is deterministic and does not use quota. The chat accepts at most 20 messages of up to 2000 characters (the client trims history); when the quota is exceeded the API returns 429 and the app shows "Limite diário de uso da IA atingido…" (daily AI usage limit reached). The regression card is the exception: it falls back to the deterministic result without AI text.
 - **Push notifications (Web Push/VAPID)**: "nap coming up" and "past the wake window", sent to every owner and caregiver with notifications on (viewers excluded), with per-user quiet hours and timezone. Only FCM, Mozilla, Apple and Windows push endpoints are accepted (at subscribe and at send time); invalid or dead subscriptions (400/404/410/413) are deactivated.
@@ -45,7 +46,7 @@ Baby sleep and feeding tracker for families. Parents and caregivers log naps, ni
 | --- | --- |
 | Framework | **Next.js 16.4** (App Router, Route Handlers, Proxy) |
 | UI | **React 19.3**, TypeScript 5 |
-| Styling | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`, `next-themes` |
+| Styling | **Tailwind CSS 4** (`@tailwindcss/postcss`), `tw-animate-css`; Fraunces and Nunito fonts (`next/font`), dark theme only |
 | Components | **shadcn/ui** (`base-nova` style) on top of **Base UI** (`@base-ui/react`), `lucide-react` icons |
 | Animation | `framer-motion` |
 | Client state | **Zustand** (with `persist` → `localStorage`) |
@@ -224,22 +225,22 @@ The `calculate_sleep_duration` trigger fills `duration_min` and `updated_at` on 
 src/
 ├── middleware.ts              # Supabase session + redirect/authorization rules
 ├── app/
-│   ├── layout.tsx             # Fonts, metadata, theme
+│   ├── layout.tsx             # Fonts, metadata, fixed dark theme
 │   ├── page.tsx               # Public landing page (/)
 │   ├── (auth)/                # /login, /register, /auth/callback (code → session exchange)
 │   ├── (dashboard)/           # Signed-in area (layout with Sidebar/BottomNav/providers)
 │   │   ├── app/               #   Home: timer, wake window, suggestions, notes
 │   │   ├── feeding/           #   Feeding
 │   │   ├── history/           #   Log (history)
-│   │   ├── analytics/         #   Analytics (charts)
-│   │   ├── ai-insights/       #   AI insights and chat
-│   │   └── settings/          #   Baby, profile, family, notifications, tools
+│   │   ├── analytics/         #   Analytics (charts) and details at /analytics/{numbers,trends,environment,naps,quality,regression}
+│   │   └── more/              #   More: list and /more/{babies,family,notifications,reports,ai,profile} routes
+│   │                          #   (/settings and /ai-insights redirect here; src/lib/redirects.ts)
 │   ├── invite/[token]/        # Public invite acceptance page
 │   └── api/                   # Route Handlers (see "API Routes")
 ├── components/
 │   ├── ui/                    # shadcn/Base UI primitives
 │   ├── sleep/                 # SleepTimer in timer/*, environment pickers in environment/*
-│   ├── settings/              # GeneralTab, NotificationsTab, ToolsTab, BabyProfileForm, PushNotificationsCard; family/* (invites, members)
+│   ├── settings/              # More screens: BabiesSettings, FamilySettings, NotificationsTab, ToolsSettings, UserProfileSettings…; family/* (invites, members)
 │   ├── forms/                 # DateTimeRangeFields + useTimeRangeValidation (shared by SleepForm/FeedingForm)
 │   ├── landing/               # Landing page; sections/* (Hero, Proof, Closing…)
 │   ├── feeding/ family/ ai/ charts/ baby/ brand/
@@ -297,7 +298,7 @@ Component ──(TanStack Query / fetch)──▶ Route Handler /api/* ──▶
 | `caregiver` | log sleep/feeding and post notes |
 | `viewer` | view only |
 
-`ui_mode = 'nanny'` (Nanny mode) restricts navigation to `/app` and `/settings` (`NannyRouteGuard` + `getNavLinks`).
+`ui_mode = 'nanny'` (Nanny mode) restricts navigation to `/app` and `/more`, which shows only Profile (`NannyRouteGuard` + `getNavLinks`).
 
 ## API Routes
 

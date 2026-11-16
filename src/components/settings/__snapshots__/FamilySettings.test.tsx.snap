@@ -3,64 +3,36 @@
 exports[`FamilySettings > generates_invite_link > link 1`] = `
 <div>
   <div
-    class="group/card flex flex-col gap-4 overflow-hidden rounded-xl py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl border-border/60 bg-card/50 backdrop-blur"
+    class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
     data-size="default"
     data-slot="card"
   >
     <div
-      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
       data-slot="card-header"
     >
       <div
-        class="font-heading group-data-[size=sm]/card:text-sm flex items-center gap-2 text-base font-semibold"
+        class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
         data-slot="card-title"
       >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-users w-4 h-4 text-primary"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-          />
-          <path
-            d="M16 3.128a4 4 0 0 1 0 7.744"
-          />
-          <path
-            d="M22 21v-2a4 4 0 0 0-3-3.87"
-          />
-          <circle
-            cx="9"
-            cy="7"
-            r="4"
-          />
-        </svg>
-        Equipe Família
+        Quem acompanha
       </div>
       <div
-        class="text-sm text-muted-foreground"
+        class="text-sn-mu text-base font-normal"
         data-slot="card-description"
       >
-        Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
+        Convide pai, mãe, avós, babá e quem mais cuida do bebê, cada um com seu papel na família.
       </div>
     </div>
     <div
-      class="px-4 group-data-[size=sm]/card:px-3 space-y-6"
+      class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-6"
       data-slot="card-content"
     >
       <div
         class="space-y-2"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Membros
         </p>
@@ -68,7 +40,7 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           class="space-y-2"
         >
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -101,33 +73,31 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-crown w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"
-                />
-                <path
-                  d="M5 21h14"
+                  d="M4.5 19h15M5 16 4 7.5l4.5 3.5L12 5l3.5 6L20 7.5 19 16H5Z"
                 />
               </svg>
               Administrador(a)
             </span>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -150,69 +120,58 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-shield-check w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                  d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z"
                 />
                 <path
-                  d="m9 12 2 2 4-4"
+                  d="m9 12 2.2 2.2L15.5 10"
                 />
               </svg>
               Pode registrar sono
             </span>
             <button
-              class="group/button inline-flex items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              aria-label="Remover membro"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -235,23 +194,24 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-slate-500/20 text-slate-400 border-slate-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-eye w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
                 />
                 <circle
                   cx="12"
@@ -262,38 +222,26 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               Só visualizar
             </span>
             <button
-              class="group/button inline-flex items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              aria-label="Remover membro"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>
@@ -304,56 +252,58 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
         class="space-y-3"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Convidar
         </p>
         <div
-          class="flex gap-2"
+          class="flex flex-col gap-2"
         >
           <button
-            class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer bg-muted/30 border-border/40 text-muted-foreground hover:bg-muted/50"
+            aria-pressed="false"
+            class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-left text-base font-bold whitespace-nowrap outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:text-sn-tx"
+            type="button"
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-shield-check w-3.5 h-3.5"
               fill="none"
-              height="24"
+              focusable="false"
+              height="18"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="18"
             >
               <path
-                d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z"
               />
               <path
-                d="m9 12 2 2 4-4"
+                d="m9 12 2.2 2.2L15.5 10"
               />
             </svg>
             Pode registrar sono
           </button>
           <button
-            class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer bg-slate-500/20 border-slate-500/50 text-slate-300"
+            aria-pressed="true"
+            class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-left text-base font-bold whitespace-nowrap outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-pr bg-sn-pr/15 text-sn-tx"
+            type="button"
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-eye w-3.5 h-3.5"
               fill="none"
-              height="24"
+              focusable="false"
+              height="18"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="18"
             >
               <path
-                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
               />
               <circle
                 cx="12"
@@ -368,14 +318,14 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           class="space-y-1.5"
         >
           <p
-            class="text-xs text-muted-foreground"
+            class="text-sm font-bold text-sn-mu"
           >
             Papel na família (opcional no convite)
           </p>
           <button
             aria-expanded="false"
             aria-haspopup="listbox"
-            class="flex items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full"
+            class="flex items-center justify-between gap-1.5 border bg-transparent py-2 pr-2 pl-2.5 whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 h-11 w-full rounded-xl border-sn-mu/70 text-base"
             data-size="default"
             data-slot="select-trigger"
             id="base-ui-id1"
@@ -387,7 +337,7 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               class="flex flex-1 text-left"
               data-slot="select-value"
             >
-              none
+              Não especificar
             </span>
             <svg
               aria-hidden="true"
@@ -417,35 +367,28 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           />
         </div>
         <button
-          class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full gap-2"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg w-full gap-2"
           data-slot="button"
           tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-link-2 w-4 h-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="18"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="18"
           >
             <path
-              d="M9 17H7A5 5 0 0 1 7 7h2"
+              d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"
             />
             <path
-              d="M15 7h2a5 5 0 1 1 0 10h-2"
-            />
-            <line
-              x1="8"
-              x2="16"
-              y1="12"
-              y2="12"
+              d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"
             />
           </svg>
           Gerar link de convite
@@ -463,34 +406,32 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
               http://localhost:3000/invite/ab%2Fc%2Bd%3D
             </p>
             <button
-              class="group/button inline-flex items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 h-7 rounded-[min(var(--radius-md),12px)] px-2.5 in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5 shrink-0 gap-1 text-xs"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 h-11 px-4 [&_svg:not([class*='size-'])]:size-4 shrink-0 gap-1 text-xs"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-copy w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="16"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="16"
               >
                 <rect
-                  height="14"
+                  height="11"
                   rx="2"
-                  ry="2"
-                  width="14"
-                  x="8"
-                  y="8"
+                  width="11"
+                  x="8.5"
+                  y="8.5"
                 />
                 <path
-                  d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                  d="M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"
                 />
               </svg>
               Copiar
@@ -499,7 +440,7 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           <p
             class="mt-1 text-xs text-muted-foreground pl-1"
           >
-            Válido por 7 dias · 
+            Válido por 7 dias, 
             Só visualizar
           </p>
         </div>
@@ -508,40 +449,27 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
         class="space-y-2"
       >
         <button
-          class="flex items-center gap-1 text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors"
+          class="flex min-h-11 w-full cursor-pointer items-center gap-1.5 rounded-xl text-sm font-bold text-sn-mu outline-none hover:text-sn-tx focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-user-plus w-3.5 h-3.5"
             fill="none"
-            height="24"
+            focusable="false"
+            height="16"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="16"
           >
-            <path
-              d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-            />
             <circle
-              cx="9"
-              cy="7"
-              r="4"
+              cx="9.5"
+              cy="8"
+              r="3.2"
             />
-            <line
-              x1="19"
-              x2="19"
-              y1="8"
-              y2="14"
-            />
-            <line
-              x1="22"
-              x2="16"
-              y1="11"
-              y2="11"
+            <path
+              d="M3.5 19.5c.6-3.3 2.9-5.2 6-5.2s5.4 1.9 6 5.2M18.5 8.5v6M15.5 11.5h6"
             />
           </svg>
           Convites pendentes (
@@ -549,19 +477,19 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           )
           <svg
             aria-hidden="true"
-            class="lucide lucide-chevron-down w-3 h-3 ml-auto"
+            class="ml-auto"
             fill="none"
-            height="24"
+            focusable="false"
+            height="16"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="16"
           >
             <path
-              d="m6 9 6 6 6-6"
+              d="m5 9 7 7 7-7"
             />
           </svg>
         </button>
@@ -574,64 +502,36 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
 exports[`FamilySettings > renders_members_and_invites > loading 1`] = `
 <div>
   <div
-    class="group/card flex flex-col gap-4 overflow-hidden rounded-xl py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl border-border/60 bg-card/50 backdrop-blur"
+    class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
     data-size="default"
     data-slot="card"
   >
     <div
-      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
       data-slot="card-header"
     >
       <div
-        class="font-heading group-data-[size=sm]/card:text-sm flex items-center gap-2 text-base font-semibold"
+        class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
         data-slot="card-title"
       >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-users w-4 h-4 text-primary"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-          />
-          <path
-            d="M16 3.128a4 4 0 0 1 0 7.744"
-          />
-          <path
-            d="M22 21v-2a4 4 0 0 0-3-3.87"
-          />
-          <circle
-            cx="9"
-            cy="7"
-            r="4"
-          />
-        </svg>
-        Equipe Família
+        Quem acompanha
       </div>
       <div
-        class="text-sm text-muted-foreground"
+        class="text-sn-mu text-base font-normal"
         data-slot="card-description"
       >
-        Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
+        Convide pai, mãe, avós, babá e quem mais cuida do bebê, cada um com seu papel na família.
       </div>
     </div>
     <div
-      class="px-4 group-data-[size=sm]/card:px-3 space-y-6"
+      class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-6"
       data-slot="card-content"
     >
       <div
         class="space-y-2"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Membros
         </p>
@@ -654,64 +554,36 @@ exports[`FamilySettings > renders_members_and_invites > loading 1`] = `
 exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
 <div>
   <div
-    class="group/card flex flex-col gap-4 overflow-hidden rounded-xl py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl border-border/60 bg-card/50 backdrop-blur"
+    class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
     data-size="default"
     data-slot="card"
   >
     <div
-      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
       data-slot="card-header"
     >
       <div
-        class="font-heading group-data-[size=sm]/card:text-sm flex items-center gap-2 text-base font-semibold"
+        class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
         data-slot="card-title"
       >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-users w-4 h-4 text-primary"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-          />
-          <path
-            d="M16 3.128a4 4 0 0 1 0 7.744"
-          />
-          <path
-            d="M22 21v-2a4 4 0 0 0-3-3.87"
-          />
-          <circle
-            cx="9"
-            cy="7"
-            r="4"
-          />
-        </svg>
-        Equipe Família
+        Quem acompanha
       </div>
       <div
-        class="text-sm text-muted-foreground"
+        class="text-sn-mu text-base font-normal"
         data-slot="card-description"
       >
-        Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
+        Convide pai, mãe, avós, babá e quem mais cuida do bebê, cada um com seu papel na família.
       </div>
     </div>
     <div
-      class="px-4 group-data-[size=sm]/card:px-3 space-y-6"
+      class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-6"
       data-slot="card-content"
     >
       <div
         class="space-y-2"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Membros
         </p>
@@ -719,7 +591,7 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
           class="space-y-2"
         >
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -752,33 +624,31 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-crown w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"
-                />
-                <path
-                  d="M5 21h14"
+                  d="M4.5 19h15M5 16 4 7.5l4.5 3.5L12 5l3.5 6L20 7.5 19 16H5Z"
                 />
               </svg>
               Administrador(a)
             </span>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -801,69 +671,58 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-shield-check w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                  d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z"
                 />
                 <path
-                  d="m9 12 2 2 4-4"
+                  d="m9 12 2.2 2.2L15.5 10"
                 />
               </svg>
               Pode registrar sono
             </span>
             <button
-              class="group/button inline-flex items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              aria-label="Remover membro"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -886,23 +745,24 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-slate-500/20 text-slate-400 border-slate-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-eye w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
                 />
                 <circle
                   cx="12"
@@ -913,38 +773,26 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
               Só visualizar
             </span>
             <button
-              class="group/button inline-flex items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              aria-label="Remover membro"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>
@@ -955,56 +803,58 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
         class="space-y-3"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Convidar
         </p>
         <div
-          class="flex gap-2"
+          class="flex flex-col gap-2"
         >
           <button
-            class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+            aria-pressed="true"
+            class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-left text-base font-bold whitespace-nowrap outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-pr bg-sn-pr/15 text-sn-tx"
+            type="button"
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-shield-check w-3.5 h-3.5"
               fill="none"
-              height="24"
+              focusable="false"
+              height="18"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="18"
             >
               <path
-                d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z"
               />
               <path
-                d="m9 12 2 2 4-4"
+                d="m9 12 2.2 2.2L15.5 10"
               />
             </svg>
             Pode registrar sono
           </button>
           <button
-            class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-150 cursor-pointer bg-muted/30 border-border/40 text-muted-foreground hover:bg-muted/50"
+            aria-pressed="false"
+            class="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-left text-base font-bold whitespace-nowrap outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:text-sn-tx"
+            type="button"
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-eye w-3.5 h-3.5"
               fill="none"
-              height="24"
+              focusable="false"
+              height="18"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2"
+              stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="18"
             >
               <path
-                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
               />
               <circle
                 cx="12"
@@ -1019,14 +869,14 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
           class="space-y-1.5"
         >
           <p
-            class="text-xs text-muted-foreground"
+            class="text-sm font-bold text-sn-mu"
           >
             Papel na família (opcional no convite)
           </p>
           <button
             aria-expanded="false"
             aria-haspopup="listbox"
-            class="flex items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full"
+            class="flex items-center justify-between gap-1.5 border bg-transparent py-2 pr-2 pl-2.5 whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 h-11 w-full rounded-xl border-sn-mu/70 text-base"
             data-size="default"
             data-slot="select-trigger"
             id="base-ui-id1"
@@ -1038,7 +888,7 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
               class="flex flex-1 text-left"
               data-slot="select-value"
             >
-              none
+              Não especificar
             </span>
             <svg
               aria-hidden="true"
@@ -1068,35 +918,28 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
           />
         </div>
         <button
-          class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 w-full gap-2"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg w-full gap-2"
           data-slot="button"
           tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-link-2 w-4 h-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="18"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="18"
           >
             <path
-              d="M9 17H7A5 5 0 0 1 7 7h2"
+              d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"
             />
             <path
-              d="M15 7h2a5 5 0 1 1 0 10h-2"
-            />
-            <line
-              x1="8"
-              x2="16"
-              y1="12"
-              y2="12"
+              d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"
             />
           </svg>
           Gerar link de convite
@@ -1106,40 +949,27 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
         class="space-y-2"
       >
         <button
-          class="flex items-center gap-1 text-xs font-medium text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground transition-colors"
+          class="flex min-h-11 w-full cursor-pointer items-center gap-1.5 rounded-xl text-sm font-bold text-sn-mu outline-none hover:text-sn-tx focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-user-plus w-3.5 h-3.5"
             fill="none"
-            height="24"
+            focusable="false"
+            height="16"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="16"
           >
-            <path
-              d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-            />
             <circle
-              cx="9"
-              cy="7"
-              r="4"
+              cx="9.5"
+              cy="8"
+              r="3.2"
             />
-            <line
-              x1="19"
-              x2="19"
-              y1="8"
-              y2="14"
-            />
-            <line
-              x1="22"
-              x2="16"
-              y1="11"
-              y2="11"
+            <path
+              d="M3.5 19.5c.6-3.3 2.9-5.2 6-5.2s5.4 1.9 6 5.2M18.5 8.5v6M15.5 11.5h6"
             />
           </svg>
           Convites pendentes (
@@ -1147,19 +977,19 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
           )
           <svg
             aria-hidden="true"
-            class="lucide lucide-chevron-up w-3 h-3 ml-auto"
+            class="ml-auto"
             fill="none"
-            height="24"
+            focusable="false"
+            height="16"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="16"
           >
             <path
-              d="m18 15-6-6-6 6"
+              d="m5 15 7-7 7 7"
             />
           </svg>
         </button>
@@ -1180,46 +1010,44 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
                  
                 08/01/2026
               </p>
-              <span
-                class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs border mt-0.5 bg-slate-500/20 text-slate-400 border-slate-500/30"
+              <p
+                class="mt-1 flex flex-wrap items-center gap-2"
               >
-                Só visualizar
-                 · Avô
-              </span>
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr"
+                  data-slot="status-pill"
+                  data-tone="attention"
+                >
+                  Só visualizar
+                </span>
+                <span
+                  class="font-sans text-sm font-semibold text-sn-mu"
+                >
+                  Avô
+                </span>
+              </p>
             </div>
             <button
-              class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              aria-label="Cancelar convite"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>
@@ -1234,64 +1062,36 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
 exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
 <div>
   <div
-    class="group/card flex flex-col gap-4 overflow-hidden rounded-xl py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl border-border/60 bg-card/50 backdrop-blur"
+    class="group/card flex flex-col gap-4 overflow-hidden rounded-[24px] border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px]"
     data-size="default"
     data-slot="card"
   >
     <div
-      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+      class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
       data-slot="card-header"
     >
       <div
-        class="font-heading group-data-[size=sm]/card:text-sm flex items-center gap-2 text-base font-semibold"
+        class="font-sans text-lg leading-snug font-bold text-sn-tx group-data-[size=sm]/card:text-base"
         data-slot="card-title"
       >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-users w-4 h-4 text-primary"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-          />
-          <path
-            d="M16 3.128a4 4 0 0 1 0 7.744"
-          />
-          <path
-            d="M22 21v-2a4 4 0 0 0-3-3.87"
-          />
-          <circle
-            cx="9"
-            cy="7"
-            r="4"
-          />
-        </svg>
-        Equipe Família
+        Quem acompanha
       </div>
       <div
-        class="text-sm text-muted-foreground"
+        class="text-sn-mu text-base font-normal"
         data-slot="card-description"
       >
-        Convide pai, mãe, avós, babá e quem mais cuida do bebê — cada um com seu papel na família.
+        Convide pai, mãe, avós, babá e quem mais cuida do bebê, cada um com seu papel na família.
       </div>
     </div>
     <div
-      class="px-4 group-data-[size=sm]/card:px-3 space-y-6"
+      class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-6"
       data-slot="card-content"
     >
       <div
         class="space-y-2"
       >
         <p
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+          class="text-sm font-bold text-sn-mu"
         >
           Membros
         </p>
@@ -1299,7 +1099,7 @@ exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
           class="space-y-2"
         >
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -1327,33 +1127,31 @@ exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-crown w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"
-                />
-                <path
-                  d="M5 21h14"
+                  d="M4.5 19h15M5 16 4 7.5l4.5 3.5L12 5l3.5 6L20 7.5 19 16H5Z"
                 />
               </svg>
               Administrador(a)
             </span>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -1376,33 +1174,34 @@ exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-shield-check w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"
+                  d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z"
                 />
                 <path
-                  d="m9 12 2 2 4-4"
+                  d="m9 12 2.2 2.2L15.5 10"
                 />
               </svg>
               Pode registrar sono
             </span>
           </div>
           <div
-            class="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/40 hover:bg-muted/50 transition-colors"
+            class="flex items-center gap-3 rounded-xl bg-sn-s2/60 p-3"
             data-motion="{"initial":{"opacity":0,"x":-8},"animate":{"opacity":1,"x":0}}"
           >
             <div
@@ -1430,23 +1229,24 @@ exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
               </p>
             </div>
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border bg-slate-500/20 text-slate-400 border-slate-500/30"
+              class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr shrink-0"
+              data-slot="status-pill"
+              data-tone="attention"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-eye w-3 h-3"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="14"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="14"
               >
                 <path
-                  d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"
+                  d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"
                 />
                 <circle
                   cx="12"
@@ -1457,38 +1257,26 @@ exports[`FamilySettings > renders_non_owner_view > viewer 1`] = `
               Só visualizar
             </span>
             <button
-              class="group/button inline-flex items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 w-7 h-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+              aria-label="Sair da família"
+              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 shrink-0 text-sn-mu hover:text-sn-danger"
               data-slot="button"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="lucide lucide-trash lucide-trash-2 w-3.5 h-3.5"
                 fill="none"
-                height="24"
+                focusable="false"
+                height="18"
                 stroke="currentColor"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                stroke-width="2"
+                stroke-width="1.8"
                 viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                width="18"
               >
                 <path
-                  d="M10 11v6"
-                />
-                <path
-                  d="M14 11v6"
-                />
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                />
-                <path
-                  d="M3 6h18"
-                />
-                <path
-                  d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13h9l1-13M10.5 10.5v6M13.5 10.5v6"
                 />
               </svg>
             </button>

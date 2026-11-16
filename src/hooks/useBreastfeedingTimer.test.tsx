@@ -75,7 +75,7 @@ describe("useBreastfeedingTimer (characterization)", () => {
     expect(result.current.isRunning).toBe(true);
     expect(result.current.startTime).toBe(rows[0].start_time);
     expect(result.current.activeSide).toBe("LEFT");
-    expect(toast.success).toHaveBeenCalledWith("Mamada iniciada 🤱");
+    expect(toast.success).toHaveBeenCalledWith("Mamada iniciada");
     expect(activityCalls("started")).toHaveLength(1);
 
     await flush(5000);
@@ -110,7 +110,7 @@ describe("useBreastfeedingTimer (characterization)", () => {
     });
     expect(activityCalls("stopped")).toHaveLength(1);
     expect(
-      vi.mocked(toast.success).mock.calls.filter(([m]) => m === "Mamada registrada com sucesso ✨")
+      vi.mocked(toast.success).mock.calls.filter(([m]) => m === "Mamada registrada com sucesso")
     ).toHaveLength(1);
     expect(result.current.isRunning).toBe(false);
     expect(result.current.liveLeftSec).toBe(0);
@@ -142,7 +142,7 @@ describe("useBreastfeedingTimer (characterization)", () => {
     expect(result.current.activeSide).toBe("RIGHT");
     expect(result.current.liveLeftSec).toBe(30);
     expect(result.current.liveRightSec).toBe(12);
-    expect(toast.success).toHaveBeenCalledWith("Já existe uma mamada em andamento — sincronizada 🤱");
+    expect(toast.success).toHaveBeenCalledWith("Já existe uma mamada em andamento, sincronizada");
     expect(activityCalls("started")).toHaveLength(0);
 
     await flush(2000);

@@ -1,42 +1,43 @@
 "use client";
 
-import { Download } from "lucide-react";
 import type { SleepExport } from "@/hooks/settings/useSleepExport";
 import { ToolsSettings } from "@/components/settings/ToolsSettings";
+import { SleepReportPdfCard } from "@/components/settings/SleepReportPdfCard";
+import { IconDownload } from "@/components/brand/icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-/** "Ferramentas" tab: e-mailed report on demand and CSV export of the active baby
- * (export state comes from the page so it survives tab switches). */
+/** Mais › Relatórios e exportar: PDF for the pediatrician, e-mailed report and
+ * CSV export of the active baby (export state comes from the page). */
 export function ToolsTab({ sleepExport }: { sleepExport: SleepExport }) {
   const { exporting, exportCsv, canExport } = sleepExport;
 
   return (
-    <>
+    <div className="flex flex-col gap-3.5">
+      <SleepReportPdfCard />
+
       <ToolsSettings />
 
-      <Card className="rounded-2xl">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Exportar dados
-          </CardTitle>
+          <CardTitle>Exportar dados</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-3">
+        <CardContent className="space-y-4">
+          <p className="text-base text-sn-mu">
             Exporte todos os registros de sono do bebê ativo em formato CSV.
           </p>
           <Button
-            variant="outline"
+            variant="secondary"
+            size="md"
             onClick={exportCsv}
             disabled={!canExport || exporting}
-            className="rounded-xl gap-2"
+            className="w-full"
           >
-            <Download className="h-4 w-4" />
+            <IconDownload />
             {exporting ? "Exportando..." : "Exportar CSV"}
           </Button>
         </CardContent>
       </Card>
-    </>
+    </div>
   );
 }

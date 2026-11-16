@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MessageSquareText, Send, Trash2, Loader2 } from "lucide-react";
+import { IconSend, IconTrash } from "@/components/brand/icons";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -78,7 +79,7 @@ export function FamilyNoteCard() {
   });
 
   if (isLoading) {
-    return <Skeleton className="h-28 rounded-2xl" />;
+    return <Skeleton className="h-36 rounded-[24px]" />;
   }
 
   // Only relevant for shared families (more than one member).
@@ -93,99 +94,82 @@ export function FamilyNoteCard() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="rounded-2xl surface p-4"
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary">
-          <MessageSquareText className="h-4 w-4 text-foreground/70" aria-hidden="true" />
-        </div>
-        <h2 className="text-sm font-semibold">Mural da família</h2>
-      </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>Mural da família</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {canWrite && (
+          <form onSubmit={handleSubmit} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              maxLength={500}
+              placeholder="Deixe um recado para a equipe…"
+              className="h-11 min-w-0 flex-1 rounded-full border border-sn-mu/70 bg-sn-s2/60 px-4 font-sans text-base text-sn-tx outline-none placeholder:text-sn-mu focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
+              aria-label="Novo recado"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              disabled={!text.trim()}
+              loading={addNote.isPending}
+              aria-label="Enviar recado"
+            >
+              {!addNote.isPending && <IconSend size={20} />}
+            </Button>
+          </form>
+        )}
 
-      {canWrite && (
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 mb-3">
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            maxLength={500}
-            placeholder="Deixe um recado para a equipe…"
-            className="flex-1 rounded-xl border border-border/50 bg-muted/40 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            aria-label="Novo recado"
-          />
-          <button
-            type="submit"
-            disabled={!text.trim() || addNote.isPending}
-            aria-label="Enviar recado"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground transition-opacity disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {addNote.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            ) : (
-              <Send className="h-4 w-4" aria-hidden="true" />
-            )}
-          </button>
-        </form>
-      )}
-
-      {data.data.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Nenhum recado ainda. Use o mural para combinar a rotina entre os
-          cuidadores.
-        </p>
-      ) : (
-        <ul className="space-y-2.5">
-          <AnimatePresence initial={false}>
+        {data.data.length === 0 ? (
+          <p className="text-base text-sn-mu">
+            Nenhum recado ainda. Use o mural para combinar a rotina entre os
+            cuidadores.
+          </p>
+        ) : (
+          <ul className="space-y-3">
             {data.data.map((note) => {
               const mine = note.author_id === data.currentUserId;
               return (
-                <motion.li
-                  key={note.id}
-                  layout
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -12 }}
-                  className="group flex items-start gap-2.5"
-                >
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-[11px] font-semibold text-foreground/70">
+                <li key={note.id} className="flex items-start gap-3">
+                  <div
+                    aria-hidden="true"
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-sn-s2 text-sm font-bold text-sn-pr"
+                  >
                     {initials(note.author_name)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-foreground/80 truncate">
+                    <div className="flex items-baseline gap-2">
+                      <span className="truncate text-sm font-bold text-sn-tx">
                         {note.author_name ?? "Membro"}
                       </span>
-                      <span className="text-[11px] text-muted-foreground shrink-0">
+                      <span className="shrink-0 text-[13px] font-semibold text-sn-mu">
                         {formatDistanceToNow(new Date(note.created_at), {
                           addSuffix: true,
                           locale: ptBR,
                         })}
                       </span>
                     </div>
-                    <p className="text-sm text-foreground/90 wrap-break-word">
-                      {note.body}
-                    </p>
+                    <p className="text-base text-sn-tx wrap-break-word">{note.body}</p>
                   </div>
                   {mine && (
-                    <button
-                      type="button"
+                    <Button
+                      variant="icon"
+                      size="icon"
                       onClick={() => removeNote.mutate(note.id)}
                       aria-label="Remover recado"
-                      className="shrink-0 rounded-lg p-1 text-muted-foreground opacity-100 transition-opacity hover:text-destructive sm:opacity-0 sm:group-hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      className="-my-1.5 shrink-0 text-sn-mu hover:text-sn-danger"
                     >
-                      <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                    </button>
+                      <IconTrash size={20} />
+                    </Button>
                   )}
-                </motion.li>
+                </li>
               );
             })}
-          </AnimatePresence>
-        </ul>
-      )}
-    </motion.div>
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }

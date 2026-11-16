@@ -5,12 +5,12 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Leaf } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { DateTimeRangeFields } from "@/components/forms/DateTimeRangeFields";
 import {
   useTimeRangeValidation,
@@ -33,10 +33,13 @@ import {
 import { toast } from "sonner";
 import { END_BEFORE_START_MESSAGE, isEndBeforeStart, isCheckViolation } from "@/lib/validation/timeRange";
 import { cn } from "@/lib/utils";
+import { deleteSleepSession } from "@/lib/supabase/queries/sleep";
 import { EnvironmentPicker, type EnvironmentData } from "./EnvironmentPicker";
 import {
   HOW_FELL_ASLEEP_OPTIONS,
+  HOW_FELL_ASLEEP_LABELS,
   WAKE_REASON_OPTIONS,
+  WAKE_REASON_LABELS,
 } from "@/lib/sleep/captureLabels";
 import type { SleepSession } from "@/types";
 
@@ -97,14 +100,26 @@ function envFromSession(s?: SleepSession | null): EnvironmentData {
     : EMPTY_ENV;
 }
 
-function buildFormValues(s?: SleepSession | null): FormData {
+const TYPE_OPTIONS: { value: "NAP" | "NIGHT_SLEEP"; label: string }[] = [
+  { value: "NAP", label: "Soneca" },
+  { value: "NIGHT_SLEEP", label: "Noite" },
+];
+
+/** Labels the closed selects show for each value. */
+const QUALITY_ITEMS: Record<string, string> = Object.fromEntries(
+  [1, 2, 3, 4, 5].map((q) => [String(q), `${q} de 5`])
+);
+
+function buildFormValues(s?: SleepSession | null, day?: string): FormData {
   const start = s ? new Date(s.start_time) : new Date();
   const end = s?.end_time ? new Date(s.end_time) : new Date();
+  // A new sleep logged from a past day starts on that day.
+  const newDay = !s && day ? day : null;
   return {
     type: (s?.type ?? "NAP") as "NAP" | "NIGHT_SLEEP",
-    start_date: toLocalDateString(start),
+    start_date: newDay ?? toLocalDateString(start),
     start_time_input: toLocalTimeString(start),
-    end_date: toLocalDateString(end),
+    end_date: newDay ?? toLocalDateString(end),
     end_time_input: toLocalTimeString(end),
     quality: s?.quality?.toString() ?? "",
     how_fell_asleep: s?.how_fell_asleep ?? "",
@@ -118,27 +133,33 @@ interface SleepFormProps {
   open: boolean;
   onClose: () => void;
   session?: SleepSession | null;
+  /** Day (yyyy-MM-dd) a new sleep starts on; today when absent. */
+  day?: string;
 }
 
-export function SleepForm({ open, onClose, session }: SleepFormProps) {
+const LABEL = "font-sans text-sm font-bold text-sn-mu";
+const FIELD = "h-11 rounded-xl border-sn-mu/70 px-3";
+const TRIGGER = "w-full rounded-xl data-[size=default]:h-11";
+
+export function SleepForm({ open, onClose, session, day }: SleepFormProps) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0">
         <DialogHeader>
-          <DialogTitle>
-            {session ? "Editar registro" : "Registrar sono manualmente"}
+          <DialogTitle className="font-display text-[22px] leading-tight font-bold text-sn-tx">
+            {session ? "Editar registro" : "Registrar sono passado"}
           </DialogTitle>
         </DialogHeader>
 
         {/* The popup's content mounts on every opening, so the form starts
             from `session` (or "now") each time without a reset effect. */}
-        <SleepFormBody onClose={onClose} session={session} />
+        <SleepFormBody onClose={onClose} session={session} day={day} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
+function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
@@ -146,6 +167,27 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
   const [envData, setEnvData] = useState<EnvironmentData>(() => envFromSession(session));
 
   const isEdit = !!session;
+  // "Excluir" asks once more before deleting.
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!session) return;
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    setDeleting(true);
+    const { error } = await deleteSleepSession(supabase, session.id);
+    setDeleting(false);
+    if (error) {
+      toast.error("Erro ao excluir registro");
+      return;
+    }
+    toast.success("Registro excluído");
+    queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
+    onClose();
+  }
 
   const {
     register,
@@ -157,7 +199,7 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
     formState: { isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: buildFormValues(session),
+    defaultValues: buildFormValues(session, day),
   });
 
   useTimeRangeValidation(control, RANGE_NAMES, { clearErrors });
@@ -235,50 +277,45 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Select
+      <SegmentedControl
+        size="sm"
+        aria-label="Tipo de sono"
         value={selectedType}
-        onValueChange={(v) =>
-          setValue("type", v as "NAP" | "NIGHT_SLEEP")
-        }
-      >
-        <SelectTrigger className="rounded-xl" aria-label="Tipo de sono">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="NAP">Soneca</SelectItem>
-          <SelectItem value="NIGHT_SLEEP">Sono noturno</SelectItem>
-        </SelectContent>
-      </Select>
+        onChange={(v) => setValue("type", v)}
+        options={TYPE_OPTIONS}
+      />
 
       <DateTimeRangeFields control={control} names={RANGE_NAMES} />
 
       <Select
+        items={QUALITY_ITEMS}
         value={quality ?? ""}
         onValueChange={(v) => v && setValue("quality", v)}
       >
-        <SelectTrigger className="rounded-xl" aria-label="Qualidade do sono">
+        <SelectTrigger className={TRIGGER} aria-label="Qualidade do sono">
           <SelectValue placeholder="Qualidade (opcional)" />
         </SelectTrigger>
         <SelectContent>
-          {[1, 2, 3, 4, 5].map((q) => (
-            <SelectItem key={q} value={q.toString()}>
-              {"⭐".repeat(q)}
+          {Object.entries(QUALITY_ITEMS).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       <Select
+        items={HOW_FELL_ASLEEP_LABELS}
         value={howFellAsleep ?? ""}
         onValueChange={(v) => v && setValue("how_fell_asleep", v)}
       >
-        <SelectTrigger className="rounded-xl" aria-label="Como adormeceu">
+        <SelectTrigger className={TRIGGER} aria-label="Como adormeceu">
           <SelectValue placeholder="Como adormeceu? (opcional)" />
         </SelectTrigger>
         <SelectContent>
           {HOW_FELL_ASLEEP_OPTIONS.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
-              {opt.emoji} {opt.label}
+              {opt.label}
             </SelectItem>
           ))}
         </SelectContent>
@@ -286,16 +323,17 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
 
       {selectedType === "NIGHT_SLEEP" && (
         <Select
+          items={WAKE_REASON_LABELS}
           value={wakeReason ?? ""}
           onValueChange={(v) => v && setValue("wake_reason", v)}
         >
-          <SelectTrigger className="rounded-xl" aria-label="Motivo do despertar">
+          <SelectTrigger className={TRIGGER} aria-label="Motivo do despertar">
             <SelectValue placeholder="Por que acordou? (opcional)" />
           </SelectTrigger>
           <SelectContent>
             {WAKE_REASON_OPTIONS.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {opt.emoji} {opt.label}
+                {opt.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -303,12 +341,12 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
       )}
 
       <div className="space-y-1">
-        <label htmlFor="location" className="sr-only">Local</label>
+        <label htmlFor="location" className={LABEL}>Local</label>
         <Input
           id="location"
-          placeholder="Local (berço, braço, carrinho…)"
+          placeholder="Berço, colo, carrinho…"
           {...register("location")}
-          className="rounded-xl"
+          className={FIELD}
           autoComplete="off"
         />
       </div>
@@ -319,77 +357,68 @@ function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
           id="notes"
           placeholder="Notas (opcional)"
           {...register("notes")}
-          className="rounded-xl resize-none"
+          className="resize-none rounded-xl border-sn-mu/70 px-3"
           rows={2}
         />
       </div>
 
       {/* ── Environment section ── */}
-      <div className="rounded-xl border border-border/50 overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-sn-bd">
         <button
           type="button"
           aria-expanded={envOpen}
           aria-controls="env-section"
           onClick={() => setEnvOpen(!envOpen)}
           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setEnvOpen(!envOpen); }}
-          className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          className="flex min-h-11 w-full cursor-pointer items-center justify-between px-4 py-3 text-left outline-none hover:bg-sn-s2/50 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-sn-pr active:bg-sn-s2 disabled:pointer-events-none disabled:opacity-55"
           style={{ touchAction: "manipulation" }}
         >
           <div className="flex items-center gap-2">
-            <Leaf className="h-4 w-4 text-emerald-400" aria-hidden="true" />
-            <span className="text-sm font-medium">Condições do ambiente</span>
+            <Leaf className="size-4 text-sn-ok" aria-hidden="true" />
+            <span className="font-sans text-[15px] font-bold text-sn-tx">Condições do ambiente</span>
             {envFilled > 0 && (
-              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[11px] font-medium text-primary">
+              <span className="rounded-full bg-sn-pr/20 px-2 py-0.5 font-sans text-xs font-bold text-sn-pr">
                 {envFilled} preenchido{envFilled > 1 ? "s" : ""}
               </span>
             )}
           </div>
-          <motion.div
-            animate={{ rotate: envOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-          </motion.div>
+          <ChevronDown
+            className={cn(
+              "size-4 text-sn-mu transition-transform duration-(--sn-dur-short) ease-sn-out motion-reduce:transition-none",
+              envOpen && "rotate-180"
+            )}
+            aria-hidden="true"
+          />
         </button>
 
-        <AnimatePresence initial={false}>
-          {envOpen && (
-            <motion.div
-              id="env-section"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className={cn("overflow-hidden border-t border-border/40")}
-            >
-              <div className="p-4">
-                <EnvironmentPicker value={envData} onChange={setEnvData} />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {envOpen && (
+          <div id="env-section" className="border-t border-sn-bd p-4">
+            <EnvironmentPicker value={envData} onChange={setEnvData} />
+          </div>
+        )}
       </div>
 
-      <div className="flex gap-2 justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onClose}
-          className="rounded-xl"
-        >
-          Cancelar
-        </Button>
-        <Button
-          type="submit"
-          className="rounded-xl"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? "Salvando…"
-            : isEdit
-              ? "Atualizar"
-              : "Registrar"}
-        </Button>
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        {isEdit && (
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            loading={deleting}
+            className="mr-auto"
+          >
+            {confirmDelete ? "Confirmar exclusão" : "Excluir"}
+          </Button>
+        )}
+        <div className="ml-auto flex gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" size="sm" loading={isSubmitting}>
+            {isEdit ? "Atualizar" : "Registrar"}
+          </Button>
+        </div>
       </div>
     </form>
   );

@@ -1,410 +1,136 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { getRecentSessions } from "@/lib/supabase/queries/sleep";
+import { Suspense } from "react";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { getBabyAge, formatDuration } from "@/lib/utils";
-import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { useAnalyticsData, type AnalyticsData } from "@/components/analytics/useAnalyticsData";
 import {
-  getDailyTotals,
-  getNapCountPerDay,
-  getLongestNightStretch,
-  getNapPatternHeatmap,
-  getLast24hStats,
-  getOverallStats,
-} from "@/lib/sleep/statistics";
-import { computeSleepDebt } from "@/lib/sleep/regression";
-import { computeEnvironmentCorrelation } from "@/lib/sleep/environmentCorrelation";
-import { allocateSessionToLocalDays } from "@/lib/sleep/sessionDayAllocation";
+  ANALYTICS_PERIODS,
+  usePeriod,
+  withPeriod,
+  parsePeriod,
+} from "@/components/analytics/period";
+import { AnalyticsEmpty, AnalyticsError, AnalyticsSkeleton } from "@/components/analytics/AnalyticsStates";
+import { DurationFigure, formatDecimal } from "@/components/analytics/format";
+import { RegressionNotice } from "@/components/home/RegressionNotice";
 import { SleepBarChart } from "@/components/charts/SleepBarChart";
-import { NapPatternHeatmap } from "@/components/charts/NapPatternHeatmap";
-import { SleepQualityTrend } from "@/components/charts/SleepQualityTrend";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PageHeader } from "@/components/ui/page-header";
-import { StatTile } from "@/components/ui/stat-tile";
+import { Card } from "@/components/ui/card";
+import { ListRow } from "@/components/ui/list-row";
+import { PageTitle } from "@/components/ui/page-title";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, Clock, Moon, Sun, Star, Thermometer, TrendingDown } from "lucide-react";
-import { format, subDays, startOfDay, eachDayOfInterval, isYesterday, isToday } from "date-fns";
-import { cn } from "@/lib/utils";
-import type { SleepSession } from "@/types";
+import { IconChart, IconGrid, IconRadar, IconStar, IconThermometer, IconTrend } from "@/components/brand/icons";
 
-const PERIODS = [
-  { value: 7, label: "7 dias" },
-  { value: 30, label: "30 dias" },
-  { value: 90, label: "90 dias" },
-] as const;
+const PERIOD_OPTIONS = ANALYTICS_PERIODS.map((p) => ({ value: String(p), label: `${p} dias` }));
 
-type PeriodValue = (typeof PERIODS)[number]["value"];
+const DETAILS = [
+  { path: "/analytics/numbers", title: "Mais números", subtitle: "Sono 24h, débito de sono e sonecas de hoje", icon: <IconChart /> },
+  { path: "/analytics/trends", title: "Tendências", subtitle: "Duração das sonecas, sonecas e noite por dia", icon: <IconTrend /> },
+  { path: "/analytics/environment", title: "Ambiente e sono", subtitle: "Temperatura, TOG e clima", icon: <IconThermometer /> },
+  { path: "/analytics/naps", title: "Padrão de sonecas", subtitle: "Horários ao longo da semana", icon: <IconGrid /> },
+  { path: "/analytics/quality", title: "Qualidade do sono", subtitle: "Nota média por dia", icon: <IconStar /> },
+  { path: "/analytics/regression", title: "Radar de regressões", subtitle: "Sinais de regressão para a idade", icon: <IconRadar /> },
+];
 
-export default function AnalyticsPage() {
-  const { activeBaby } = useBaby();
-  const supabase = createClient();
-  const [period, setPeriod] = useState<PeriodValue>(7);
-
-  const { data: sessions = [], isLoading } = useQuery({
-    queryKey: ["sleep-sessions", activeBaby?.id, "analytics"],
-    queryFn: async (): Promise<SleepSession[]> => {
-      if (!activeBaby) return [];
-      // Always fetch the widest window and slice client-side per period.
-      const { data, error } = await getRecentSessions(
-        supabase,
-        activeBaby.id,
-        90
-      );
-      if (error) throw error;
-      return (data ?? []) as SleepSession[];
-    },
-    enabled: !!activeBaby,
-  });
-
-  const ageWeeks = activeBaby
-    ? getBabyAge(activeBaby.birth_date).weeks
-    : 12;
-  const schedule = getAgeSchedule(ageWeeks);
-
-  const last24h = useMemo(() => getLast24hStats(sessions), [sessions]);
-
-  const periodSessions = useMemo(() => {
-    const cutoff = subDays(new Date(), period);
-    return sessions.filter((s) => new Date(s.start_time) >= cutoff);
-  }, [sessions, period]);
-
-  const statsPeriod = useMemo(
-    () => getOverallStats(periodSessions),
-    [periodSessions]
+function Figure({ value, label }: { value: React.ReactNode; label: string }) {
+  return (
+    <div className="flex min-w-0 flex-col-reverse justify-end gap-0.5 rounded-[18px] border border-sn-bd bg-sn-card px-3 py-2.5">
+      <dt className="font-sans text-[13px] font-semibold text-sn-mu">{label}</dt>
+      <dd className="font-display text-[20px] leading-tight font-bold text-sn-tx tabular-nums">{value}</dd>
+    </div>
   );
+}
 
-  const sleepDebt = useMemo(
-    () => computeSleepDebt(sessions, ageWeeks, period),
-    [sessions, ageWeeks, period]
-  );
-
-  const envCorrelation = useMemo(
-    () => computeEnvironmentCorrelation(periodSessions),
-    [periodSessions]
-  );
-
-  const dailyTotals = useMemo(
-    () => getDailyTotals(sessions, period),
-    [sessions, period]
-  );
-
-  const napCounts = useMemo(
-    () => getNapCountPerDay(sessions, period),
-    [sessions, period]
-  );
-
-  const nightStretch = useMemo(
-    () => getLongestNightStretch(sessions, period),
-    [sessions, period]
-  );
-
-  const heatmapData = useMemo(
-    () => getNapPatternHeatmap(sessions),
-    [sessions]
-  );
-
-  const avgNapTrend = useMemo(() => {
-    const end = new Date();
-    const start = subDays(startOfDay(end), period - 1);
-    const days = eachDayOfInterval({ start, end });
-
-    return days.map((day) => {
-      const dayStr = format(day, "yyyy-MM-dd");
-      let napMinutesOnDay = 0;
-      let napCountOnDay = 0;
-
-      for (const s of sessions) {
-        if (s.type !== "NAP" || s.duration_min == null) continue;
-        const alloc = allocateSessionToLocalDays(s).find(
-          (a) => a.dayKey === dayStr
-        );
-        if (alloc && alloc.napMinutes > 0) {
-          napMinutesOnDay += alloc.napMinutes;
-          napCountOnDay += 1;
-        }
-      }
-
-      const avg = napCountOnDay > 0 ? napMinutesOnDay / napCountOnDay : 0;
-      return {
-        date: format(day, "dd/MM"),
-        avgDuration: Math.round(avg),
-      };
-    });
-  }, [sessions, period]);
-
-  const todayNaps = useMemo(
-    () =>
-      sessions.filter(
-        (s) => isToday(new Date(s.start_time)) && s.type === "NAP"
-      ).length,
-    [sessions]
-  );
-
-  const yesterdayNaps = useMemo(
-    () =>
-      sessions.filter(
-        (s) => isYesterday(new Date(s.start_time)) && s.type === "NAP"
-      ).length,
-    [sessions]
-  );
-
-  if (isLoading) {
+/** The three figures of the complete days of the period, or why there are none yet. */
+function PeriodFigures({ summary }: { summary: AnalyticsData["periodSummary"] }) {
+  if (summary.daysWithData === 0 || summary.avgSleepMinutes === null || summary.avgNapsPerDay === null) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-8 w-48 rounded-xl" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-2xl" />
-          ))}
-        </div>
-        <Skeleton className="h-64 rounded-2xl" />
-      </div>
+      <p className="px-1 font-sans text-[15px] font-semibold text-sn-mu">
+        Os números do período aparecem depois do primeiro dia completo.
+      </p>
     );
   }
+  const days = summary.daysWithData;
+  return (
+    <section aria-label="Números do período" className="flex flex-col gap-2">
+      <dl className="grid grid-cols-3 gap-2">
+        <Figure value={<DurationFigure minutes={summary.avgSleepMinutes} />} label="sono por dia" />
+        <Figure value={formatDecimal(summary.avgNapsPerDay)} label="sonecas por dia" />
+        <Figure
+          value={summary.longestNightMinutes === null ? "Nenhuma" : <DurationFigure minutes={summary.longestNightMinutes} />}
+          label="maior noite"
+        />
+      </dl>
+      <p className="px-1 font-sans text-[13px] font-semibold text-sn-mu">
+        {`Médias de ${days} ${days === 1 ? "dia completo" : "dias completos"}, sem contar hoje. Maior noite: a mais longa já terminada.`}
+      </p>
+    </section>
+  );
+}
 
-  const periodLabel = `${period}d`;
+function AnalyticsView() {
+  const [period, setPeriod] = usePeriod();
+  const { isLoading: babyLoading } = useBaby();
+  const data = useAnalyticsData(period);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <PageHeader
-          title="Análise de sono"
-          subtitle="Padrões e tendências do período"
-        />
+    <div className="flex flex-col gap-3">
+      <SegmentedControl
+        aria-label="Período"
+        size="sm"
+        value={String(period)}
+        onChange={(v) => setPeriod(parsePeriod(v))}
+        options={PERIOD_OPTIONS}
+      />
 
-        {/* Period toggle */}
-        <div
-          role="group"
-          aria-label="Período de análise"
-          className="inline-flex shrink-0 rounded-full surface-muted p-1"
-        >
-          {PERIODS.map((p) => {
-            const active = period === p.value;
-            return (
-              <button
-                key={p.value}
-                type="button"
-                onClick={() => setPeriod(p.value)}
-                aria-pressed={active}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {p.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-        <StatTile
-          icon={<Clock className="h-4 w-4" />}
-          label="Sono 24h"
-          value={formatDuration(last24h.totalSleepMinutes)}
-          sub={`Meta: ${schedule.totalSleepHours}h`}
-        />
-        <StatTile
-          icon={<TrendingDown className="h-4 w-4" />}
-          label="Débito de sono"
-          value={sleepDebt.debtHours > 0 ? `-${sleepDebt.debtHours}h` : "Em dia"}
-          sub={
-            sleepDebt.daysAnalyzed > 0
-              ? `Média ${sleepDebt.avgHours}h/dia`
-              : "Sem dados"
-          }
-        />
-        <StatTile
-          icon={<Moon className="h-4 w-4" />}
-          label={`Média soneca (${periodLabel})`}
-          value={formatDuration(statsPeriod.avgNapDuration)}
-          sub={`${statsPeriod.napCount} sonecas`}
-        />
-        <StatTile
-          icon={<Sun className="h-4 w-4" />}
-          label="Sonecas hoje"
-          value={todayNaps.toString()}
-          sub={`Ontem: ${yesterdayNaps}`}
-        />
-        <StatTile
-          icon={<BarChart3 className="h-4 w-4" />}
-          label="Maior trecho noturno"
-          value={formatDuration(last24h.longestStretch)}
-          sub="Últimas 24h"
-        />
-      </div>
-
-      {/* Charts */}
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">
-            Sono total por dia ({periodLabel})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SleepBarChart
-            data={dailyTotals}
-            recommendedHours={schedule.totalSleepHours}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Environment × Sleep */}
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Thermometer className="h-4 w-4 text-emerald-400" aria-hidden="true" />
-            Ambiente × Sono
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {envCorrelation.temperature.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Registre a temperatura do quarto ao iniciar o sono para ver a
-              correlação com a qualidade e a duração.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {envCorrelation.bestTemperature && (
-                <div className="rounded-xl surface-soft px-3 py-2 text-sm">
-                  <span className="text-muted-foreground">
-                    Melhor faixa de temperatura:{" "}
-                  </span>
-                  <span className="font-semibold text-foreground">
-                    {envCorrelation.bestTemperature.label}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {" "}
-                    (qualidade média {envCorrelation.bestTemperature.avgQuality}
-                    /5)
-                  </span>
-                </div>
-              )}
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-xs text-muted-foreground">
-                      <th className="py-1.5 pr-3 font-medium">Temperatura</th>
-                      <th className="py-1.5 px-3 font-medium">Registros</th>
-                      <th className="py-1.5 px-3 font-medium">Qualidade</th>
-                      <th className="py-1.5 pl-3 font-medium">Duração média</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {envCorrelation.temperature.map((b) => {
-                      const isBest =
-                        envCorrelation.bestTemperature?.label === b.label;
-                      return (
-                        <tr
-                          key={b.label}
-                          className={cn(
-                            "border-t border-border/30",
-                            isBest && "text-foreground"
-                          )}
-                        >
-                          <td className="py-2 pr-3 font-medium tabular-nums">
-                            {b.label}
-                          </td>
-                          <td className="py-2 px-3 tabular-nums text-muted-foreground">
-                            {b.count}
-                          </td>
-                          <td className="py-2 px-3">
-                            {b.avgQuality != null ? (
-                              <span className="inline-flex items-center gap-1">
-                                <Star
-                                  className="h-3 w-3 fill-amber-400 text-amber-400"
-                                  aria-hidden="true"
-                                />
-                                <span className="tabular-nums">
-                                  {b.avgQuality}
-                                </span>
-                              </span>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
-                            )}
-                          </td>
-                          <td className="py-2 pl-3 tabular-nums text-muted-foreground">
-                            {formatDuration(b.avgDurationMin)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Duração média das sonecas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SleepQualityTrend data={avgNapTrend} />
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Sonecas por dia
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SleepQualityTrend
-              data={napCounts.map((d) => ({
-                date: d.date,
-                avgDuration: d.count,
-              }))}
-              label="Sonecas"
-              color="#6366f1"
-              unit=""
+      {babyLoading || data.isLoading ? (
+        <AnalyticsSkeleton />
+      ) : data.isError ? (
+        <AnalyticsError onRetry={() => void data.refetch()} />
+      ) : data.periodSessions.length === 0 ? (
+        <AnalyticsEmpty message="Nenhum sono registrado neste período." />
+      ) : (
+        <>
+          <PeriodFigures summary={data.periodSummary} />
+          <Card className="gap-3 px-[18px]">
+            <h2 id="sono-por-dia" className="font-sans text-sm font-bold text-sn-mu">Sono por dia</h2>
+            <SleepBarChart
+              data={data.dailyTotals}
+              recommendedHours={data.schedule.totalSleepHours}
+              labelledBy="sono-por-dia"
             />
-          </CardContent>
-        </Card>
-      </div>
+          </Card>
+        </>
+      )}
 
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">
-            Maior trecho noturno
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SleepQualityTrend
-            data={nightStretch.map((d) => ({
-              date: d.date,
-              avgDuration: d.hours,
-            }))}
-            label="Horas"
-            color="#93c5fd"
-            unit="h"
-          />
-        </CardContent>
-      </Card>
+      <RegressionNotice href={withPeriod("/analytics/regression", period)} actionLabel="Ver o radar completo" />
 
-      <Card className="rounded-2xl">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium">
-            Padrão de sonecas por hora e dia
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <NapPatternHeatmap data={heatmapData} />
-        </CardContent>
+      <Card className="gap-0 px-3.5 py-1.5">
+        <ul aria-label="Mais detalhes" className="divide-y divide-sn-bd">
+          {DETAILS.map((d) => (
+            <li key={d.path}>
+              <ListRow href={withPeriod(d.path, period)} icon={d.icon} title={d.title} subtitle={d.subtitle} />
+            </li>
+          ))}
+        </ul>
       </Card>
+    </div>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <div>
+      <PageTitle>Análise</PageTitle>
+      <Suspense
+        fallback={
+          <div className="flex flex-col gap-3">
+            <Skeleton className="h-[54px] w-full rounded-full" />
+            <AnalyticsSkeleton />
+          </div>
+        }
+      >
+        <AnalyticsView />
+      </Suspense>
     </div>
   );
 }

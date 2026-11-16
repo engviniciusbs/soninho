@@ -103,7 +103,7 @@ export default function LoginPage() {
 
         <Button
           type="submit"
-          className="w-full rounded-xl h-11 font-semibold glow-primary"
+          className="w-full rounded-xl h-11 font-semibold glow-primary active:scale-[0.98] disabled:opacity-55"
           disabled={loading}
         >
           {loading ? "Entrando…" : "Entrar"}

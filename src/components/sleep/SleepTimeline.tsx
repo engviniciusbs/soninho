@@ -1,203 +1,99 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { createClient } from "@/lib/supabase/client";
-import { getSleepSessions } from "@/lib/supabase/queries/sleep";
-import { useBaby } from "@/components/providers/BabyProvider";
-import { SectionCard } from "@/components/ui/section-card";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, startOfDay, endOfDay, addDays, subDays, isToday } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { formatDuration, formatTimeRange } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { SleepSession } from "@/types";
 
+export interface SleepTimelineProps {
+  /** Sleeps that touch the day; the parts outside it are cut off. */
+  sessions: SleepSession[];
+  /** Start of the day (inclusive) and of the next one (exclusive). */
+  dayStart: Date;
+  dayEnd: Date;
+  /** Current time in ms: ends a sleep still running and places "agora". */
+  now: number | null;
+}
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+const TICKS = [0, 6, 12, 18];
+/** A fixed mark this close to "agora" (fraction of the day) gives way to it. */
+const TICK_GAP = 0.09;
 
-export function SleepTimeline() {
-  const { activeBaby } = useBaby();
-  const supabase = createClient();
-  const [currentDate, setCurrentDate] = useState(new Date());
+interface Block {
+  id: string;
+  night: boolean;
+  left: number;
+  width: number;
+}
 
-  const dayStart = startOfDay(currentDate);
-  const dayEnd = endOfDay(currentDate);
-
-  // Fetch from previous day's start so night sleep that began before midnight
-  // (e.g. 22:00 last night, ending 06:00 today) is included.
-  const extendedFrom = subDays(dayStart, 1);
-
-  const { data: allSessions = [], isLoading } = useQuery({
-    queryKey: [
-      "sleep-sessions",
-      activeBaby?.id,
-      "timeline",
-      format(currentDate, "yyyy-MM-dd"),
-    ],
-    queryFn: async (): Promise<SleepSession[]> => {
-      if (!activeBaby) return [];
-      const { data, error } = await getSleepSessions(
-        supabase,
-        activeBaby.id,
-        extendedFrom,
-        dayEnd
-      );
-      if (error) throw error;
-      return (data ?? []) as SleepSession[];
-    },
-    enabled: !!activeBaby,
-  });
-
-  const blocks = useMemo(() => {
-    return allSessions
-      .filter((s) => {
-        if (!s.end_time) return false;
-        const start = new Date(s.start_time);
-        const end = new Date(s.end_time);
-        // Keep only sessions that overlap with the current day
-        return start < dayEnd && end > dayStart;
-      })
-      .map((s) => {
-        const start = new Date(s.start_time);
-        const end = new Date(s.end_time!);
-
-        // Clamp both boundaries to [dayStart, dayEnd] and compute as ms offsets.
-        // This handles sessions that cross midnight correctly without using getHours().
-        const clampedStartMs =
-          Math.max(start.getTime(), dayStart.getTime()) - dayStart.getTime();
-        const clampedEndMs =
-          Math.min(end.getTime(), dayEnd.getTime() + 1) - dayStart.getTime();
-
-        const left = (clampedStartMs / DAY_MS) * 100;
-        const width = ((clampedEndMs - clampedStartMs) / DAY_MS) * 100;
-
-        return {
-          session: s,
-          left: Math.max(0, left),
-          width: Math.max(0.5, Math.min(width, 100 - left)),
-          crossesMidnight:
-            new Date(s.start_time) < dayStart || new Date(s.end_time!) > dayEnd,
-        };
-      });
-  }, [allSessions, dayStart, dayEnd]);
-
-  if (isLoading) {
-    return <Skeleton className="h-40 rounded-2xl" />;
+function blocksOf({ sessions, dayStart, dayEnd, now }: SleepTimelineProps): Block[] {
+  const from = dayStart.getTime();
+  const span = dayEnd.getTime() - from;
+  const blocks: Block[] = [];
+  for (const s of sessions) {
+    const start = Date.parse(s.start_time);
+    const end = s.end_time ? Date.parse(s.end_time) : now;
+    if (end === null) continue;
+    const a = Math.max(start, from);
+    const b = Math.min(end, dayEnd.getTime());
+    if (b <= a) continue;
+    blocks.push({
+      id: s.id,
+      night: s.type === "NIGHT_SLEEP",
+      left: ((a - from) / span) * 100,
+      width: ((b - a) / span) * 100,
+    });
   }
+  return blocks;
+}
+
+/**
+ * The day's blocks band (mockup `.day` and `.ticks`): night in `sn-night`,
+ * naps in `sn-pr`, over the 24 hours of the day, with marks at 0h, 6h, 12h
+ * and 18h, and "agora" while the day is today (24h otherwise).
+ */
+export function SleepTimeline(props: SleepTimelineProps) {
+  const { dayStart, dayEnd, now } = props;
+  const blocks = blocksOf(props);
+  const span = dayEnd.getTime() - dayStart.getTime();
+  const nowAt =
+    now !== null && now >= dayStart.getTime() && now < dayEnd.getTime()
+      ? (now - dayStart.getTime()) / span
+      : null;
+  const ticks = TICKS.filter((h) => nowAt === null || h === 0 || Math.abs(h / 24 - nowAt) >= TICK_GAP);
 
   return (
-    <SectionCard>
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold">Linha do tempo</h2>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg"
-            onClick={() => setCurrentDate((d) => subDays(d, 1))}
-            aria-label="Dia anterior"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-xs text-muted-foreground min-w-[100px] text-center">
-            {isToday(currentDate)
-              ? "Hoje"
-              : format(currentDate, "d 'de' MMM", { locale: ptBR })}
-          </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg"
-            onClick={() => setCurrentDate((d) => addDays(d, 1))}
-            disabled={isToday(currentDate)}
-            aria-label="Próximo dia"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+    <div data-slot="day-band" className="mt-3">
+      <div aria-hidden="true" className="relative h-[26px] overflow-hidden rounded-md bg-sn-s2">
+        {blocks.map((b) => (
+          <i
+            key={b.id}
+            data-kind={b.night ? "night" : "nap"}
+            className={cn("absolute inset-y-0 rounded-md", b.night ? "bg-sn-night" : "bg-sn-pr")}
+            style={{ left: `${b.left}%`, width: `max(${b.width}%, 3px)` }}
+          />
+        ))}
+        {nowAt !== null && (
+          <i className="absolute inset-y-0 w-0.5 -translate-x-1/2 bg-sn-tx/70" style={{ left: `${nowAt * 100}%` }} />
+        )}
       </div>
-
-      {/* Hour labels */}
-        <div className="relative mb-1">
-          <div className="flex justify-between">
-            {[0, 4, 8, 12, 16, 20, 24].map((h) => (
-              <span
-                key={h}
-                className="text-[10px] text-muted-foreground"
-                style={{
-                  position: "absolute",
-                  left: `${(h / 24) * 100}%`,
-                  transform: "translateX(-50%)",
-                }}
-              >
-                {h}h
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Timeline bar */}
-        <div className="relative h-12 mt-5 rounded-xl bg-secondary/50 overflow-hidden">
-          {blocks.map(({ session, left, width, crossesMidnight }) => (
-            <Popover key={session.id}>
-              <PopoverTrigger
-                  className={`absolute top-1 bottom-1 rounded-lg cursor-pointer transition-opacity hover:opacity-80 ${
-                    session.type === "NIGHT_SLEEP"
-                      ? "bg-sky-sleep/60"
-                      : "bg-lavender/60"
-                  }`}
-                  style={{
-                    left: `${left}%`,
-                    width: `${width}%`,
-                    minWidth: 4,
-                  }}
-                  aria-label={`${session.type === "NAP" ? "Soneca" : "Sono noturno"}: ${formatTimeRange(session.start_time, session.end_time)}`}
-              />
-              <PopoverContent className="w-56 rounded-xl p-3 text-sm space-y-1">
-                <p className="font-semibold">
-                  {session.type === "NAP" ? "Soneca" : "Sono noturno"}
-                </p>
-                <p className="text-muted-foreground">
-                  {formatTimeRange(session.start_time, session.end_time)}
-                </p>
-                {crossesMidnight && (
-                  <p className="text-[11px] text-amber-400">
-                    ↗ Cruzou a meia-noite
-                  </p>
-                )}
-                {session.duration_min != null && (
-                  <p className="font-medium">
-                    {formatDuration(session.duration_min)}
-                  </p>
-                )}
-                {session.notes && (
-                  <p className="text-xs text-muted-foreground">
-                    {session.notes}
-                  </p>
-                )}
-              </PopoverContent>
-            </Popover>
-          ))}
-        </div>
-
-        {/* Legend */}
-        <div className="flex gap-4 mt-3 justify-center">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="h-3 w-3 rounded-sm bg-sky-sleep/60" />
-            Noturno
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <div className="h-3 w-3 rounded-sm bg-lavender/60" />
-            Soneca
-          </div>
-        </div>
-    </SectionCard>
+      <div aria-hidden="true" className="relative mt-1.5 h-4 font-sans text-[11px] font-semibold text-sn-mu tabular-nums">
+        {ticks.map((h) => (
+          <span
+            key={h}
+            className={cn("absolute top-0", h > 0 && "-translate-x-1/2")}
+            style={{ left: `${(h / 24) * 100}%` }}
+          >
+            {h}h
+          </span>
+        ))}
+        {nowAt === null ? (
+          <span className="absolute top-0 right-0">24h</span>
+        ) : (
+          <span
+            className={cn("absolute top-0", nowAt > 0.92 ? "right-0" : "-translate-x-1/2")}
+            style={nowAt > 0.92 ? undefined : { left: `${nowAt * 100}%` }}
+          >
+            agora
+          </span>
+        )}
+      </div>
+    </div>
   );
 }

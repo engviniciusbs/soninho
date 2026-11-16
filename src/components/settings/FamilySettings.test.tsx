@@ -165,7 +165,7 @@ describe("FamilySettings", () => {
 
     const link = buildInviteLink(window.location.origin, "ab/c+d=");
     expect(await screen.findByText(link)).toBeInTheDocument();
-    expect(screen.getByText(/Válido por 7 dias/)).toHaveTextContent("Válido por 7 dias · Só visualizar");
+    expect(screen.getByText(/Válido por 7 dias/)).toHaveTextContent("Válido por 7 dias, Só visualizar");
     await waitFor(() => expect(calls).toHaveLength(4));
     expect(calls.slice(2)).toEqual([
       'POST /api/family/invite {"babyId":"baby-1","role":"viewer","familyRelation":null}',
