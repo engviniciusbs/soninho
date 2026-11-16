@@ -46,6 +46,7 @@ npx supabase db push --remote
 - `teste@soninho.local` / `soninho-local`: owner da "Família da Lua".
 - `baba@soninho.local` / `soninho-local`: membro `caregiver` com `user_profiles.ui_mode = 'nanny'`
   (o schema não tem coluna `nanny_mode`; o modo babá é o `ui_mode`).
+- `viewer@soninho.local` / `soninho-local`: membro `viewer` ("Só visualizar"), sem controles de escrita
 - Bebê "Lua", 9 meses, com 21 noites (~19:10 a ~06:05), 2 a 3 sonecas por dia, mamadeiras
   a cada ~3h (150 a 200 ml) e mamadas no peito. Aleatoriedade determinística via `setseed(0.42)`.
   O schema não tem coluna de despertares, então eles não são modelados.
