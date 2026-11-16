@@ -314,8 +314,12 @@ describe("Mais detail pages (former settings tabs)", () => {
   });
 
   it("export_csv_same_content", async () => {
+    // Honours .range(): the rows on the first page, then an empty page (the
+    // export now reads until an empty page, so a mock that answered the same
+    // rows for every range would never end).
     sb.respond((c) =>
-      c.target === "sleep_sessions"
+      c.target === "sleep_sessions" &&
+      (c.ops.find(([m]) => m === "range")?.[1] as [number, number] | undefined)?.[0] === 0
         ? {
             data: [
               {
@@ -339,7 +343,9 @@ describe("Mais detail pages (former settings tabs)", () => {
             ],
             error: null,
           }
-        : undefined
+        : c.target === "sleep_sessions"
+          ? { data: [], error: null }
+          : undefined
     );
     let blob: Blob | null = null;
     vi.stubGlobal("URL", Object.assign(URL, {
@@ -364,6 +370,13 @@ describe("Mais detail pages (former settings tabs)", () => {
         ["order", ["start_time", { ascending: false }]],
         ["order", ["id", { ascending: true }]],
         ["range", [0, 999]],
+      ],
+      [
+        ["select", ["*"]],
+        ["eq", ["baby_id", "baby-1"]],
+        ["order", ["start_time", { ascending: false }]],
+        ["order", ["id", { ascending: true }]],
+        ["range", [2, 1001]],
       ],
     ]);
     expect(click).toHaveBeenCalledTimes(1);

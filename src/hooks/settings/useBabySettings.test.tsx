@@ -85,6 +85,21 @@ describe("useBabySettings", () => {
     expect(result.current.isSaving).toBe(false);
   });
 
+  it("family_required_explains_how_to_pick_the_family", async () => {
+    sb.respond((c) =>
+      c.target.startsWith("rpc:") ? { data: null, error: { message: "family_required" } } : undefined
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ id: null, ...values });
+    });
+    expect(ok).toBe(false);
+    expect(toast.error).toHaveBeenCalledWith(
+      "Você é dono de mais de uma família. Troque para um bebê da família onde quer adicionar o novo bebê e tente de novo."
+    );
+  });
+
   it("update_error_keeps_form_open_with_toast", async () => {
     sb.respond((c) => (c.target === "babies" ? { data: null, error: { message: "x" } } : undefined));
     const { result } = setup();

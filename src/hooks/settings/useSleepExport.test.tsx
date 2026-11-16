@@ -81,6 +81,23 @@ describe("useSleepExport", () => {
     expect(result.current.exporting).toBe(false);
   });
 
+  it("a_server_page_smaller_than_1000_does_not_truncate", async () => {
+    // A lower PostgREST max_rows (500) answers short pages that are not the end.
+    sb.respond((c) => {
+      if (c.target !== "sleep_sessions") return undefined;
+      const [from, to] = c.ops.find(([m]) => m === "range")?.[1] as [number, number];
+      const end = Math.min(to, from + 499, 1200 - 1);
+      const rows = [];
+      for (let i = from; i <= end; i++) rows.push(session(i));
+      return { data: rows, error: null };
+    });
+    const { result } = setup();
+    await act(() => result.current.exportCsv());
+
+    const lines = (await blobs[0].text()).trim().split(/\r?\n/);
+    expect(lines).toHaveLength(1 + 1200);
+  });
+
   it("error_on_page_two_reports_failure_not_empty", async () => {
     sb.respond(paginated(2350, 1));
     const { result } = setup();

@@ -25,11 +25,15 @@ function sessionsToCsv(sessions: SleepSession[]): string {
 /** PostgREST caps every answer at 1000 rows; pages are fetched with `.range()`. */
 const PAGE_SIZE = 1000;
 
-/** Every sleep session of the baby, newest first. Throws on any page error. */
+/**
+ * Every sleep session of the baby, newest first. Throws on any page error.
+ * Reads until an empty page: a server with a lower `max_rows` answers pages
+ * shorter than asked that are not the end, so a short page never stops it.
+ */
 async function fetchAllSessions(babyId: string): Promise<SleepSession[]> {
   const supabase = createClient();
   const all: SleepSession[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
+  for (let from = 0; ; from = all.length) {
     const { data, error } = await supabase
       .from("sleep_sessions")
       .select("*")
@@ -40,8 +44,8 @@ async function fetchAllSessions(babyId: string): Promise<SleepSession[]> {
       .range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     const page = (data ?? []) as SleepSession[];
+    if (page.length === 0) return all;
     all.push(...page);
-    if (page.length < PAGE_SIZE) return all;
   }
 }
 

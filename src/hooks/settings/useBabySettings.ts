@@ -111,7 +111,7 @@ export function useBabySettings() {
       if (error) {
         toast.error(
           (error as DbError)?.message === "family_required"
-            ? "Selecione um bebê da família onde quer adicionar o novo bebê"
+            ? "Você é dono de mais de uma família. Troque para um bebê da família onde quer adicionar o novo bebê e tente de novo."
             : "Erro ao adicionar bebê"
         );
         setIsSaving(false);
