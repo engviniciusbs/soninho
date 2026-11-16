@@ -57,6 +57,16 @@ export function StartSleepControls({ sleepType, onSleepTypeChange, onStart, back
         <IconClock size={20} />
         Começou antes?
       </Button>
+      {!backdateOpen && backdate.startLabel && (
+        <div className="-mt-1 mb-1 flex items-center justify-center gap-1">
+          <p className="font-sans text-sm font-semibold text-sn-tx tabular-nums">
+            Começou às {backdate.startLabel}
+          </p>
+          <Button variant="ghost" size="sm" onClick={backdate.reset}>
+            Limpar
+          </Button>
+        </div>
+      )}
       {backdateOpen && (
         <div className="pt-1 pb-2">
           <BackdateStartChips

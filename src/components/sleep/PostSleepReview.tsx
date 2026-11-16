@@ -80,7 +80,7 @@ export function PostSleepReview({
       return;
     }
 
-    toast.success("Detalhes salvos ✨");
+    toast.success("Detalhes salvos");
     queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
     queryClient.invalidateQueries({ queryKey: ["last-session"] });
     handleClose();

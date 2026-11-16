@@ -12,6 +12,7 @@ import {
 } from "@/components/providers/UserProfileProvider";
 import { EMPTY_SLEEP_DRAFT, SLEEP_STORE_VERSION, useSleepStore } from "@/store/sleepStore";
 import type { AISuggestion, Baby, FeedingTimelineItem, SleepSession } from "@/types";
+import { updateSleepSession } from "@/lib/supabase/queries/sleep";
 import AppHomePage from "@/app/(dashboard)/app/page";
 
 const holder = vi.hoisted(() => ({
@@ -23,17 +24,29 @@ const holder = vi.hoisted(() => ({
   regression: null as unknown,
   notes: null as unknown,
   toasts: vi.fn(),
+  noDbRestore: false,
 }));
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
-vi.mock("@/lib/supabase/queries/sleep", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/supabase/queries/sleep")>()),
-  getLastSleepSession: vi.fn(async () => ({ data: holder.lastSession, error: null })),
-  getRecentSessions: vi.fn(async (_c: unknown, babyId: string) => ({
-    data: holder.recent[babyId] ?? [],
-    error: null,
-  })),
-}));
+vi.mock("@/lib/supabase/queries/sleep", async (importOriginal) => {
+  const orig = await importOriginal<typeof import("@/lib/supabase/queries/sleep")>();
+  return {
+    ...orig,
+    getLastSleepSession: vi.fn(async () => ({ data: holder.lastSession, error: null })),
+    getRecentSessions: vi.fn(async (_c: unknown, babyId: string) => ({
+      data: holder.recent[babyId] ?? [],
+      error: null,
+    })),
+    // Spied so tests can see which fields a save sends.
+    updateSleepSession: vi.fn(orig.updateSleepSession),
+    // Switchable so a test can rule out the DB restore of an open session.
+    getActiveSleepSession: vi.fn((...args: Parameters<typeof orig.getActiveSleepSession>) =>
+      holder.noDbRestore
+        ? Promise.resolve({ data: null, error: null })
+        : orig.getActiveSleepSession(...args)
+    ),
+  };
+});
 vi.mock("@/lib/supabase/feedingQueries", () => ({
   getFeedingTimeline: vi.fn(async (_c: unknown, babyId: string) => ({
     data: holder.feedings[babyId] ?? [],
@@ -98,6 +111,7 @@ beforeEach(() => {
   holder.recent = {};
   holder.feedings = {};
   holder.toasts.mockClear();
+  holder.noDbRestore = false;
   holder.lastSession = {
     id: "prev",
     end_time: new Date(NOW.getTime() - 30 * 60_000).toISOString(),
@@ -281,7 +295,13 @@ describe("Home", () => {
 
   it("persisted_v1_timer_rehydrates_as_sleeping", async () => {
     const startTime = new Date(NOW.getTime() - 3600_000).toISOString();
+    // The open row exists (so the live sync keeps the timer), but the DB
+    // restore is off: only localStorage can bring the timer back.
     fake.seed(TABLE, { id: "s-old", baby_id: helena.id, type: "NIGHT_SLEEP", start_time: startTime });
+    holder.noDbRestore = true;
+    // Clear the store first: persist's setState writes storage, so seeding
+    // after it would be overwritten.
+    useSleepStore.setState({ timers: {}, draft: { ...EMPTY_SLEEP_DRAFT } });
     localStorage.setItem(
       "soninho-timer",
       JSON.stringify({
@@ -300,13 +320,100 @@ describe("Home", () => {
         version: SLEEP_STORE_VERSION,
       })
     );
-    useSleepStore.setState({ timers: {} });
     await useSleepStore.persist.rehydrate();
+    expect(useSleepStore.getState().timers[helena.id]?.sessionId).toBe("s-old");
+
     await mount();
 
     expect(screen.getByText("Sono noturno em andamento")).toBeInTheDocument();
     expect(screen.getByText("01:00:00")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Acordou" })).toBeInTheDocument();
+  });
+
+  it("restored_session_shows_stored_environment_and_closing_writes_nothing", async () => {
+    const startTime = new Date(NOW.getTime() - 600_000).toISOString();
+    // Started on another phone: the DB row has the environment, the local
+    // timer entry (restoreFromSession) has none.
+    fake.seed(TABLE, {
+      id: "s-2",
+      baby_id: helena.id,
+      type: "NAP",
+      start_time: startTime,
+      room_temp_celsius: 22,
+      sleep_sack_type: "flannel",
+      sleep_sack_tog: 1,
+      notes: "Nota da outra cuidadora",
+    });
+    await mount();
+
+    expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "22°C" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "TOG 1.0" })).toBeInTheDocument();
+
+    await click(screen.getByRole("button", { name: "Ambiente" }));
+    await click(screen.getByRole("button", { name: "Pronto" }));
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    expect(screen.getByLabelText("Notas sobre o sono")).toHaveValue("Nota da outra cuidadora");
+    await click(screen.getByRole("button", { name: "Salvar nota" }));
+    await flush();
+
+    expect(updateSleepSession).not.toHaveBeenCalled();
+    const row = fake.rows(TABLE)[0];
+    expect(row.room_temp_celsius).toBe(22);
+    expect(row.sleep_sack_tog).toBe(1);
+    expect(row.notes).toBe("Nota da outra cuidadora");
+  });
+
+  it("editing_only_tog_sends_only_tog", async () => {
+    const startTime = new Date(NOW.getTime() - 600_000).toISOString();
+    fake.seed(TABLE, {
+      id: "s-3",
+      baby_id: helena.id,
+      type: "NAP",
+      start_time: startTime,
+      room_temp_celsius: 22,
+      sleep_sack_type: "flannel",
+      sleep_sack_tog: 1,
+    });
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Ambiente" }));
+    await click(screen.getByRole("button", { name: "TOG 2.5" }));
+    await click(screen.getByRole("button", { name: "Pronto" }));
+    await flush();
+
+    expect(updateSleepSession).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(updateSleepSession).mock.calls[0][2]).toEqual({ sleep_sack_tog: 2.5 });
+    const row = fake.rows(TABLE)[0];
+    expect(row.sleep_sack_tog).toBe(2.5);
+    expect(row.room_temp_celsius).toBe(22);
+  });
+
+  it("overdue_comes_from_the_suggestion_not_the_wake_window", async () => {
+    // Wake window already past its max, but the suggestion is still ahead.
+    holder.lastSession = {
+      id: "prev",
+      end_time: new Date(NOW.getTime() - 300 * 60_000).toISOString(),
+    };
+    holder.ai = { ...nightAi, suggestedNapTime: "09:30", minutesUntilSuggested: 30 };
+    await mount();
+
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("09:30")).toBeInTheDocument();
+    expect(within(hero).queryByText("Já passou do horário previsto")).not.toBeInTheDocument();
+  });
+
+  it("collapsed_backdate_stays_visible_and_can_be_cleared", async () => {
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Começou antes?" }));
+    await click(screen.getByRole("button", { name: "10 min" }));
+    await click(screen.getByRole("button", { name: "Começou antes?" }));
+
+    expect(screen.queryByText("Iniciou há quanto tempo?")).not.toBeInTheDocument();
+    expect(screen.getByText("Começou às 08:50")).toBeInTheDocument();
+    await click(screen.getByRole("button", { name: "Limpar" }));
+    expect(screen.queryByText("Começou às 08:50")).not.toBeInTheDocument();
   });
 
   it("wake_estimate_hidden_with_fewer_than_3_nights", async () => {

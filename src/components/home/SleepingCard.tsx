@@ -26,18 +26,21 @@ export interface SleepingCardProps {
   since: string | null;
   environment: EnvironmentData;
   onEnvironmentChange: (d: EnvironmentData) => void;
+  /** Environment sheet opened: refresh from the session. */
+  onEnvironmentOpen: () => void;
   /** Called when the environment sheet closes, to save what changed. */
   onEnvironmentDone: () => void;
   notes: string;
   onNotesChange: (notes: string) => void;
+  onNotesOpen: () => void;
   onNotesDone: () => void;
   onStop: () => Promise<void>;
 }
 
 /** Running sleep (mockup "Dormindo"): ring with the time, environment chips, "Acordou". */
 export function SleepingCard({
-  sleepType, elapsed, since, environment, onEnvironmentChange, onEnvironmentDone,
-  notes, onNotesChange, onNotesDone, onStop,
+  sleepType, elapsed, since, environment, onEnvironmentChange, onEnvironmentOpen, onEnvironmentDone,
+  notes, onNotesChange, onNotesOpen, onNotesDone, onStop,
 }: SleepingCardProps) {
   const [envOpen, setEnvOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -57,14 +60,26 @@ export function SleepingCard({
     }
   }
 
+  function openEnv() {
+    setEnvOpen(true);
+    onEnvironmentOpen();
+  }
+
   function closeEnv(open: boolean) {
-    setEnvOpen(open);
-    if (!open) onEnvironmentDone();
+    if (open) return openEnv();
+    setEnvOpen(false);
+    onEnvironmentDone();
+  }
+
+  function openNotes() {
+    setNotesOpen(true);
+    onNotesOpen();
   }
 
   function closeNotes(open: boolean) {
-    setNotesOpen(open);
-    if (!open) onNotesDone();
+    if (open) return openNotes();
+    setNotesOpen(false);
+    onNotesDone();
   }
 
   return (
@@ -84,18 +99,18 @@ export function SleepingCard({
       </Ring>
 
       <div className="mb-3.5 flex flex-wrap justify-center gap-2">
-        <Chip onClick={() => setEnvOpen(true)}>
+        <Chip onClick={openEnv}>
           {temp !== null ? `${temp}°C` : "Temperatura"}
         </Chip>
-        <Chip onClick={() => setEnvOpen(true)}>{tog !== null ? `TOG ${tog.toFixed(1)}` : "TOG"}</Chip>
-        <Chip onClick={() => setEnvOpen(true)}>Ambiente</Chip>
+        <Chip onClick={openEnv}>{tog !== null ? `TOG ${tog.toFixed(1)}` : "TOG"}</Chip>
+        <Chip onClick={openEnv}>Ambiente</Chip>
       </div>
 
       <Button variant="secondary" className="w-full" onClick={stop} loading={stopping}>
         {!stopping && <IconStop size={20} />}
         Acordou
       </Button>
-      <Button variant="ghost" className="mt-2" onClick={() => setNotesOpen(true)}>
+      <Button variant="ghost" className="mt-2" onClick={openNotes}>
         <IconPen size={18} />
         Anotar algo
       </Button>

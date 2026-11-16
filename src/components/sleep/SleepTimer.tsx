@@ -7,7 +7,7 @@
  * presentational and live in src/components/home.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
@@ -17,7 +17,7 @@ import { useNow } from "@/hooks/useNow";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { useActiveSleepTimer } from "@/store/sleepStore";
 import { createClient } from "@/lib/supabase/client";
-import { updateSleepSession } from "@/lib/supabase/queries/sleep";
+import { getSleepSessionDetails, updateSleepSession } from "@/lib/supabase/queries/sleep";
 import { NextSleepCard } from "@/components/home/NextSleepCard";
 import { WakeWindowCard } from "@/components/home/WakeWindowCard";
 import { StartSleepControls } from "@/components/home/StartSleepControls";
@@ -28,6 +28,17 @@ import { PostSleepReview } from "./PostSleepReview";
 import { useBackdate } from "./timer/useBackdate";
 
 const ASAP = "Assim que possível";
+
+/** What the open session holds for the fields editable during a sleep. */
+interface SessionFields {
+  room_temp_celsius: number | null;
+  weather_condition: string | null;
+  sleep_sack_type: string | null;
+  sleep_sack_tog: number | null;
+  notes: string;
+}
+type FieldKey = keyof SessionFields;
+const ENV_KEYS: FieldKey[] = ["room_temp_celsius", "weather_condition", "sleep_sack_type", "sleep_sack_tog"];
 
 export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   const {
@@ -96,12 +107,90 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
     setSleepSackTog(d.sleep_sack_tog);
   }
 
-  // Environment and notes edited during the sleep go to the open session
-  // right away; stopping only sets end_time.
-  async function saveToSession(patch: Parameters<typeof updateSleepSession>[2], what: string) {
-    if (!timer?.sessionId) return;
-    const { error } = await updateSleepSession(supabase, timer.sessionId, patch);
-    if (error) toast.error(`Não foi possível salvar ${what}`);
+  // Environment and notes edited during the sleep go to the open session;
+  // stopping only sets end_time. The session row is the source of truth: it
+  // seeds the local values (a session restored from the DB, or started on
+  // another phone, has none locally) and is the snapshot each save diffs
+  // against, so a save only sends what this user changed.
+  const sessionId = timer?.sessionId ?? null;
+  const snapshot = useRef<SessionFields | null>(null);
+
+  const local: SessionFields = {
+    room_temp_celsius: roomTemp,
+    weather_condition: weatherCondition,
+    sleep_sack_type: sleepSackType,
+    sleep_sack_tog: sleepSackTog,
+    notes,
+  };
+
+  const applyLocal = useCallback(
+    (f: Partial<SessionFields>) => {
+      if ("room_temp_celsius" in f) setRoomTemp(f.room_temp_celsius ?? null);
+      if ("weather_condition" in f) setWeatherCondition(f.weather_condition ?? null);
+      if ("sleep_sack_type" in f) setSleepSackType(f.sleep_sack_type ?? null);
+      if ("sleep_sack_tog" in f) setSleepSackTog(f.sleep_sack_tog ?? null);
+      if ("notes" in f) setNotes(f.notes ?? "");
+    },
+    [setRoomTemp, setWeatherCondition, setSleepSackType, setSleepSackTog, setNotes]
+  );
+
+  const readSession = useCallback(async (): Promise<SessionFields | null> => {
+    if (!sessionId) return null;
+    const { data } = await getSleepSessionDetails(supabase, sessionId);
+    if (!data) return null;
+    return {
+      room_temp_celsius: data.room_temp_celsius ?? null,
+      weather_condition: data.weather_condition ?? null,
+      sleep_sack_type: data.sleep_sack_type ?? null,
+      sleep_sack_tog: data.sleep_sack_tog ?? null,
+      notes: data.notes ?? "",
+    };
+  }, [sessionId, supabase]);
+
+  // On a new running session: fill what the DB has; local values the DB
+  // doesn't have yet are kept (they show up as changes on the next save).
+  useEffect(() => {
+    snapshot.current = null;
+    if (!sessionId) return;
+    let alive = true;
+    void readSession().then((row) => {
+      if (!alive || !row) return;
+      snapshot.current = row;
+      const stored: Partial<SessionFields> = {};
+      for (const k of [...ENV_KEYS, "notes"] as FieldKey[]) {
+        if (row[k] !== null && row[k] !== "") Object.assign(stored, { [k]: row[k] });
+      }
+      applyLocal(stored);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [sessionId, readSession, applyLocal]);
+
+  // Opening a sheet re-reads the session, so it shows (and later diffs
+  // against) what another caregiver may have saved meanwhile.
+  async function syncFromSession(keys: FieldKey[]) {
+    const row = await readSession();
+    if (!row) return;
+    snapshot.current = { ...(snapshot.current ?? row), ...pick(row, keys) };
+    applyLocal(pick(row, keys));
+  }
+
+  async function saveChanged(keys: FieldKey[], what: string) {
+    if (!sessionId || !snapshot.current) return;
+    const base = snapshot.current;
+    const patch = Object.fromEntries(
+      keys
+        .filter((k) => local[k] !== base[k])
+        .map((k) => [k, k === "notes" ? local.notes || null : local[k]])
+    ) as Parameters<typeof updateSleepSession>[2];
+    if (Object.keys(patch).length === 0) return;
+    const { error } = await updateSleepSession(supabase, sessionId, patch);
+    if (error) {
+      toast.error(`Não foi possível salvar ${what}`);
+      return;
+    }
+    snapshot.current = { ...base, ...pick(local, keys) };
   }
 
   /* ── Next sleep: the AI suggestion, else the wake-window fallback ── */
@@ -110,9 +199,11 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   let minutesUntil: number | null = null;
   let overdue = false;
   if (ai) {
-    overdue = minutesUntilNextNap <= 0 || ai.suggestedNapTime === ASAP;
+    // Time and "overdue" both come from the suggestion itself.
+    const aiMinutes = ai.minutesUntilSuggested ?? minutesUntilNextNap;
+    overdue = ai.suggestedNapTime === ASAP || aiMinutes <= 0;
     time = overdue ? "Agora" : ai.suggestedNapTime;
-    minutesUntil = overdue ? null : (ai.minutesUntilSuggested ?? minutesUntilNextNap);
+    minutesUntil = overdue ? null : aiMinutes;
   } else if (!wwLoading && now !== null) {
     overdue = minutesUntilNextNap <= 0;
     time = overdue ? "Agora" : format(new Date(now + minutesUntilNextNap * 60_000), "HH:mm");
@@ -128,20 +219,12 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
           since={timer ? format(new Date(timer.startTime), "HH:mm") : null}
           environment={envData}
           onEnvironmentChange={onEnvChange}
-          onEnvironmentDone={() =>
-            void saveToSession(
-              {
-                room_temp_celsius: roomTemp,
-                weather_condition: weatherCondition,
-                sleep_sack_type: sleepSackType,
-                sleep_sack_tog: sleepSackTog,
-              },
-              "o ambiente"
-            )
-          }
+          onEnvironmentOpen={() => void syncFromSession(ENV_KEYS)}
+          onEnvironmentDone={() => void saveChanged(ENV_KEYS, "o ambiente")}
           notes={notes}
           onNotesChange={setNotes}
-          onNotesDone={() => void saveToSession({ notes: notes || null }, "a nota")}
+          onNotesOpen={() => void syncFromSession(["notes"])}
+          onNotesDone={() => void saveChanged(["notes"], "a nota")}
           onStop={onStop}
         />
       ) : (
@@ -188,4 +271,8 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
       />
     </div>
   );
+}
+
+function pick(f: SessionFields, keys: FieldKey[]): Partial<SessionFields> {
+  return Object.fromEntries(keys.map((k) => [k, f[k]])) as Partial<SessionFields>;
 }
