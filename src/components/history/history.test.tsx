@@ -79,35 +79,60 @@ afterEach(() => {
 });
 
 describe("WeekStrip", () => {
-  it("shows_the_7_days_ending_today_and_selects_on_tap", () => {
+  const days = () => within(screen.getByRole("group", { name: "Escolher o dia" })).getAllByRole("button");
+  const labels = () => days().map((d) => d.textContent);
+
+  it("shows_exactly_the_7_days_ending_today_and_selects_on_tap", () => {
     const onSelect = vi.fn();
     mount(<WeekStrip selected={NOW} onSelect={onSelect} timeZone={TZ} />);
-    const days = within(screen.getByRole("group", { name: "Escolher o dia" })).getAllByRole("button");
-    // Up to 30 days back by scrolling; the last 7 end today.
-    expect(days).toHaveLength(30);
-    expect(days.slice(-7).map((d) => d.textContent)).toEqual([
-      "sex26",
-      "sáb27",
-      "dom28",
-      "seg29",
-      "ter30",
-      "qua31",
-      "hoje1",
-    ]);
-    const today = days[days.length - 1];
+    expect(labels()).toEqual(["sex26", "sáb27", "dom28", "seg29", "ter30", "qua31", "hoje1"]);
+    const today = days()[6];
     expect(today).toHaveAttribute("aria-current", "date");
     expect(today).toHaveAccessibleName("Hoje, 1 de janeiro");
-    expect(days.filter((d) => d.hasAttribute("aria-current"))).toHaveLength(1);
+    expect(days().filter((d) => d.hasAttribute("aria-current"))).toHaveLength(1);
+    // No sideways scrolling: the week is paged with buttons.
+    expect(screen.getByRole("group", { name: "Escolher o dia" }).className).not.toMatch(/overflow-x-(auto|scroll)/);
 
-    fireEvent.click(days[days.length - 6]);
+    fireEvent.click(days()[1]);
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(key(onSelect.mock.calls[0][0])).toBe("2025-12-27");
   });
 
-  it("marks_the_selected_day_as_current", () => {
-    mount(<WeekStrip selected={new Date("2025-12-29T15:00:00.000Z")} onSelect={() => {}} timeZone={TZ} />);
-    const current = screen.getByRole("button", { current: "date" });
-    expect(current).toHaveTextContent("seg29");
+  it("next_week_is_disabled_on_the_current_week", () => {
+    mount(<WeekStrip selected={NOW} onSelect={() => {}} timeZone={TZ} />);
+    expect(screen.getByRole("button", { name: "Próxima semana" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Semana anterior" })).toBeEnabled();
+  });
+
+  it("previous_week_shows_the_prior_7_days_back_to_30_days", () => {
+    const onSelect = vi.fn();
+    mount(<WeekStrip selected={NOW} onSelect={onSelect} timeZone={TZ} />);
+    fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
+    expect(labels()).toEqual(["sex19", "sáb20", "dom21", "seg22", "ter23", "qua24", "qui25"]);
+    expect(screen.getByText("19 de dezembro a 25 de dezembro")).toBeInTheDocument();
+    // The selected day is not in this week.
+    expect(days().some((d) => d.hasAttribute("aria-current"))).toBe(false);
+    expect(screen.getByRole("button", { name: "Próxima semana" })).toBeEnabled();
+    fireEvent.click(days()[0]);
+    expect(key(onSelect.mock.calls[0][0])).toBe("2025-12-19");
+
+    // 30 days ending Jan 1 start on Dec 3: the oldest week is Dec 3 to 9.
+    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
+    expect(labels()).toEqual(["qua3", "qui4", "sex5", "sáb6", "dom7", "seg8", "ter9"]);
+    expect(screen.getByRole("button", { name: "Semana anterior" })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
+    fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
+    fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
+    fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
+    expect(labels()).toEqual(["sex26", "sáb27", "dom28", "seg29", "ter30", "qua31", "hoje1"]);
+    expect(screen.getByRole("button", { name: "Próxima semana" })).toBeDisabled();
+  });
+
+  it("a_selected_day_in_an_older_week_opens_that_week", () => {
+    mount(<WeekStrip selected={new Date("2025-12-20T15:00:00.000Z")} onSelect={() => {}} timeZone={TZ} />);
+    expect(screen.getByRole("button", { current: "date" })).toHaveTextContent("sáb20");
+    expect(labels()).toEqual(["sex19", "sáb20", "dom21", "seg22", "ter23", "qua24", "qui25"]);
   });
 });
 
@@ -243,5 +268,12 @@ describe("HistoryPage", () => {
     expect(screen.queryByText("Nenhum sono registrado neste dia")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
     expect(await screen.findByText("Nenhum sono registrado neste dia")).toBeInTheDocument();
+  });
+
+  it("dia_in_an_older_week_opens_that_week", async () => {
+    holder.search = "dia=2025-12-10";
+    mount(<HistoryPage />);
+    expect(await screen.findByRole("button", { current: "date" })).toHaveTextContent("qua10");
+    expect(screen.getByRole("button", { name: "Próxima semana" })).toBeEnabled();
   });
 });
