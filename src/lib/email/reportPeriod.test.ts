@@ -46,6 +46,16 @@ describe("reportPeriod", () => {
     expect(tokyo.startUtc.toISOString()).toBe("2026-05-18T15:00:00.000Z");
   });
 
+  it("a period that ends yesterday stops at the last complete local day", () => {
+    // 22:30 of 16/11 in São Paulo while the server (UTC) is already on 17/11.
+    const now = new Date("2026-11-17T01:30:00Z");
+    const p = getReportPeriod(now, 7, "America/Sao_Paulo", { endsYesterday: true });
+    expect(p.endKey).toBe("2026-11-15");
+    expect(p.startKey).toBe("2026-11-09");
+    expect(p.endUtc.toISOString()).toBe("2026-11-16T03:00:00.000Z");
+    expect(p.label).toBe("de 09/11 a 15/11 (últimos 7 dias)");
+  });
+
   describe("DST (America/New_York, spring forward 2026-03-08)", () => {
     const tz = "America/New_York";
 

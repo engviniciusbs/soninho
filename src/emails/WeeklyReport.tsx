@@ -16,6 +16,11 @@ import {
   Text,
 } from "@react-email/components";
 import { emailTheme, fontLink } from "@/emails/theme";
+import { formatDuration } from "@/lib/utils";
+
+/** One decimal with a comma, as in pt-BR ("13,5"). */
+const dec = (n: number) =>
+  n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 export interface WeeklyReportBabyStats {
   name: string;
@@ -23,7 +28,8 @@ export interface WeeklyReportBabyStats {
   ageLabel: string;
   avgTotalHours: number;
   targetTotalHours: number;
-  avgNapHours: number;
+  /** Average length of one nap, in minutes. */
+  avgNapMinutes: number;
   napCountAvg: number;
   longestNightHours: number;
   adherencePct: number;
@@ -294,32 +300,31 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
           <div style={progressFill(baby.adherencePct)} />
         </div>
         <Text style={progressMeta}>
-          {baby.adherencePct}% · meta {baby.targetTotalHours}h/dia · média{" "}
-          {baby.avgTotalHours.toFixed(1)}h
+          {baby.adherencePct}% da meta de {baby.targetTotalHours}h/dia, média de{" "}
+          {dec(baby.avgTotalHours)}h
         </Text>
       </Section>
 
       <Row>
         <StatCell
           label="Sono total"
-          value={baby.avgTotalHours.toFixed(1)}
+          value={dec(baby.avgTotalHours)}
           unit="h/dia"
         />
         <StatCell
           label="Sonecas"
-          value={baby.napCountAvg.toFixed(1)}
+          value={dec(baby.napCountAvg)}
           unit="/ dia"
         />
       </Row>
       <Row>
         <StatCell
           label="Média soneca"
-          value={baby.avgNapHours.toFixed(1)}
-          unit="h"
+          value={baby.avgNapMinutes > 0 ? formatDuration(baby.avgNapMinutes) : "–"}
         />
         <StatCell
           label="Trecho noturno"
-          value={baby.longestNightHours.toFixed(1)}
+          value={dec(baby.longestNightHours)}
           unit="h máx."
         />
       </Row>
@@ -341,14 +346,14 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
             {baby.feeding.avgBottlesPerDay > 0 ? (
               <StatCell
                 label="Mamadeiras"
-                value={baby.feeding.avgBottlesPerDay.toFixed(1)}
-                unit={`· ${Math.round(baby.feeding.avgBottleVolumeMlPerDay)}ml`}
+                value={dec(baby.feeding.avgBottlesPerDay)}
+                unit={`/ dia, ${Math.round(baby.feeding.avgBottleVolumeMlPerDay)} ml`}
               />
             ) : null}
             {baby.feeding.avgBreastfeedsPerDay > 0 ? (
               <StatCell
                 label="Mamadas no peito"
-                value={baby.feeding.avgBreastfeedsPerDay.toFixed(1)}
+                value={dec(baby.feeding.avgBreastfeedsPerDay)}
                 unit="/ dia"
               />
             ) : null}
@@ -357,7 +362,7 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
             <Row>
               <StatCell
                 label="Refeições de sólidos"
-                value={baby.feeding.avgSolidMealsPerDay.toFixed(1)}
+                value={dec(baby.feeding.avgSolidMealsPerDay)}
                 unit="/ dia"
               />
             </Row>
@@ -444,8 +449,8 @@ export default function WeeklyReport({
             {footerNote ? null : (
               <>
                 <br />
-                Para desativar o resumo semanal automático, acesse Configurações
-                → Notificações.
+                Para desativar o resumo semanal automático, acesse Mais →
+                Notificações.
               </>
             )}
           </Text>

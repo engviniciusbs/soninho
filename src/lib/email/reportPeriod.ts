@@ -8,18 +8,26 @@ import {
 
 export const DEFAULT_REPORT_TIMEZONE = "America/Sao_Paulo";
 
-export function getReportPeriod(
-  now: Date,
-  days: number,
-  timeZone: string
-): {
+export interface ReportPeriod {
   startUtc: Date;
   endUtc: Date;
   startKey: string;
   endKey: string;
   label: string;
-} {
-  const endKey = localDayKey(now, timeZone);
+}
+
+/**
+ * The last `days` local days. By default they end today; with `endsYesterday`
+ * (weekly e-mail) they end on the last complete local day.
+ */
+export function getReportPeriod(
+  now: Date,
+  days: number,
+  timeZone: string,
+  opts: { endsYesterday?: boolean } = {}
+): ReportPeriod {
+  const todayKey = localDayKey(now, timeZone);
+  const endKey = opts.endsYesterday ? addDaysToKey(todayKey, -1) : todayKey;
   const startKey = addDaysToKey(endKey, -(days - 1));
   const startUtc = fromZonedTime(`${startKey}T00:00:00`, timeZone);
   const endUtc = fromZonedTime(`${addDaysToKey(endKey, 1)}T00:00:00`, timeZone);

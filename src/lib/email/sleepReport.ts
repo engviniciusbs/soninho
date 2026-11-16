@@ -1,13 +1,13 @@
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import { differenceInWeeks } from "date-fns";
-import { getReportPeriod, DEFAULT_REPORT_TIMEZONE } from "@/lib/email/reportPeriod";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import {
-  getDailyTotals,
-  getNapCountPerDay,
-  getLongestNightStretch,
-} from "@/lib/sleep/statistics";
+  getReportPeriod,
+  groupSessionsByLocalDay,
+  DEFAULT_REPORT_TIMEZONE,
+  type ReportPeriod,
+} from "@/lib/email/reportPeriod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { computeEnvironmentCorrelation } from "@/lib/sleep/environmentCorrelation";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
 import { computeFeedingStats } from "@/lib/feeding/feedingStatistics";
@@ -20,15 +20,26 @@ import type {
   BreastfeedingSession,
   SolidFeeding,
 } from "@/types";
-import { parseLocalDate } from "@/lib/dates/localDate";
+import { addDaysToKey, parseLocalDate } from "@/lib/dates/localDate";
 const FROM = "Soninho <sono@soninho.baby>";
 
+/** Minutes of a finished session (duration_min, else from its timestamps). */
+function sessionMinutes(s: SleepSession): number {
+  if (s.duration_min != null) return s.duration_min;
+  return (Date.parse(s.end_time!) - Date.parse(s.start_time)) / 60000;
+}
+
+/**
+ * Stats over the local days of `period`. Totals are split by local day; the
+ * longest night and the average nap are per session (started in the period),
+ * so a 19:00 to 06:00 night counts as 11 h, not as two halves.
+ */
 export function buildBabyStats(
   sessions: SleepSession[],
   birthDate: string,
   name: string,
   emoji: string,
-  periodDays: number,
+  period: Pick<ReportPeriod, "startKey" | "endKey" | "startUtc" | "endUtc">,
   feeding?: {
     bottles: BottleFeeding[];
     breastSessions: BreastfeedingSession[];
@@ -39,24 +50,42 @@ export function buildBabyStats(
   const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(birthDate));
   const schedule = getAgeSchedule(ageWeeks);
 
-  const daily = getDailyTotals(sessions, periodDays, timeZone);
-  const daysWithData = daily.filter((d) => d.totalHours > 0);
-  const denom = daysWithData.length || 1;
+  const dayKeys: string[] = [];
+  for (let k = period.startKey; k <= period.endKey; k = addDaysToKey(k, 1)) dayKeys.push(k);
 
+  const finished = sessions.filter((s) => s.end_time != null && s.duration_min != null);
+  const byDay = groupSessionsByLocalDay(finished, timeZone);
+
+  const dayTotals = dayKeys.map((k) =>
+    (byDay.get(k) ?? []).reduce((a, x) => a + x.napMinutes + x.nightMinutes, 0)
+  );
+  const daysWithData = dayTotals.filter((m) => m > 0);
   const avgTotalHours =
-    daysWithData.reduce((a, d) => a + d.totalHours, 0) / denom;
-  const avgNapHours =
-    daysWithData.reduce((a, d) => a + d.napHours, 0) / denom;
-
-  const napCounts = getNapCountPerDay(sessions, periodDays, timeZone);
-  const napDays = napCounts.filter((d) => d.count > 0);
-  const napCountAvg =
-    napDays.length > 0
-      ? napDays.reduce((a, d) => a + d.count, 0) / napDays.length
+    daysWithData.length > 0
+      ? daysWithData.reduce((a, m) => a + m, 0) / daysWithData.length / 60
       : 0;
 
-  const nightStretch = getLongestNightStretch(sessions, periodDays, timeZone);
-  const longestNightHours = Math.max(0, ...nightStretch.map((d) => d.hours));
+  const napDayCounts = dayKeys
+    .map((k) => (byDay.get(k) ?? []).filter((x) => x.napMinutes > 0).length)
+    .filter((n) => n > 0);
+  const napCountAvg =
+    napDayCounts.length > 0
+      ? napDayCounts.reduce((a, n) => a + n, 0) / napDayCounts.length
+      : 0;
+
+  const startMs = period.startUtc.getTime();
+  const endMs = period.endUtc.getTime();
+  const inPeriod = finished.filter((s) => {
+    const t = Date.parse(s.start_time);
+    return t >= startMs && t < endMs;
+  });
+  const naps = inPeriod.filter((s) => s.type === "NAP");
+  const avgNapMinutes =
+    naps.length > 0 ? naps.reduce((a, s) => a + sessionMinutes(s), 0) / naps.length : 0;
+  const longestNightMinutes = Math.max(
+    0,
+    ...inPeriod.filter((s) => s.type === "NIGHT_SLEEP").map(sessionMinutes)
+  );
 
   const adherencePct = Math.min(
     100,
@@ -73,7 +102,7 @@ export function buildBabyStats(
         feeding.bottles,
         feeding.breastSessions,
         feeding.solids,
-        periodDays
+        dayKeys.length
       )
     : null;
 
@@ -81,11 +110,11 @@ export function buildBabyStats(
     name,
     emoji,
     ageLabel: schedule.ageLabel,
-    avgTotalHours: Number.isFinite(avgTotalHours) ? avgTotalHours : 0,
+    avgTotalHours,
     targetTotalHours: schedule.totalSleepHours,
-    avgNapHours: Number.isFinite(avgNapHours) ? avgNapHours : 0,
+    avgNapMinutes,
     napCountAvg,
-    longestNightHours,
+    longestNightHours: Math.round((longestNightMinutes / 60) * 10) / 10,
     adherencePct,
     bestEnvironment,
     feeding: feedingStats,
@@ -116,8 +145,12 @@ export async function sendSleepReport(params: {
 }): Promise<SendSleepReportResult> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://soninho.baby";
   const timeZone = params.timeZone || DEFAULT_REPORT_TIMEZONE;
-  const period = getReportPeriod(new Date(), params.periodDays, timeZone);
-  const periodStart = period.startUtc;
+  // The weekly e-mail covers complete days only: it ends yesterday.
+  const period = getReportPeriod(new Date(), params.periodDays, timeZone, {
+    endsYesterday: params.kind === "weekly",
+  });
+  const periodStartIso = period.startUtc.toISOString();
+  const periodEndIso = period.endUtc.toISOString();
   const periodStartStr = period.startKey;
   const periodEndStr = period.endKey;
   const periodLabel = period.label;
@@ -174,27 +207,32 @@ export async function sendSleepReport(params: {
   for (const baby of params.babies) {
     const [{ data: sessions }, { data: bottles }, { data: breastSessions }, { data: solids }] =
       await Promise.all([
+        // Overlap with the period: a night that began the evening before counts.
         params.supabase
           .from("sleep_sessions")
           .select("*")
           .eq("baby_id", baby.id)
-          .gte("start_time", periodStart.toISOString())
+          .lt("start_time", periodEndIso)
+          .gt("end_time", periodStartIso)
           .order("start_time", { ascending: true }),
         params.supabase
           .from("bottle_feedings")
           .select("*")
           .eq("baby_id", baby.id)
-          .gte("start_time", periodStart.toISOString()),
+          .gte("start_time", periodStartIso)
+          .lt("start_time", periodEndIso),
         params.supabase
           .from("breastfeeding_sessions")
           .select("*")
           .eq("baby_id", baby.id)
-          .gte("start_time", periodStart.toISOString()),
+          .gte("start_time", periodStartIso)
+          .lt("start_time", periodEndIso),
         params.supabase
           .from("solid_feedings")
           .select("*")
           .eq("baby_id", baby.id)
-          .gte("start_time", periodStart.toISOString()),
+          .gte("start_time", periodStartIso)
+          .lt("start_time", periodEndIso),
       ]);
 
     const list = (sessions ?? []) as SleepSession[];
@@ -216,7 +254,7 @@ export async function sendSleepReport(params: {
         baby.birth_date,
         baby.name,
         baby.avatar_emoji || "👶",
-        params.periodDays,
+        period,
         feeding,
         timeZone
       )
@@ -243,7 +281,7 @@ export async function sendSleepReport(params: {
         ? `Seu resumo de sono dos últimos ${params.periodDays} dias no Soninho`
         : undefined,
       footerNote: isManual
-        ? "Este relatório foi enviado a pedido em Configurações → Ferramentas."
+        ? "Este relatório foi enviado a pedido em Mais → Relatórios."
         : undefined,
     })
   );

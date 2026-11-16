@@ -1,12 +1,16 @@
-import { describe, it, expect, vi } from "vitest";
-import { sendSleepReport } from "./sleepReport";
+import { afterEach, describe, it, expect, vi } from "vitest";
+import { render } from "@react-email/render";
+import WeeklyReport from "@/emails/WeeklyReport";
+import { getReportPeriod } from "./reportPeriod";
+import { buildBabyStats, sendSleepReport } from "./sleepReport";
+import type { SleepSession } from "@/types";
 
 /** Chainable, awaitable query builder that resolves to `{ data }` at any point. */
 function query(data: unknown[]) {
   const q: Record<string, unknown> = {
     then: (resolve: (v: unknown) => void) => resolve({ data }),
   };
-  for (const m of ["select", "eq", "gte", "order"]) q[m] = () => q;
+  for (const m of ["select", "eq", "gte", "gt", "lt", "order"]) q[m] = () => q;
   return q;
 }
 
@@ -21,11 +25,13 @@ const SESSION = {
 
 function fakeSupabase(opts: { inserted: boolean; withData?: boolean }) {
   const deleted: string[] = [];
+  const claims: Record<string, unknown>[] = [];
   const supabase = {
     from: (table: string) => {
       if (table === "email_log") {
         return {
-          upsert: () => ({
+          upsert: (row: Record<string, unknown>) => ({
+            _: claims.push(row),
             select: async () => ({
               data: opts.inserted ? [{ id: 1 }] : [],
               error: null,
@@ -44,7 +50,7 @@ function fakeSupabase(opts: { inserted: boolean; withData?: boolean }) {
       );
     },
   };
-  return { supabase: supabase as never, deleted };
+  return { supabase: supabase as never, deleted, claims };
 }
 
 const base = {
@@ -101,5 +107,107 @@ describe("sendSleepReport claim", () => {
     const r = await sendSleepReport({ ...base, supabase, resend: resendWith(send) });
     expect(r).toEqual({ ok: true });
     expect(deleted).toEqual([]);
+  });
+});
+
+const TZ = "America/Sao_Paulo";
+
+function sess(type: "NAP" | "NIGHT_SLEEP", start: string, end: string): SleepSession {
+  return {
+    id: `${type}-${start}`,
+    baby_id: "b1",
+    type,
+    start_time: start,
+    end_time: end,
+    duration_min: Math.round((Date.parse(end) - Date.parse(start)) / 60000),
+  } as unknown as SleepSession;
+}
+
+describe("buildBabyStats", () => {
+  const period = getReportPeriod(new Date("2026-11-17T01:30:00Z"), 7, TZ, {
+    endsYesterday: true,
+  }); // 09/11 to 15/11
+
+  it("measures the longest night per session, across midnight", () => {
+    // 19:00 of 12/11 to 06:00 of 13/11 in São Paulo: one 11 h night.
+    const night = sess("NIGHT_SLEEP", "2026-11-12T22:00:00Z", "2026-11-13T09:00:00Z");
+    const stats = buildBabyStats([night], "2026-02-10", "Lia", "", period, undefined, TZ);
+    expect(stats.longestNightHours).toBe(11);
+  });
+
+  it("reports the average nap length, not the nap hours per day", () => {
+    const naps = [
+      sess("NAP", "2026-11-10T12:00:00Z", "2026-11-10T13:00:00Z"), // 60 min
+      sess("NAP", "2026-11-10T17:00:00Z", "2026-11-10T17:30:00Z"), // 30 min
+      sess("NAP", "2026-11-11T12:00:00Z", "2026-11-11T13:30:00Z"), // 90 min
+    ];
+    const stats = buildBabyStats(naps, "2026-02-10", "Lia", "", period, undefined, TZ);
+    expect(stats.avgNapMinutes).toBe(60);
+  });
+
+  it("ignores sleep after the period (today)", () => {
+    const today = sess("NIGHT_SLEEP", "2026-11-16T22:00:00Z", "2026-11-17T01:00:00Z");
+    const stats = buildBabyStats([today], "2026-02-10", "Lia", "", period, undefined, TZ);
+    expect(stats.longestNightHours).toBe(0);
+    expect(stats.avgTotalHours).toBe(0);
+  });
+});
+
+describe("weekly e-mail copy", () => {
+  it("points to Mais, never Configurações, and shows the nap length as a duration", async () => {
+    const html = await render(
+      WeeklyReport({
+        parentName: "Ana",
+        periodLabel: "x",
+        appUrl: "https://soninho.baby",
+        babies: [
+          {
+            name: "Lia",
+            emoji: "",
+            ageLabel: "9 meses",
+            avgTotalHours: 13.5,
+            targetTotalHours: 14,
+            avgNapMinutes: 75,
+            napCountAvg: 2,
+            longestNightHours: 11,
+            adherencePct: 96,
+            bestEnvironment: null,
+            feeding: null,
+          },
+        ],
+      })
+    );
+    expect(html).toContain("Mais → Notificações");
+    expect(html).not.toContain("Configurações");
+    expect(html).toContain("1h 15min");
+  });
+});
+
+describe("manual report copy", () => {
+  it("says it was requested in Mais → Relatórios", async () => {
+    const { supabase } = fakeSupabase({ inserted: true, withData: true });
+    const send = vi.fn().mockResolvedValue({ error: null });
+    await sendSleepReport({ ...base, supabase, resend: resendWith(send) });
+    const { html } = send.mock.calls[0][0] as { html: string };
+    expect(html).toContain("Mais → Relatórios");
+    expect(html).not.toContain("Configurações");
+  });
+});
+
+describe("weekly sendSleepReport period", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("claims a week that ends yesterday (local), even with the server already on the next UTC day", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-11-17T01:30:00Z"));
+    const { supabase, claims } = fakeSupabase({ inserted: true });
+    await sendSleepReport({
+      ...base,
+      kind: "weekly",
+      timeZone: TZ,
+      supabase,
+      resend: resendWith(vi.fn()),
+    });
+    expect(claims[0]).toMatchObject({ period_start: "2026-11-09", period_end: "2026-11-15" });
   });
 });
