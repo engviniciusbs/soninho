@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { User, Baby, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,19 +19,22 @@ import type { UiMode } from "@/types";
 
 export function UserProfileSettings() {
   const { profile, refreshProfile } = useUserProfile();
-  const [displayName, setDisplayName] = useState("");
-  const [familyRelation, setFamilyRelation] = useState<string>("");
-  const [uiMode, setUiMode] = useState<UiMode>("standard");
+  const [displayName, setDisplayName] = useState(profile?.display_name ?? "");
+  const [familyRelation, setFamilyRelation] = useState<string>(profile?.family_relation ?? "");
+  const [uiMode, setUiMode] = useState<UiMode>(profile?.ui_mode ?? "standard");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!profile) return;
-    /* eslint-disable react-hooks/set-state-in-effect -- form defaults from fetched profile */
-    setDisplayName(profile.display_name ?? "");
-    setFamilyRelation(profile.family_relation ?? "");
-    setUiMode(profile.ui_mode ?? "standard");
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [profile]);
+  // Re-sync the form whenever a new profile arrives (react.dev "storing
+  // information from previous renders": adjust state during render, no effect).
+  const [syncedProfile, setSyncedProfile] = useState(profile);
+  if (profile !== syncedProfile) {
+    setSyncedProfile(profile);
+    if (profile) {
+      setDisplayName(profile.display_name ?? "");
+      setFamilyRelation(profile.family_relation ?? "");
+      setUiMode(profile.ui_mode ?? "standard");
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true);
