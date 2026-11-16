@@ -5,10 +5,10 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { Milk, Baby, Salad } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
 import { Input } from "@/components/ui/input";
 import { DateTimeRangeFields } from "@/components/forms/DateTimeRangeFields";
 import {
@@ -30,7 +30,6 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { END_BEFORE_START_MESSAGE, isEndBeforeStart, isCheckViolation } from "@/lib/validation/timeRange";
-import { cn } from "@/lib/utils";
 import {
   logBottleFeeding,
   updateBottleFeeding,
@@ -64,19 +63,28 @@ function toLocalTimeString(d: Date): string {
   return `${hours}:${minutes}`;
 }
 
-const TYPE_OPTIONS: { value: FeedingType; label: string; icon: typeof Milk }[] = [
-  { value: "BOTTLE", label: "Mamadeira", icon: Milk },
-  { value: "BREAST", label: "Peito", icon: Baby },
-  { value: "SOLID", label: "Sólidos", icon: Salad },
+const TYPE_OPTIONS: { value: FeedingType; label: string }[] = [
+  { value: "BOTTLE", label: "Mamadeira" },
+  { value: "BREAST", label: "Peito" },
+  { value: "SOLID", label: "Sólidos" },
 ];
 
 const REACTION_OPTIONS: { value: FoodReaction; label: string }[] = [
-  { value: "LOVED", label: "😍 Adorou" },
-  { value: "LIKED", label: "🙂 Gostou" },
-  { value: "NEUTRAL", label: "😐 Neutro" },
-  { value: "DISLIKED", label: "😖 Não gostou" },
-  { value: "ALLERGIC_REACTION", label: "⚠️ Reação alérgica" },
+  { value: "LOVED", label: "Adorou" },
+  { value: "LIKED", label: "Gostou" },
+  { value: "NEUTRAL", label: "Neutro" },
+  { value: "DISLIKED", label: "Não gostou" },
+  { value: "ALLERGIC_REACTION", label: "Reação alérgica" },
 ];
+
+const MILK_TYPE_ITEMS: Record<MilkType, string> = {
+  FORMULA: "Fórmula",
+  BREAST_MILK: "Leite materno",
+  MIXED: "Misto",
+};
+
+/** Labels the closed select shows for each reaction value. */
+const REACTION_ITEMS = Object.fromEntries(REACTION_OPTIONS.map((o) => [o.value, o.label]));
 
 const formSchema = z.object({
   start_date: z.string().min(1),
@@ -127,27 +135,32 @@ interface FeedingFormProps {
   onClose: () => void;
   /** When set, edits this entry. When null, creates a new one (backdated log). */
   item?: FeedingTimelineItem | null;
+  /** Deletes the edited entry; resolves true when it is gone. Shows "Excluir" when given. */
+  onDelete?: (item: FeedingTimelineItem) => Promise<boolean>;
 }
 
-export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
+const LABEL = "font-sans text-sm font-bold text-sn-mu";
+const FIELD = "h-11 rounded-xl border-sn-mu/70 px-3";
+
+export function FeedingForm({ open, onClose, item, onDelete }: FeedingFormProps) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0">
         <DialogHeader>
-          <DialogTitle>
-            {item ? "Editar registro" : "Registrar alimentação esquecida"}
+          <DialogTitle className="font-display text-[22px] leading-tight font-bold text-sn-tx">
+            {item ? "Editar registro" : "Registrar mamada passada"}
           </DialogTitle>
         </DialogHeader>
 
         {/* The popup's content mounts on every opening, so the form starts
             from `item` (or "now") each time without a reset effect. */}
-        <FeedingFormBody onClose={onClose} item={item} />
+        <FeedingFormBody onClose={onClose} item={item} onDelete={onDelete} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
+function FeedingFormBody({ onClose, item, onDelete }: Omit<FeedingFormProps, "open">) {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
@@ -158,6 +171,21 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
     item?.type === "SOLID" ? (item.raw as SolidFeeding).food_tags : []
   );
   const [customTag, setCustomTag] = useState("");
+  // "Excluir" asks once more before deleting.
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!item || !onDelete) return;
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    setDeleting(true);
+    const done = await onDelete(item);
+    setDeleting(false);
+    if (done) onClose();
+  }
 
   const {
     register,
@@ -296,25 +324,11 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Type selector — locked while editing */}
-      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Tipo de alimentação">
-        {TYPE_OPTIONS.map(({ value, label, icon: Icon }) => (
-          <button
-            key={value}
-            type="button"
-            disabled={isEdit}
-            aria-pressed={type === value}
-            onClick={() => setType(value)}
-            className={cn(
-              "flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
-              type === value
-                ? "border-primary/50 bg-primary/10 text-primary"
-                : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            )}
-            style={{ touchAction: "manipulation" }}
-          >
-            <Icon className="h-4 w-4" aria-hidden="true" />
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Tipo de alimentação">
+        {TYPE_OPTIONS.map(({ value, label }) => (
+          <Chip key={value} disabled={isEdit} selected={type === value} onClick={() => setType(value)}>
             {label}
-          </button>
+          </Chip>
         ))}
       </div>
 
@@ -328,16 +342,16 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
       {type === "BREAST" && (
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label htmlFor="side_left_min" className="text-xs text-muted-foreground">
-              Minutos (Esq.)
+            <label htmlFor="side_left_min" className={LABEL}>
+              Minutos no esquerdo
             </label>
-            <Input id="side_left_min" type="number" min={0} {...register("side_left_min")} className="rounded-xl" autoComplete="off" />
+            <Input id="side_left_min" type="number" min={0} {...register("side_left_min")} className={FIELD} autoComplete="off" />
           </div>
           <div className="space-y-1">
-            <label htmlFor="side_right_min" className="text-xs text-muted-foreground">
-              Minutos (Dir.)
+            <label htmlFor="side_right_min" className={LABEL}>
+              Minutos no direito
             </label>
-            <Input id="side_right_min" type="number" min={0} {...register("side_right_min")} className="rounded-xl" autoComplete="off" />
+            <Input id="side_right_min" type="number" min={0} {...register("side_right_min")} className={FIELD} autoComplete="off" />
           </div>
         </div>
       )}
@@ -345,21 +359,23 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
       {type === "BOTTLE" && (
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
-            <label htmlFor="volume_ml" className="text-xs text-muted-foreground">
-              Volume (ml)
+            <label htmlFor="volume_ml" className={LABEL}>
+              Quanto tomou (ml)
             </label>
-            <Input id="volume_ml" type="number" min={1} {...register("volume_ml")} className="rounded-xl" autoComplete="off" />
+            <Input id="volume_ml" type="number" min={1} {...register("volume_ml")} className={FIELD} autoComplete="off" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Tipo de leite</label>
-            <Select value={milkType ?? "FORMULA"} onValueChange={(v) => v && setValue("milk_type", v)}>
-              <SelectTrigger className="rounded-xl" aria-label="Tipo de leite">
+            <span className={LABEL}>Tipo de leite</span>
+            <Select items={MILK_TYPE_ITEMS} value={milkType ?? "FORMULA"} onValueChange={(v) => v && setValue("milk_type", v)}>
+              <SelectTrigger className="w-full rounded-xl data-[size=default]:h-11" aria-label="Tipo de leite">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FORMULA">Fórmula</SelectItem>
-                <SelectItem value="BREAST_MILK">Leite ordenhado</SelectItem>
-                <SelectItem value="MIXED">Misto</SelectItem>
+                {Object.entries(MILK_TYPE_ITEMS).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>
+                    {label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -375,29 +391,18 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag)}
-                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-medium text-emerald-400"
+                  className="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
                 >
                   {tag} ✕
                 </button>
               ))}
             </div>
           )}
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Alimentos">
             {COMMON_FOOD_TAGS.map((tag) => (
-              <button
-                key={tag}
-                type="button"
-                aria-pressed={foodTags.includes(tag)}
-                onClick={() => toggleTag(tag)}
-                className={cn(
-                  "rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all",
-                  foodTags.includes(tag)
-                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                    : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-                )}
-              >
+              <Chip key={tag} selected={foodTags.includes(tag)} onClick={() => toggleTag(tag)}>
                 {tag}
-              </button>
+              </Chip>
             ))}
           </div>
           <div className="flex gap-2">
@@ -411,14 +416,16 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
                 }
               }}
               placeholder="Outro alimento…"
-              className="rounded-xl"
+              aria-label="Outro alimento"
+              autoComplete="off"
+              className={FIELD}
             />
-            <Button type="button" variant="outline" onClick={addCustomTag} className="rounded-xl shrink-0">
+            <Button type="button" variant="secondary" size="sm" onClick={addCustomTag}>
               Adicionar
             </Button>
           </div>
-          <Select value={reaction ?? ""} onValueChange={(v) => v && setValue("reaction", v)}>
-            <SelectTrigger className="rounded-xl" aria-label="Reação do bebê">
+          <Select items={REACTION_ITEMS} value={reaction ?? ""} onValueChange={(v) => v && setValue("reaction", v)}>
+            <SelectTrigger className="w-full rounded-xl data-[size=default]:h-11" aria-label="Reação do bebê">
               <SelectValue placeholder="Reação do bebê (opcional)" />
             </SelectTrigger>
             <SelectContent>
@@ -434,16 +441,30 @@ function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
 
       <div className="space-y-1">
         <label htmlFor="notes" className="sr-only">Notas</label>
-        <Input id="notes" placeholder="Notas (opcional)" {...register("notes")} className="rounded-xl" autoComplete="off" />
+        <Input id="notes" placeholder="Notas (opcional)" {...register("notes")} className={FIELD} autoComplete="off" />
       </div>
 
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={onClose} className="rounded-xl">
-          Cancelar
-        </Button>
-        <Button type="submit" className="rounded-xl" disabled={isSubmitting}>
-          {isSubmitting ? "Salvando…" : isEdit ? "Atualizar" : "Registrar"}
-        </Button>
+      <div className="flex flex-wrap items-center gap-2 pt-1">
+        {isEdit && onDelete && (
+          <Button
+            type="button"
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            loading={deleting}
+            className="mr-auto"
+          >
+            {confirmDelete ? "Confirmar exclusão" : "Excluir"}
+          </Button>
+        )}
+        <div className="ml-auto flex gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button type="submit" size="sm" loading={isSubmitting}>
+            {isEdit ? "Atualizar" : "Registrar"}
+          </Button>
+        </div>
       </div>
     </form>
   );

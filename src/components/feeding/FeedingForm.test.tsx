@@ -88,7 +88,7 @@ describe("FeedingForm", () => {
     expect(field("start_time_input").value).toBe("07:20");
     if (type === "BOTTLE") {
       expect(field("volume_ml").value).toBe("90");
-      expect(screen.getByLabelText("Tipo de leite")).toHaveTextContent("BREAST_MILK");
+      expect(screen.getByLabelText("Tipo de leite")).toHaveTextContent("Leite materno");
       expect(field("notes").value).toBe("morna");
     } else if (type === "BREAST") {
       expect(field("end_date").value).toBe("2026-01-01");
@@ -99,7 +99,7 @@ describe("FeedingForm", () => {
     } else {
       expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Banana" })).toHaveAttribute("aria-pressed", "true");
-      expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("LIKED");
+      expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("Gostou");
       expect(field("notes").value).toBe("sujou");
     }
     expect(stable(document.body)).toMatchSnapshot(`edit ${type}`);

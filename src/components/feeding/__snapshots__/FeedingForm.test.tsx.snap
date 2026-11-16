@@ -38,7 +38,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -52,7 +52,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -64,109 +64,34 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -217,14 +142,14 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="volume_ml"
             >
-              Volume (ml)
+              Quanto tomou (ml)
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="volume_ml"
               min="1"
@@ -235,16 +160,16 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
           <div
             class="space-y-1"
           >
-            <label
-              class="text-xs text-muted-foreground"
+            <span
+              class="font-sans text-sm font-bold text-sn-mu"
             >
               Tipo de leite
-            </label>
+            </span>
             <button
               aria-expanded="false"
               aria-haspopup="listbox"
               aria-label="Tipo de leite"
-              class="flex w-fit items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 rounded-xl"
+              class="flex items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full rounded-xl data-[size=default]:h-11"
               data-size="default"
               data-slot="select-trigger"
               id="base-ui-id4"
@@ -256,7 +181,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
                 class="flex flex-1 text-left"
                 data-slot="select-value"
               >
-                BREAST_MILK
+                Leite materno
               </span>
               <svg
                 aria-hidden="true"
@@ -297,7 +222,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -305,24 +230,28 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Atualizar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Atualizar
+            </button>
+          </div>
         </div>
       </form>
       <button
@@ -408,7 +337,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -422,7 +351,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -434,109 +363,34 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -628,14 +482,14 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="side_left_min"
             >
-              Minutos (Esq.)
+              Minutos no esquerdo
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="side_left_min"
               min="0"
@@ -647,14 +501,14 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="side_right_min"
             >
-              Minutos (Dir.)
+              Minutos no direito
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="side_right_min"
               min="0"
@@ -674,7 +528,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -682,24 +536,28 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Atualizar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Atualizar
+            </button>
+          </div>
         </div>
       </form>
       <button
@@ -785,7 +643,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -799,7 +657,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -811,109 +669,34 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             disabled=""
-            style="touch-action: manipulation;"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -964,14 +747,14 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
             class="flex flex-wrap gap-1.5"
           >
             <button
-              class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-medium text-emerald-400"
+              class="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
               type="button"
             >
               Banana
                ✕
             </button>
             <button
-              class="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-medium text-emerald-400"
+              class="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
               type="button"
             >
               Kiwi
@@ -979,109 +762,126 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
             </button>
           </div>
           <div
-            class="grid grid-cols-3 gap-1.5"
+            aria-label="Alimentos"
+            class="flex flex-wrap gap-2"
+            role="group"
           >
             <button
               aria-pressed="true"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Banana
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Maçã
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Pera
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Mamão
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Abacate
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Batata-doce
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Cenoura
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Abóbora
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Brócolis
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Arroz
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Aveia
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Frango
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Feijão
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Ovo
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Iogurte
@@ -1091,14 +891,16 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
             class="flex gap-2"
           >
             <input
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              aria-label="Outro alimento"
+              autocomplete="off"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="base-ui-id4"
               placeholder="Outro alimento…"
               value=""
             />
             <button
-              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl shrink-0"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -1110,7 +912,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
             aria-expanded="false"
             aria-haspopup="listbox"
             aria-label="Reação do bebê"
-            class="flex w-fit items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 rounded-xl"
+            class="flex items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full rounded-xl data-[size=default]:h-11"
             data-size="default"
             data-slot="select-trigger"
             id="base-ui-id5"
@@ -1122,7 +924,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
               class="flex flex-1 text-left"
               data-slot="select-value"
             >
-              LIKED
+              Gostou
             </span>
             <svg
               aria-hidden="true"
@@ -1162,7 +964,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -1170,24 +972,28 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Atualizar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Atualizar
+            </button>
+          </div>
         </div>
       </form>
       <button
@@ -1273,7 +1079,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -1287,11 +1093,11 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Registrar alimentação esquecida
+          Registrar mamada passada
         </h2>
       </div>
       <form
@@ -1299,106 +1105,31 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -1449,14 +1180,14 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="volume_ml"
             >
-              Volume (ml)
+              Quanto tomou (ml)
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="volume_ml"
               min="1"
@@ -1467,16 +1198,16 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
           <div
             class="space-y-1"
           >
-            <label
-              class="text-xs text-muted-foreground"
+            <span
+              class="font-sans text-sm font-bold text-sn-mu"
             >
               Tipo de leite
-            </label>
+            </span>
             <button
               aria-expanded="false"
               aria-haspopup="listbox"
               aria-label="Tipo de leite"
-              class="flex w-fit items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 rounded-xl"
+              class="flex items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full rounded-xl data-[size=default]:h-11"
               data-size="default"
               data-slot="select-trigger"
               id="base-ui-id4"
@@ -1488,7 +1219,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
                 class="flex flex-1 text-left"
                 data-slot="select-value"
               >
-                FORMULA
+                Fórmula
               </span>
               <svg
                 aria-hidden="true"
@@ -1529,7 +1260,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -1537,24 +1268,28 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Registrar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Registrar
+            </button>
+          </div>
         </div>
       </form>
       <button
@@ -1640,7 +1375,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -1654,11 +1389,11 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Registrar alimentação esquecida
+          Registrar mamada passada
         </h2>
       </div>
       <form
@@ -1666,106 +1401,31 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -1857,14 +1517,14 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="side_left_min"
             >
-              Minutos (Esq.)
+              Minutos no esquerdo
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="side_left_min"
               min="0"
@@ -1876,14 +1536,14 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
             class="space-y-1"
           >
             <label
-              class="text-xs text-muted-foreground"
+              class="font-sans text-sm font-bold text-sn-mu"
               for="side_right_min"
             >
-              Minutos (Dir.)
+              Minutos no direito
             </label>
             <input
               autocomplete="off"
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="side_right_min"
               min="0"
@@ -1903,7 +1563,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -1911,24 +1571,28 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Registrar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Registrar
+            </button>
+          </div>
         </div>
       </form>
       <button
@@ -2014,7 +1678,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -2028,11 +1692,11 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-heading text-base leading-none font-medium"
+          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Registrar alimentação esquecida
+          Registrar mamada passada
         </h2>
       </div>
       <form
@@ -2040,106 +1704,31 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
       >
         <div
           aria-label="Tipo de alimentação"
-          class="grid grid-cols-3 gap-2"
+          class="flex flex-wrap gap-2"
           role="group"
         >
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-milk h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8 2h8"
-              />
-              <path
-                d="M9 2v2.789a4 4 0 0 1-.672 2.219l-.656.984A4 4 0 0 0 7 10.212V20a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-9.789a4 4 0 0 0-.672-2.219l-.656-.984A4 4 0 0 1 15 4.788V2"
-              />
-              <path
-                d="M7 15a6.472 6.472 0 0 1 5 0 6.47 6.47 0 0 0 5 0"
-              />
-            </svg>
             Mamadeira
           </button>
           <button
             aria-pressed="false"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-baby h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"
-              />
-              <path
-                d="M15 12h.01"
-              />
-              <path
-                d="M19.38 6.813A9 9 0 0 1 20.8 10.2a2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"
-              />
-              <path
-                d="M9 12h.01"
-              />
-            </svg>
             Peito
           </button>
           <button
             aria-pressed="true"
-            class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 border-primary/50 bg-primary/10 text-primary"
-            style="touch-action: manipulation;"
+            class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+            data-slot="chip"
             type="button"
           >
-            <svg
-              aria-hidden="true"
-              class="lucide lucide-salad h-4 w-4"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M19.496 12a2.5 2.5 0 00.399-2.214A2 2 0 0020.32 6.5 2 2 0 0019 3a2 2 0 00-1.5.68 2 2 0 00-3.287.424 2.5 2.5 0 00-3.189 2.06A3 3 0 0012 12l4-4"
-              />
-              <path
-                d="M4 12a1 1 0 00-.99 1.133A9 9 0 0012 21a9 9 0 008.99-7.867A1 1 0 0020 12z"
-              />
-              <path
-                d="M7 21h10"
-              />
-              <path
-                d="M9.85 6.907A3.5 3.5 0 005.05 12"
-              />
-            </svg>
             Sólidos
           </button>
         </div>
@@ -2187,109 +1776,126 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
           class="space-y-3"
         >
           <div
-            class="grid grid-cols-3 gap-1.5"
+            aria-label="Alimentos"
+            class="flex flex-wrap gap-2"
+            role="group"
           >
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Banana
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Maçã
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Pera
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Mamão
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Abacate
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Batata-doce
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Cenoura
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Abóbora
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Brócolis
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Arroz
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Aveia
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Frango
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Feijão
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Ovo
             </button>
             <button
               aria-pressed="false"
-              class="rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+              class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+              data-slot="chip"
               type="button"
             >
               Iogurte
@@ -2299,14 +1905,16 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
             class="flex gap-2"
           >
             <input
-              class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+              aria-label="Outro alimento"
+              autocomplete="off"
+              class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
               data-slot="input"
               id="base-ui-id4"
               placeholder="Outro alimento…"
               value=""
             />
             <button
-              class="group/button relative inline-flex cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl shrink-0"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -2318,7 +1926,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
             aria-expanded="false"
             aria-haspopup="listbox"
             aria-label="Reação do bebê"
-            class="flex w-fit items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=default]:h-8 data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 rounded-xl"
+            class="flex items-center justify-between gap-1.5 border border-input bg-transparent py-2 pr-2 pl-2.5 text-sm whitespace-nowrap transition-colors outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 data-placeholder:text-muted-foreground data-[size=sm]:h-7 data-[size=sm]:rounded-[min(var(--radius-md),10px)] *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 w-full rounded-xl data-[size=default]:h-11"
             data-placeholder=""
             data-size="default"
             data-slot="select-trigger"
@@ -2372,7 +1980,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
           </label>
           <input
             autocomplete="off"
-            class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+            class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
             data-slot="input"
             id="notes"
             name="notes"
@@ -2380,24 +1988,28 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
           />
         </div>
         <div
-          class="flex gap-2 justify-end"
+          class="flex flex-wrap items-center gap-2 pt-1"
         >
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="button"
+          <div
+            class="ml-auto flex gap-2"
           >
-            Cancelar
-          </button>
-          <button
-            class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
-            data-slot="button"
-            tabindex="0"
-            type="submit"
-          >
-            Registrar
-          </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
+              data-slot="button"
+              tabindex="0"
+              type="submit"
+            >
+              Registrar
+            </button>
+          </div>
         </div>
       </form>
       <button

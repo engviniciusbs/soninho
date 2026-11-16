@@ -122,6 +122,8 @@ export const IconSpark = make(
 
 export const IconPlus = make("IconPlus", <path d="M12 5v14M5 12h14" />);
 
+export const IconMinus = make("IconMinus", <path d="M5 12h14" />);
+
 export const IconPen = make("IconPen", <path d="M4 20h4L19 9l-4-4L4 16v4Z" />);
 
 export const IconChat = make("IconChat", <path d="M4 5.5h16v10H9l-5 4v-14Z" />);
