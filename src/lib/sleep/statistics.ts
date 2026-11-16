@@ -151,3 +151,19 @@ export function getLast24hStats(
   }
   return { totalMinutes: Math.round(totalMs / 60_000), longestNightMinutes };
 }
+
+/**
+ * The most recent finished night sleep, whole, in minutes; `null` without one.
+ * "Maior trecho noturno" falls back to it when no night touches the last 24 h.
+ */
+export function getLastFinishedNightMinutes(sessions: SleepSession[]): number | null {
+  let last: { end: number; minutes: number } | null = null;
+  for (const s of sessions) {
+    if (s.type !== "NIGHT_SLEEP" || s.end_time == null) continue;
+    const end = Date.parse(s.end_time);
+    if (last === null || end > last.end) {
+      last = { end, minutes: Math.round((end - Date.parse(s.start_time)) / 60_000) };
+    }
+  }
+  return last && last.minutes > 0 ? last.minutes : null;
+}

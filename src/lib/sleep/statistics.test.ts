@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getDailyTotals,
   getLast24hStats,
+  getLastFinishedNightMinutes,
   getLongestNightStretch,
   getNapCountPerDay,
   getNapPatternHeatmap,
@@ -177,5 +178,26 @@ describe("getLast24hStats: overlap with the last 24 h", () => {
       end_time: spAt("2026-11-16", "15:00").toISOString(),
     });
     expect(getLast24hStats([longNap], now)).toEqual({ totalMinutes: 180, longestNightMinutes: 0 });
+  });
+});
+
+describe("getLastFinishedNightMinutes", () => {
+  it("is the most recent finished night, whole, even outside the last 24 h", () => {
+    const older = makeSession({
+      type: "NIGHT_SLEEP",
+      start_time: "2026-05-19T22:00:00Z",
+      end_time: "2026-05-20T10:00:00Z", // 12h
+    });
+    const recent = makeSession({
+      type: "NIGHT_SLEEP",
+      start_time: "2026-05-21T22:00:00Z",
+      end_time: "2026-05-22T08:00:00Z", // 10h, ended two days ago
+    });
+    const running = makeSession({ type: "NIGHT_SLEEP", start_time: "2026-05-23T22:00:00Z" });
+    expect(getLastFinishedNightMinutes([older, recent, running, nap23a])).toBe(600);
+  });
+
+  it("is null without a finished night", () => {
+    expect(getLastFinishedNightMinutes([nap23a, nap24])).toBeNull();
   });
 });

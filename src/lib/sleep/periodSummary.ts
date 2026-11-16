@@ -1,10 +1,15 @@
 import { eachDayOfInterval, format, startOfDay, subDays } from "date-fns";
 import type { SleepSession } from "@/types";
-import { allocateSessionToLocalDays } from "@/lib/sleep/sessionDayAllocation";
+import { fromZonedTime } from "date-fns-tz";
+import {
+  allocateSessionToLocalDays,
+  buildCompleteDailySleepTotals,
+} from "@/lib/sleep/sessionDayAllocation";
+import { addDaysToKey, localDayKey } from "@/lib/dates/localDate";
 import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 export interface PeriodSummary {
-  /** Complete days of the period (today left out) with some sleep logged. */
+  /** Complete days of the period (the `days` days before today) with some sleep logged. */
   daysWithData: number;
   /** Average sleep per complete day with data, in minutes. */
   avgSleepMinutes: number | null;
@@ -19,48 +24,44 @@ function periodDays(days: number, now: Date): Date[] {
 }
 
 /**
- * The three figures of the Análise screen for the last `days` local days
- * (today included in the window, like the chart).
+ * The three figures of the Análise screen for the `days` complete local days
+ * before today — the same days as the sleep debt
+ * ({@link buildCompleteDailySleepTotals}).
  *
- * Today is still running, so the averages use only the complete days, and only
- * those with sleep logged (a day nobody logged is not a day without sleep, the
- * same rule as `computeSleepDebt`). A sleep still running counts up to
- * now; it is never the "maior noite", which must be finished. With no such day every figure is `null`:
- * the screen shows an empty state, never zeros.
+ * Averages use only the days with sleep logged (a day nobody logged is not a
+ * day without sleep, the same rule as `computeSleepDebt`). A sleep still
+ * running counts up to now; it is never the "maior noite", which must be
+ * finished. With no such day every figure is `null`: the screen shows an empty
+ * state, never zeros.
  */
 export function summarizePeriod(
   sessions: SleepSession[],
   days: number,
-  now: Date = new Date()
+  now: Date = new Date(),
+  timeZone: string = Intl.DateTimeFormat().resolvedOptions().timeZone
 ): PeriodSummary {
-  const interval = periodDays(days, now);
-  const todayKey = format(now, "yyyy-MM-dd");
-  const complete = new Map<string, { minutes: number; naps: number }>();
-  for (const day of interval) {
-    const key = format(day, "yyyy-MM-dd");
-    if (key !== todayKey) complete.set(key, { minutes: 0, naps: 0 });
-  }
+  const totals = buildCompleteDailySleepTotals(sessions, days, timeZone, now);
+  const todayKey = localDayKey(now, timeZone);
+  // Same order as `totals`: oldest first, yesterday last.
+  const keys = totals.map((_, i) => addDaysToKey(todayKey, i - days));
 
+  // A nap counts on the day it slept on, as in `getNapCountPerDay`.
+  const naps = new Map<string, number>();
   for (const session of sessions) {
-    // A sleep still running counts up to now (the allocation skips open
-    // sessions), so a night that crossed midnight fills yesterday, as in Registro.
-    const counted = withProvisionalEnd(session, now);
-    if (counted.duration_min == null) continue;
-    for (const alloc of allocateSessionToLocalDays(counted)) {
-      const bucket = complete.get(alloc.dayKey);
-      if (!bucket) continue;
-      bucket.minutes += alloc.napMinutes + alloc.nightMinutes;
-      // A nap counts on the day it slept on, as in `getNapCountPerDay`.
-      if (session.type === "NAP" && alloc.napMinutes > 0) bucket.naps += 1;
+    if (session.type !== "NAP") continue;
+    for (const alloc of allocateSessionToLocalDays(withProvisionalEnd(session, now), timeZone)) {
+      if (alloc.napMinutes > 0) naps.set(alloc.dayKey, (naps.get(alloc.dayKey) ?? 0) + 1);
     }
   }
 
-  const withData = [...complete.values()].filter((d) => d.minutes > 0);
+  const withData = totals
+    .map((d, i) => ({ minutes: Math.round(d.totalHours * 60), naps: naps.get(keys[i]) ?? 0 }))
+    .filter((d) => d.minutes > 0);
   if (withData.length === 0) {
     return { daysWithData: 0, avgSleepMinutes: null, avgNapsPerDay: null, longestNightMinutes: null };
   }
 
-  const rangeStart = interval[0].getTime();
+  const rangeStart = fromZonedTime(`${keys[0]}T00:00:00`, timeZone).getTime();
   const nights = sessions.filter(
     (s) =>
       s.type === "NIGHT_SLEEP" &&

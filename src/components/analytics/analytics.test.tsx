@@ -241,6 +241,18 @@ describe("Analytics detail pages", () => {
     }
   });
 
+  it("numbers_longest_night_falls_back_to_the_last_night", () => {
+    holder.data = fakeData({
+      last24h: { totalMinutes: 120, longestNightMinutes: 0 },
+      lastNightMinutes: 600,
+    });
+    mount(<NumbersPage />);
+    const tile = screen.getByText("Maior trecho noturno").closest("[data-slot=stat-tile]") as HTMLElement;
+    expect(tile).toHaveTextContent("10h");
+    expect(tile).toHaveTextContent("Última noite");
+    expect(tile).not.toHaveTextContent("Sem dados");
+  });
+
   it("numbers_debt_reads_em_dia_and_sem_dados_like_today", () => {
     holder.data = fakeData({ sleepDebt: { targetHours: 14, avgHours: 0, debtHours: 14, daysAnalyzed: 0 } });
     mount(<NumbersPage />);
