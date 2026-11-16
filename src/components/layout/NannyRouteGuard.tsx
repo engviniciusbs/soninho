@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserProfile } from "@/components/providers/UserProfileProvider";
-
-const NANNY_ALLOWED = ["/app", "/settings"];
+import { isNannyAllowed } from "@/components/layout/nannyAccess";
 
 export function NannyRouteGuard({ children }: { children: React.ReactNode }) {
   const { isNannyMode, isLoading } = useUserProfile();
@@ -13,7 +12,7 @@ export function NannyRouteGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoading || !isNannyMode) return;
-    if (!NANNY_ALLOWED.includes(pathname)) {
+    if (!isNannyAllowed(pathname)) {
       router.replace("/app");
     }
   }, [isNannyMode, isLoading, pathname, router]);

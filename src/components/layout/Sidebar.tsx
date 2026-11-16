@@ -3,59 +3,44 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SoninhoLogo } from "@/components/brand/SoninhoLogo";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { getNavLinks } from "@/components/layout/navLinks";
+import { getNavLinks, isNavLinkActive } from "@/components/layout/navLinks";
 import { useUserProfile } from "@/components/providers/UserProfileProvider";
 
+/** Coluna de navegação do desktop: a marca no topo e as mesmas abas do menu inferior. */
 export function Sidebar() {
   const pathname = usePathname();
   const { isNannyMode } = useUserProfile();
   const links = getNavLinks(isNannyMode);
 
   return (
-    <aside className="hidden md:flex md:w-64 md:flex-col border-r border-sidebar-border bg-sidebar">
-      <div className="flex h-16 items-center gap-3 px-5 border-b border-sidebar-border">
-        <SoninhoLogo href="/app" markSize={34} textClassName="text-lg" />
+    <aside className="hidden border-r border-sn-bd bg-sn-bg/60 md:flex md:w-60 md:shrink-0 md:flex-col">
+      <div className="flex h-20 items-center px-6">
+        <SoninhoLogo href="/app" markSize={34} textClassName="text-xl font-bold text-sn-tx" />
       </div>
 
-      <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-1 p-3">
+      <nav aria-label="Navegação principal" className="flex flex-1 flex-col gap-1 px-3 pb-6">
         {links.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href;
+          const isActive = isNavLinkActive(pathname, href);
           return (
             <Link
               key={href}
               href={href}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                isActive
-                  ? "text-foreground"
-                  : "text-sidebar-foreground/55 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                "relative flex min-h-12 items-center gap-3.5 rounded-xl px-3.5 font-sans text-base font-bold outline-none hover:bg-sn-s2/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr",
+                isActive ? "bg-sn-s2 text-sn-pr" : "text-sn-tx"
               )}
             >
-              {isActive && (
-                <motion.span
-                  layoutId="sidebar-indicator"
-                  className="absolute inset-0 rounded-xl bg-secondary"
-                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                />
-              )}
-              {isActive && (
-                <motion.span
-                  layoutId="sidebar-accent"
-                  className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-primary"
-                  transition={{ type: "spring", stiffness: 500, damping: 38 }}
-                />
-              )}
-              <Icon
-                className={cn(
-                  "relative z-10 h-4.5 w-4.5 transition-colors",
-                  isActive ? "text-primary" : ""
-                )}
+              <Icon size={26} />
+              <span>{label}</span>
+              <span
                 aria-hidden="true"
+                className={cn(
+                  "absolute top-1/2 left-0 h-7 w-1 -translate-y-1/2 rounded-full",
+                  isActive ? "bg-sn-pr" : "bg-transparent"
+                )}
               />
-              <span className="relative z-10">{label}</span>
             </Link>
           );
         })}

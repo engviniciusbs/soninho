@@ -163,3 +163,8 @@ export const IconBaby = make(
     <path d="M9.5 15c1.4 1.2 3.6 1.2 5 0" />
   </>
 );
+
+export const IconLogout = make(
+  "IconLogout",
+  <path d="M14 4.5H6.5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1H14M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" />
+);

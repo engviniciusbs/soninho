@@ -17,23 +17,22 @@ export default function DashboardLayout({
     <QueryProvider>
       <BabyProvider>
         <UserProfileProvider>
-        <div className="flex h-screen overflow-hidden bg-background">
-          <Sidebar />
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <TopBar />
-            <MiniTimerBar />
+          <div className="flex h-dvh overflow-hidden">
+            <Sidebar />
             <main
               id="main-content"
-              className="flex-1 overflow-y-auto overscroll-contain pb-24 md:pb-10 px-4 md:px-8 py-5 md:py-7"
+              className="flex-1 overflow-y-auto overscroll-contain"
             >
-              <NannyRouteGuard>
-                <div className="mx-auto w-full max-w-5xl">{children}</div>
-              </NannyRouteGuard>
+              {/* Coluna de uso: ~480px, centralizada também no desktop (spec §8.2). */}
+              <div className="mx-auto w-full max-w-[480px] px-4 pb-32 md:pb-12">
+                <TopBar />
+                <MiniTimerBar />
+                <NannyRouteGuard>{children}</NannyRouteGuard>
+              </div>
             </main>
             <BottomNav />
           </div>
-        </div>
-        <Toaster />
+          <Toaster />
         </UserProfileProvider>
       </BabyProvider>
     </QueryProvider>

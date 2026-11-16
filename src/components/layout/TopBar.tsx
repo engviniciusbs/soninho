@@ -12,9 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { LogOut } from "lucide-react";
-import { SoninhoLogo } from "@/components/brand/SoninhoLogo";
+import { IconLogout } from "@/components/brand/icons";
 
+/**
+ * Faixa do topo: só o seletor de bebê e o sair. A marca fica na Sidebar
+ * (desktop) e, na home, dentro da própria página (Tarefa 7); as outras
+ * páginas têm o título em `PageTitle`.
+ */
 export function TopBar() {
   const { babies, activeBaby, setActiveBaby } = useBaby();
   const router = useRouter();
@@ -27,59 +31,48 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/85 px-4 md:px-6 backdrop-blur-md supports-backdrop-filter:bg-background/70">
-      {/* Mobile logo */}
-      <SoninhoLogo href="/app" markSize={30} textClassName="text-base" className="md:hidden" />
-
-      {/* Right side controls */}
-      <div className="flex items-center gap-2 ml-auto">
-        {babies.length > 0 && activeBaby && (
-          <Select
-            value={activeBaby.id}
-            onValueChange={(id) => {
-              const baby = babies.find((b) => b.id === id);
-              if (baby) setActiveBaby(baby);
-            }}
-          >
-            <SelectTrigger className="h-9 rounded-full border-border/50 bg-muted/40 px-3 text-sm gap-2 w-auto min-w-[120px]">
-              <SelectValue>
-                <span className="flex items-center gap-2">
-                  <BabyAvatar
-                    avatarUrl={activeBaby.avatar_url}
-                    name={activeBaby.name}
-                    size="sm"
-                  />
-                  <span className="truncate max-w-[80px]">{activeBaby.name}</span>
-                </span>
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {babies.map((baby) => (
-                <SelectItem key={baby.id} value={baby.id}>
-                  <span className="flex items-center gap-2">
-                    <BabyAvatar
-                      avatarUrl={baby.avatar_url}
-                      name={baby.name}
-                      size="sm"
-                    />
-                    <span>{baby.name}</span>
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleLogout}
-          className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
-          aria-label="Sair da conta"
+    <header className="flex h-16 items-center justify-end gap-2">
+      {babies.length > 0 && activeBaby && (
+        <Select
+          value={activeBaby.id}
+          onValueChange={(id) => {
+            const baby = babies.find((b) => b.id === id);
+            if (baby) setActiveBaby(baby);
+          }}
         >
-          <LogOut className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      </div>
+          <SelectTrigger
+            aria-label="Trocar de bebê"
+            className="h-11 min-w-[120px] gap-2 rounded-full border-sn-bd bg-sn-s1 pr-3 pl-1 font-sans text-[15px] font-bold text-sn-tx data-[size=default]:h-11 dark:bg-sn-s1 dark:hover:bg-sn-s2"
+          >
+            <SelectValue>
+              <span className="flex items-center gap-2">
+                <BabyAvatar avatarUrl={activeBaby.avatar_url} name={activeBaby.name} size="sm" />
+                <span className="max-w-[120px] truncate">{activeBaby.name}</span>
+              </span>
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {babies.map((baby) => (
+              <SelectItem key={baby.id} value={baby.id}>
+                <span className="flex items-center gap-2">
+                  <BabyAvatar avatarUrl={baby.avatar_url} name={baby.name} size="sm" />
+                  <span>{baby.name}</span>
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      <Button
+        variant="icon"
+        size="icon"
+        onClick={handleLogout}
+        className="text-sn-mu hover:text-sn-tx"
+        aria-label="Sair da conta"
+      >
+        <IconLogout size={22} />
+      </Button>
     </header>
   );
 }
