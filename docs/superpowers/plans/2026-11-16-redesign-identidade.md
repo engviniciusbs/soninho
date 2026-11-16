@@ -84,7 +84,7 @@
 
 ---
 
-### Tarefa 1: Ambiente local com dados fictícios e registro "antes"
+### Task 1: Ambiente local com dados fictícios e registro "antes"
 
 **Files:**
 - Create: `supabase/seed.sql`
@@ -112,7 +112,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 
 - [ ] **Step 6:** commit de `supabase/seed.sql` e `docs/CONTRIBUTING-DB.md` (`chore(dev): seed local com dados fictícios`). Antes, conferir que `.env.local` e `.hallmark/` não entram no `git status`; `.hallmark/` vai para `.git/info/exclude`.
 
-### Tarefa 2: Tokens, só escuro, marca e avatar
+### Task 2: Tokens, só escuro, marca e avatar
 
 **Files:**
 - Modify: `src/app/globals.css`, `src/components/ui/sonner.tsx`, `package.json` (remover `next-themes` se não sobrar uso)
@@ -159,7 +159,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 7:** `npm test`, `npm run lint` e `npx tsc --noEmit` passando. Regravar só os snapshots que mudaram pelo avatar (`FamilySettings` e `settings/page`, se for o caso), conferindo o diff.
 - [ ] **Step 8:** commit `feat(redesign): tokens escuros, ilustrações lua/sol e avatar sem emoji`.
 
-### Tarefa 3: Componentes base
+### Task 3: Componentes base
 
 **Files:**
 - Modify: `src/components/ui/button.tsx`, `card.tsx`, `sheet.tsx`, `skeleton.tsx`, `badge.tsx`
@@ -212,7 +212,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 5:** `npm run lint` e `npx tsc --noEmit`.
 - [ ] **Step 6:** commit `feat(redesign): componentes base do sistema`.
 
-### Tarefa 4: Casca, navegação, rotas do Mais e modo babá
+### Task 4: Casca, navegação, rotas do Mais e modo babá
 
 **Files:**
 - Modify: `src/components/layout/navLinks.ts`, `BottomNav.tsx`, `Sidebar.tsx`, `TopBar.tsx`, `MiniTimerBar.tsx`, `NannyRouteGuard.tsx`, `src/app/(dashboard)/layout.tsx`, `next.config.ts`
@@ -258,7 +258,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 6:** `npm test`, lint, tsc, build e conferência no navegador local (usuário normal e babá).
 - [ ] **Step 7:** commit `feat(redesign): navegação de 5 abas, casca e acesso da babá`.
 
-### Tarefa 5: Cálculos novos (funções puras)
+### Task 5: Cálculos novos (funções puras)
 
 **Files:**
 - Create: `src/lib/sleep/wakeEstimate.ts` e `.test.ts`, `src/lib/sleep/dayStatus.ts` e `.test.ts`, `src/lib/feeding/suggestionExplanation.ts` e `.test.ts`
@@ -296,7 +296,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 4:** rodar de novo, que deve PASSAR. Depois `npm test`.
 - [ ] **Step 5:** commit `feat(sleep): estimativa de despertar, status do dia e texto da próxima mamada`.
 
-### Tarefa 6: Mais e telas de detalhe
+### Task 6: Mais e telas de detalhe
 
 **Files:**
 - Create: `src/app/(dashboard)/more/page.tsx` (completo), `more/ai/page.tsx`, `more/ai/chat/page.tsx`, `more/babies/page.tsx`, `more/family/page.tsx`, `more/notifications/page.tsx`, `more/reports/page.tsx`, `more/profile/page.tsx`
@@ -338,7 +338,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 
 - [ ] **Step 7:** `npm test`, lint e tsc. Commit `feat(redesign): Mais e telas de detalhe; settings e ai-insights redirecionam`.
 
-### Tarefa 7: Home
+### Task 7: Home
 
 **Files:**
 - Modify: `src/app/(dashboard)/app/page.tsx`, `src/components/sleep/SleepTimer.tsx` e `src/components/sleep/timer/*` (só apresentação), `src/components/sleep/PostSleepReview.tsx` (estilo)
@@ -401,7 +401,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 5:** Hallmark `sloplint --scope app --render --url http://localhost:3000/app`, com um sono rodando e sem sono rodando. Também a finish review da Hallmark em contexto novo (`gates.md` §6), com os screenshots antes e depois. Corrigir.
 - [ ] **Step 6:** `npm test`, lint, tsc e build. Commit `feat(redesign): home nova (acordado, soneca, dormindo)`.
 
-### Tarefa 8: Comida
+### Task 8: Comida
 
 **Files:**
 - Modify: `src/app/(dashboard)/feeding/page.tsx`, `src/components/feeding/BottleQuickLog.tsx`, `BreastfeedingTimer.tsx`, `SolidFeedingLog.tsx`, `FeedingSuggestionCard.tsx`, `FeedingTimeline.tsx`, `FeedingForm.tsx` (só apresentação)
@@ -427,7 +427,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 4:** testes passando e snapshots regravados com o diff conferido. Hallmark `--url http://localhost:3000/feeding`.
 - [ ] **Step 5:** lint, tsc e build. Commit `feat(redesign): Comida`.
 
-### Tarefa 9: Registro
+### Task 9: Registro
 
 **Files:**
 - Modify: `src/app/(dashboard)/history/page.tsx`, `src/components/sleep/SleepCard.tsx`, `SleepForm.tsx`, `SleepTimeline.tsx` (vira a faixa de blocos do dia)
@@ -455,7 +455,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
 - [ ] **Step 4:** testes, snapshots e Hallmark `--url http://localhost:3000/history`.
 - [ ] **Step 5:** lint, tsc e build. Commit `feat(redesign): Registro por dia`.
 
-### Tarefa 10: Análise e telas de detalhe
+### Task 10: Análise e telas de detalhe
 
 **Files:**
 - Modify: `src/app/(dashboard)/analytics/page.tsx`, `src/components/charts/*` (cores por tokens), `src/components/sleep/RegressionRadar.tsx`, `src/components/ui/stat-tile.tsx`
@@ -488,7 +488,7 @@ node ~/.claude/skills/hallmark/scripts/sloplint.mjs src/app --scope app --render
   - **`regression`:** `RegressionRadar` completo.
 - [ ] **Step 6:** Hallmark `--url` em `/analytics` e `/analytics/numbers`, lint, tsc e build. Commit `feat(redesign): Análise e telas de detalhe`.
 
-### Tarefa 11: Varredura final, limpeza e PR
+### Task 11: Varredura final, limpeza e PR
 
 **Files:** os que a varredura apontar.
 
