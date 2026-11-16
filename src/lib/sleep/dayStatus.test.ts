@@ -6,6 +6,13 @@ describe("dayStatus", () => {
     expect(dayStatus(0, 14)).toBeNull();
   });
   it.each([
+    [Number.NaN, 14],
+    [Number.POSITIVE_INFINITY, 14],
+    [13 * 60, Number.NaN],
+  ])("entrada não finita (%s min, meta %s h) não tem status", (min, target) => {
+    expect(dayStatus(min, target)).toBeNull();
+  });
+  it.each([
     [13 * 60 + 1, "within"],
     [12 * 60 + 59, "below"],
     [15 * 60 + 1, "above"],
