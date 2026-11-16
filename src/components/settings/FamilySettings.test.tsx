@@ -225,4 +225,33 @@ describe("FamilySettings", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(screen.getByText("Carlos")).toBeInTheDocument();
   });
+
+  it("generate_invite_link_network_error_shows_generic_toast", async () => {
+    handler = api("owner", (method) =>
+      method === "POST" ? Promise.reject(new TypeError("Failed to fetch")) : undefined
+    );
+    await mount();
+    fireEvent.click(screen.getByRole("button", { name: "Gerar link de convite" }));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Ocorreu um erro. Tente novamente.")
+    );
+    expect(screen.getByRole("button", { name: "Gerar link de convite" })).toBeEnabled();
+    expect(screen.queryByText(/Válido por 7 dias/)).not.toBeInTheDocument();
+  });
+
+  it("removes_member_network_error_shows_generic_toast", async () => {
+    handler = api("owner", (method) =>
+      method === "DELETE" ? Promise.reject(new TypeError("Failed to fetch")) : undefined
+    );
+    await mount();
+    const row = screen.getByText("Carlos").closest("div.flex") as HTMLElement;
+    fireEvent.click(row.querySelector("button")!);
+    await screen.findByRole("dialog");
+    fireEvent.click(screen.getByRole("button", { name: "Remover" }));
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith("Ocorreu um erro. Tente novamente.")
+    );
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.getByText("Carlos")).toBeInTheDocument();
+  });
 });

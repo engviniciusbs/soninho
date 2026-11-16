@@ -4,6 +4,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { FamilyInvite, FamilyMember, FamilyRole } from "@/types";
 
+/** Same generic text the API sends (`genericError` in src/lib/http/errors.ts). */
+const GENERIC_ERROR = "Ocorreu um erro. Tente novamente.";
+
 /** Non-2xx answer from the family API; `message` is the server's `error` text. */
 export class FamilyApiError extends Error {}
 
@@ -12,12 +15,12 @@ async function apiError(res: Response): Promise<FamilyApiError> {
     const body = await res.json();
     if (typeof body?.error === "string") return new FamilyApiError(body.error);
   } catch {}
-  return new FamilyApiError("Ocorreu um erro. Tente novamente.");
+  return new FamilyApiError(GENERIC_ERROR);
 }
 
-/** Server errors become toasts; anything else (e.g. offline) is left silent. */
+/** Toasts the server's message, or the generic text for network-level failures. */
 export function toastApiError(error: Error) {
-  if (error instanceof FamilyApiError) toast.error(error.message);
+  toast.error(error instanceof FamilyApiError ? error.message : GENERIC_ERROR);
 }
 
 export interface FamilyMembersData {
@@ -32,11 +35,11 @@ export const familyMembersKey = (babyId: string) => ["family-members", babyId] a
 export const familyInvitesKey = (babyId: string) => ["family-invites", babyId] as const;
 
 /**
- * Settings data is refetched on every mount (`staleTime: 0`) and never retried,
- * matching the former on-mount fetch. A failed (non-2xx) load keeps whatever
+ * Settings data is refetched on every mount (`staleTime: 0`), never on
+ * reconnect, and never retried, matching the former on-mount fetch. A failed (non-2xx) load keeps whatever
  * was loaded before for that baby.
  */
-const LOAD_OPTIONS = { staleTime: 0, retry: false } as const;
+const LOAD_OPTIONS = { staleTime: 0, refetchOnReconnect: false, retry: false } as const;
 
 /** Members of the baby's family plus the signed-in user's role; remove a member. */
 export function useFamilyMembers(babyId: string) {
