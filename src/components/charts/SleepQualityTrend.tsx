@@ -14,8 +14,15 @@ import { formatValue, INITIAL_SIZE, todayLabel } from "./chartText";
 interface Props {
   /** One point per day; `null` leaves a gap (no data that day). */
   data: { date: string; avgDuration: number | null }[];
-  /** What the chart shows, for the text alternative (usually the card title). */
-  caption: string;
+  /**
+   * Names the text alternative. Pass `labelledBy`, the id of the visible
+   * title, so the name is not read twice; `caption` is the fallback when the
+   * chart has no visible title.
+   */
+  labelledBy?: string;
+  caption?: string;
+  /** Header of the value column in the text alternative, naming the measure. */
+  valueHeader?: string;
   label?: string;
   /** A colour token, e.g. `var(--sn-night)`. */
   color?: string;
@@ -29,7 +36,9 @@ const MUTED = "var(--sn-mu)";
 
 export function SleepQualityTrend({
   data,
+  labelledBy,
   caption,
+  valueHeader = "Valor",
   label = "Duração média (min)",
   color = "var(--sn-pr)",
   unit = "min",
@@ -88,12 +97,12 @@ export function SleepQualityTrend({
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <table className="sr-only">
-        <caption>{caption}</caption>
+      <table className="sr-only" aria-labelledby={labelledBy}>
+        {!labelledBy && caption && <caption>{caption}</caption>}
         <thead>
           <tr>
             <th scope="col">Dia</th>
-            <th scope="col">Valor</th>
+            <th scope="col">{valueHeader}</th>
           </tr>
         </thead>
         <tbody>

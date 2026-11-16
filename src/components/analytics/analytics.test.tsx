@@ -118,6 +118,9 @@ describe("AnalyticsPage", () => {
       screen.getByText("Médias de 6 dias completos, sem contar hoje. Maior noite: a mais longa já terminada.")
     ).toBeInTheDocument();
     expect(screen.getByText("Sono por dia", { selector: "h2" })).toBeInTheDocument();
+    // The chart's table is named by that heading, not by a caption read again.
+    const table = screen.getByRole("table", { name: "Sono por dia" });
+    expect(table.querySelector("caption")).toBeNull();
     // The legend names both series.
     const legend = screen.getByRole("list", { name: "Legenda" });
     expect(within(legend).getByText("Noite")).toBeInTheDocument();
@@ -291,6 +294,10 @@ describe("Analytics detail pages", () => {
     mount(<QualityPage />);
     expect(screen.getByText("Qualidade média por dia", { selector: "[data-slot=card-title]" })).toBeInTheDocument();
     expect(screen.queryByText(/Avalie a qualidade ao terminar um sono/)).toBeNull();
+    // The table is named by the visible title (no second caption) and names the measure.
+    const table = screen.getByRole("table", { name: "Qualidade média por dia" });
+    expect(table.querySelector("caption")).toBeNull();
+    expect(within(table).getByRole("columnheader", { name: "Nota (1 a 5)" })).toBeInTheDocument();
   });
 
   it("regression_shows_the_full_radar", () => {

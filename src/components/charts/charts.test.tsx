@@ -68,4 +68,16 @@ describe("SleepQualityTrend", () => {
     const rows = within(table).getAllByRole("row").map((r) => r.textContent);
     expect(rows).toEqual(["DiaValor", "14/1148min", "15/11sem dado", "hoje40min"]);
   });
+
+  it("names_the_table_by_the_visible_title_and_the_measure", () => {
+    render(
+      <>
+        <h3 id="t">Qualidade média por dia</h3>
+        <SleepQualityTrend data={points} labelledBy="t" valueHeader="Nota (1 a 5)" unit="" />
+      </>
+    );
+    const table = screen.getByRole("table", { name: "Qualidade média por dia" });
+    expect(table.querySelector("caption")).toBeNull();
+    expect(within(table).getAllByRole("columnheader").map((h) => h.textContent)).toEqual(["Dia", "Nota (1 a 5)"]);
+  });
 });

@@ -15,6 +15,8 @@ import { formatValue, INITIAL_SIZE, todayLabel } from "./chartText";
 interface Props {
   data: { date: string; napHours: number; nightHours: number }[];
   recommendedHours?: number;
+  /** Id of the visible title; names the table so it is not read twice. */
+  labelledBy?: string;
 }
 
 // Colours come from the tokens (globals.css), never literals.
@@ -29,7 +31,7 @@ const hours = (v: number) => formatValue(v, "h");
  * "Sono por dia": night (bottom) and naps stacked per day, with the
  * age target as a reference line. The legend sits below, outside the SVG.
  */
-export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
+export function SleepBarChart({ data, recommendedHours = 14, labelledBy }: Props) {
   const dayLabel = todayLabel(data);
   return (
     <div className="flex flex-col gap-3">
@@ -76,8 +78,8 @@ export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <table className="sr-only">
-        <caption>Sono por dia</caption>
+      <table className="sr-only" aria-labelledby={labelledBy}>
+        {!labelledBy && <caption>Sono por dia</caption>}
         <thead>
           <tr>
             <th scope="col">Dia</th>

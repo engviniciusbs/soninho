@@ -92,8 +92,12 @@ function AnalyticsView() {
         <>
           <PeriodFigures summary={data.periodSummary} />
           <Card className="gap-3 px-[18px]">
-            <h2 className="font-sans text-sm font-bold text-sn-mu">Sono por dia</h2>
-            <SleepBarChart data={data.dailyTotals} recommendedHours={data.schedule.totalSleepHours} />
+            <h2 id="sono-por-dia" className="font-sans text-sm font-bold text-sn-mu">Sono por dia</h2>
+            <SleepBarChart
+              data={data.dailyTotals}
+              recommendedHours={data.schedule.totalSleepHours}
+              labelledBy="sono-por-dia"
+            />
           </Card>
         </>
       )}
