@@ -433,6 +433,31 @@ describe("Home", () => {
     expect(updateSleepSession).not.toHaveBeenCalled();
   });
 
+  it("save_after_failed_reads_sends_only_the_edited_field", async () => {
+    const startTime = new Date(NOW.getTime() - 600_000).toISOString();
+    fake.seed(TABLE, { id: "s-1", baby_id: helena.id, type: "NAP", start_time: startTime, room_temp_celsius: 22 });
+    useSleepStore.setState({
+      timers: { [helena.id]: { ...EMPTY_SLEEP_DRAFT, sessionId: "s-1", startTime } },
+    });
+    // The mount read and the sheet-open read fail; only the save's read answers.
+    const failed = { data: null, error: { message: "offline" } } as unknown as Awaited<
+      ReturnType<typeof getSleepSessionDetails>
+    >;
+    vi.mocked(getSleepSessionDetails).mockResolvedValueOnce(failed).mockResolvedValueOnce(failed);
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Ambiente" }));
+    await click(screen.getByRole("button", { name: "Chuvoso" }));
+    await click(screen.getByRole("button", { name: "Pronto" }));
+    await flush();
+
+    expect(updateSleepSession).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(updateSleepSession).mock.calls[0][2]).toEqual({ weather_condition: "rainy" });
+    expect(fake.rows(TABLE)[0].room_temp_celsius).toBe(22);
+    // The sheet now shows the server's temperature.
+    expect(screen.getByRole("button", { name: "22°C" })).toBeInTheDocument();
+  });
+
   it("late_sheet_open_read_does_not_overwrite_a_note_being_typed", async () => {
     seedRunning(helena.id, "NAP", 600);
     await mount();

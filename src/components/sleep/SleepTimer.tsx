@@ -189,15 +189,23 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   async function saveChanged(keys: FieldKey[], what: string) {
     if (!sessionId) return;
     // No snapshot yet (the first read failed or is still pending): read now,
-    // and say so if that fails too, instead of dropping the edit.
-    if (!snapshot.current) snapshot.current = await readSession();
+    // and say so if that fails too, instead of dropping the edit. The local
+    // values were never seeded from the row then, so only what the user
+    // edited is sent; the rest of the sheet takes the server's values.
+    let candidates = keys;
     if (!snapshot.current) {
-      toast.error(`Não foi possível salvar ${what}`);
-      return;
+      const row = await readSession();
+      if (!row) {
+        toast.error(`Não foi possível salvar ${what}`);
+        return;
+      }
+      snapshot.current = row;
+      candidates = keys.filter((k) => edited.current.has(k));
+      applyLocal(pick(row, keys.filter((k) => !edited.current.has(k))));
     }
     const base = snapshot.current;
     const patch = Object.fromEntries(
-      keys
+      candidates
         .filter((k) => local[k] !== base[k])
         .map((k) => [k, k === "notes" ? local.notes || null : local[k]])
     ) as Parameters<typeof updateSleepSession>[2];
@@ -207,8 +215,8 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
       toast.error(`Não foi possível salvar ${what}`);
       return;
     }
-    snapshot.current = { ...base, ...pick(local, keys) };
-    for (const k of keys) edited.current.delete(k);
+    snapshot.current = { ...base, ...pick(local, candidates) };
+    for (const k of candidates) edited.current.delete(k);
   }
 
   /* ── Next sleep: the AI suggestion, else the wake-window fallback ── */
