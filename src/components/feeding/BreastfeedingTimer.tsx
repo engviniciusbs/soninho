@@ -14,15 +14,16 @@ function formatMinSec(totalSec: number): string {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
-const SIDES: { side: BreastSide; label: string }[] = [
-  { side: "LEFT", label: "Esquerdo" },
-  { side: "RIGHT", label: "Direito" },
+const SIDES: { side: BreastSide; label: string; start: string }[] = [
+  { side: "LEFT", label: "Esquerdo", start: "Começar pelo esquerdo" },
+  { side: "RIGHT", label: "Direito", start: "Começar pelo direito" },
 ];
 
 /**
  * Breastfeeding (mockup "Comida, aba Peito"): the two sides are big buttons
- * with their time. Stopped, a side starts the feeding on it; running, the
- * other side switches with one tap, and "Terminar mamada" ends it.
+ * with their time. Stopped, each says it starts the feeding on that side
+ * ("Começar pelo esquerdo"); running, the other side switches with one tap,
+ * and "Terminar mamada" ends it.
  */
 export function BreastfeedingTimer() {
   const labelId = useId();
@@ -43,7 +44,7 @@ export function BreastfeedingTimer() {
       </p>
 
       <div className="my-3 grid grid-cols-2 gap-2.5">
-        {SIDES.map(({ side, label }) => {
+        {SIDES.map(({ side, label, start }) => {
           const active = isRunning && activeSide === side;
           const sec = side === "LEFT" ? liveLeftSec : liveRightSec;
           return (
@@ -56,14 +57,17 @@ export function BreastfeedingTimer() {
                 "flex min-h-[92px] cursor-pointer flex-col items-center justify-center rounded-[22px] border-[1.5px] p-4 outline-none select-none",
                 "transition-transform duration-(--sn-dur-micro) ease-sn-out motion-reduce:transition-none active:scale-[0.98]",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr",
-                "disabled:pointer-events-none disabled:opacity-55",
                 active
                   ? "border-sn-pr bg-sn-pr/8"
                   : "border-sn-bd hover:border-sn-pr/60 hover:bg-sn-s2/50"
               )}
             >
-              <span className="font-sans text-sm font-bold text-sn-mu">{label}</span>
-              <span className="mt-1 font-display text-[28px] leading-tight font-bold text-sn-tx tabular-nums">
+              <span className="font-sans text-sm font-bold text-sn-mu">
+                {isRunning ? label : start}
+              </span>
+              <span
+                aria-hidden={isRunning ? undefined : true}
+                className="mt-1 font-display text-[28px] leading-tight font-bold text-sn-tx tabular-nums">
                 {formatMinSec(sec)}
               </span>
             </button>

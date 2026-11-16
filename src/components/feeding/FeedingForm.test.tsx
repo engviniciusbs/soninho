@@ -256,4 +256,35 @@ describe("FeedingForm", () => {
     change("end_date", "2025-12-30");
     expect(await screen.findByRole("alert")).toHaveTextContent(MSG);
   });
+
+  it("save_and_delete_do_not_run_at_the_same_time", async () => {
+    const pending = new Promise<boolean>(() => {});
+    const onDelete = vi.fn(() => pending);
+    renderWithProviders(
+      <FeedingForm open onClose={onClose} item={items.BOTTLE} onDelete={onDelete} />,
+      { baby: { activeBaby: baby, babies: [baby] } }
+    );
+    await screen.findByRole("dialog");
+    await settle();
+
+    // Deleting: "Atualizar" waits.
+    fireEvent.click(screen.getByRole("button", { name: "Excluir" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar exclusão" }));
+    await waitFor(() => expect(onDelete).toHaveBeenCalled());
+    expect(screen.getByRole("button", { name: "Atualizar" })).toBeDisabled();
+  });
+
+  it("excluir_waits_while_the_update_is_saving", async () => {
+    // The update never answers, so the form stays submitting.
+    sb.respond(() => new Promise(() => {}) as never);
+    renderWithProviders(
+      <FeedingForm open onClose={onClose} item={items.BOTTLE} onDelete={vi.fn(async () => true)} />,
+      { baby: { activeBaby: baby, babies: [baby] } }
+    );
+    await screen.findByRole("dialog");
+    await settle();
+
+    submit();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Excluir" })).toBeDisabled());
+  });
 });

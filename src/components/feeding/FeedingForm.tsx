@@ -452,6 +452,7 @@ function FeedingFormBody({ onClose, item, onDelete }: Omit<FeedingFormProps, "op
             size="sm"
             onClick={handleDelete}
             loading={deleting}
+            disabled={isSubmitting}
             className="mr-auto"
           >
             {confirmDelete ? "Confirmar exclusão" : "Excluir"}
@@ -461,7 +462,7 @@ function FeedingFormBody({ onClose, item, onDelete }: Omit<FeedingFormProps, "op
           <Button type="button" variant="secondary" size="sm" onClick={onClose}>
             Cancelar
           </Button>
-          <Button type="submit" size="sm" loading={isSubmitting}>
+          <Button type="submit" size="sm" loading={isSubmitting} disabled={deleting}>
             {isEdit ? "Atualizar" : "Registrar"}
           </Button>
         </div>

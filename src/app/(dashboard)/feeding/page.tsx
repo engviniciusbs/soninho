@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageTitle } from "@/components/ui/page-title";
 import { Button } from "@/components/ui/button";
@@ -29,9 +29,16 @@ function parseTab(value: string | null): Tab | null {
   return TABS.some((t) => t.value === value) ? (value as Tab) : null;
 }
 
+function writeTipo(tab: Tab) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("tipo", tab);
+  window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+}
+
 /**
  * Mamadeira / Peito / Sólidos. The tab lives in `?tipo=` (replaced, not
- * pushed). With no `tipo`, a feeding at the breast in progress opens Peito.
+ * pushed). With no `tipo`, a feeding at the breast in progress opens Peito
+ * and writes `tipo=peito`, so the tab stays on Peito after "Terminar mamada".
  */
 function FeedingTabs() {
   const param = useSearchParams().get("tipo");
@@ -46,10 +53,18 @@ function FeedingTabs() {
 
   function select(next: Tab) {
     setPicked({ param, tab: next });
-    const url = new URL(window.location.href);
-    url.searchParams.set("tipo", next);
-    window.history.replaceState(null, "", `${url.pathname}${url.search}`);
+    writeTipo(next);
   }
+
+  // A running feeding picked Peito with no `tipo`: hold it, so stopping the
+  // feeding does not flip the tab back to Mamadeira, and put it in the URL.
+  if (param === null && breastRunning && picked?.param !== param) {
+    setPicked({ param, tab: "peito" });
+  }
+  const pinnedPeito = param === null && picked?.param === null && picked.tab === "peito";
+  useEffect(() => {
+    if (pinnedPeito) writeTipo("peito");
+  }, [pinnedPeito]);
 
   return (
     <>

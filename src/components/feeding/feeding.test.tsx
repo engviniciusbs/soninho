@@ -9,6 +9,7 @@ import { BottleQuickLog } from "./BottleQuickLog";
 import { BreastfeedingTimer } from "./BreastfeedingTimer";
 import { FeedingTimeline } from "./FeedingTimeline";
 import FeedingPage from "@/app/(dashboard)/feeding/page";
+import { useFeedingStore } from "@/store/feedingStore";
 
 const holder = vi.hoisted(() => ({
   feedings: [] as unknown[],
@@ -101,6 +102,7 @@ beforeEach(() => {
   holder.breast.isRunning = true;
   holder.breast.initialSide = "LEFT";
   window.history.replaceState(null, "", "/feeding");
+  useFeedingStore.setState({ timers: {} });
 });
 
 afterEach(() => {
@@ -165,7 +167,9 @@ describe("BreastfeedingTimer", () => {
     holder.breast.isRunning = false;
     mount(<BreastfeedingTimer />);
     expect(screen.queryByRole("button", { name: "Terminar mamada" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /Direito/ }));
+    // Stopped, each side says what one tap does.
+    expect(screen.getByRole("button", { name: "Começar pelo esquerdo" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Começar pelo direito" }));
     expect(holder.breast.start).toHaveBeenCalledWith("RIGHT");
   });
 });
@@ -227,6 +231,29 @@ describe("FeedingPage", () => {
     expect(within(tabs).getByRole("radio", { name: "Sólidos" })).toHaveAttribute("aria-checked", "true");
     expect(window.location.search).toBe("?tipo=solidos");
     expect(screen.getByRole("button", { name: "Banana" })).toBeInTheDocument();
+  });
+
+  it("running_feeding_pins_peito_so_stopping_keeps_the_tab", async () => {
+    useFeedingStore.setState({
+      timers: {
+        [baby.id]: {
+          sessionId: "f-run",
+          startTime: NOW.toISOString(),
+          activeSide: "LEFT",
+          sideLeftSec: 0,
+          sideRightSec: 0,
+          sideStartedAt: NOW.toISOString(),
+        },
+      },
+    });
+    mount(<FeedingPage />);
+    const tabs = await screen.findByRole("radiogroup", { name: "Tipo de alimentação" });
+    expect(within(tabs).getByRole("radio", { name: "Peito" })).toHaveAttribute("aria-checked", "true");
+    expect(window.location.search).toBe("?tipo=peito");
+
+    // "Terminar mamada" clears the running entry.
+    act(() => useFeedingStore.setState({ timers: {} }));
+    expect(within(tabs).getByRole("radio", { name: "Peito" })).toHaveAttribute("aria-checked", "true");
   });
 
   it("registrar_mamada_passada_opens_the_form", async () => {
