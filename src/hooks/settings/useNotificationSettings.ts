@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries/notifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -87,17 +88,21 @@ export function useNotificationSettings() {
     setPrefs((p) => ({ ...p, ...partial }));
   }
 
-  /** Resolves `false` when signed out (nothing is written). */
+  /** Resolves `false` when signed out (nothing is written) or the upsert failed (error toast shown). */
   async function save(partial: Partial<NotificationPrefs>): Promise<boolean> {
     edit(partial);
     const {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return false;
-    await upsertNotificationPreferences(supabase, user.id, {
+    const { error } = await upsertNotificationPreferences(supabase, user.id, {
       ...toRow(partial),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
+    if (error) {
+      toast.error("Erro ao salvar preferências");
+      return false;
+    }
     return true;
   }
 

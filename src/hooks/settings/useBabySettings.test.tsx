@@ -70,15 +70,32 @@ describe("useBabySettings", () => {
     expect(result.current.isSaving).toBe(false);
   });
 
-  it("reports_create_error_but_still_closes", async () => {
+  it("create_error_keeps_form_open_with_toast", async () => {
     sb.respond((c) => (c.target.startsWith("rpc:") ? { data: null, error: { message: "x" } } : undefined));
-    const { result } = setup();
+    const { result, queryClient } = setup();
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
     let ok: boolean | undefined;
     await act(async () => {
       ok = await result.current.save({ id: null, ...values });
     });
-    expect(ok).toBe(true);
+    expect(ok).toBe(false);
     expect(toast.error).toHaveBeenCalledWith("Erro ao adicionar bebê");
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+    expect(result.current.isSaving).toBe(false);
+  });
+
+  it("update_error_keeps_form_open_with_toast", async () => {
+    sb.respond((c) => (c.target === "babies" ? { data: null, error: { message: "x" } } : undefined));
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ id: "baby-1", ...values });
+    });
+    expect(ok).toBe(false);
+    expect(toast.error).toHaveBeenCalledWith("Erro ao atualizar bebê");
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(result.current.isSaving).toBe(false);
   });
 
   it("uploads_avatar_and_returns_public_url", async () => {

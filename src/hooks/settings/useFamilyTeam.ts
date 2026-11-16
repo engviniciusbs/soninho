@@ -36,10 +36,15 @@ export const familyInvitesKey = (babyId: string) => ["family-invites", babyId] a
 
 /**
  * Settings data is refetched on every mount (`staleTime: 0`), never on
- * reconnect, and never retried, matching the former on-mount fetch. A failed (non-2xx) load keeps whatever
+ * reconnect, and never retried or refetched on window focus, matching the former on-mount fetch. A failed (non-2xx) load keeps whatever
  * was loaded before for that baby.
  */
-const LOAD_OPTIONS = { staleTime: 0, refetchOnReconnect: false, retry: false } as const;
+const LOAD_OPTIONS = {
+  staleTime: 0,
+  refetchOnReconnect: false,
+  refetchOnWindowFocus: false,
+  retry: false,
+} as const;
 
 /** Members of the baby's family plus the signed-in user's role; remove a member. */
 export function useFamilyMembers(babyId: string) {

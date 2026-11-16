@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, waitFor } from "@testing-library/react";
+import { toast } from "sonner";
 import { renderHookWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
 import { useNotificationSettings } from "./useNotificationSettings";
 
 const holder = vi.hoisted(() => ({ client: null as unknown, push: null as unknown }));
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
+vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 vi.mock("@/hooks/usePushNotifications", () => ({ usePushNotifications: () => holder.push }));
 
 const NOW = new Date("2026-01-01T12:00:00.000Z");
@@ -90,6 +92,23 @@ describe("useNotificationSettings", () => {
         ],
       ],
     ]);
+  });
+
+  it("save_surfaces_upsert_error_with_toast_and_resolves_false", async () => {
+    sb.respond((c) =>
+      c.target === "notification_preferences" && c.ops.some(([m]) => m === "upsert")
+        ? { data: null, error: { message: "x" } }
+        : undefined
+    );
+    const { result } = setup();
+    await waitFor(() => expect(result.current.userId).toBe("user-1"));
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ enabled: false });
+    });
+    expect(ok).toBe(false);
+    expect(toast.error).toHaveBeenCalledWith("Erro ao salvar preferências");
+    expect(toast.success).not.toHaveBeenCalled();
   });
 
   it("does_not_write_when_signed_out", async () => {

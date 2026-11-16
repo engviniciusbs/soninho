@@ -15,14 +15,13 @@ vi.mock("@/components/providers/BabyProvider", () => ({
   }),
 }));
 
+let client: QueryClient;
 function wrapper({ children }: { children: ReactNode }) {
-  const client = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
   return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }
 
 beforeEach(() => {
+  client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   vi.useFakeTimers({ shouldAdvanceTime: true });
 });
 afterEach(() => {
@@ -44,5 +43,21 @@ describe("useWakeWindow", () => {
       vi.advanceTimersByTime(2 * 60_000);
     });
     expect(result.current.elapsedMinutes - before).toBeCloseTo(2, 0);
+  });
+
+  it("elapsed_reflects_a_fresh_last_sleep_end_without_advancing_timers", async () => {
+    const queries = await import("@/lib/supabase/queries/sleep");
+    const old = new Date(Date.now() - 60 * 60_000).toISOString();
+    // Sleep ended after the last 60s tick: must read as just-ended, never negative.
+    const fresh = new Date(Date.now() + 20_000).toISOString();
+    vi.mocked(queries.getLastSleepSession)
+      .mockResolvedValueOnce({ data: { end_time: old } } as never)
+      .mockResolvedValue({ data: { end_time: fresh } } as never);
+    const { result } = renderHook(() => useWakeWindow(), { wrapper });
+    await waitFor(() => expect(result.current.lastSleepEnd).toBe(old));
+    expect(result.current.elapsedMinutes).toBeCloseTo(60, 0);
+    void client.refetchQueries({ queryKey: ["last-session"] });
+    await waitFor(() => expect(result.current.lastSleepEnd).toBe(fresh));
+    expect(result.current.elapsedMinutes).toBe(0);
   });
 });

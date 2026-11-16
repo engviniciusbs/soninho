@@ -45,9 +45,11 @@ export function useWakeWindow(): WakeWindowData {
 
   const lastSleepEnd = lastSession?.end_time ?? null;
 
+  // A lastSleepEnd newer than the 60s tick is taken as "now", so a sleep that
+  // just stopped reads 0 immediately instead of waiting for the next tick.
   const elapsedMinutes =
     lastSleepEnd && tick !== null
-      ? Math.max(0, (tick - new Date(lastSleepEnd).getTime()) / 60000)
+      ? (Math.max(tick, Date.parse(lastSleepEnd)) - Date.parse(lastSleepEnd)) / 60000
       : 0;
 
   const status = getWakeWindowStatus(elapsedMinutes, range);

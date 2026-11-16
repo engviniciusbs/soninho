@@ -30,15 +30,19 @@ export function useBabySettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  /** Resolves `false` only when the form must stay open (signed out). */
+  /** Resolves `false` when the form must stay open (signed out or the write failed). */
   async function save(values: BabyValues): Promise<boolean> {
     setIsSaving(true);
     const { id, ...data } = values;
 
     if (id) {
       const { error } = await updateBaby(supabase, id, data);
-      if (error) toast.error("Erro ao atualizar bebê");
-      else toast.success("Bebê atualizado");
+      if (error) {
+        toast.error("Erro ao atualizar bebê");
+        setIsSaving(false);
+        return false;
+      }
+      toast.success("Bebê atualizado");
     } else {
       const {
         data: { user },
@@ -49,8 +53,12 @@ export function useBabySettings() {
         return false;
       }
       const { error } = await createBaby(supabase, data);
-      if (error) toast.error("Erro ao adicionar bebê");
-      else toast.success("Bebê adicionado");
+      if (error) {
+        toast.error("Erro ao adicionar bebê");
+        setIsSaving(false);
+        return false;
+      }
+      toast.success("Bebê adicionado");
     }
 
     queryClient.invalidateQueries({ queryKey: ["babies"] });
