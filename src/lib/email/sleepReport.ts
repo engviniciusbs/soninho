@@ -149,9 +149,10 @@ export async function sendSleepReport(params: {
 }): Promise<SendSleepReportResult> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://soninho.baby";
   const timeZone = params.timeZone || DEFAULT_REPORT_TIMEZONE;
-  // The weekly e-mail covers complete days only: it ends yesterday.
+  // Both e-mails cover complete days only: they end yesterday, so today's
+  // partial day never pulls the daily averages down.
   const period = getReportPeriod(new Date(), params.periodDays, timeZone, {
-    endsYesterday: params.kind === "weekly",
+    endsYesterday: true,
   });
   const periodStartIso = period.startUtc.toISOString();
   const periodEndIso = period.endUtc.toISOString();
@@ -279,10 +280,10 @@ export async function sendSleepReport(params: {
       babies: babyStats,
       appUrl,
       reportTitle: isManual
-        ? `Resumo dos últimos ${params.periodDays} dias`
+        ? `Resumo dos últimos ${params.periodDays} dias completos`
         : undefined,
       previewText: isManual
-        ? `Seu resumo de sono dos últimos ${params.periodDays} dias no Soninho`
+        ? `Seu resumo de sono dos últimos ${params.periodDays} dias completos, sem contar hoje, no Soninho`
         : undefined,
       footerNote: isManual
         ? "Este relatório foi enviado a pedido em Mais → Relatórios."

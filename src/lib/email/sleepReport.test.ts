@@ -23,7 +23,7 @@ const SESSION = {
   duration_min: 60,
 };
 
-function fakeSupabase(opts: { inserted: boolean; withData?: boolean }) {
+function fakeSupabase(opts: { inserted: boolean; withData?: boolean; sessions?: unknown[] }) {
   const deleted: string[] = [];
   const claims: Record<string, unknown>[] = [];
   const supabase = {
@@ -45,6 +45,7 @@ function fakeSupabase(opts: { inserted: boolean; withData?: boolean }) {
           }),
         };
       }
+      if (table === "sleep_sessions" && opts.sessions) return query(opts.sessions);
       return query(
         table === "sleep_sessions" && opts.withData ? [SESSION] : []
       );
@@ -221,5 +222,36 @@ describe("weekly sendSleepReport period", () => {
       resend: resendWith(vi.fn()),
     });
     expect(claims[0]).toMatchObject({ period_start: "2026-11-09", period_end: "2026-11-15" });
+  });
+});
+
+describe("manual report covers complete days only", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("at midday, today's 3 h do not pull the average down", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    // 16/11, 12:00 in São Paulo.
+    vi.setSystemTime(new Date("2026-11-16T15:00:00Z"));
+    const sessions: SleepSession[] = [];
+    // Nights 19:00 to 08:00 from 09/11 to 15/11: 09/11 gets 5 h, 10/11 to
+    // 15/11 get 8 h + 5 h = 13 h each.
+    for (let d = 9; d <= 14; d++) {
+      const day = String(d).padStart(2, "0");
+      const next = String(d + 1).padStart(2, "0");
+      sessions.push(sess("NIGHT_SLEEP", `2026-11-${day}T22:00:00Z`, `2026-11-${next}T11:00:00Z`));
+    }
+    sessions.push(sess("NIGHT_SLEEP", "2026-11-15T22:00:00Z", "2026-11-16T03:00:00Z"));
+    // Today, 16/11: 3 h of naps so far.
+    sessions.push(sess("NAP", "2026-11-16T11:00:00Z", "2026-11-16T14:00:00Z"));
+
+    const { supabase, claims } = fakeSupabase({ inserted: true, sessions });
+    const send = vi.fn().mockResolvedValue({ error: null });
+    await sendSleepReport({ ...base, timeZone: TZ, supabase, resend: resendWith(send) });
+
+    expect(claims[0]).toMatchObject({ period_start: "2026-11-09", period_end: "2026-11-15" });
+    const { html } = send.mock.calls[0][0] as { html: string };
+    // (5 + 6 × 13) / 7 = 11,857 h: today's 3 h are left out.
+    expect(html).toContain("11h 51min");
+    expect(html).toContain("dias completos");
   });
 });

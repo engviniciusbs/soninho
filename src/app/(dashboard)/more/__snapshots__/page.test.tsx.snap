@@ -589,7 +589,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > tools 1`
           <p
             class="text-base text-sn-mu"
           >
-            Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono total por dia, média de soneca, maior trecho noturno, aderência à meta e melhor ambiente, para todos os bebês da conta.
+            Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono total por dia, média de soneca, maior trecho noturno, aderência à meta e melhor ambiente, para todos os bebês da conta. O período conta só dias completos, até ontem.
           </p>
           <div
             class="space-y-2"
