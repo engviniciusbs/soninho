@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Copy, Eye, Link2, Loader2, ShieldCheck } from "lucide-react";
+import { IconCheck, IconCopy, IconEye, IconLink, IconShield } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -71,9 +71,9 @@ export function InviteCreator({
             }`}
           >
             {r === "caregiver" ? (
-              <ShieldCheck className="size-4" aria-hidden="true" />
+              <IconShield size={18} />
             ) : (
-              <Eye className="size-4" aria-hidden="true" />
+              <IconEye size={18} />
             )}
             {ROLE_LABELS[r]}
           </button>
@@ -108,13 +108,9 @@ export function InviteCreator({
         variant="outline"
         className="w-full gap-2"
         onClick={onGenerate}
-        disabled={generating}
+        loading={generating}
       >
-        {generating ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <Link2 className="w-4 h-4" />
-        )}
+        {!generating && <IconLink size={18} />}
         Gerar link de convite
       </Button>
 
@@ -138,9 +134,9 @@ export function InviteCreator({
                 onClick={handleCopyLink}
               >
                 {copied ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <IconCheck size={16} className="text-sn-ok" />
                 ) : (
-                  <Copy className="w-3.5 h-3.5" />
+                  <IconCopy size={16} />
                 )}
                 {copied ? "Copiado!" : "Copiar"}
               </Button>

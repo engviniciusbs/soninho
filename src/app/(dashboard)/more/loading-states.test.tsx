@@ -45,6 +45,7 @@ describe("Mais › Família without a resolvable user", () => {
     holder.getUser = getUser;
     renderWithProviders(<FamilyPage />, { baby: { babies: [lua], activeBaby: lua } });
     expect(await screen.findByText(/Não foi possível carregar sua conta/)).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent(/Não foi possível carregar sua conta/);
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.queryByTestId("family")).not.toBeInTheDocument();
   });

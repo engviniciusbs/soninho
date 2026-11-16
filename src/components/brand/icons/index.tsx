@@ -236,3 +236,51 @@ export const IconRadar = make(
     <path d="M12 12 18 6" />
   </>
 );
+
+export const IconCrown = make("IconCrown", <path d="M4.5 19h15M5 16 4 7.5l4.5 3.5L12 5l3.5 6L20 7.5 19 16H5Z" />);
+
+export const IconShield = make(
+  "IconShield",
+  <>
+    <path d="M12 3.5 5 6v5.5c0 4.2 3 7.6 7 9 4-1.4 7-4.8 7-9V6l-7-2.5Z" />
+    <path d="m9 12 2.2 2.2L15.5 10" />
+  </>
+);
+
+export const IconEye = make(
+  "IconEye",
+  <>
+    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </>
+);
+
+export const IconUserPlus = make(
+  "IconUserPlus",
+  <>
+    <circle cx="9.5" cy="8" r="3.2" />
+    <path d="M3.5 19.5c.6-3.3 2.9-5.2 6-5.2s5.4 1.9 6 5.2M18.5 8.5v6M15.5 11.5h6" />
+  </>
+);
+
+export const IconChevronDown = make("IconChevronDown", <path d="m5 9 7 7 7-7" />);
+
+export const IconChevronUp = make("IconChevronUp", <path d="m5 15 7-7 7 7" />);
+
+export const IconCheck = make("IconCheck", <path d="m5 12.5 4.5 4.5L19 7.5" />);
+
+export const IconCopy = make(
+  "IconCopy",
+  <>
+    <rect x="8.5" y="8.5" width="11" height="11" rx="2" />
+    <path d="M15.5 8.5V6A1.5 1.5 0 0 0 14 4.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" />
+  </>
+);
+
+export const IconLink = make(
+  "IconLink",
+  <>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+  </>
+);

@@ -43,7 +43,7 @@ export default function MoreFamilyPage() {
       {isLoading || (activeBaby && userId === undefined) ? (
         <Skeleton className="h-64 rounded-[24px]" role="status" aria-label="Carregando" />
       ) : activeBaby && userId === null ? (
-        <Card className="items-start gap-4 px-[18px]">
+        <Card role="alert" className="items-start gap-4 px-[18px]">
           <p className="text-base text-sn-mu">
             Não foi possível carregar sua conta. Recarregue a página para ver quem acompanha o bebê.
           </p>

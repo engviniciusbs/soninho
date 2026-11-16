@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Trash2, Users } from "lucide-react";
+import { IconTrash, IconUsers } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
+import { StatusPill } from "@/components/ui/status-pill";
 import { getFamilyRelationLabel } from "@/lib/family/relations";
 import type { FamilyMember, FamilyRole } from "@/types";
-import { ROLE_BADGE_CLASSES, ROLE_ICONS, ROLE_LABELS } from "./roles";
+import { ROLE_ICONS, ROLE_LABELS } from "./roles";
 
 function getInitials(name: string | null, email: string | null): string {
   const source = name ?? email ?? "?";
@@ -47,7 +48,7 @@ export function MembersList({
       ) : (
         <div className="space-y-2">
           {members.map((member) => {
-            const RoleIcon = ROLE_ICONS[member.role as FamilyRole] ?? Users;
+            const RoleIcon = ROLE_ICONS[member.role as FamilyRole] ?? IconUsers;
             const isMe = member.user_id === currentUserId;
             const isThisOwner = member.role === "owner";
 
@@ -81,13 +82,11 @@ export function MembersList({
                   )}
                 </div>
 
-                {/* Role badge */}
-                <span
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${ROLE_BADGE_CLASSES[member.role as FamilyRole]}`}
-                >
-                  <RoleIcon className="w-3 h-3" />
+                {/* Role badge: lavender for every role; the label says which. */}
+                <StatusPill tone="attention" className="shrink-0">
+                  <RoleIcon size={14} />
                   {ROLE_LABELS[member.role as FamilyRole]}
-                </span>
+                </StatusPill>
 
                 {/* Remove button (owner removes others; others may leave) */}
                 {((isOwner && !isThisOwner) || (!isOwner && isMe && !isThisOwner)) && (
@@ -98,7 +97,7 @@ export function MembersList({
                     onClick={() => onRemove(member)}
                     aria-label={isMe ? "Sair da família" : "Remover membro"}
                   >
-                    <Trash2 className="size-4" aria-hidden="true" />
+                    <IconTrash size={18} />
                   </Button>
                 )}
               </motion.div>
