@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
 import type { NotificationSettings } from "@/hooks/settings/useNotificationSettings";
@@ -21,16 +20,16 @@ export function NotificationsTab({ settings }: { settings: NotificationSettings 
 }
 
 function WeeklyEmailCard({ settings }: { settings: NotificationSettings }) {
-  const { prefs, save } = settings;
+  const { prefs, save, busy, track } = settings;
   const enabled = prefs.weeklyEmailEnabled;
-  const [saving, setSaving] = useState(false);
+  const saving = busy.savingWeekly;
 
   async function handleToggle(next: boolean) {
-    setSaving(true);
-    if (await save({ weeklyEmailEnabled: next })) {
-      toast.success(next ? "Relatório semanal ativado!" : "Relatório semanal desativado");
-    }
-    setSaving(false);
+    await track("savingWeekly", async () => {
+      if (await save({ weeklyEmailEnabled: next })) {
+        toast.success(next ? "Relatório semanal ativado!" : "Relatório semanal desativado");
+      }
+    });
   }
 
   return (

@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/client";
 import { getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries/notifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
+/** Per-card in-flight flags, kept here so they survive switching tabs. */
+export type NotificationBusyKey = "saving" | "savingWeekly" | "testing";
+
 export interface NotificationPrefs {
   enabled: boolean;
   alertBefore: number;
@@ -43,6 +46,21 @@ export function useNotificationSettings() {
   const pushState = usePushNotifications();
   const [userId, setUserId] = useState<string | null>(null);
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_PREFS);
+  const [busy, setBusy] = useState<Record<NotificationBusyKey, boolean>>({
+    saving: false,
+    savingWeekly: false,
+    testing: false,
+  });
+
+  /** Runs `fn` with the given in-flight flag raised, lowering it afterwards. */
+  async function track<T>(key: NotificationBusyKey, fn: () => Promise<T>): Promise<T> {
+    setBusy((b) => ({ ...b, [key]: true }));
+    try {
+      return await fn();
+    } finally {
+      setBusy((b) => ({ ...b, [key]: false }));
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -93,6 +111,8 @@ export function useNotificationSettings() {
   return {
     userId,
     prefs,
+    busy,
+    track,
     edit,
     save,
     push: { status, enable: subscribe, disable: unsubscribe, test },

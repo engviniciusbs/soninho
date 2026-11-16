@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useNow } from "@/hooks/useNow";
 import type { SleepSession } from "@/types";
 import { CX, CY, R, R_INNER, SZ, dateToAngle, polar, type TypeConfig } from "./config";
 
@@ -28,7 +29,10 @@ export function TimerRing({
     })), [todaySessions]);
 
   /* ── Now marker ───────────────────────────────────────────────────────── */
-  const nowMarker = polar(R, dateToAngle(new Date()));
+  // useNow is null on the server / first render: the marker only appears after
+  // mount, so SSR and hydration agree.
+  const now = useNow(60_000);
+  const nowMarker = now === null ? null : polar(R, dateToAngle(new Date(now)));
 
   /* ── Arc geometry ─────────────────────────────────────────────────────── */
   const circumference = 2 * Math.PI * R;
@@ -141,10 +145,12 @@ export function TimerRing({
       })}
 
       {/* "Now" position marker on ring */}
-      <circle
-        cx={nowMarker.x} cy={nowMarker.y} r={2.5}
-        fill="white" opacity={0.3}
-      />
+      {nowMarker && (
+        <circle
+          cx={nowMarker.x} cy={nowMarker.y} r={2.5}
+          fill="white" opacity={0.3}
+        />
+      )}
     </svg>
   );
 }

@@ -31,16 +31,6 @@ afterEach(() => {
 });
 
 describe("useWakeWindow", () => {
-  it("now_advances_without_completed_session", async () => {
-    const { result } = renderHook(() => useWakeWindow(), { wrapper });
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    const before = result.current.now;
-    act(() => {
-      vi.advanceTimersByTime(2 * 60_000);
-    });
-    expect(result.current.now).toBeGreaterThanOrEqual(before + 2 * 60_000);
-  });
-
   it("elapsed_advances_with_completed_session", async () => {
     const queries = await import("@/lib/supabase/queries/sleep");
     const end = new Date(Date.now() - 10 * 60_000).toISOString();

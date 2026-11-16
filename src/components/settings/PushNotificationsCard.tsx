@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Bell, BellOff, Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import type { NotificationSettings } from "@/hooks/settings/useNotificationSettings";
@@ -12,29 +11,28 @@ const ALERT_OPTIONS = [5, 10, 15, 20];
 
 /** Push subscription toggle plus alert timing, quiet hours and dispatch prefs. */
 export function PushNotificationsCard({ settings }: { settings: NotificationSettings }) {
-  const { prefs, edit, save, push } = settings;
+  const { prefs, edit, save, push, busy, track } = settings;
+  const { saving, testing } = busy;
   const { status } = push;
-  const [saving, setSaving] = useState(false);
-  const [testing, setTesting] = useState(false);
 
   async function handleSave() {
-    setSaving(true);
     const { enabled, alertBefore, quietStart, quietEnd } = prefs;
-    if (await save({ enabled, alertBefore, quietStart, quietEnd })) {
-      toast.success("Preferências de notificação salvas!");
-    }
-    setSaving(false);
+    await track("saving", async () => {
+      if (await save({ enabled, alertBefore, quietStart, quietEnd })) {
+        toast.success("Preferências de notificação salvas!");
+      }
+    });
   }
 
   async function handleTest() {
-    setTesting(true);
-    try {
-      if (await push.test()) toast.success("Notificação de teste enviada!");
-      else toast.error("Erro ao enviar notificação de teste");
-    } catch {
-      toast.error("Erro de rede");
-    }
-    setTesting(false);
+    await track("testing", async () => {
+      try {
+        if (await push.test()) toast.success("Notificação de teste enviada!");
+        else toast.error("Erro ao enviar notificação de teste");
+      } catch {
+        toast.error("Erro de rede");
+      }
+    });
   }
 
   async function handleToggle() {

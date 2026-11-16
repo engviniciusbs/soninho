@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useNow } from "@/hooks/useNow";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
@@ -21,8 +20,6 @@ interface WakeWindowData {
   range: WakeWindowRange;
   minutesUntilNextNap: number;
   lastSleepEnd: string | null;
-  /** Wall-clock time (ms) at which elapsedMinutes was last computed. */
-  now: number;
   isLoading: boolean;
 }
 
@@ -31,8 +28,6 @@ export function useWakeWindow(): WakeWindowData {
   const { activeBaby } = useBaby();
   // Shared 60s clock; null only on the very first client render.
   const tick = useNow(60_000);
-  const [initialNow] = useState(() => Date.now());
-  const now = tick ?? initialNow;
 
   const { data: lastSession, isLoading } = useQuery({
     queryKey: ["last-session", activeBaby?.id],
@@ -64,7 +59,6 @@ export function useWakeWindow(): WakeWindowData {
     range,
     minutesUntilNextNap,
     lastSleepEnd,
-    now,
     isLoading,
   };
 }

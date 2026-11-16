@@ -2,6 +2,7 @@
 
 import { Wrench } from "lucide-react";
 import { useNotificationSettings } from "@/hooks/settings/useNotificationSettings";
+import { useSleepExport } from "@/hooks/settings/useSleepExport";
 import { GeneralTab } from "@/components/settings/GeneralTab";
 import { NotificationsTab } from "@/components/settings/NotificationsTab";
 import { ToolsTab } from "@/components/settings/ToolsTab";
@@ -12,6 +13,7 @@ export default function SettingsPage() {
   // Page-level so the loaded prefs/edits survive tab switches; its initial load
   // also resolves the user id the family section needs.
   const notifications = useNotificationSettings();
+  const sleepExport = useSleepExport();
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">
@@ -40,7 +42,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="tools" className="space-y-6 mt-4">
-          <ToolsTab />
+          <ToolsTab sleepExport={sleepExport} />
         </TabsContent>
       </Tabs>
     </div>

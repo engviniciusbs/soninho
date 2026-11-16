@@ -120,4 +120,30 @@ describe("useNotificationSettings", () => {
     await expect(push.test()).resolves.toBe(false);
     expect(fetchMock).toHaveBeenCalledWith("/api/notifications/test", { method: "POST" });
   });
+
+  it("track_raises_flag_for_the_duration_and_lowers_it_on_failure", async () => {
+    const { result } = setup();
+    await waitFor(() => expect(result.current.userId).toBe("user-1"));
+    expect(result.current.busy).toEqual({ saving: false, savingWeekly: false, testing: false });
+    let release!: () => void;
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current.track("testing", () => new Promise<void>((r) => (release = r)));
+    });
+    expect(result.current.busy.testing).toBe(true);
+    expect(result.current.busy.saving).toBe(false);
+    await act(async () => {
+      release();
+      await pending;
+    });
+    expect(result.current.busy.testing).toBe(false);
+    await act(async () => {
+      await expect(
+        result.current.track("saving", async () => {
+          throw new Error("boom");
+        })
+      ).rejects.toThrow("boom");
+    });
+    expect(result.current.busy.saving).toBe(false);
+  });
 });
