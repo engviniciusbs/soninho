@@ -440,7 +440,7 @@ exports[`FamilySettings > generates_invite_link > link 1`] = `
           <p
             class="mt-1 text-xs text-muted-foreground pl-1"
           >
-            Válido por 7 dias · 
+            Válido por 7 dias, 
             Só visualizar
           </p>
         </div>
@@ -1010,14 +1010,22 @@ exports[`FamilySettings > renders_members_and_invites > owner 1`] = `
                  
                 08/01/2026
               </p>
-              <span
-                class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr mt-1"
-                data-slot="status-pill"
-                data-tone="attention"
+              <p
+                class="mt-1 flex flex-wrap items-center gap-2"
               >
-                Só visualizar
-                 · Avô
-              </span>
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-sans text-xs font-extrabold whitespace-nowrap border-sn-pr/50 bg-sn-pr/8 text-sn-pr"
+                  data-slot="status-pill"
+                  data-tone="attention"
+                >
+                  Só visualizar
+                </span>
+                <span
+                  class="font-sans text-sm font-semibold text-sn-mu"
+                >
+                  Avô
+                </span>
+              </p>
             </div>
             <button
               aria-label="Cancelar convite"

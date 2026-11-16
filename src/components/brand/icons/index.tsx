@@ -312,3 +312,5 @@ export const IconShirt = make(
   "IconShirt",
   <path d="M9 3.5 4 6l1.5 4.5 2.5-1v11h8v-11l2.5 1L20 6l-5-2.5c-.4 1.4-1.6 2.5-3 2.5S9.4 4.9 9 3.5Z" />
 );
+
+export const IconX = make("IconX", <path d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5" />);

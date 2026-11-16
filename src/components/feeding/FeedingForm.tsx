@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
+import { IconX } from "@/components/brand/icons";
 import { Input } from "@/components/ui/input";
 import { DateTimeRangeFields } from "@/components/forms/DateTimeRangeFields";
 import {
@@ -387,14 +388,17 @@ function FeedingFormBody({ onClose, item, onDelete }: Omit<FeedingFormProps, "op
           {foodTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {foodTags.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => toggleTag(tag)}
-                  className="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
-                >
-                  {tag} ✕
-                </button>
+                <Chip key={tag} selected className="gap-1 py-1 pr-1">
+                  {tag}
+                  <button
+                    type="button"
+                    aria-label={`Remover ${tag}`}
+                    onClick={() => toggleTag(tag)}
+                    className="relative grid size-7 cursor-pointer place-items-center rounded-full outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-2 hover:bg-sn-pr-ink/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sn-pr-ink active:scale-[0.92] motion-reduce:transition-none"
+                  >
+                    <IconX size={16} />
+                  </button>
+                </Chip>
               ))}
             </div>
           )}

@@ -746,20 +746,64 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
           <div
             class="flex flex-wrap gap-1.5"
           >
-            <button
-              class="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
-              type="button"
+            <span
+              class="inline-flex items-center rounded-full border px-[13px] font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink gap-1 py-1 pr-1"
+              data-selected="true"
+              data-slot="chip"
             >
               Banana
-               ✕
-            </button>
-            <button
-              class="relative inline-flex min-h-9 cursor-pointer items-center gap-1.5 rounded-full border border-sn-pr bg-sn-pr px-[13px] py-2 font-sans text-[13px] font-bold text-sn-pr-ink outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-y-1 after:inset-x-0 hover:bg-sn-pr/88 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:scale-[0.97] motion-reduce:transition-none"
-              type="button"
+              <button
+                aria-label="Remover Banana"
+                class="relative grid size-7 cursor-pointer place-items-center rounded-full outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-2 hover:bg-sn-pr-ink/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sn-pr-ink active:scale-[0.92] motion-reduce:transition-none"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  focusable="false"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
+                  />
+                </svg>
+              </button>
+            </span>
+            <span
+              class="inline-flex items-center rounded-full border px-[13px] font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink gap-1 py-1 pr-1"
+              data-selected="true"
+              data-slot="chip"
             >
               Kiwi
-               ✕
-            </button>
+              <button
+                aria-label="Remover Kiwi"
+                class="relative grid size-7 cursor-pointer place-items-center rounded-full outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out after:absolute after:-inset-2 hover:bg-sn-pr-ink/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sn-pr-ink active:scale-[0.92] motion-reduce:transition-none"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  focusable="false"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
+                  />
+                </svg>
+              </button>
+            </span>
           </div>
           <div
             aria-label="Alimentos"

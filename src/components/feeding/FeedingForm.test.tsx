@@ -97,7 +97,7 @@ describe("FeedingForm", () => {
       expect(field("side_right_min").value).toBe("7");
       expect(field("notes").value).toBe("calma");
     } else {
-      expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Remover Kiwi" })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: "Banana" })).toHaveAttribute("aria-pressed", "true");
       expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("Gostou");
       expect(field("notes").value).toBe("sujou");
@@ -118,7 +118,7 @@ describe("FeedingForm", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     rerender(<FeedingForm open onClose={onClose} item={items.SOLID} />);
     await screen.findByRole("dialog");
-    expect(screen.getByRole("button", { name: "Kiwi ✕" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Remover Kiwi" })).toBeInTheDocument();
     expect(field("notes").value).toBe("sujou");
   });
 
@@ -286,5 +286,14 @@ describe("FeedingForm", () => {
 
     submit();
     await waitFor(() => expect(screen.getByRole("button", { name: "Excluir" })).toBeDisabled());
+  });
+
+  it("a_custom_food_tag_is_removed_by_its_own_close_button", async () => {
+    await mount(items.SOLID);
+    fireEvent.click(screen.getByRole("button", { name: "Remover Kiwi" }));
+    expect(screen.queryByRole("button", { name: "Remover Kiwi" })).toBeNull();
+    expect(screen.queryByText("Kiwi")).toBeNull();
+    // Banana stays picked.
+    expect(screen.getByRole("button", { name: "Banana" })).toHaveAttribute("aria-pressed", "true");
   });
 });

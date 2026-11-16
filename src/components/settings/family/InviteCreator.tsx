@@ -142,8 +142,8 @@ export function InviteCreator({
               </Button>
             </div>
             <p className="mt-1 text-xs text-muted-foreground pl-1">
-              Válido por 7 dias · {ROLE_LABELS[role]}
-              {relation ? ` · ${getFamilyRelationLabel(relation)}` : ""}
+              Válido por 7 dias, {ROLE_LABELS[role]}
+              {relation ? `, ${getFamilyRelationLabel(relation)}` : ""}
             </p>
           </motion.div>
         )}

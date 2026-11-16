@@ -19,6 +19,6 @@ describe("getFeedingTimeline", () => {
       new Date("2026-01-01T00:00:00.000Z"),
       new Date("2026-01-02T00:00:00.000Z")
     );
-    expect(data[0].summary).toBe("90ml · leite materno");
+    expect(data[0].summary).toBe("90ml, leite materno");
   });
 });

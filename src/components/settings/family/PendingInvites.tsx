@@ -49,12 +49,14 @@ export function PendingInvites({ invites, onRevoke }: PendingInvitesProps) {
                     Expira em{" "}
                     {new Date(invite.expires_at).toLocaleDateString("pt-BR")}
                   </p>
-                  <StatusPill tone="attention" className="mt-1">
-                    {ROLE_LABELS[invite.role as FamilyRole]}
-                    {invite.family_relation
-                      ? ` · ${getFamilyRelationLabel(invite.family_relation)}`
-                      : ""}
-                  </StatusPill>
+                  <p className="mt-1 flex flex-wrap items-center gap-2">
+                    <StatusPill tone="attention">{ROLE_LABELS[invite.role as FamilyRole]}</StatusPill>
+                    {invite.family_relation && (
+                      <span className="font-sans text-sm font-semibold text-sn-mu">
+                        {getFamilyRelationLabel(invite.family_relation)}
+                      </span>
+                    )}
+                  </p>
                 </div>
                 <Button
                   variant="icon"
