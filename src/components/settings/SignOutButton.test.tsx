@@ -5,10 +5,11 @@ import { renderWithProviders } from "@/test/render";
 import { useSleepStore } from "@/store/sleepStore";
 import { useFeedingStore } from "@/store/feedingStore";
 import { regressionAiKey } from "@/lib/sleep/regressionAiGate";
+import { toast } from "sonner";
 import { SignOutButton, signOutEverywhere } from "./SignOutButton";
 
 const holder = vi.hoisted(() => ({
-  signOut: vi.fn(async () => ({ error: null })),
+  signOut: vi.fn(async (): Promise<{ error: { message: string } | null }> => ({ error: null })),
   push: vi.fn(),
   calls: [] as string[],
 }));
@@ -16,6 +17,7 @@ const holder = vi.hoisted(() => ({
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => ({ auth: { signOut: holder.signOut } }),
 }));
+vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: holder.push, refresh: () => {} }),
 }));
@@ -196,5 +198,21 @@ describe("SignOutButton", () => {
     finish();
     await waitFor(() => expect(holder.push).toHaveBeenCalledWith("/login"));
     expect(holder.signOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("se a sessão não encerra, fica na tela e avisa para tentar de novo", async () => {
+    holder.signOut.mockImplementation(async () => ({ error: { message: "Failed to fetch" } }));
+    renderWithProviders(<SignOutButton />);
+    const button = screen.getByRole("button", { name: "Sair da conta" });
+    fireEvent.click(button);
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "Não foi possível sair. Verifique a conexão e tente de novo."
+      )
+    );
+    expect(holder.push).not.toHaveBeenCalled();
+    expect(button).not.toBeDisabled();
+    // Still signed in: the timers of this device stay.
+    expect(useSleepStore.getState().timers).not.toEqual({});
   });
 });

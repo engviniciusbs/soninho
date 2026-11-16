@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { unsubscribeThisDevice } from "@/lib/notifications/pushClient";
 import { REGRESSION_AI_KEY_PREFIX } from "@/lib/sleep/regressionAiGate";
@@ -34,8 +35,10 @@ function clearLocalState() {
 
 /**
  * Sign out of this device: cancels its push (while the session still
- * authorizes the DELETE), clears the local timers and the regression gate,
- * and ends the Supabase session. A push failure never blocks the sign-out.
+ * authorizes the DELETE), ends the Supabase session, then clears the local
+ * timers and the regression gate. A push failure never blocks the sign-out.
+ * Throws when the session could not be ended: the user is still signed in,
+ * so nothing local is cleared.
  */
 export async function signOutEverywhere(supabase = createClient()): Promise<void> {
   try {
@@ -43,8 +46,9 @@ export async function signOutEverywhere(supabase = createClient()): Promise<void
   } catch {
     /* offline or no worker: signing out still goes on */
   }
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
   clearLocalState();
-  await supabase.auth.signOut();
 }
 
 /** "Sair da conta": cleans this device, ends the session and goes to the login page. */
@@ -66,7 +70,9 @@ export function SignOutButton() {
       router.push("/login");
       router.refresh();
     } catch {
-      // The session could not be ended (offline): the button works again.
+      // The session could not be ended (offline): stay here, say so, and
+      // let the button work again.
+      toast.error("Não foi possível sair. Verifique a conexão e tente de novo.");
       running.current = false;
       setSigningOut(false);
     }
