@@ -10,7 +10,7 @@ function query(data: unknown[]) {
   const q: Record<string, unknown> = {
     then: (resolve: (v: unknown) => void) => resolve({ data }),
   };
-  for (const m of ["select", "eq", "gte", "gt", "lt", "order"]) q[m] = () => q;
+  for (const m of ["select", "eq", "gte", "gt", "lt", "or", "order"]) q[m] = () => q;
   return q;
 }
 
@@ -253,5 +253,78 @@ describe("manual report covers complete days only", () => {
     // (5 + 6 × 13) / 7 = 11,857 h: today's 3 h are left out.
     expect(html).toContain("11h 51min");
     expect(html).toContain("dias completos");
+  });
+});
+
+describe("a night still running at report time", () => {
+  afterEach(() => vi.useRealTimers());
+  // The weekly e-mail runs on Monday morning: 17/11 11:00 UTC = 08:00 local.
+  const now = new Date("2026-11-17T11:00:00Z");
+  const period = getReportPeriod(now, 7, TZ, { endsYesterday: true }); // 10/11 to 16/11
+  // Sunday 16/11 19:00 local, not stopped yet.
+  const running = {
+    id: "run",
+    baby_id: "b1",
+    type: "NIGHT_SLEEP",
+    start_time: "2026-11-16T22:00:00Z",
+    end_time: null,
+    duration_min: null,
+  } as unknown as SleepSession;
+
+  it("counts up to the period end, so Sunday night is not lost", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(now);
+    const stats = buildBabyStats([running], "2026-02-10", "Lia", "", period, undefined, TZ);
+    // 19:00 to 24:00 on 16/11: 5 h on the only day with data.
+    expect(stats.avgTotalHours).toBe(5);
+    // Not finished: never the longest night.
+    expect(stats.longestNightHours).toBe(0);
+  });
+
+  it("a session left open for days is a forgotten stop, not sleep", () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(now);
+    const forgotten = { ...running, id: "old", start_time: "2026-11-12T22:00:00Z" } as SleepSession;
+    const stats = buildBabyStats([forgotten], "2026-02-10", "Lia", "", period, undefined, TZ);
+    expect(stats.avgTotalHours).toBe(0);
+  });
+
+  it("is data: the e-mail goes out", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(now);
+    const { supabase } = fakeSupabase({ inserted: true, sessions: [running] });
+    const send = vi.fn().mockResolvedValue({ error: null });
+    const r = await sendSleepReport({ ...base, kind: "weekly", timeZone: TZ, supabase, resend: resendWith(send) });
+    expect(r).toEqual({ ok: true });
+  });
+});
+
+describe("e-mail with no sleep in the period", () => {
+  it("shows a dash, never 0 min or 0%", async () => {
+    const html = await render(
+      WeeklyReport({
+        parentName: "Ana",
+        periodLabel: "x",
+        appUrl: "https://soninho.baby",
+        babies: [
+          {
+            name: "Lia",
+            emoji: "",
+            ageLabel: "9 meses",
+            avgTotalHours: 0,
+            targetTotalHours: 14,
+            avgNapMinutes: 0,
+            napCountAvg: 0,
+            longestNightHours: 0,
+            adherencePct: 0,
+            bestEnvironment: null,
+            feeding: null,
+          },
+        ],
+      })
+    );
+    expect(html).not.toMatch(/\b0 ?min\b/);
+    expect(html).not.toContain("0% da meta");
+    expect(html).toContain("Sem sono registrado no período");
   });
 });

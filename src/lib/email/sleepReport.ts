@@ -22,7 +22,10 @@ import type {
 } from "@/types";
 import { addDaysToKey, parseLocalDate } from "@/lib/dates/localDate";
 import { formatDecimal } from "@/lib/format/number";
+import { withProvisionalEnd } from "@/lib/sleep/provisional";
 const FROM = "Soninho <sono@soninho.baby>";
+/** A sleep open longer than this at report time is not counted. */
+const MAX_RUNNING_MS = 24 * 60 * 60_000;
 
 /** Minutes of a finished session (duration_min, else from its timestamps). */
 function sessionMinutes(s: SleepSession): number {
@@ -55,7 +58,16 @@ export function buildBabyStats(
   for (let k = period.startKey; k <= period.endKey; k = addDaysToKey(k, 1)) dayKeys.push(k);
 
   const finished = sessions.filter((s) => s.end_time != null && s.duration_min != null);
-  const byDay = groupSessionsByLocalDay(finished, timeZone);
+  // A sleep still running at report time counts up to the period end (or now,
+  // if earlier): Sunday's night is not lost on Monday morning. It is never the
+  // longest night nor an average nap, which must be finished.
+  // A session left open for more than a day is a forgotten stop, not sleep.
+  const until = Math.min(Date.now(), period.endUtc.getTime());
+  const counted = sessions
+    .filter((s) => s.end_time != null || until - Date.parse(s.start_time) <= MAX_RUNNING_MS)
+    .map((s) => withProvisionalEnd(s, until))
+    .filter((s) => s.end_time != null && s.duration_min != null);
+  const byDay = groupSessionsByLocalDay(counted, timeZone);
 
   const dayTotals = dayKeys.map((k) =>
     (byDay.get(k) ?? []).reduce((a, x) => a + x.napMinutes + x.nightMinutes, 0)
@@ -218,7 +230,8 @@ export async function sendSleepReport(params: {
           .select("*")
           .eq("baby_id", baby.id)
           .lt("start_time", periodEndIso)
-          .gt("end_time", periodStartIso)
+          // A night still running (end_time null) is in too.
+          .or(`end_time.gt.${periodStartIso},end_time.is.null`)
           .order("start_time", { ascending: true }),
         params.supabase
           .from("bottle_feedings")
@@ -246,7 +259,8 @@ export async function sendSleepReport(params: {
       breastSessions: (breastSessions ?? []) as BreastfeedingSession[],
       solids: (solids ?? []) as SolidFeeding[],
     };
-    const hasSleepData = list.filter((s) => s.duration_min != null).length > 0;
+    // Finished or still running: both count in the period.
+    const hasSleepData = list.length > 0;
     const hasFeedingData =
       feeding.bottles.length > 0 ||
       feeding.breastSessions.length > 0 ||

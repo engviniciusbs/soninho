@@ -287,6 +287,8 @@ function StatCell({
 }
 
 function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
+  // No sleep logged in the period: dashes, never a "0 min" or "0%" that looks measured.
+  const hasSleep = baby.avgTotalHours > 0;
   return (
     <Section style={babyCard}>
       <div style={babyHeader}>
@@ -302,21 +304,22 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
           <div style={progressFill(baby.adherencePct)} />
         </div>
         <Text style={progressMeta}>
-          {baby.adherencePct}% da meta de {hours(baby.targetTotalHours)} por dia, média de{" "}
-          {hours(baby.avgTotalHours)}
+          {hasSleep
+            ? `${baby.adherencePct}% da meta de ${hours(baby.targetTotalHours)} por dia, média de ${hours(baby.avgTotalHours)}`
+            : `Sem sono registrado no período. Meta de ${hours(baby.targetTotalHours)} por dia.`}
         </Text>
       </Section>
 
       <Row>
         <StatCell
           label="Sono total"
-          value={hours(baby.avgTotalHours)}
-          unit="por dia"
+          value={hasSleep ? hours(baby.avgTotalHours) : "–"}
+          unit={hasSleep ? "por dia" : undefined}
         />
         <StatCell
           label="Sonecas"
-          value={dec(baby.napCountAvg)}
-          unit="/ dia"
+          value={hasSleep ? dec(baby.napCountAvg) : "–"}
+          unit={hasSleep ? "/ dia" : undefined}
         />
       </Row>
       <Row>
