@@ -12,7 +12,8 @@ import {
 } from "@/components/providers/UserProfileProvider";
 import { EMPTY_SLEEP_DRAFT, SLEEP_STORE_VERSION, useSleepStore } from "@/store/sleepStore";
 import type { AISuggestion, Baby, FeedingTimelineItem, SleepSession } from "@/types";
-import { updateSleepSession } from "@/lib/supabase/queries/sleep";
+import { getSleepSessionDetails, updateSleepSession } from "@/lib/supabase/queries/sleep";
+import { toast } from "sonner";
 import AppHomePage from "@/app/(dashboard)/app/page";
 
 const holder = vi.hoisted(() => ({
@@ -39,6 +40,8 @@ vi.mock("@/lib/supabase/queries/sleep", async (importOriginal) => {
     })),
     // Spied so tests can see which fields a save sends.
     updateSleepSession: vi.fn(orig.updateSleepSession),
+    // Spied so tests can fail or delay the session read.
+    getSleepSessionDetails: vi.fn(orig.getSleepSessionDetails),
     // Switchable so a test can rule out the DB restore of an open session.
     getActiveSleepSession: vi.fn((...args: Parameters<typeof orig.getActiveSleepSession>) =>
       holder.noDbRestore
@@ -112,6 +115,8 @@ beforeEach(() => {
   holder.feedings = {};
   holder.toasts.mockClear();
   holder.noDbRestore = false;
+  // Back to the real read (a test may have failed or delayed it).
+  vi.mocked(getSleepSessionDetails).mockReset();
   holder.lastSession = {
     id: "prev",
     end_time: new Date(NOW.getTime() - 30 * 60_000).toISOString(),
@@ -387,6 +392,70 @@ describe("Home", () => {
     const row = fake.rows(TABLE)[0];
     expect(row.sleep_sack_tog).toBe(2.5);
     expect(row.room_temp_celsius).toBe(22);
+  });
+
+  it("note_is_saved_when_the_session_reads_failed_before", async () => {
+    seedRunning(helena.id, "NAP", 600);
+    // The first read (on mount) and the sheet-open read fail; the save reads again.
+    const failed = { data: null, error: { message: "offline" } } as unknown as Awaited<
+      ReturnType<typeof getSleepSessionDetails>
+    >;
+    vi.mocked(getSleepSessionDetails).mockResolvedValueOnce(failed).mockResolvedValueOnce(failed);
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    fireEvent.change(screen.getByLabelText("Notas sobre o sono"), {
+      target: { value: "Dormiu no colo" },
+    });
+    await click(screen.getByRole("button", { name: "Salvar nota" }));
+    await flush();
+
+    expect(fake.rows(TABLE)[0].notes).toBe("Dormiu no colo");
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it("note_that_cannot_be_saved_says_so_instead_of_vanishing", async () => {
+    seedRunning(helena.id, "NAP", 600);
+    vi.mocked(getSleepSessionDetails).mockResolvedValue({
+      data: null,
+      error: { message: "offline" },
+    } as unknown as Awaited<ReturnType<typeof getSleepSessionDetails>>);
+    await mount();
+
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    fireEvent.change(screen.getByLabelText("Notas sobre o sono"), {
+      target: { value: "Dormiu no colo" },
+    });
+    await click(screen.getByRole("button", { name: "Salvar nota" }));
+    await flush();
+
+    expect(toast.error).toHaveBeenCalledWith("Não foi possível salvar a nota");
+    expect(updateSleepSession).not.toHaveBeenCalled();
+  });
+
+  it("late_sheet_open_read_does_not_overwrite_a_note_being_typed", async () => {
+    seedRunning(helena.id, "NAP", 600);
+    await mount();
+    // Another caregiver saved a note meanwhile; the sheet-open read is slow.
+    fake.rows(TABLE)[0].notes = "Nota antiga";
+    const orig = vi.mocked(getSleepSessionDetails).getMockImplementation()!;
+    vi.mocked(getSleepSessionDetails).mockImplementationOnce(
+      (...args) =>
+        new Promise((resolve) => setTimeout(() => resolve(orig(...args)), 2000)) as ReturnType<
+          typeof getSleepSessionDetails
+        >
+    );
+
+    await click(screen.getByRole("button", { name: "Anotar algo" }));
+    fireEvent.change(screen.getByLabelText("Notas sobre o sono"), {
+      target: { value: "Nota nova" },
+    });
+    await flush(2500);
+
+    expect(screen.getByLabelText("Notas sobre o sono")).toHaveValue("Nota nova");
+    await click(screen.getByRole("button", { name: "Salvar nota" }));
+    await flush();
+    expect(fake.rows(TABLE)[0].notes).toBe("Nota nova");
   });
 
   it("overdue_comes_from_the_suggestion_not_the_wake_window", async () => {

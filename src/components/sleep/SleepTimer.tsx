@@ -101,6 +101,10 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   };
 
   function onEnvChange(d: EnvironmentData) {
+    for (const k of ENV_KEYS) {
+      const key = k as keyof EnvironmentData;
+      if (d[key] !== envData[key]) edited.current.add(k);
+    }
     setRoomTemp(d.room_temp_celsius);
     setWeatherCondition(d.weather_condition);
     setSleepSackType(d.sleep_sack_type);
@@ -114,6 +118,9 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   // against, so a save only sends what this user changed.
   const sessionId = timer?.sessionId ?? null;
   const snapshot = useRef<SessionFields | null>(null);
+  // Fields the user changed since their sheet opened: a session read that
+  // lands after the edit must not overwrite it.
+  const edited = useRef(new Set<FieldKey>());
 
   const local: SessionFields = {
     room_temp_celsius: roomTemp,
@@ -151,13 +158,15 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   // doesn't have yet are kept (they show up as changes on the next save).
   useEffect(() => {
     snapshot.current = null;
+    edited.current.clear();
     if (!sessionId) return;
     let alive = true;
     void readSession().then((row) => {
       if (!alive || !row) return;
-      snapshot.current = row;
+      snapshot.current = snapshot.current ?? row;
       const stored: Partial<SessionFields> = {};
       for (const k of [...ENV_KEYS, "notes"] as FieldKey[]) {
+        if (edited.current.has(k)) continue;
         if (row[k] !== null && row[k] !== "") Object.assign(stored, { [k]: row[k] });
       }
       applyLocal(stored);
@@ -170,14 +179,22 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   // Opening a sheet re-reads the session, so it shows (and later diffs
   // against) what another caregiver may have saved meanwhile.
   async function syncFromSession(keys: FieldKey[]) {
+    for (const k of keys) edited.current.delete(k);
     const row = await readSession();
     if (!row) return;
     snapshot.current = { ...(snapshot.current ?? row), ...pick(row, keys) };
-    applyLocal(pick(row, keys));
+    applyLocal(pick(row, keys.filter((k) => !edited.current.has(k))));
   }
 
   async function saveChanged(keys: FieldKey[], what: string) {
-    if (!sessionId || !snapshot.current) return;
+    if (!sessionId) return;
+    // No snapshot yet (the first read failed or is still pending): read now,
+    // and say so if that fails too, instead of dropping the edit.
+    if (!snapshot.current) snapshot.current = await readSession();
+    if (!snapshot.current) {
+      toast.error(`Não foi possível salvar ${what}`);
+      return;
+    }
     const base = snapshot.current;
     const patch = Object.fromEntries(
       keys
@@ -191,6 +208,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
       return;
     }
     snapshot.current = { ...base, ...pick(local, keys) };
+    for (const k of keys) edited.current.delete(k);
   }
 
   /* ── Next sleep: the AI suggestion, else the wake-window fallback ── */
@@ -222,7 +240,10 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
           onEnvironmentOpen={() => void syncFromSession(ENV_KEYS)}
           onEnvironmentDone={() => void saveChanged(ENV_KEYS, "o ambiente")}
           notes={notes}
-          onNotesChange={setNotes}
+          onNotesChange={(n) => {
+            edited.current.add("notes");
+            setNotes(n);
+          }}
           onNotesOpen={() => void syncFromSession(["notes"])}
           onNotesDone={() => void saveChanged(["notes"], "a nota")}
           onStop={onStop}
