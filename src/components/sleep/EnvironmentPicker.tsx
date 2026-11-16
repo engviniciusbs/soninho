@@ -13,7 +13,6 @@ import { TogSelector } from "./environment/TogSelector";
 import { RecommendationCard } from "./environment/RecommendationCard";
 
 export type { EnvironmentData } from "./environment/types";
-export { EnvironmentPickerCompact } from "./environment/EnvironmentPickerCompact";
 
 interface EnvironmentPickerProps {
   value: EnvironmentData;

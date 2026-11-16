@@ -284,3 +284,31 @@ export const IconLink = make(
     <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
   </>
 );
+
+export const IconCloud = make(
+  "IconCloud",
+  <path d="M7 18.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 10.1 4.2 4.2 0 0 0 7 18.5Z" />
+);
+
+export const IconRain = make(
+  "IconRain",
+  <>
+    <path d="M7 14.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 6.1 4.2 4.2 0 0 0 7 14.5Z" />
+    <path d="m9 17.5-1 2.5M13 17.5l-1 2.5M17 17.5l-1 2.5" />
+  </>
+);
+
+export const IconSnow = make(
+  "IconSnow",
+  <path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5" />
+);
+
+export const IconWind = make(
+  "IconWind",
+  <path d="M3.5 9h11a2.5 2.5 0 1 0-2.5-2.5M3.5 13h15a2.5 2.5 0 1 1-2.5 2.5M3.5 17h7" />
+);
+
+export const IconShirt = make(
+  "IconShirt",
+  <path d="M9 3.5 4 6l1.5 4.5 2.5-1v11h8v-11l2.5 1L20 6l-5-2.5c-.4 1.4-1.6 2.5-3 2.5S9.4 4.9 9 3.5Z" />
+);

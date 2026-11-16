@@ -1,7 +1,6 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { Info } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Chip } from "@/components/ui/chip";
 import { TOG_OPTIONS, type SleepSackType } from "@/lib/sleep/clothingRecommendation";
+import { FIELD_LABEL } from "./options";
 
 // ─── TOG selector — only when a sack is selected ──────────────────────────────
 export function TogSelector({
@@ -13,51 +12,23 @@ export function TogSelector({
   value: number | null;
   onSelect: (tog: number) => void;
 }) {
+  if (!sackType || sackType === "none") return null;
   return (
-    <AnimatePresence>
-      {sackType && sackType !== "none" && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="space-y-2 overflow-hidden"
-        >
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              TOG do saquinho
-            </label>
-            <Info className="h-3 w-3 text-muted-foreground/40" aria-hidden="true" />
-          </div>
-          <div
-            role="group"
-            aria-label="TOG do saquinho"
-            className="flex gap-1.5 flex-wrap"
+    <div className="space-y-2">
+      <p className={FIELD_LABEL}>TOG do saquinho</p>
+      <div role="group" aria-label="TOG do saquinho" className="flex flex-wrap gap-2">
+        {TOG_OPTIONS.map((t) => (
+          <Chip
+            key={t}
+            aria-label={`TOG ${t}`}
+            selected={value === t}
+            onClick={() => onSelect(t)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(t); }}
           >
-            {TOG_OPTIONS.map((t) => {
-              const isActive = value === t;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={isActive}
-                  aria-label={`TOG ${t}`}
-                  onClick={() => onSelect(t)}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(t); }}
-                  className={cn(
-                    "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  )}
-                  style={{ touchAction: "manipulation" }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+            {t}
+          </Chip>
+        ))}
+      </div>
+    </div>
   );
 }

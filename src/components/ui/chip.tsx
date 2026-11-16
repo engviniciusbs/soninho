@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { KeyboardEventHandler, ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -8,6 +8,9 @@ export interface ChipProps {
   disabled?: boolean
   children: ReactNode
   className?: string
+  /** Accessible name when the visible text is short ("26°" for "Definir temperatura como 26°C"). */
+  "aria-label"?: string
+  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>
 }
 
 const BASE =
@@ -17,7 +20,15 @@ const LOOK = (selected: boolean) =>
   selected ? "border-sn-pr bg-sn-pr text-sn-pr-ink" : "border-sn-bd bg-sn-s2 text-sn-tx"
 
 /** Small pill (mockup `.chip`, `.chip.on`). A toggle button with `aria-pressed` when clickable. */
-export function Chip({ selected = false, onClick, disabled, children, className }: ChipProps) {
+export function Chip({
+  selected = false,
+  onClick,
+  disabled,
+  children,
+  className,
+  "aria-label": ariaLabel,
+  onKeyDown,
+}: ChipProps) {
   if (!onClick) {
     return (
       <span data-slot="chip" data-selected={selected || undefined} className={cn(BASE, LOOK(selected), className)}>
@@ -30,8 +41,10 @@ export function Chip({ selected = false, onClick, disabled, children, className 
       type="button"
       data-slot="chip"
       aria-pressed={selected}
+      aria-label={ariaLabel}
       disabled={disabled}
       onClick={onClick}
+      onKeyDown={onKeyDown}
       className={cn(
         BASE,
         LOOK(selected),

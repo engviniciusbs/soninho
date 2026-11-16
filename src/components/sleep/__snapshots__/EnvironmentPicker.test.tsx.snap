@@ -110,34 +110,37 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
     class="space-y-5"
   >
     <div
+      aria-labelledby="_r_0_"
       class="flex flex-col gap-2"
+      role="group"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_0_"
       >
         Temperatura do quarto
-      </label>
+      </p>
       <div
         class="flex items-center gap-3"
       >
         <button
           aria-label="Diminuir temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-minus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
               d="M5 12h14"
@@ -145,57 +148,54 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
           </svg>
         </button>
         <div
-          class="flex flex-1 items-center justify-center gap-1"
+          class="flex flex-1 items-baseline justify-center gap-1"
         >
           <span
             aria-atomic="true"
             aria-live="polite"
-            class="text-3xl font-bold tabular-nums transition-colors text-emerald-400"
+            class="font-display text-[34px] leading-none font-bold tabular-nums text-sn-mu"
           >
             —
           </span>
           <span
-            class="text-sm text-muted-foreground mt-1"
+            class="font-sans text-base font-bold text-sn-mu"
           >
             °C
           </span>
         </div>
         <button
           aria-label="Aumentar temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-plus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M5 12h14"
-            />
-            <path
-              d="M12 5v14"
+              d="M12 5v14M5 12h14"
             />
           </svg>
         </button>
       </div>
       <div
-        class="flex gap-1.5 flex-wrap"
+        class="flex flex-wrap gap-2"
       >
         <button
           aria-label="Definir temperatura como 18°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           18
@@ -204,8 +204,8 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Definir temperatura como 20°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           20
@@ -214,8 +214,8 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Definir temperatura como 22°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           22
@@ -224,8 +224,8 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Definir temperatura como 24°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           24
@@ -234,8 +234,8 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Definir temperatura como 26°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           26
@@ -244,8 +244,8 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Definir temperatura como 28°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           28
@@ -256,16 +256,17 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_1_"
       >
-        Clima externo
+        Clima externo 
         <span
-          class="ml-1 normal-case font-normal text-muted-foreground/50"
+          class="font-semibold"
         >
           (opcional)
         </span>
-      </label>
+      </p>
       <div
         aria-label="Condição climática"
         class="grid grid-cols-3 gap-2"
@@ -274,22 +275,20 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Ensolarado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-sun h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <circle
               cx="12"
@@ -297,32 +296,11 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
               r="4"
             />
             <path
-              d="M12 2v2"
-            />
-            <path
-              d="M12 20v2"
-            />
-            <path
-              d="m4.93 4.93 1.41 1.41"
-            />
-            <path
-              d="m17.66 17.66 1.41 1.41"
-            />
-            <path
-              d="M2 12h2"
-            />
-            <path
-              d="M20 12h2"
-            />
-            <path
-              d="m6.34 17.66-1.41 1.41"
-            />
-            <path
-              d="m19.07 4.93-1.41 1.41"
+              d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ensolarado
           </span>
@@ -330,29 +308,27 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Nublado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+              d="M7 18.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 10.1 4.2 4.2 0 0 0 7 18.5Z"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Nublado
           </span>
@@ -360,38 +336,30 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Chuvoso"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud-rain h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+              d="M7 14.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 6.1 4.2 4.2 0 0 0 7 14.5Z"
             />
             <path
-              d="M16 14v6"
-            />
-            <path
-              d="M8 14v6"
-            />
-            <path
-              d="M12 16v6"
+              d="m9 17.5-1 2.5M13 17.5l-1 2.5M17 17.5l-1 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Chuvoso
           </span>
@@ -399,29 +367,27 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Muito quente"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-thermometer h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+              d="M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0ZM12 9v6.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Muito quente
           </span>
@@ -429,62 +395,27 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Frio"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-snowflake h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="m10 20-1.25-2.5L6 18"
-            />
-            <path
-              d="M10 4 8.75 6.5 6 6"
-            />
-            <path
-              d="m14 20 1.25-2.5L18 18"
-            />
-            <path
-              d="m14 4 1.25 2.5L18 6"
-            />
-            <path
-              d="m17 21-3-6h-4"
-            />
-            <path
-              d="m17 3-3 6 1.5 3"
-            />
-            <path
-              d="M2 12h6.5L10 9"
-            />
-            <path
-              d="m20 10-1.5 2 1.5 2"
-            />
-            <path
-              d="M22 12h-6.5L14 15"
-            />
-            <path
-              d="m4 10 1.5 2L4 14"
-            />
-            <path
-              d="m7 21 3-6-1.5-3"
-            />
-            <path
-              d="m7 3 3 6h4"
+              d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Frio
           </span>
@@ -492,35 +423,27 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Ventando"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-wind h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M12.8 19.6A2 2 0 1 0 14 16H2"
-            />
-            <path
-              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
-            />
-            <path
-              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+              d="M3.5 9h11a2.5 2.5 0 1 0-2.5-2.5M3.5 13h15a2.5 2.5 0 1 1-2.5 2.5M3.5 17h7"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ventando
           </span>
@@ -530,25 +453,24 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
       >
         Saquinho de dormir
-      </label>
+      </p>
       <div
         aria-label="Tipo de saquinho"
-        class="grid grid-cols-4 gap-1.5"
+        class="grid grid-cols-4 gap-2"
         role="group"
       >
         <button
           aria-label="Sem saquinho"
           aria-pressed="true"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-pr bg-sn-pr/10 text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Nenhum
           </span>
@@ -556,17 +478,16 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Saquinho de malha (TOG ~0.5)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Malha
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             ~0.5
@@ -575,17 +496,16 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Saquinho flanelado (TOG 1–2)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Flanela
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             1–2
@@ -594,17 +514,16 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         <button
           aria-label="Saquinho soft/fleece (TOG 2–3)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Fleece
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             2–3
@@ -612,15 +531,11 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
         </button>
       </div>
     </div>
-    <div
-      class="rounded-xl border border-dashed border-border/40 bg-card/20 px-4 py-3"
+    <p
+      class="rounded-2xl bg-sn-s2/40 px-4 py-3 text-center font-sans text-[15px] font-semibold text-sn-mu"
     >
-      <p
-        class="text-xs text-muted-foreground/60 text-center"
-      >
-        Informe a temperatura do quarto para ver a sugestão de roupa
-      </p>
-    </div>
+      Informe a temperatura do quarto para ver a sugestão de roupa
+    </p>
   </div>
 </div>
 `;
@@ -631,34 +546,37 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
     class="space-y-5"
   >
     <div
+      aria-labelledby="_r_0_"
       class="flex flex-col gap-2"
+      role="group"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_0_"
       >
         Temperatura do quarto
-      </label>
+      </p>
       <div
         class="flex items-center gap-3"
       >
         <button
           aria-label="Diminuir temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-minus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
               d="M5 12h14"
@@ -666,57 +584,54 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
           </svg>
         </button>
         <div
-          class="flex flex-1 items-center justify-center gap-1"
+          class="flex flex-1 items-baseline justify-center gap-1"
         >
           <span
             aria-atomic="true"
             aria-live="polite"
-            class="text-3xl font-bold tabular-nums transition-colors text-sky-400"
+            class="font-display text-[34px] leading-none font-bold tabular-nums text-sn-pr"
           >
             17.0
           </span>
           <span
-            class="text-sm text-muted-foreground mt-1"
+            class="font-sans text-base font-bold text-sn-mu"
           >
             °C
           </span>
         </div>
         <button
           aria-label="Aumentar temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-plus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M5 12h14"
-            />
-            <path
-              d="M12 5v14"
+              d="M12 5v14M5 12h14"
             />
           </svg>
         </button>
       </div>
       <div
-        class="flex gap-1.5 flex-wrap"
+        class="flex flex-wrap gap-2"
       >
         <button
           aria-label="Definir temperatura como 18°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           18
@@ -725,8 +640,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Definir temperatura como 20°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           20
@@ -735,8 +650,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Definir temperatura como 22°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           22
@@ -745,8 +660,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Definir temperatura como 24°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           24
@@ -755,8 +670,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Definir temperatura como 26°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           26
@@ -765,8 +680,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Definir temperatura como 28°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           28
@@ -774,8 +689,9 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         </button>
         <button
           aria-label="Limpar temperatura"
-          class="rounded-lg px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 h-9 gap-1.5 px-3 text-sm after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           Limpar
@@ -785,16 +701,17 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_1_"
       >
-        Clima externo
+        Clima externo 
         <span
-          class="ml-1 normal-case font-normal text-muted-foreground/50"
+          class="font-semibold"
         >
           (opcional)
         </span>
-      </label>
+      </p>
       <div
         aria-label="Condição climática"
         class="grid grid-cols-3 gap-2"
@@ -803,22 +720,20 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Ensolarado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-sun h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <circle
               cx="12"
@@ -826,32 +741,11 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
               r="4"
             />
             <path
-              d="M12 2v2"
-            />
-            <path
-              d="M12 20v2"
-            />
-            <path
-              d="m4.93 4.93 1.41 1.41"
-            />
-            <path
-              d="m17.66 17.66 1.41 1.41"
-            />
-            <path
-              d="M2 12h2"
-            />
-            <path
-              d="M20 12h2"
-            />
-            <path
-              d="m6.34 17.66-1.41 1.41"
-            />
-            <path
-              d="m19.07 4.93-1.41 1.41"
+              d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ensolarado
           </span>
@@ -859,29 +753,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Nublado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+              d="M7 18.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 10.1 4.2 4.2 0 0 0 7 18.5Z"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Nublado
           </span>
@@ -889,38 +781,30 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Chuvoso"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud-rain h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+              d="M7 14.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 6.1 4.2 4.2 0 0 0 7 14.5Z"
             />
             <path
-              d="M16 14v6"
-            />
-            <path
-              d="M8 14v6"
-            />
-            <path
-              d="M12 16v6"
+              d="m9 17.5-1 2.5M13 17.5l-1 2.5M17 17.5l-1 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Chuvoso
           </span>
@@ -928,29 +812,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Muito quente"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-thermometer h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+              d="M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0ZM12 9v6.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Muito quente
           </span>
@@ -958,62 +840,28 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Frio"
           aria-pressed="true"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-pr bg-sn-pr/10 text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-snowflake h-4 w-4"
+            class="text-sn-pr"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="m10 20-1.25-2.5L6 18"
-            />
-            <path
-              d="M10 4 8.75 6.5 6 6"
-            />
-            <path
-              d="m14 20 1.25-2.5L18 18"
-            />
-            <path
-              d="m14 4 1.25 2.5L18 6"
-            />
-            <path
-              d="m17 21-3-6h-4"
-            />
-            <path
-              d="m17 3-3 6 1.5 3"
-            />
-            <path
-              d="M2 12h6.5L10 9"
-            />
-            <path
-              d="m20 10-1.5 2 1.5 2"
-            />
-            <path
-              d="M22 12h-6.5L14 15"
-            />
-            <path
-              d="m4 10 1.5 2L4 14"
-            />
-            <path
-              d="m7 21 3-6-1.5-3"
-            />
-            <path
-              d="m7 3 3 6h4"
+              d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Frio
           </span>
@@ -1021,35 +869,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Ventando"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-wind h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M12.8 19.6A2 2 0 1 0 14 16H2"
-            />
-            <path
-              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
-            />
-            <path
-              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+              d="M3.5 9h11a2.5 2.5 0 1 0-2.5-2.5M3.5 13h15a2.5 2.5 0 1 1-2.5 2.5M3.5 17h7"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ventando
           </span>
@@ -1059,25 +899,24 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
       >
         Saquinho de dormir
-      </label>
+      </p>
       <div
         aria-label="Tipo de saquinho"
-        class="grid grid-cols-4 gap-1.5"
+        class="grid grid-cols-4 gap-2"
         role="group"
       >
         <button
           aria-label="Sem saquinho"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Nenhum
           </span>
@@ -1085,17 +924,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Saquinho de malha (TOG ~0.5)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Malha
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             ~0.5
@@ -1104,17 +942,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Saquinho flanelado (TOG 1–2)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Flanela
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             1–2
@@ -1123,17 +960,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="Saquinho soft/fleece (TOG 2–3)"
           aria-pressed="true"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-pr bg-sn-pr/10 text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Fleece
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             2–3
@@ -1142,53 +978,23 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
       </div>
     </div>
     <div
-      class="space-y-2 overflow-hidden"
-      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
+      class="space-y-2"
     >
-      <div
-        class="flex items-center gap-1.5"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
       >
-        <label
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          TOG do saquinho
-        </label>
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-info h-3 w-3 text-muted-foreground/40"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-          />
-          <path
-            d="M12 16v-4"
-          />
-          <path
-            d="M12 8h.01"
-          />
-        </svg>
-      </div>
+        TOG do saquinho
+      </p>
       <div
         aria-label="TOG do saquinho"
-        class="flex gap-1.5 flex-wrap"
+        class="flex flex-wrap gap-2"
         role="group"
       >
         <button
           aria-label="TOG 0.5"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           0.5
@@ -1196,8 +1002,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="TOG 1"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           1
@@ -1205,8 +1011,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="TOG 1.5"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           1.5
@@ -1214,8 +1020,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="TOG 2"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           2
@@ -1223,8 +1029,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="TOG 2.5"
           aria-pressed="true"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary text-primary-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           2.5
@@ -1232,8 +1038,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         <button
           aria-label="TOG 3"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           3
@@ -1243,89 +1049,64 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
     <div
       aria-atomic="true"
       aria-live="polite"
-      class="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2"
-      data-motion="{"initial":{"opacity":0,"y":4},"animate":{"opacity":1,"y":0}}"
+      class="space-y-2 rounded-2xl bg-sn-s2/60 p-4"
     >
-      <div
-        class="flex items-center gap-2"
-      >
-        <div
-          class="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/20"
-        >
-          <svg
-            aria-hidden="true"
-            class="lucide lucide-shirt h-3.5 w-3.5 text-primary"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"
-            />
-          </svg>
-        </div>
-        <span
-          class="text-xs font-semibold text-primary uppercase tracking-wide"
-        >
-          Sugestão de roupa
-        </span>
-      </div>
-      <div
-        class="space-y-1"
-      >
-        <p
-          class="text-xs text-muted-foreground"
-        >
-          <span
-            class="font-medium text-foreground"
-          >
-            Saquinho TOG 2.5
-          </span>
-        </p>
-        <p
-          class="text-sm font-medium text-foreground leading-snug"
-        >
-          Body manga longa + macacão
-        </p>
-      </div>
-      <div
-        class="flex items-start gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-2"
+      <p
+        class="flex items-center gap-2 font-sans text-sm font-bold text-sn-pr"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-triangle-exclamation-point lucide-alert-triangle lucide-triangle-alert h-3.5 w-3.5 shrink-0 mt-0.5 text-amber-400"
           fill="none"
-          height="24"
+          focusable="false"
+          height="18"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
+          width="18"
         >
           <path
-            d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
-          />
-          <path
-            d="M12 9v4"
-          />
-          <path
-            d="M12 17h.01"
+            d="M9 3.5 4 6l1.5 4.5 2.5-1v11h8v-11l2.5 1L20 6l-5-2.5c-.4 1.4-1.6 2.5-3 2.5S9.4 4.9 9 3.5Z"
           />
         </svg>
-        <p
-          class="text-xs text-amber-300/90"
+        Sugestão de roupa
+      </p>
+      <p
+        class="font-sans text-[15px] font-bold text-sn-tx"
+      >
+        Saquinho TOG 2.5
+      </p>
+      <p
+        class="font-sans text-base leading-snug text-sn-tx"
+      >
+        Body manga longa + macacão
+      </p>
+      <p
+        class="flex items-start gap-2 rounded-xl bg-sn-warn/10 px-3 py-2 font-sans text-[15px] font-semibold text-sn-warn"
+      >
+        <svg
+          aria-hidden="true"
+          class="mt-0.5 shrink-0"
+          fill="none"
+          focusable="false"
+          height="18"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          viewBox="0 0 24 24"
+          width="18"
         >
-          Para TOG 2.5 nesta temperatura, use como referência TOG 3
-        </p>
-      </div>
+          <path
+            d="M12 4 21 19.5H3L12 4Z"
+          />
+          <path
+            d="M12 10v4M12 17v.01"
+          />
+        </svg>
+        Para TOG 2.5 nesta temperatura, use como referência TOG 3
+      </p>
     </div>
   </div>
 </div>
@@ -1337,34 +1118,37 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
     class="space-y-5"
   >
     <div
+      aria-labelledby="_r_0_"
       class="flex flex-col gap-2"
+      role="group"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_0_"
       >
         Temperatura do quarto
-      </label>
+      </p>
       <div
         class="flex items-center gap-3"
       >
         <button
           aria-label="Diminuir temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-minus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
               d="M5 12h14"
@@ -1372,57 +1156,54 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
           </svg>
         </button>
         <div
-          class="flex flex-1 items-center justify-center gap-1"
+          class="flex flex-1 items-baseline justify-center gap-1"
         >
           <span
             aria-atomic="true"
             aria-live="polite"
-            class="text-3xl font-bold tabular-nums transition-colors text-sky-400"
+            class="font-display text-[34px] leading-none font-bold tabular-nums text-sn-pr"
           >
             17.0
           </span>
           <span
-            class="text-sm text-muted-foreground mt-1"
+            class="font-sans text-base font-bold text-sn-mu"
           >
             °C
           </span>
         </div>
         <button
           aria-label="Aumentar temperatura"
-          class="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 size-11 p-0"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-plus h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M5 12h14"
-            />
-            <path
-              d="M12 5v14"
+              d="M12 5v14M5 12h14"
             />
           </svg>
         </button>
       </div>
       <div
-        class="flex gap-1.5 flex-wrap"
+        class="flex flex-wrap gap-2"
       >
         <button
           aria-label="Definir temperatura como 18°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           18
@@ -1431,8 +1212,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Definir temperatura como 20°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           20
@@ -1441,8 +1222,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Definir temperatura como 22°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           22
@@ -1451,8 +1232,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Definir temperatura como 24°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           24
@@ -1461,8 +1242,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Definir temperatura como 26°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           26
@@ -1471,8 +1252,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Definir temperatura como 28°C"
           aria-pressed="false"
-          class="rounded-lg px-2.5 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           28
@@ -1480,8 +1261,9 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         </button>
         <button
           aria-label="Limpar temperatura"
-          class="rounded-lg px-2.5 py-1 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
+          class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 h-9 gap-1.5 px-3 text-sm after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4"
+          data-slot="button"
+          tabindex="0"
           type="button"
         >
           Limpar
@@ -1491,16 +1273,17 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="_r_1_"
       >
-        Clima externo
+        Clima externo 
         <span
-          class="ml-1 normal-case font-normal text-muted-foreground/50"
+          class="font-semibold"
         >
           (opcional)
         </span>
-      </label>
+      </p>
       <div
         aria-label="Condição climática"
         class="grid grid-cols-3 gap-2"
@@ -1509,22 +1292,20 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Ensolarado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-sun h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <circle
               cx="12"
@@ -1532,32 +1313,11 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
               r="4"
             />
             <path
-              d="M12 2v2"
-            />
-            <path
-              d="M12 20v2"
-            />
-            <path
-              d="m4.93 4.93 1.41 1.41"
-            />
-            <path
-              d="m17.66 17.66 1.41 1.41"
-            />
-            <path
-              d="M2 12h2"
-            />
-            <path
-              d="M20 12h2"
-            />
-            <path
-              d="m6.34 17.66-1.41 1.41"
-            />
-            <path
-              d="m19.07 4.93-1.41 1.41"
+              d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ensolarado
           </span>
@@ -1565,29 +1325,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Nublado"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+              d="M7 18.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 10.1 4.2 4.2 0 0 0 7 18.5Z"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Nublado
           </span>
@@ -1595,38 +1353,30 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Chuvoso"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-cloud-rain h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"
+              d="M7 14.5h10.5a3.5 3.5 0 0 0 .6-6.95A5.5 5.5 0 0 0 7.4 6.1 4.2 4.2 0 0 0 7 14.5Z"
             />
             <path
-              d="M16 14v6"
-            />
-            <path
-              d="M8 14v6"
-            />
-            <path
-              d="M12 16v6"
+              d="m9 17.5-1 2.5M13 17.5l-1 2.5M17 17.5l-1 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Chuvoso
           </span>
@@ -1634,29 +1384,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Muito quente"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-thermometer h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"
+              d="M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0ZM12 9v6.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Muito quente
           </span>
@@ -1664,62 +1412,28 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Frio"
           aria-pressed="true"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-pr bg-sn-pr/10 text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-snowflake h-4 w-4"
+            class="text-sn-pr"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="m10 20-1.25-2.5L6 18"
-            />
-            <path
-              d="M10 4 8.75 6.5 6 6"
-            />
-            <path
-              d="m14 20 1.25-2.5L18 18"
-            />
-            <path
-              d="m14 4 1.25 2.5L18 6"
-            />
-            <path
-              d="m17 21-3-6h-4"
-            />
-            <path
-              d="m17 3-3 6 1.5 3"
-            />
-            <path
-              d="M2 12h6.5L10 9"
-            />
-            <path
-              d="m20 10-1.5 2 1.5 2"
-            />
-            <path
-              d="M22 12h-6.5L14 15"
-            />
-            <path
-              d="m4 10 1.5 2L4 14"
-            />
-            <path
-              d="m7 21 3-6-1.5-3"
-            />
-            <path
-              d="m7 3 3 6h4"
+              d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Frio
           </span>
@@ -1727,35 +1441,27 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Ventando"
           aria-pressed="false"
-          class="flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] px-2 py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="lucide lucide-wind h-4 w-4"
             fill="none"
-            height="24"
+            focusable="false"
+            height="20"
             stroke="currentColor"
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
+            stroke-width="1.8"
             viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
+            width="20"
           >
             <path
-              d="M12.8 19.6A2 2 0 1 0 14 16H2"
-            />
-            <path
-              d="M17.5 8a2.5 2.5 0 1 1 2 4H2"
-            />
-            <path
-              d="M9.8 4.4A2 2 0 1 1 11 8H2"
+              d="M3.5 9h11a2.5 2.5 0 1 0-2.5-2.5M3.5 13h15a2.5 2.5 0 1 1-2.5 2.5M3.5 17h7"
             />
           </svg>
           <span
-            class="leading-tight text-center"
+            class="text-center text-[13px] leading-tight font-bold"
           >
             Ventando
           </span>
@@ -1765,25 +1471,24 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
     <div
       class="space-y-2"
     >
-      <label
-        class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
       >
         Saquinho de dormir
-      </label>
+      </p>
       <div
         aria-label="Tipo de saquinho"
-        class="grid grid-cols-4 gap-1.5"
+        class="grid grid-cols-4 gap-2"
         role="group"
       >
         <button
           aria-label="Sem saquinho"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Nenhum
           </span>
@@ -1791,17 +1496,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Saquinho de malha (TOG ~0.5)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Malha
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             ~0.5
@@ -1810,17 +1514,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Saquinho flanelado (TOG 1–2)"
           aria-pressed="false"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Flanela
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             1–2
@@ -1829,17 +1532,16 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="Saquinho soft/fleece (TOG 2–3)"
           aria-pressed="true"
-          class="flex flex-col items-center gap-0.5 rounded-xl border py-2.5 px-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border-primary/50 bg-primary/10 text-primary"
-          style="touch-action: manipulation;"
+          class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-pr bg-sn-pr/10 text-sn-tx"
           type="button"
         >
           <span
-            class="text-[11px] font-semibold leading-tight"
+            class="text-[13px] leading-tight font-bold"
           >
             Fleece
           </span>
           <span
-            class="text-[10px] opacity-60 leading-tight"
+            class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
             2–3
@@ -1848,53 +1550,23 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
       </div>
     </div>
     <div
-      class="space-y-2 overflow-hidden"
-      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
+      class="space-y-2"
     >
-      <div
-        class="flex items-center gap-1.5"
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
       >
-        <label
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          TOG do saquinho
-        </label>
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-info h-3 w-3 text-muted-foreground/40"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-          />
-          <path
-            d="M12 16v-4"
-          />
-          <path
-            d="M12 8h.01"
-          />
-        </svg>
-      </div>
+        TOG do saquinho
+      </p>
       <div
         aria-label="TOG do saquinho"
-        class="flex gap-1.5 flex-wrap"
+        class="flex flex-wrap gap-2"
         role="group"
       >
         <button
           aria-label="TOG 0.5"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           0.5
@@ -1902,8 +1574,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="TOG 1"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           1
@@ -1911,8 +1583,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="TOG 1.5"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           1.5
@@ -1920,8 +1592,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="TOG 2"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           2
@@ -1929,8 +1601,8 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="TOG 2.5"
           aria-pressed="true"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary text-primary-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           2.5
@@ -1938,361 +1610,12 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         <button
           aria-label="TOG 3"
           aria-pressed="false"
-          class="rounded-lg px-3 py-1.5 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/60 bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-          style="touch-action: manipulation;"
+          class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
+          data-slot="chip"
           type="button"
         >
           3
         </button>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`EnvironmentPickerCompact > renders_compact_picker > calls 1`] = `
-[
-  [
-    {
-      "clothing_description": null,
-      "room_temp_celsius": 18,
-      "sleep_sack_tog": 2.5,
-      "sleep_sack_type": "fleece",
-      "weather_condition": "cold",
-    },
-  ],
-  [
-    {
-      "clothing_description": null,
-      "room_temp_celsius": null,
-      "sleep_sack_tog": 2.5,
-      "sleep_sack_type": "fleece",
-      "weather_condition": "cold",
-    },
-  ],
-  [
-    {
-      "clothing_description": null,
-      "room_temp_celsius": 17,
-      "sleep_sack_tog": 2.5,
-      "sleep_sack_type": null,
-      "weather_condition": "cold",
-    },
-  ],
-  [
-    {
-      "clothing_description": null,
-      "room_temp_celsius": 17,
-      "sleep_sack_tog": null,
-      "sleep_sack_type": "none",
-      "weather_condition": "cold",
-    },
-  ],
-]
-`;
-
-exports[`EnvironmentPickerCompact > renders_compact_picker > empty 1`] = `
-<div>
-  <div
-    class="space-y-3"
-  >
-    <div
-      class="flex items-center justify-between gap-2"
-    >
-      <span
-        class="text-xs text-muted-foreground"
-      >
-        Temp. do quarto
-      </span>
-      <div
-        class="flex items-center gap-2"
-      >
-        <button
-          aria-label="Diminuir temperatura"
-          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          <svg
-            aria-hidden="true"
-            class="lucide lucide-minus h-3 w-3"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5 12h14"
-            />
-          </svg>
-        </button>
-        <span
-          aria-live="polite"
-          class="w-14 text-center text-sm font-semibold tabular-nums"
-        >
-          —
-        </span>
-        <button
-          aria-label="Aumentar temperatura"
-          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          <svg
-            aria-hidden="true"
-            class="lucide lucide-plus h-3 w-3"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5 12h14"
-            />
-            <path
-              d="M12 5v14"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div
-      class="flex items-center gap-2"
-    >
-      <span
-        class="text-xs text-muted-foreground shrink-0"
-      >
-        Saquinho
-      </span>
-      <div
-        aria-label="Saquinho"
-        class="flex gap-1 flex-1"
-        role="group"
-      >
-        <button
-          aria-label="Sem saquinho"
-          aria-pressed="true"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary/20 text-primary border border-primary/30"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Nenhum
-        </button>
-        <button
-          aria-label="Saquinho de malha"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Malha
-        </button>
-        <button
-          aria-label="Saquinho flanelado"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Flanela
-        </button>
-        <button
-          aria-label="Saquinho soft/fleece"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Fleece
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-`;
-
-exports[`EnvironmentPickerCompact > renders_compact_picker > filled 1`] = `
-<div>
-  <div
-    class="space-y-3"
-  >
-    <div
-      class="flex items-center justify-between gap-2"
-    >
-      <span
-        class="text-xs text-muted-foreground"
-      >
-        Temp. do quarto
-      </span>
-      <div
-        class="flex items-center gap-2"
-      >
-        <button
-          aria-label="Diminuir temperatura"
-          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          <svg
-            aria-hidden="true"
-            class="lucide lucide-minus h-3 w-3"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5 12h14"
-            />
-          </svg>
-        </button>
-        <span
-          aria-live="polite"
-          class="w-14 text-center text-sm font-semibold tabular-nums"
-        >
-          17°C
-        </span>
-        <button
-          aria-label="Aumentar temperatura"
-          class="flex h-7 w-7 items-center justify-center rounded-lg border border-border/60 bg-card/50 text-muted-foreground hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          <svg
-            aria-hidden="true"
-            class="lucide lucide-plus h-3 w-3"
-            fill="none"
-            height="24"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            width="24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5 12h14"
-            />
-            <path
-              d="M12 5v14"
-            />
-          </svg>
-        </button>
-        <button
-          aria-label="Limpar temperatura"
-          class="text-[10px] text-muted-foreground/50 hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          type="button"
-        >
-          ✕
-        </button>
-      </div>
-    </div>
-    <div
-      class="flex items-center gap-2"
-    >
-      <span
-        class="text-xs text-muted-foreground shrink-0"
-      >
-        Saquinho
-      </span>
-      <div
-        aria-label="Saquinho"
-        class="flex gap-1 flex-1"
-        role="group"
-      >
-        <button
-          aria-label="Sem saquinho"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Nenhum
-        </button>
-        <button
-          aria-label="Saquinho de malha"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Malha
-        </button>
-        <button
-          aria-label="Saquinho flanelado"
-          aria-pressed="false"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-border/40 text-muted-foreground hover:text-foreground"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Flanela
-        </button>
-        <button
-          aria-label="Saquinho soft/fleece"
-          aria-pressed="true"
-          class="flex-1 rounded-lg py-1 text-[11px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring bg-primary/20 text-primary border border-primary/30"
-          style="touch-action: manipulation;"
-          type="button"
-        >
-          Fleece
-        </button>
-      </div>
-    </div>
-    <div
-      aria-live="polite"
-      class="overflow-hidden"
-      data-motion="{"initial":{"opacity":0,"height":0},"animate":{"opacity":1,"height":"auto"},"exit":{"opacity":0,"height":0}}"
-    >
-      <div
-        class="rounded-xl bg-primary/5 border border-primary/15 px-3 py-2 flex items-start gap-2"
-      >
-        <svg
-          aria-hidden="true"
-          class="lucide lucide-shirt h-3.5 w-3.5 text-primary mt-0.5 shrink-0"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"
-          />
-        </svg>
-        <div
-          class="min-w-0"
-        >
-          <p
-            class="text-xs font-medium text-foreground leading-snug"
-          >
-            Body manga longa + macacão
-          </p>
-          <p
-            class="text-[11px] text-amber-400/80 mt-0.5 leading-snug"
-          >
-            Para TOG 2.5 nesta temperatura, use como referência TOG 3
-          </p>
-        </div>
       </div>
     </div>
   </div>
