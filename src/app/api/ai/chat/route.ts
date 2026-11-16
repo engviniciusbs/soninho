@@ -1,6 +1,6 @@
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
-import { buildSleepContext } from "@/lib/ai/analyzeSleep";
+import { babyAgeOn, buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { chatRequestSchema } from "@/lib/ai/chatSchema";
@@ -27,9 +27,6 @@ export async function POST(request: Request) {
     const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
     if (!role) {
       return new Response("Forbidden", { status: 403 });
-    }
-    if (!(await consumeAiQuota(supabase))) {
-      return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
@@ -71,13 +68,14 @@ export async function POST(request: Request) {
       }`;
     }
 
+    const timezone = "America/Sao_Paulo";
     const context = buildSleepContext(
       baby,
       (sessionsData ?? []) as SleepSession[],
-      "America/Sao_Paulo",
+      timezone,
       feedbackSummary
     );
-    const systemPrompt = getSleepSystemPrompt(context);
+    const systemPrompt = getSleepSystemPrompt(context, babyAgeOn(baby.birth_date, timezone));
 
     const stream = await openai.chat.completions.create({
       model: OPENAI_MODEL,
@@ -88,6 +86,13 @@ export async function POST(request: Request) {
         ...parsed.data.messages,
       ],
     });
+
+    // Charged only once OpenAI accepted the request: a failure before the
+    // stream (thrown above) costs the family nothing.
+    if (!(await consumeAiQuota(supabase))) {
+      stream.controller.abort();
+      return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
+    }
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({

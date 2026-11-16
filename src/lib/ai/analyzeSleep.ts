@@ -1,12 +1,26 @@
-import {
-  differenceInWeeks,
-  differenceInMonths,
-  subDays,
-  eachDayOfInterval,
-} from "date-fns";
-import { formatInTimeZone, toZonedTime } from "date-fns-tz";
+import { differenceInWeeks, differenceInMonths } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import type { Baby, SleepSession } from "@/types";
-import { parseLocalDate } from "@/lib/dates/localDate";
+import {
+  addDaysToKey,
+  formatLocalDate,
+  localDayKey,
+  parseLocalDate,
+} from "@/lib/dates/localDate";
+
+/** Age on the local day of `now` in `timezone` (whole weeks and months). */
+export function babyAgeOn(
+  birthDate: string,
+  timezone: string,
+  now: Date = new Date()
+): { weeks: number; months: number } {
+  const birth = parseLocalDate(birthDate);
+  const today = parseLocalDate(localDayKey(now, timezone));
+  return {
+    weeks: differenceInWeeks(today, birth),
+    months: differenceInMonths(today, birth),
+  };
+}
 
 /**
  * Builds a human-readable sleep context string for the AI prompt.
@@ -21,36 +35,30 @@ export function buildSleepContext(
   timezone: string = "America/Sao_Paulo",
   feedbackSummary?: string | null
 ): string {
-  const birth = parseLocalDate(baby.birth_date);
-  // "now" in the user's local timezone
   const nowUtc = new Date();
-  const nowLocal = toZonedTime(nowUtc, timezone);
+  const { weeks: ageWeeks, months: ageMonths } = babyAgeOn(baby.birth_date, timezone, nowUtc);
 
-  const ageWeeks = differenceInWeeks(nowLocal, birth);
-  const ageMonths = differenceInMonths(nowLocal, birth);
+  // Day keys are formatted once, in the user's timezone, and stepped as
+  // strings: shifting the instant first and formatting again (old code) moved
+  // "today" one day back on a UTC server.
+  const todayKey = localDayKey(nowUtc, timezone);
+  const dayKeys = Array.from({ length: 7 }, (_, i) => addDaysToKey(todayKey, i - 6));
 
-  // Compute "7 days ago" in the user's timezone to avoid off-by-one at midnight
-  const sevenDaysAgo = subDays(nowLocal, 7);
-
-  const last7days = sessions.filter(
-    (s) => toZonedTime(new Date(s.start_time), timezone) >= sevenDaysAgo
-  );
+  const sevenDaysAgoMs = nowUtc.getTime() - 7 * 24 * 60 * 60 * 1000;
+  const last7days = sessions.filter((s) => Date.parse(s.start_time) >= sevenDaysAgoMs);
 
   const completed = last7days.filter((s) => s.duration_min != null);
   const naps = completed.filter((s) => s.type === "NAP");
   const nightSessions = completed.filter((s) => s.type === "NIGHT_SLEEP");
 
   // Daily summaries — all dates in user's timezone
-  const days = eachDayOfInterval({ start: subDays(nowLocal, 6), end: nowLocal });
-
-  const dailySummaries = days.map((day) => {
-    const dayStr = formatInTimeZone(day, timezone, "yyyy-MM-dd");
+  const dailySummaries = dayKeys.map((dayStr) => {
     const daySessions = completed.filter(
-      (s) => formatInTimeZone(new Date(s.start_time), timezone, "yyyy-MM-dd") === dayStr
+      (s) => localDayKey(new Date(s.start_time), timezone) === dayStr
     );
     const totalMin = daySessions.reduce((a, s) => a + (s.duration_min ?? 0), 0);
     const dayNaps = daySessions.filter((s) => s.type === "NAP");
-    return `  ${formatInTimeZone(day, timezone, "dd/MM")}: ${(totalMin / 60).toFixed(1)}h total, ${dayNaps.length} sonecas`;
+    return `  ${formatLocalDate(dayStr, "dd/MM")}: ${(totalMin / 60).toFixed(1)}h total, ${dayNaps.length} sonecas`;
   });
 
   const avgNapDur =
@@ -142,7 +150,7 @@ export function buildSleepContext(
   return `
 Nome do bebê: ${baby.name}
 Idade: ${ageWeeks} semanas (${ageMonths} meses)
-Data de nascimento: ${formatInTimeZone(birth, timezone, "dd/MM/yyyy")}
+Data de nascimento: ${formatLocalDate(baby.birth_date)}
 Horário de referência (agora): ${currentTime} (fuso: ${timezone})
 
 === ÚLTIMO SONO REGISTRADO (ÂNCORA PARA CÁLCULO) ===
