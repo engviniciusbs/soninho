@@ -22,6 +22,7 @@ import { Chip } from "@/components/ui/chip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IconPlus } from "@/components/brand/icons";
 import type { SleepSession } from "@/types";
+import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 type Filter = "todos" | "sonecas" | "noite";
 
@@ -119,11 +120,7 @@ function DayView() {
   const totalMinutes = useMemo(
     () =>
       sessions
-        .map((s) =>
-          s.end_time || now === null
-            ? s
-            : { ...s, end_time: new Date(now).toISOString(), duration_min: (now - Date.parse(s.start_time)) / 60_000 }
-        )
+        .map((s) => (now === null ? s : withProvisionalEnd(s, now)))
         .flatMap((s) => allocateSessionToLocalDays(s, timeZone))
         .filter((a) => a.dayKey === dayKey)
         .reduce((sum, a) => sum + a.napMinutes + a.nightMinutes, 0),

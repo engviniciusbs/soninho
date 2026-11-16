@@ -1,6 +1,7 @@
 import { eachDayOfInterval, format, startOfDay, subDays } from "date-fns";
 import type { SleepSession } from "@/types";
 import { allocateSessionToLocalDays } from "@/lib/sleep/sessionDayAllocation";
+import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 export interface PeriodSummary {
   /** Complete days of the period (today left out) with some sleep logged. */
@@ -15,13 +16,6 @@ export interface PeriodSummary {
 
 function periodDays(days: number, now: Date): Date[] {
   return eachDayOfInterval({ start: subDays(startOfDay(now), days - 1), end: now });
-}
-
-function withProvisionalEnd(session: SleepSession, now: Date): SleepSession {
-  if (session.end_time) return session;
-  const start = Date.parse(session.start_time);
-  if (!(now.getTime() > start)) return session;
-  return { ...session, end_time: now.toISOString(), duration_min: (now.getTime() - start) / 60_000 };
 }
 
 /**
