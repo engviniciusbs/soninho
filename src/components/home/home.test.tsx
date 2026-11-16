@@ -645,6 +645,12 @@ describe("Home", () => {
     expect(screen.getByText("1h 30min")).toBeInTheDocument();
   });
 
+  it("nanny_with_no_baby_gets_no_add_baby_action", async () => {
+    await mount({ baby: { babies: [], activeBaby: null }, nanny: true });
+    expect(screen.getByText(/Ainda não há bebê na família/)).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Adicionar bebê/ })).toBeNull();
+  });
+
   it("no_babies_invites_to_more_babies", async () => {
     await mount({ baby: { babies: [], activeBaby: null } });
     expect(screen.getByRole("link", { name: /Adicionar bebê/ })).toHaveAttribute(

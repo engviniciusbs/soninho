@@ -52,13 +52,18 @@ export default function AppHomePage() {
           <div className="space-y-2">
             <h1 className="font-display text-[28px] leading-tight font-bold">Bem-vindo ao Soninho</h1>
             <p className="max-w-xs text-base text-sn-mu">
-              Adicione seu bebê para ver a previsão do próximo sono e registrar sonecas e noites.
+              {isNannyMode
+                ? "Ainda não há bebê na família. Peça a quem administra a família para adicionar o bebê."
+                : "Adicione seu bebê para ver a previsão do próximo sono e registrar sonecas e noites."}
             </p>
           </div>
-          <Link href="/more/babies" className={buttonVariants({ variant: "primary" })}>
-            <IconPlus size={22} />
-            Adicionar bebê
-          </Link>
+          {/* The babá cannot reach /more/babies (it redirects her home): no action for her. */}
+          {!isNannyMode && (
+            <Link href="/more/babies" className={buttonVariants({ variant: "primary" })}>
+              <IconPlus size={22} />
+              Adicionar bebê
+            </Link>
+          )}
         </div>
       </div>
     );

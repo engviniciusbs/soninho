@@ -4,6 +4,7 @@ import { useId, useMemo } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ListRow } from "@/components/ui/list-row";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -84,10 +85,7 @@ export function TodayCard({ nanny }: { nanny: boolean }) {
           Hoje
         </h2>
         {!nanny && (
-          <Link
-            href="/history"
-            className="-my-2 -mr-2 inline-flex min-h-11 items-center gap-1 rounded-full px-2 font-sans text-sm font-bold text-sn-pr outline-none transition-transform duration-(--sn-dur-micro) ease-sn-out motion-reduce:transition-none hover:bg-sn-pr/10 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr"
-          >
+          <Link href="/history" className={buttonVariants({ variant: "ghost", size: "sm", className: "-my-2 -mr-3 gap-1" })}>
             Ver registro
             <IconChevronRight size={16} />
           </Link>
