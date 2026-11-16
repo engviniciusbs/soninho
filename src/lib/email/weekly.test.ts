@@ -4,6 +4,7 @@ type Row = Record<string, unknown>;
 const h = vi.hoisted(() => ({
   tables: {} as Record<string, Row[]>,
   calls: [] as Row[],
+  failing: null as string | null,
 }));
 
 /** Thenable query over in-memory rows: select/eq/in/not(col,"is",null). */
@@ -16,7 +17,12 @@ function query(table: string) {
     in: (c: string, vs: unknown[]) => (filters.push((r) => vs.includes(r[c])), q),
     // Only `.not(col, "is", null)` is used.
     not: (c: string) => (filters.push((r) => r[c] != null), q),
-    then: (resolve: (v: unknown) => void) => resolve({ data: rows(), error: null }),
+    then: (resolve: (v: unknown) => void) =>
+      resolve(
+        h.failing === table
+          ? { data: null, error: { message: "boom" } }
+          : { data: rows(), error: null }
+      ),
   };
   return q;
 }
@@ -58,6 +64,7 @@ const BABY = { id: "b1", name: "Lia", birth_date: "2026-02-10", avatar_emoji: nu
 
 beforeEach(() => {
   h.calls = [];
+  h.failing = null;
   h.tables = {
     babies: [BABY],
     family_members: [
@@ -96,4 +103,14 @@ describe("dispatchWeeklyEmails", () => {
     const owner = h.calls.find((c) => c.email === "owner@x.com")!;
     expect(owner.dedupeKey).toBe("owner:weekly:2026-11-09");
   });
+
+  it.each(["notification_preferences", "family_members", "babies"])(
+    "sends nothing when the %s query fails (an opt-out could be lost)",
+    async (table) => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      h.failing = table;
+      await expect(dispatchWeeklyEmails()).resolves.toEqual({ sent: 0, skipped: 0 });
+      expect(h.calls).toEqual([]);
+    }
+  );
 });

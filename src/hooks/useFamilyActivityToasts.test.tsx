@@ -8,9 +8,15 @@ import type { Baby } from "@/types";
 import { useFamilyActivityToasts } from "./useFamilyActivityToasts";
 
 vi.mock("sonner", () => ({ toast: { info: vi.fn() } }));
+const auth = vi.hoisted(() => ({ fail: false }));
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => ({
-    auth: { getUser: async () => ({ data: { user: { id: "me" } } }) },
+    auth: {
+      getUser: async () => {
+        if (auth.fail) throw new Error("offline");
+        return { data: { user: { id: "me" } } };
+      },
+    },
   }),
 }));
 
@@ -38,6 +44,7 @@ function item(id: string, over: Item = {}): Item {
 beforeEach(() => {
   vi.useFakeTimers();
   latest = {};
+  auth.fail = false;
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => {
@@ -122,5 +129,15 @@ describe("useFamilyActivityToasts", () => {
     latest[babyB.id] = item("new-b");
     await nextPoll();
     expect(toast.info).toHaveBeenCalledWith("Bia iniciou soneca de Teo");
+  });
+
+  it("keeps polling when the current user cannot be read", async () => {
+    auth.fail = true;
+    latest[babyA.id] = item("s1");
+    setup();
+    await act(async () => {});
+    latest[babyA.id] = item("s2");
+    await nextPoll();
+    expect(toast.info).toHaveBeenCalledWith("Bia iniciou soneca de Lia");
   });
 });

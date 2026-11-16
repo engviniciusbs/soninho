@@ -30,7 +30,7 @@ export async function dispatchWeeklyEmails(): Promise<{
   let sent = 0;
   let skipped = 0;
 
-  const [{ data: members }, { data: babies }, { data: prefs }] = await Promise.all([
+  const [membersRes, babiesRes, prefsRes] = await Promise.all([
     supabase
       .from("family_members")
       .select("family_id, user_id, role")
@@ -43,6 +43,16 @@ export async function dispatchWeeklyEmails(): Promise<{
       .from("notification_preferences")
       .select("user_id, weekly_email_enabled, timezone"),
   ]);
+
+  // Without every list, an opt-out could read as "no row = on": send nothing.
+  const failed = [membersRes, babiesRes, prefsRes].find((r) => r.error);
+  if (failed) {
+    console.error("[weekly-email] Aborting run, query failed:", failed.error);
+    return { sent: 0, skipped: 0 };
+  }
+  const members = membersRes.data;
+  const babies = babiesRes.data;
+  const prefs = prefsRes.data;
 
   const babiesByFamily = new Map<string, ReportBaby[]>();
   for (const b of babies ?? []) {

@@ -45,9 +45,16 @@ export function useFamilyActivityToasts(enabled: boolean) {
     let cancelled = false;
     const supabase = createClient();
 
-    const userReady = supabase.auth.getUser().then(({ data: { user } }) => {
-      userIdRef.current = user?.id ?? null;
-    });
+    // A failed read leaves the user unknown (null): polls keep working, only
+    // the own-action filter is lost.
+    const userReady = supabase.auth
+      .getUser()
+      .then(({ data: { user } }) => {
+        userIdRef.current = user?.id ?? null;
+      })
+      .catch(() => {
+        userIdRef.current = null;
+      });
 
     async function poll() {
       const res = await fetch(`/api/family/activity?babyId=${babyId}&limit=1`);
@@ -65,7 +72,8 @@ export function useFamilyActivityToasts(enabled: boolean) {
       lastSeenId.current = latest.id;
 
       await userReady;
-      if (cancelled || latest.actor_user_id === userIdRef.current) return;
+      if (cancelled) return;
+      if (userIdRef.current !== null && latest.actor_user_id === userIdRef.current) return;
 
       toast.info(messageFor(latest, babyName!));
     }

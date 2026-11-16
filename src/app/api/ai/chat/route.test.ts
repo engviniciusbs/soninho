@@ -5,6 +5,7 @@ const BABY = { id: "00000000-0000-4000-8000-0000000000b1", name: "Lia", birth_da
 const h = vi.hoisted(() => ({
   consume: vi.fn(async () => true),
   create: vi.fn(),
+  usedToday: null as number | null,
 }));
 
 /** Chainable, awaitable query: every filter returns itself, `single` gives the baby. */
@@ -22,6 +23,19 @@ vi.mock("@/lib/supabase/server", () => ({
     auth: { getUser: async () => ({ data: { user: { id: "u1" } } }) },
     from: () => query(BABY),
   }),
+}));
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: () => {
+    const q = {
+      select: () => q,
+      eq: () => q,
+      maybeSingle: async () => ({
+        data: h.usedToday == null ? null : { count: h.usedToday },
+        error: null,
+      }),
+    };
+    return { from: () => q };
+  },
 }));
 vi.mock("@/lib/supabase/queries/family", () => ({ getUserRoleForBaby: async () => "owner" }));
 vi.mock("@/lib/ai/quota", async (importOriginal) => ({
@@ -62,6 +76,7 @@ function fakeStream(text: string) {
 beforeEach(() => {
   h.consume.mockReset().mockResolvedValue(true);
   h.create.mockReset();
+  h.usedToday = null;
   vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -87,6 +102,23 @@ describe("POST /api/ai/chat quota", () => {
     h.consume.mockResolvedValue(false);
     const res = await post();
     expect(res.status).toBe(429);
+    expect(abort).toHaveBeenCalled();
+  });
+
+  it("answers 429 without calling OpenAI when today's 50 uses are spent", async () => {
+    h.usedToday = 50;
+    const res = await post();
+    expect(res.status).toBe(429);
+    expect(h.create).not.toHaveBeenCalled();
+    expect(h.consume).not.toHaveBeenCalled();
+  });
+
+  it("aborts the stream when charging the quota throws", async () => {
+    const { stream, abort } = fakeStream("Olá");
+    h.create.mockResolvedValue(stream);
+    h.consume.mockRejectedValue(new Error("rpc down"));
+    const res = await post();
+    expect(res.status).toBe(500);
     expect(abort).toHaveBeenCalled();
   });
 

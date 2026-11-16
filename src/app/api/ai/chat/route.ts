@@ -4,7 +4,12 @@ import { babyAgeOn, buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { chatRequestSchema } from "@/lib/ai/chatSchema";
-import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
+import {
+  consumeAiQuota,
+  isAiQuotaExhausted,
+  AI_QUOTA_EXCEEDED_MESSAGE,
+} from "@/lib/ai/quota";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Baby, SleepSession } from "@/types";
 
 export async function POST(request: Request) {
@@ -27,6 +32,10 @@ export async function POST(request: Request) {
     const role = await getUserRoleForBaby(supabase, user.id, parsed.data.babyId);
     if (!role) {
       return new Response("Forbidden", { status: 403 });
+    }
+    // Over the limit: answer before spending anything on OpenAI.
+    if (await isAiQuotaExhausted(createAdminClient(), user.id)) {
+      return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
     const { data: babyData, error: babyError } = await supabase
       .from("babies")
@@ -88,8 +97,16 @@ export async function POST(request: Request) {
     });
 
     // Charged only once OpenAI accepted the request: a failure before the
-    // stream (thrown above) costs the family nothing.
-    if (!(await consumeAiQuota(supabase))) {
+    // stream (thrown above) costs the family nothing. The atomic consume is
+    // the real gate (two requests may pass the pre-check together).
+    let charged: boolean;
+    try {
+      charged = await consumeAiQuota(supabase);
+    } catch (err) {
+      stream.controller.abort();
+      throw err;
+    }
+    if (!charged) {
       stream.controller.abort();
       return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
