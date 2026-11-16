@@ -14,6 +14,7 @@ import { Chip } from "@/components/ui/chip";
 import { StarRating } from "@/components/ui/star-rating";
 import { createClient } from "@/lib/supabase/client";
 import { updateSleepSession } from "@/lib/supabase/queries/sleep";
+import { invalidateSleepQueries } from "@/lib/query/invalidateSleep";
 import { howFellAsleepOptions, wakeReasonOptions } from "@/lib/sleep/captureLabels";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { toast } from "sonner";
@@ -34,7 +35,8 @@ export function PostSleepReview({
 }: PostSleepReviewProps) {
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const sex = useBaby().activeBaby?.sex;
+  const { activeBaby } = useBaby();
+  const sex = activeBaby?.sex;
   const qualityLabelId = useId();
 
   const [quality, setQuality] = useState<number | null>(null);
@@ -80,8 +82,8 @@ export function PostSleepReview({
     }
 
     toast.success("Detalhes salvos");
-    queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
-    queryClient.invalidateQueries({ queryKey: ["last-session"] });
+    if (activeBaby) void invalidateSleepQueries(queryClient, activeBaby.id);
+    else void queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
     handleClose();
   }
 
