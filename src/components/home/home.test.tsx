@@ -362,7 +362,7 @@ describe("Home", () => {
 
     expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "22°C" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "TOG 1.0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "TOG 1,0" })).toBeInTheDocument();
 
     await click(screen.getByRole("button", { name: "Ambiente" }));
     await click(screen.getByRole("button", { name: "Pronto" }));
@@ -392,7 +392,7 @@ describe("Home", () => {
     await mount();
 
     await click(screen.getByRole("button", { name: "Ambiente" }));
-    await click(screen.getByRole("button", { name: "TOG 2.5" }));
+    await click(screen.getByRole("button", { name: "TOG 2,5" }));
     await click(screen.getByRole("button", { name: "Pronto" }));
     await flush();
 
@@ -623,7 +623,7 @@ describe("Home", () => {
     expect(screen.getByRole("button", { name: "Ver todos" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Ver registro/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Por que esse horário?" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Tempo acordada")).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Tempo acordad[ao]$/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Ver análise/ })).not.toBeInTheDocument();
     // The prediction itself stays.
     expect(screen.getByRole("region", { name: "Previsão de sono" })).toBeInTheDocument();

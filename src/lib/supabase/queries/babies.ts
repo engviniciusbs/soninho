@@ -48,7 +48,13 @@ export async function getOwnedFamilyIds(supabase: Client, userId: string) {
 export async function updateBaby(
   supabase: Client,
   babyId: string,
-  data: { name?: string; birth_date?: string; avatar_emoji?: string; avatar_url?: string | null }
+  data: {
+    name?: string;
+    birth_date?: string;
+    avatar_emoji?: string;
+    avatar_url?: string | null;
+    sex?: "F" | "M" | null;
+  }
 ) {
   return supabase.from("babies").update(data).eq("id", babyId).select().single();
 }

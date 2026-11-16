@@ -812,6 +812,51 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
     <div
       class="space-y-1"
     >
+      <p
+        aria-hidden="true"
+        class="text-xs text-muted-foreground"
+      >
+        Sexo
+      </p>
+      <div
+        aria-label="Sexo"
+        class="flex w-full rounded-full border border-sn-bd bg-sn-s1 p-[5px]"
+        data-size="sm"
+        data-slot="segmented-control"
+        role="radiogroup"
+      >
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menina
+        </button>
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menino
+        </button>
+        <button
+          aria-checked="true"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="0"
+          type="button"
+        >
+          Não informar
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-1"
+    >
       <label
         class="text-xs text-muted-foreground"
       >
@@ -986,6 +1031,51 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
       placeholder="Nome do bebê"
       value=""
     />
+    <div
+      class="space-y-1"
+    >
+      <p
+        aria-hidden="true"
+        class="text-xs text-muted-foreground"
+      >
+        Sexo
+      </p>
+      <div
+        aria-label="Sexo"
+        class="flex w-full rounded-full border border-sn-bd bg-sn-s1 p-[5px]"
+        data-size="sm"
+        data-slot="segmented-control"
+        role="radiogroup"
+      >
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menina
+        </button>
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menino
+        </button>
+        <button
+          aria-checked="true"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="0"
+          type="button"
+        >
+          Não informar
+        </button>
+      </div>
+    </div>
     <div
       class="space-y-1"
     >

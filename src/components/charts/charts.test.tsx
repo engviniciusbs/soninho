@@ -50,7 +50,7 @@ describe("SleepBarChart", () => {
     await expectNoFocusableInsideHidden(container);
     const table = screen.getByRole("table", { name: "Sono por dia" });
     const rows = within(table).getAllByRole("row").map((r) => r.textContent);
-    expect(rows).toEqual(["DiaNoiteSonecas", "14/1110,9h2,5h", "15/1111h2h", "hoje6h0h"]);
+    expect(rows).toEqual(["DiaNoiteSonecas", "14/1110h 54min2h 30min", "15/1111h2h", "hoje6h0 min"]);
   });
 });
 
@@ -66,7 +66,7 @@ describe("SleepQualityTrend", () => {
     await expectNoFocusableInsideHidden(container);
     const table = screen.getByRole("table", { name: "Duração média das sonecas" });
     const rows = within(table).getAllByRole("row").map((r) => r.textContent);
-    expect(rows).toEqual(["DiaValor", "14/1148min", "15/11sem dado", "hoje40min"]);
+    expect(rows).toEqual(["DiaValor", "14/1148 min", "15/11sem dado", "hoje40 min"]);
   });
 
   it("names_the_table_by_the_visible_title_and_the_measure", () => {

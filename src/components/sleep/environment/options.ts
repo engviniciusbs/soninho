@@ -23,7 +23,7 @@ export const WEATHER_OPTIONS: { value: WeatherCondition; label: string; icon: Co
 // ─── Sack type options ────────────────────────────────────────────────────────
 export const SACK_OPTIONS: { value: SleepSackType; shortLabel: string; tog?: string }[] = [
   { value: "none",    shortLabel: "Nenhum" },
-  { value: "mesh",    shortLabel: "Malha",   tog: "~0.5" },
+  { value: "mesh",    shortLabel: "Malha",   tog: "~0,5" },
   { value: "flannel", shortLabel: "Flanela", tog: "1–2" },
   { value: "fleece",  shortLabel: "Fleece",  tog: "2–3" },
 ];

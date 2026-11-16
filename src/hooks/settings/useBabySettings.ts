@@ -11,7 +11,7 @@ import {
   getOwnedFamilyIds,
 } from "@/lib/supabase/queries/babies";
 import { useBaby } from "@/components/providers/BabyProvider";
-import type { Baby } from "@/types";
+import type { Baby, BabySex } from "@/types";
 
 export interface BabyValues {
   /** Baby being edited; `null` creates a new one. */
@@ -20,6 +20,8 @@ export interface BabyValues {
   birth_date: string;
   avatar_emoji: string;
   avatar_url: string | null;
+  /** 'F' menina, 'M' menino, null não informado. */
+  sex: BabySex | null;
 }
 
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
@@ -105,7 +107,8 @@ export function useBabySettings() {
       // otherwise the RPC uses the only family they own, or creates one.
       const activeFamily = activeBaby?.family_id ?? null;
       const familyId = activeFamily && owned.includes(activeFamily) ? activeFamily : null;
-      const { error } = await createBaby(supabase, data, familyId);
+      const { sex, ...babyData } = data;
+      const { data: created, error } = await createBaby(supabase, babyData, familyId);
       if (error) {
         toast.error(
           (error as DbError)?.message === "family_required"
@@ -115,7 +118,14 @@ export function useBabySettings() {
         setIsSaving(false);
         return false;
       }
-      toast.success("Bebê adicionado");
+      // The RPC does not take the sex: it is set right after, on the new row.
+      const newId = (created as { id?: string } | null)?.id;
+      const sexError = sex && newId ? (await updateBaby(supabase, newId, { sex })).error : null;
+      if (sexError) {
+        toast.error("Bebê adicionado, mas o sexo não foi salvo. Edite o bebê para tentar de novo.");
+      } else {
+        toast.success("Bebê adicionado");
+      }
     }
 
     invalidate();

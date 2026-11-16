@@ -1,5 +1,6 @@
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
+import { toBabySex } from "@/lib/i18n/gender";
 import { babyAgeOn, buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
       timezone,
       feedbackSummary
     );
-    const systemPrompt = getSleepSystemPrompt(context, babyAgeOn(baby.birth_date, timezone));
+    const systemPrompt = getSleepSystemPrompt(context, babyAgeOn(baby.birth_date, timezone), toBabySex(baby.sex));
 
     const stream = await openai.chat.completions.create({
       model: OPENAI_MODEL,

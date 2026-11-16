@@ -17,6 +17,10 @@ import { IconPen, IconStop } from "@/components/brand/icons";
 import { EnvironmentPicker, type EnvironmentData } from "@/components/sleep/EnvironmentPicker";
 import { SleepNotes } from "@/components/sleep/timer/SleepNotes";
 import { elapsedToSeconds } from "./format";
+import { formatDecimal } from "@/lib/format/number";
+
+const tempText = (t: number) => `${formatDecimal(t)}°C`;
+const togText = (t: number) => `TOG ${formatDecimal(t, 1, { fixed: true })}`;
 
 export interface SleepingCardProps {
   sleepType: "NAP" | "NIGHT_SLEEP";
@@ -104,17 +108,17 @@ export function SleepingCard({
         // Only what was recorded; nothing to tap.
         (temp !== null || tog !== null) && (
           <div className="flex flex-wrap justify-center gap-2">
-            {temp !== null && <Chip>{`${temp}°C`}</Chip>}
-            {tog !== null && <Chip>{`TOG ${tog.toFixed(1)}`}</Chip>}
+            {temp !== null && <Chip>{tempText(temp)}</Chip>}
+            {tog !== null && <Chip>{togText(tog)}</Chip>}
           </div>
         )
       ) : (
         <>
           <div className="mb-3.5 flex flex-wrap justify-center gap-2">
             <Chip onClick={openEnv}>
-              {temp !== null ? `${temp}°C` : "Temperatura"}
+              {temp !== null ? tempText(temp) : "Temperatura"}
             </Chip>
-            <Chip onClick={openEnv}>{tog !== null ? `TOG ${tog.toFixed(1)}` : "TOG"}</Chip>
+            <Chip onClick={openEnv}>{tog !== null ? togText(tog) : "TOG"}</Chip>
             <Chip onClick={openEnv}>Ambiente</Chip>
           </div>
 

@@ -15,6 +15,7 @@ import { useFeedingStore, useActiveBreastTimer } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
 import { toast } from "sonner";
+import { toastNoBaby } from "@/lib/toasts/noBaby";
 import type { BreastSide } from "@/types";
 import { breastTotalsAt, sideOf, sideStartOf } from "@/lib/feeding/breastSides";
 import { useSessionClock } from "@/hooks/timer/useSessionClock";
@@ -107,7 +108,7 @@ export function useBreastfeedingTimer() {
 
   const handleStart = useCallback(async (side: BreastSide = "LEFT") => {
     if (!activeBaby) {
-      toast.error("Adicione um bebê primeiro nas configurações");
+      toastNoBaby();
       return;
     }
     const baby = activeBaby;

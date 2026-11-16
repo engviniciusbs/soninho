@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import { renderWithProviders } from "@/test/render";
 import type { Baby, FeedingSuggestion, FeedingTimelineItem } from "@/types";
@@ -10,6 +10,7 @@ import { BreastfeedingTimer } from "./BreastfeedingTimer";
 import { FeedingTimeline } from "./FeedingTimeline";
 import FeedingPage from "@/app/(dashboard)/feeding/page";
 import { useFeedingStore } from "@/store/feedingStore";
+import { toast } from "sonner";
 
 const holder = vi.hoisted(() => ({
   feedings: [] as unknown[],
@@ -144,6 +145,22 @@ describe("BottleQuickLog", () => {
       volume_ml: 130,
       milk_type: "BREAST_MILK",
     });
+  });
+});
+
+describe("BottleQuickLog without a baby", () => {
+  it("points to Mais › Bebês with a link, never to Configurações", async () => {
+    renderWithProviders(<BottleQuickLog />, { baby: { activeBaby: null, babies: [] } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Registrar mamadeira" }));
+    });
+    expect(logBottleFeeding).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    const [message, opts] = vi.mocked(toast.error).mock.calls[0];
+    expect(message).toBe("Adicione um bebê em Mais › Bebês");
+    cleanup();
+    render(<>{(opts as { action?: React.ReactNode })?.action}</>);
+    expect(screen.getByRole("link", { name: "Abrir Bebês" })).toHaveAttribute("href", "/more/babies");
   });
 });
 

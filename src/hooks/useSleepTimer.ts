@@ -8,6 +8,7 @@ import { useSleepStore, useActiveSleepTimer, type SleepType } from "@/store/slee
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsedSeconds } from "@/lib/utils";
 import { toast } from "sonner";
+import { toastNoBaby } from "@/lib/toasts/noBaby";
 import { classifyEndResult, isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
 import { useSessionClock } from "@/hooks/timer/useSessionClock";
@@ -101,7 +102,7 @@ export function useSleepTimer() {
 
   const handleStart = useCallback(async (startTimeIso?: string) => {
     if (!activeBaby) {
-      toast.error("Adicione um bebê primeiro nas configurações");
+      toastNoBaby();
       return;
     }
     const baby = activeBaby;

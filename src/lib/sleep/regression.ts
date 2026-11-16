@@ -1,6 +1,7 @@
 import { differenceInWeeks } from "date-fns";
 import type { SleepSession } from "@/types";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { formatDuration } from "@/lib/utils";
 import { buildCompleteDailySleepTotals } from "@/lib/sleep/sessionDayAllocation";
 import { addDaysToKey, localDayKey, parseLocalDate } from "@/lib/dates/localDate";
 
@@ -159,15 +160,16 @@ export function detectRegression(
 
   const detected = enoughData && hasSignal && (ageWindow != null || hasSleepDrop);
 
+  const dropText = `${formatDuration(sleepDropHours * 60)}/dia`;
   let summary: string;
   if (!enoughData) {
     summary = "Dados insuficientes para avaliar regressão.";
   } else if (detected && ageWindow) {
     summary = `${ageWindow.label} provável: ${
-      hasSleepDrop ? `queda de ${sleepDropHours}h/dia no sono` : "sono mais fragmentado"
+      hasSleepDrop ? `queda de ${dropText} no sono` : "sono mais fragmentado"
     }.`;
   } else if (detected) {
-    summary = `Mudança no padrão: queda de ${sleepDropHours}h/dia no sono recente.`;
+    summary = `Mudança no padrão: queda de ${dropText} no sono recente.`;
   } else if (ageWindow) {
     summary = `Fase de ${ageWindow.label} — padrão ainda estável.`;
   } else {

@@ -14,10 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { createClient } from "@/lib/supabase/client";
 import { updateSleepSession } from "@/lib/supabase/queries/sleep";
-import {
-  HOW_FELL_ASLEEP_OPTIONS,
-  WAKE_REASON_OPTIONS,
-} from "@/lib/sleep/captureLabels";
+import { howFellAsleepOptions, wakeReasonOptions } from "@/lib/sleep/captureLabels";
+import { useBaby } from "@/components/providers/BabyProvider";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import type { HowFellAsleep, WakeReason } from "@/types";
@@ -37,6 +35,7 @@ export function PostSleepReview({
 }: PostSleepReviewProps) {
   const supabase = createClient();
   const queryClient = useQueryClient();
+  const sex = useBaby().activeBaby?.sex;
 
   const [quality, setQuality] = useState<number | null>(null);
   const [howFellAsleep, setHowFellAsleep] = useState<HowFellAsleep | null>(null);
@@ -130,7 +129,7 @@ export function PostSleepReview({
           <div className="space-y-2">
             <p className="font-sans text-sm font-bold text-sn-mu">Como adormeceu?</p>
             <div className="flex flex-wrap gap-2">
-              {HOW_FELL_ASLEEP_OPTIONS.map((opt) => {
+              {howFellAsleepOptions(sex).map((opt) => {
                 const active = howFellAsleep === opt.value;
                 return (
                   <Chip
@@ -150,7 +149,7 @@ export function PostSleepReview({
             <div className="space-y-2">
               <p className="font-sans text-sm font-bold text-sn-mu">Por que acordou?</p>
               <div className="flex flex-wrap gap-2">
-                {WAKE_REASON_OPTIONS.map((opt) => {
+                {wakeReasonOptions(sex).map((opt) => {
                   const active = wakeReason === opt.value;
                   return (
                     <Chip

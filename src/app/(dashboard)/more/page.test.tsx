@@ -177,7 +177,8 @@ describe("Mais detail pages (former settings tabs)", () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê atualizado"));
     expect(sb.find("babies", "update").map((c) => c.ops)).toEqual([
       [
-        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "\u{1F98A}", avatar_url: null }]],
+        // The form now also edits the sex ("Não informar" is null).
+        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "\u{1F98A}", avatar_url: null, sex: null }]],
         ["eq", ["id", "baby-1"]],
         ["select", []],
         ["single", []],

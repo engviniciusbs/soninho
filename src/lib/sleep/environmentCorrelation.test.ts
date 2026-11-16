@@ -74,7 +74,7 @@ describe("computeEnvironmentCorrelation", () => {
     ]);
     expect(result.sleepSackTog).toEqual([
       { label: "TOG 1", count: 2, avgQuality: 3.5, avgDurationMin: 75 },
-      { label: "TOG 2.5", count: 1, avgQuality: null, avgDurationMin: 45 },
+      { label: "TOG 2,5", count: 1, avgQuality: null, avgDurationMin: 45 },
     ]);
     expect(result.weather).toEqual([
       { label: "Chuvoso", count: 2, avgQuality: 3.5, avgDurationMin: 75 },

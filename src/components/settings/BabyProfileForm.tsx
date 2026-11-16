@@ -9,6 +9,7 @@ import { useBabySettings } from "@/hooks/settings/useBabySettings";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SegmentedControl, type SegmentedOption } from "@/components/ui/segmented-control";
 import {
   Dialog,
   DialogContent,
@@ -27,9 +28,18 @@ const babySchema = z.object({
   // stored value rides along unchanged so the payload keeps its shape.
   avatar_emoji: z.string(),
   avatar_url: z.string().nullable(),
+  // "N" (Não informar) is the form's stand-in for null: the control needs a string.
+  sex: z.enum(["F", "M", "N"]).transform((v) => (v === "N" ? null : v)),
 });
 type BabyFormInput = z.input<typeof babySchema>;
 type BabyFormOutput = z.output<typeof babySchema>;
+type SexChoice = BabyFormInput["sex"];
+
+const SEX_OPTIONS: SegmentedOption<SexChoice>[] = [
+  { value: "F", label: "Menina" },
+  { value: "M", label: "Menino" },
+  { value: "N", label: "Não informar" },
+];
 
 interface Props {
   open: boolean;
@@ -69,6 +79,7 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
       birth_date: baby?.birth_date ?? "",
       avatar_emoji: baby?.avatar_emoji ?? "🍼",
       avatar_url: baby?.avatar_url ?? null,
+      sex: baby?.sex ?? "N",
     },
   });
   const [name, avatarUrl] = useWatch({
@@ -145,6 +156,24 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
             />
           )}
         />
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground" aria-hidden="true">
+            Sexo
+          </p>
+          <Controller
+            control={control}
+            name="sex"
+            render={({ field }) => (
+              <SegmentedControl
+                aria-label="Sexo"
+                size="sm"
+                options={SEX_OPTIONS}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground">Data de nascimento</label>
           <Controller

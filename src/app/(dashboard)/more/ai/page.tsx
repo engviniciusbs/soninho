@@ -20,7 +20,7 @@ export default function MoreAIPage() {
       ) : activeBaby ? (
         <AIInsights babyId={activeBaby.id} />
       ) : (
-        <NoBabyNotice>Adicione um bebê para ver os resumos da IA sobre o sono dele.</NoBabyNotice>
+        <NoBabyNotice>Adicione um bebê para ver os resumos da IA sobre o sono.</NoBabyNotice>
       )}
     </div>
   );

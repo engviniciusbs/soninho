@@ -1,13 +1,10 @@
 import { formatDuration } from "@/lib/utils";
 
-/** A decimal in PT-BR ("2,4"), at most one decimal place. */
-export function formatDecimal(n: number): string {
-  return n.toLocaleString("pt-BR", { maximumFractionDigits: 1 });
-}
+export { formatDecimal } from "@/lib/format/number";
 
-/** Hours with a PT-BR decimal ("1,5h"). */
-export function formatHours(n: number): string {
-  return `${formatDecimal(n)}h`;
+/** Hours (possibly fractional) as a duration: 10.9 → "10h 54min", never "10,9h". */
+export function formatHours(hours: number): string {
+  return formatDuration(hours * 60);
 }
 
 /** A duration as a figure ("12h 10min"), the unit "min" set smaller so it fits a narrow tile. */

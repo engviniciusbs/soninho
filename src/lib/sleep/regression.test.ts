@@ -133,6 +133,16 @@ describe("detectRegression", () => {
     expect(r.summary).toBe("Mudança no padrão: queda de 5h/dia no sono recente.");
   });
 
+  it("a fractional drop reads as a duration (1h 30min), never 1.5h", () => {
+    const partial = [
+      ...priorDays.map((d) => dayNap(d, 10)),
+      ...recentDays.map((d) => dayNap(d, 8.5)),
+    ];
+    const r = detectRegression(birthForAge(25), partial, 3);
+    expect(r.sleepDropHours).toBe(1.5);
+    expect(r.summary).toBe("Mudança no padrão: queda de 1h 30min/dia no sono recente.");
+  });
+
   it("window boundaries are inclusive (14 and 20 in, 13 and 21 out)", () => {
     expect(detectRegression(birthForAge(14), [], 3).ageWindow).not.toBeNull();
     expect(detectRegression(birthForAge(20), [], 3).ageWindow).not.toBeNull();

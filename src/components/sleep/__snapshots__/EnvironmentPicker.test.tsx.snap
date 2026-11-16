@@ -476,7 +476,7 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
           </span>
         </button>
         <button
-          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-label="Saquinho de malha (TOG ~0,5)"
           aria-pressed="false"
           class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
@@ -490,7 +490,7 @@ exports[`EnvironmentPicker > renders_environment_picker > empty 1`] = `
             class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
-            ~0.5
+            ~0,5
           </span>
         </button>
         <button
@@ -591,7 +591,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
             aria-live="polite"
             class="font-display text-[34px] leading-none font-bold tabular-nums text-sn-pr"
           >
-            17.0
+            17,0
           </span>
           <span
             class="font-sans text-base font-bold text-sn-mu"
@@ -922,7 +922,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
           </span>
         </button>
         <button
-          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-label="Saquinho de malha (TOG ~0,5)"
           aria-pressed="false"
           class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
@@ -936,7 +936,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
             class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
-            ~0.5
+            ~0,5
           </span>
         </button>
         <button
@@ -991,13 +991,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
         role="group"
       >
         <button
-          aria-label="TOG 0.5"
+          aria-label="TOG 0,5"
           aria-pressed="false"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          0.5
+          0,5
         </button>
         <button
           aria-label="TOG 1"
@@ -1009,13 +1009,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
           1
         </button>
         <button
-          aria-label="TOG 1.5"
+          aria-label="TOG 1,5"
           aria-pressed="false"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          1.5
+          1,5
         </button>
         <button
           aria-label="TOG 2"
@@ -1027,13 +1027,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled 1`] = `
           2
         </button>
         <button
-          aria-label="TOG 2.5"
+          aria-label="TOG 2,5"
           aria-pressed="true"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          2.5
+          2,5
         </button>
         <button
           aria-label="TOG 3"
@@ -1163,7 +1163,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
             aria-live="polite"
             class="font-display text-[34px] leading-none font-bold tabular-nums text-sn-pr"
           >
-            17.0
+            17,0
           </span>
           <span
             class="font-sans text-base font-bold text-sn-mu"
@@ -1494,7 +1494,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
           </span>
         </button>
         <button
-          aria-label="Saquinho de malha (TOG ~0.5)"
+          aria-label="Saquinho de malha (TOG ~0,5)"
           aria-pressed="false"
           class="flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-[1.5px] py-2.5 font-sans outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr px-1 border-sn-bd bg-sn-s2/50 text-sn-mu hover:border-sn-pr/60 hover:text-sn-tx"
           type="button"
@@ -1508,7 +1508,7 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
             class="text-xs leading-tight font-semibold text-sn-mu"
           >
             TOG 
-            ~0.5
+            ~0,5
           </span>
         </button>
         <button
@@ -1563,13 +1563,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
         role="group"
       >
         <button
-          aria-label="TOG 0.5"
+          aria-label="TOG 0,5"
           aria-pressed="false"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          0.5
+          0,5
         </button>
         <button
           aria-label="TOG 1"
@@ -1581,13 +1581,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
           1
         </button>
         <button
-          aria-label="TOG 1.5"
+          aria-label="TOG 1,5"
           aria-pressed="false"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-bd bg-sn-s2 text-sn-tx relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:border-sn-pr/60 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          1.5
+          1,5
         </button>
         <button
           aria-label="TOG 2"
@@ -1599,13 +1599,13 @@ exports[`EnvironmentPicker > renders_environment_picker > filled-compact-prop 1`
           2
         </button>
         <button
-          aria-label="TOG 2.5"
+          aria-label="TOG 2,5"
           aria-pressed="true"
           class="inline-flex items-center gap-1.5 rounded-full border px-[13px] py-2 font-sans text-[13px] font-bold whitespace-nowrap border-sn-pr bg-sn-pr text-sn-pr-ink relative min-h-9 min-w-11 justify-center cursor-pointer outline-none select-none after:absolute after:-inset-y-1 after:inset-x-0 transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-pr/88 disabled:pointer-events-none disabled:opacity-55"
           data-slot="chip"
           type="button"
         >
-          2.5
+          2,5
         </button>
         <button
           aria-label="TOG 3"

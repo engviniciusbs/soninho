@@ -1,6 +1,7 @@
 import { differenceInWeeks, differenceInMonths } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import type { Baby, SleepSession } from "@/types";
+import { g, toBabySex } from "@/lib/i18n/gender";
 import {
   addDaysToKey,
   formatLocalDate,
@@ -149,6 +150,7 @@ export function buildSleepContext(
 
   return `
 Nome do bebê: ${baby.name}
+Sexo: ${g(toBabySex(baby.sex), { f: "menina", m: "menino", n: "não informado" })}
 Idade: ${ageWeeks} semanas (${ageMonths} meses)
 Data de nascimento: ${formatLocalDate(baby.birth_date)}
 Horário de referência (agora): ${currentTime} (fuso: ${timezone})

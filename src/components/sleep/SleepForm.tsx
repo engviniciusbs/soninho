@@ -37,10 +37,10 @@ import { deleteSleepSession } from "@/lib/supabase/queries/sleep";
 import { invalidateSleepQueries } from "@/lib/query/invalidateSleep";
 import { EnvironmentPicker, type EnvironmentData } from "./EnvironmentPicker";
 import {
-  HOW_FELL_ASLEEP_OPTIONS,
-  HOW_FELL_ASLEEP_LABELS,
-  WAKE_REASON_OPTIONS,
-  WAKE_REASON_LABELS,
+  howFellAsleepOptions,
+  howFellAsleepLabels,
+  wakeReasonOptions,
+  wakeReasonLabels,
 } from "@/lib/sleep/captureLabels";
 import type { SleepSession } from "@/types";
 
@@ -164,6 +164,7 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
+  const sex = activeBaby?.sex;
   const [envOpen, setEnvOpen] = useState(false);
   const [envData, setEnvData] = useState<EnvironmentData>(() => envFromSession(session));
 
@@ -308,7 +309,7 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
       </Select>
 
       <Select
-        items={HOW_FELL_ASLEEP_LABELS}
+        items={howFellAsleepLabels(sex)}
         value={howFellAsleep ?? ""}
         onValueChange={(v) => v && setValue("how_fell_asleep", v)}
       >
@@ -316,7 +317,7 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
           <SelectValue placeholder="Como adormeceu? (opcional)" />
         </SelectTrigger>
         <SelectContent>
-          {HOW_FELL_ASLEEP_OPTIONS.map((opt) => (
+          {howFellAsleepOptions(sex).map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
               {opt.label}
             </SelectItem>
@@ -326,7 +327,7 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
 
       {selectedType === "NIGHT_SLEEP" && (
         <Select
-          items={WAKE_REASON_LABELS}
+          items={wakeReasonLabels(sex)}
           value={wakeReason ?? ""}
           onValueChange={(v) => v && setValue("wake_reason", v)}
         >
@@ -334,7 +335,7 @@ function SleepFormBody({ onClose, session, day }: Omit<SleepFormProps, "open">) 
             <SelectValue placeholder="Por que acordou? (opcional)" />
           </SelectTrigger>
           <SelectContent>
-            {WAKE_REASON_OPTIONS.map((opt) => (
+            {wakeReasonOptions(sex).map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
               </SelectItem>

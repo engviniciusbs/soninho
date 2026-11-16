@@ -21,7 +21,7 @@ export default function MoreAIChatPage() {
           <AIChat />
         </div>
       ) : (
-        <NoBabyNotice>Adicione um bebê para conversar com a IA sobre o sono dele.</NoBabyNotice>
+        <NoBabyNotice>Adicione um bebê para conversar com a IA sobre o sono.</NoBabyNotice>
       )}
     </div>
   );

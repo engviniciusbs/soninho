@@ -180,6 +180,10 @@ describe("weekly e-mail copy", () => {
     expect(html).toContain("Mais → Notificações");
     expect(html).not.toContain("Configurações");
     expect(html).toContain("1h 15min");
+    // Hours as durations, never "13,5 h/dia" or "11,0 h máx.".
+    expect(html).toContain("13h 30min");
+    expect(html).toContain("11h");
+    expect(html).not.toMatch(/13,5|11,0/);
   });
 });
 
@@ -191,6 +195,14 @@ describe("manual report copy", () => {
     const { html } = send.mock.calls[0][0] as { html: string };
     expect(html).toContain("Mais → Relatórios");
     expect(html).not.toContain("Configurações");
+  });
+
+  it("has no emoji in the subject", async () => {
+    const { supabase } = fakeSupabase({ inserted: true, withData: true });
+    const send = vi.fn().mockResolvedValue({ error: null });
+    await sendSleepReport({ ...base, kind: "weekly", supabase, resend: resendWith(send) });
+    const { subject } = send.mock.calls[0][0] as { subject: string };
+    expect(subject).toBe("Seu resumo de sono da semana");
   });
 });
 

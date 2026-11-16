@@ -54,7 +54,7 @@ export default function MoreFamilyPage() {
           <FamilyNoteCard />
         </div>
       ) : (
-        <NoBabyNotice>Adicione um bebê para convidar quem cuida dele junto com você.</NoBabyNotice>
+        <NoBabyNotice>Adicione um bebê para convidar quem vai cuidar junto com você.</NoBabyNotice>
       )}
     </div>
   );

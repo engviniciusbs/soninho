@@ -3,6 +3,7 @@ import { IconMinus, IconPlus } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
+import { formatDecimal } from "@/lib/format/number";
 import { FIELD_LABEL } from "./options";
 
 /** Colour of the reading, from the tokens; the number itself carries the meaning. */
@@ -46,7 +47,7 @@ export function TempStepper({
             aria-live="polite"
             aria-atomic="true"
           >
-            {value === null ? "—" : temp.toFixed(1)}
+            {value === null ? "—" : formatDecimal(temp, 1, { fixed: true })}
           </span>
           <span className="font-sans text-base font-bold text-sn-mu">°C</span>
         </div>

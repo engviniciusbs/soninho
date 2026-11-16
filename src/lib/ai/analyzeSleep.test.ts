@@ -43,6 +43,12 @@ describe.each(["UTC", "America/Sao_Paulo"])("buildSleepContext (process TZ=%s)",
     expect(buildSleepContext(baby, [])).toContain("Data de nascimento: 10/02/2026");
   });
 
+  it("states the baby's sex, or that it was not informed", () => {
+    expect(buildSleepContext({ ...baby, sex: "F" }, [])).toContain("Sexo: menina");
+    expect(buildSleepContext({ ...baby, sex: "M" }, [])).toContain("Sexo: menino");
+    expect(buildSleepContext({ ...baby, sex: null }, [])).toContain("Sexo: não informado");
+  });
+
   it("states the age in months", () => {
     expect(buildSleepContext(baby, [])).toContain("Idade: 39 semanas (9 meses)");
   });

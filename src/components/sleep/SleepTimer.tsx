@@ -289,6 +289,7 @@ export function SleepTimer({ nanny = false, canWrite = true }: { nanny?: boolean
               range={range}
               hasLastSleep={lastSleepEnd !== null}
               isLoading={wwLoading}
+              sex={activeBaby?.sex}
             />
           )}
           {canWrite && (

@@ -214,14 +214,18 @@ describe("Analytics detail pages", () => {
     const tile = (label: string) => screen.getByText(label).closest("[data-slot=stat-tile]") as HTMLElement;
     expect(tile("Sono 24h")).toHaveTextContent("12h 40min");
     expect(tile("Sono 24h")).toHaveTextContent("Meta: 14h");
-    expect(tile("Débito de sono")).toHaveTextContent("-1,5h");
-    expect(tile("Débito de sono")).toHaveTextContent("Média 12,5h/dia");
+    expect(tile("Débito de sono")).toHaveTextContent("-1h 30min");
+    expect(tile("Débito de sono")).toHaveTextContent("Média 12h 30min/dia");
     expect(tile("Média de soneca")).toHaveTextContent("52 min");
     expect(tile("Média de soneca")).toHaveTextContent("17 sonecas em 14 dias");
     expect(tile("Sonecas hoje")).toHaveTextContent("2");
     expect(tile("Sonecas hoje")).toHaveTextContent("Ontem: 3");
     expect(tile("Maior trecho noturno")).toHaveTextContent("6h 40min");
     expect(tile("Maior trecho noturno")).toHaveTextContent("Últimas 24h");
+    // Hours are always a duration ("10h 54min"), never a decimal ("10,9h").
+    for (const label of ["Sono 24h", "Débito de sono", "Média de soneca", "Maior trecho noturno"]) {
+      expect(tile(label).textContent).not.toMatch(/\d+[,.]\d+\s*h/);
+    }
   });
 
   it("numbers_with_an_empty_window_read_sem_dados_not_zero", () => {

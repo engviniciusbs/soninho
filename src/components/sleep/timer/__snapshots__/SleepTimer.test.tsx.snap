@@ -229,7 +229,7 @@ exports[`SleepTimer (characterization) > renders_idle_state 1`] = `
         <p
           class="font-sans text-sm font-bold text-sn-mu"
         >
-          Tempo acordada
+          Tempo acordado
         </p>
         <span
           class="block font-display font-bold text-sn-tx tabular-nums text-[32px] leading-[1.1] mt-1"
@@ -247,7 +247,7 @@ exports[`SleepTimer (characterization) > renders_idle_state 1`] = `
       </span>
     </div>
     <div
-      aria-label="Tempo acordada dentro da janela de vigília"
+      aria-label="Tempo acordado dentro da janela de vigília"
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="40"
@@ -274,7 +274,7 @@ exports[`SleepTimer (characterization) > renders_idle_state 1`] = `
     <p
       class="font-sans text-[13px] font-semibold text-sn-mu"
     >
-      Janela de vigília: 1h a 1h15
+      Janela de vigília: 1h a 1h 15min
     </p>
   </div>
   <div

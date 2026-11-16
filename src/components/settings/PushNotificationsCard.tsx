@@ -66,7 +66,7 @@ export function PushNotificationsCard({ settings }: { settings: NotificationSett
                 </p>
                 <p className="text-base text-sn-mu">
                   {status.permission === "denied"
-                    ? "Bloqueado pelo navegador. Altere nas configurações do site."
+                    ? "Bloqueado pelo navegador. Libere as notificações nas permissões do site."
                     : status.isSubscribed
                       ? "Você receberá alertas sobre sonecas e janelas de sono."
                       : "Ative para receber alertas inteligentes."}

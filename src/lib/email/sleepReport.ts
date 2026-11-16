@@ -21,6 +21,7 @@ import type {
   SolidFeeding,
 } from "@/types";
 import { addDaysToKey, parseLocalDate } from "@/lib/dates/localDate";
+import { formatDecimal } from "@/lib/format/number";
 const FROM = "Soninho <sono@soninho.baby>";
 
 /** Minutes of a finished session (duration_min, else from its timestamps). */
@@ -94,7 +95,7 @@ export function buildBabyStats(
 
   const env = computeEnvironmentCorrelation(sessions);
   const bestEnvironment = env.bestTemperature
-    ? `${env.bestTemperature.label} (qualidade ${env.bestTemperature.avgQuality}/5)`
+    ? `${env.bestTemperature.label} (qualidade ${formatDecimal(env.bestTemperature.avgQuality ?? 0)}/5)`
     : null;
 
   const feedingStats = feeding
@@ -114,7 +115,8 @@ export function buildBabyStats(
     targetTotalHours: schedule.totalSleepHours,
     avgNapMinutes,
     napCountAvg,
-    longestNightHours: Math.round((longestNightMinutes / 60) * 10) / 10,
+    // Unrounded: the e-mail shows it as a duration ("10h 54min").
+    longestNightHours: longestNightMinutes / 60,
     adherencePct,
     bestEnvironment,
     feeding: feedingStats,
@@ -122,8 +124,8 @@ export function buildBabyStats(
 }
 
 function subjectFor(kind: "weekly" | "manual", days: number): string {
-  if (kind === "weekly") return "🌙 Seu resumo de sono da semana";
-  return `🌙 Seu resumo de sono — últimos ${days} dias`;
+  if (kind === "weekly") return "Seu resumo de sono da semana";
+  return `Seu resumo de sono — últimos ${days} dias`;
 }
 
 export type SendSleepReportResult =

@@ -12,7 +12,7 @@ vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 
 const baby = { id: "baby-1", name: "Lia" } as Baby;
-const values = { name: "Lia", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null };
+const values = { name: "Lia", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null, sex: null };
 let sb: RecordingSupabase;
 
 beforeEach(() => {
@@ -184,4 +184,42 @@ describe("useBabySettings", () => {
     const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
     expect(args).not.toHaveProperty("p_family_id");
   });
+
+  it("edit_saves_the_sex", async () => {
+    const { result } = setup();
+    await act(async () => {
+      await result.current.save({ id: "baby-1", ...values, sex: "F" });
+    });
+    expect(sb.find("babies", "update")[0].ops[0]).toEqual(["update", [{ ...values, sex: "F" }]]);
+  });
+
+  it("create_with_sex_sets_it_on_the_new_baby", async () => {
+    sb.respond((c) =>
+      c.target === "rpc:create_baby_with_family" ? { data: { id: "new-baby" }, error: null } : undefined
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ id: null, ...values, sex: "M" });
+    });
+    expect(ok).toBe(true);
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args).not.toHaveProperty("p_sex");
+    expect(sb.find("babies", "update")[0].ops.slice(0, 2)).toEqual([
+      ["update", [{ sex: "M" }]],
+      ["eq", ["id", "new-baby"]],
+    ]);
+  });
+
+  it("create_without_sex_makes_no_extra_write", async () => {
+    sb.respond((c) =>
+      c.target === "rpc:create_baby_with_family" ? { data: { id: "new-baby" }, error: null } : undefined
+    );
+    const { result } = setup();
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    expect(sb.find("babies", "update")).toHaveLength(0);
+  });
 });
+

@@ -1,6 +1,7 @@
 import { Chip } from "@/components/ui/chip";
 import { TOG_OPTIONS, type SleepSackType } from "@/lib/sleep/clothingRecommendation";
 import { FIELD_LABEL } from "./options";
+import { formatDecimal } from "@/lib/format/number";
 
 // ─── TOG selector — only when a sack is selected ──────────────────────────────
 export function TogSelector({
@@ -20,12 +21,12 @@ export function TogSelector({
         {TOG_OPTIONS.map((t) => (
           <Chip
             key={t}
-            aria-label={`TOG ${t}`}
+            aria-label={`TOG ${formatDecimal(t)}`}
             selected={value === t}
             onClick={() => onSelect(t)}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(t); }}
           >
-            {t}
+            {formatDecimal(t)}
           </Chip>
         ))}
       </div>

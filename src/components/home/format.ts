@@ -1,10 +1,8 @@
-/** Wake-window bound as "3h", "1h15" or "45 min". */
+import { formatDuration } from "@/lib/utils";
+
+/** Wake-window bound in the app's single duration format: "3h", "1h 15min", "45 min". */
 export function formatWindowBound(total: number): string {
-  const m = Math.max(0, Math.round(total));
-  if (m < 60) return `${m} min`;
-  const h = Math.floor(m / 60);
-  const rest = m % 60;
-  return rest === 0 ? `${h}h` : `${h}h${String(rest).padStart(2, "0")}`;
+  return formatDuration(total);
 }
 
 /** "HH:MM:SS" (from useSleepTimer) back to seconds; 0 when malformed. */

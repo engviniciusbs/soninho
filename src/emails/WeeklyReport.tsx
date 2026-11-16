@@ -17,10 +17,12 @@ import {
 } from "@react-email/components";
 import { emailTheme, fontLink } from "@/emails/theme";
 import { formatDuration } from "@/lib/utils";
+import { formatDecimal } from "@/lib/format/number";
 
-/** One decimal with a comma, as in pt-BR ("13,5"). */
-const dec = (n: number) =>
-  n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+/** A count per day with a pt-BR comma, at most one decimal ("2,5", "2"). */
+const dec = (n: number) => formatDecimal(n);
+/** Hours (possibly fractional) as a duration: 13.5 → "13h 30min". */
+const hours = (h: number) => formatDuration(h * 60);
 
 export interface WeeklyReportBabyStats {
   name: string;
@@ -300,16 +302,16 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
           <div style={progressFill(baby.adherencePct)} />
         </div>
         <Text style={progressMeta}>
-          {baby.adherencePct}% da meta de {baby.targetTotalHours}h/dia, média de{" "}
-          {dec(baby.avgTotalHours)}h
+          {baby.adherencePct}% da meta de {hours(baby.targetTotalHours)} por dia, média de{" "}
+          {hours(baby.avgTotalHours)}
         </Text>
       </Section>
 
       <Row>
         <StatCell
           label="Sono total"
-          value={dec(baby.avgTotalHours)}
-          unit="h/dia"
+          value={hours(baby.avgTotalHours)}
+          unit="por dia"
         />
         <StatCell
           label="Sonecas"
@@ -323,9 +325,8 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
           value={baby.avgNapMinutes > 0 ? formatDuration(baby.avgNapMinutes) : "–"}
         />
         <StatCell
-          label="Trecho noturno"
-          value={dec(baby.longestNightHours)}
-          unit="h máx."
+          label="Maior trecho noturno"
+          value={baby.longestNightHours > 0 ? hours(baby.longestNightHours) : "–"}
         />
       </Row>
 

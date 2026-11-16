@@ -199,7 +199,7 @@ function DayView() {
                     <ul aria-label="Sonos do dia" className="divide-y divide-sn-bd">
                       {listed.map((s) => (
                         <li key={s.id}>
-                          <SleepCard session={s} onEdit={canWrite ? openForm : undefined} />
+                          <SleepCard session={s} sex={activeBaby?.sex} onEdit={canWrite ? openForm : undefined} />
                         </li>
                       ))}
                     </ul>
