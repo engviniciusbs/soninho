@@ -2,7 +2,7 @@ import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
 import { buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
-import { getUserRoleForBaby } from "@/lib/supabase/queries";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { chatRequestSchema } from "@/lib/ai/chatSchema";
 import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
 import type { Baby, SleepSession } from "@/types";

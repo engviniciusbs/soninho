@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import {
-  getNotificationPreferences,
-  upsertNotificationPreferences,
-} from "@/lib/supabase/queries";
+import { getNotificationPreferences, upsertNotificationPreferences } from "@/lib/supabase/queries/notifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export interface NotificationPrefs {

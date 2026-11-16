@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNow } from "@/hooks/useNow";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { getLastSleepSession } from "@/lib/supabase/queries";
+import { getLastSleepSession } from "@/lib/supabase/queries/sleep";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { getBabyAge } from "@/lib/utils";
 import {

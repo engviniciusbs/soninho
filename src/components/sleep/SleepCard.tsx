@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { formatDuration, formatTimeRange } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { deleteSleepSession } from "@/lib/supabase/queries";
+import { deleteSleepSession } from "@/lib/supabase/queries/sleep";
 import {
   HOW_FELL_ASLEEP_LABELS,
   HOW_FELL_ASLEEP_EMOJI,

@@ -3,13 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { zUuid } from "@/lib/validation/common";
 import { dbErrorToResponse } from "@/lib/http/errors";
-import {
-  createFamilyInvite,
-  getActiveFamilyInvites,
-  getFamilyForBaby,
-  getUserRoleForBaby,
-  revokeFamilyInvite,
-} from "@/lib/supabase/queries";
+import { createFamilyInvite, getActiveFamilyInvites, getFamilyForBaby, getUserRoleForBaby, revokeFamilyInvite } from "@/lib/supabase/queries/family";
 
 const postSchema = z.object({
   babyId: zUuid,

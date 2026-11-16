@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getFamilyForBaby,
-  getUserProfile,
-  getUserRoleForBaby,
-  insertSleepActivityLog,
-} from "@/lib/supabase/queries";
+import { getFamilyForBaby, getUserRoleForBaby } from "@/lib/supabase/queries/family";
+import { getUserProfile } from "@/lib/supabase/queries/profile";
+import { insertSleepActivityLog } from "@/lib/supabase/queries/sleep";
 import { getActorDisplayLabel } from "@/lib/family/relations";
 import { notifyFamilySleepActivity } from "@/lib/notifications/familyActivity";
 import { zUuid } from "@/lib/validation/common";

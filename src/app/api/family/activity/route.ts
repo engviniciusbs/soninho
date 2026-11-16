@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import { zUuid, zLimit } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getSleepActivityLog,
-  getUserRoleForBaby,
-} from "@/lib/supabase/queries";
+import { getSleepActivityLog } from "@/lib/supabase/queries/sleep";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { getFeedingActivityLog } from "@/lib/supabase/feedingQueries";
 
 export interface UnifiedActivityItem {

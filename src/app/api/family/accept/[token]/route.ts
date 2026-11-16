@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeInviteToken } from "@/lib/invites/inviteLink";
-import { acceptFamilyInvite, getInvitePreview } from "@/lib/supabase/queries";
+import { acceptFamilyInvite, getInvitePreview } from "@/lib/supabase/queries/family";
 
 // GET /api/family/accept/[token] — preview invite info (for the accept page)
 export async function GET(

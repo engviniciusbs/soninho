@@ -8,7 +8,7 @@ import { useWakeWindow } from "@/hooks/useWakeWindow";
 import { useActiveSleepTimer } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { createClient } from "@/lib/supabase/client";
-import { getRecentSessions } from "@/lib/supabase/queries";
+import { getRecentSessions } from "@/lib/supabase/queries/sleep";
 import { formatDuration, formatElapsed } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, AlertTriangle, CheckCircle2, Moon, TrendingUp } from "lucide-react";

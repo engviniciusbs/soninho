@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useWakeWindow } from "./useWakeWindow";
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => ({}) }));
-vi.mock("@/lib/supabase/queries", () => ({
+vi.mock("@/lib/supabase/queries/sleep", () => ({
   getLastSleepSession: vi.fn(async () => ({ data: null })),
 }));
 vi.mock("@/components/providers/BabyProvider", () => ({
@@ -42,7 +42,7 @@ describe("useWakeWindow", () => {
   });
 
   it("elapsed_advances_with_completed_session", async () => {
-    const queries = await import("@/lib/supabase/queries");
+    const queries = await import("@/lib/supabase/queries/sleep");
     const end = new Date(Date.now() - 10 * 60_000).toISOString();
     vi.mocked(queries.getLastSleepSession).mockResolvedValueOnce({
       data: { end_time: end },

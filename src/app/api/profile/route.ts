@@ -2,11 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import { createClient } from "@/lib/supabase/server";
-import {
-  getUserProfile,
-  upsertUserProfile,
-  updateMemberFamilyRelation,
-} from "@/lib/supabase/queries";
+import { getUserProfile, upsertUserProfile } from "@/lib/supabase/queries/profile";
+import { updateMemberFamilyRelation } from "@/lib/supabase/queries/family";
 
 const patchSchema = z.object({
   display_name: z.string().max(100).nullish(),

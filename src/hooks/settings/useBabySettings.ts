@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { createBaby, updateBaby, deleteBaby } from "@/lib/supabase/queries";
+import { createBaby, updateBaby, deleteBaby } from "@/lib/supabase/queries/babies";
 import { useBaby } from "@/components/providers/BabyProvider";
 
 export interface BabyValues {

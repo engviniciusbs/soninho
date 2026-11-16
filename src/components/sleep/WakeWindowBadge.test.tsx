@@ -7,7 +7,7 @@ import type { Baby } from "@/types";
 import { WakeWindowBadge } from "./WakeWindowBadge";
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => ({}) }));
-vi.mock("@/lib/supabase/queries", () => ({
+vi.mock("@/lib/supabase/queries/sleep", () => ({
   getLastSleepSession: vi.fn(async () => ({ data: null, error: null })),
   getRecentSessions: vi.fn(async () => ({ data: [], error: null })),
 }));

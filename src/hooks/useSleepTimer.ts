@@ -3,12 +3,7 @@
 import { useEffect, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import {
-  startSleepSession,
-  endSleepSession,
-  getActiveSleepSession,
-  getSleepSessionStatus,
-} from "@/lib/supabase/queries";
+import { startSleepSession, endSleepSession, getActiveSleepSession, getSleepSessionStatus } from "@/lib/supabase/queries/sleep";
 import { useSleepStore, useActiveSleepTimer, type SleepType } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsedSeconds } from "@/lib/utils";

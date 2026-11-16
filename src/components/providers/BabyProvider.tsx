@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { getBabies } from "@/lib/supabase/queries";
+import { getBabies } from "@/lib/supabase/queries/babies";
 import { useSleepStore } from "@/store/sleepStore";
 import type { Baby } from "@/types";
 

@@ -3,13 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { zUuid } from "@/lib/validation/common";
 import { dbErrorToResponse } from "@/lib/http/errors";
-import {
-  getFamilyForBaby,
-  getFamilyMembers,
-  getUserRoleForBaby,
-  removeFamilyMember,
-  updateMemberRole,
-} from "@/lib/supabase/queries";
+import { getFamilyForBaby, getFamilyMembers, getUserRoleForBaby, removeFamilyMember, updateMemberRole } from "@/lib/supabase/queries/family";
 
 const patchSchema = z.object({
   babyId: zUuid,

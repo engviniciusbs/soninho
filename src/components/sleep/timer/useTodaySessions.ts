@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { isToday } from "date-fns";
 import { createClient } from "@/lib/supabase/client";
-import { getRecentSessions } from "@/lib/supabase/queries";
+import { getRecentSessions } from "@/lib/supabase/queries/sleep";
 import type { SleepSession } from "@/types";
 
 /** Today's sleep sessions of the baby, drawn as dots on the timer ring. */

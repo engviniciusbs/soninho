@@ -3,7 +3,7 @@ import { z } from "zod";
 import { zTimeZone, zUuid } from "@/lib/validation/common";
 import { differenceInWeeks } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
-import { getUserRoleForBaby } from "@/lib/supabase/queries";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { getRecentMilkFeedTimes } from "@/lib/supabase/feedingQueries";
 import { computeFeedingSuggestion } from "@/lib/feeding/computeFeedingSuggestion";
 import type { Baby } from "@/types";

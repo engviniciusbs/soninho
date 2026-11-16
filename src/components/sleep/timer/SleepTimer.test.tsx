@@ -18,8 +18,8 @@ const holder = vi.hoisted(() => ({
   lastSession: null as unknown,
 }));
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
-vi.mock("@/lib/supabase/queries", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/lib/supabase/queries")>()),
+vi.mock("@/lib/supabase/queries/sleep", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/supabase/queries/sleep")>()),
   // The fake client models the live-timer queries only; the ring's read-only
   // queries are stubbed here.
   getLastSleepSession: vi.fn(async () => ({ data: holder.lastSession, error: null })),

@@ -4,7 +4,7 @@ import { zUuid } from "@/lib/validation/common";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { isUniqueViolation } from "@/lib/supabase/sessionConflict";
-import { getUserRoleForBaby } from "@/lib/supabase/queries";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 
 const createSchema = z.object({
   baby_id: z.string().uuid(),
