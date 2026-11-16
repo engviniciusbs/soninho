@@ -3,9 +3,8 @@ import type { SleepSession } from "@/types";
 import { fromZonedTime } from "date-fns-tz";
 import {
   allocateSessionToLocalDays,
-  buildCompleteDailySleepTotals,
+  buildCompleteDailySleepMinutes,
 } from "@/lib/sleep/sessionDayAllocation";
-import { addDaysToKey, localDayKey } from "@/lib/dates/localDate";
 import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 export interface PeriodSummary {
@@ -25,8 +24,8 @@ function periodDays(days: number, now: Date): Date[] {
 
 /**
  * The three figures of the Análise screen for the `days` complete local days
- * before today — the same days as the sleep debt
- * ({@link buildCompleteDailySleepTotals}).
+ * before today — the same days as the sleep debt — in exact minutes
+ * ({@link buildCompleteDailySleepMinutes}).
  *
  * Averages use only the days with sleep logged (a day nobody logged is not a
  * day without sleep, the same rule as `computeSleepDebt`). A sleep still
@@ -40,10 +39,8 @@ export function summarizePeriod(
   now: Date = new Date(),
   timeZone: string = Intl.DateTimeFormat().resolvedOptions().timeZone
 ): PeriodSummary {
-  const totals = buildCompleteDailySleepTotals(sessions, days, timeZone, now);
-  const todayKey = localDayKey(now, timeZone);
-  // Same order as `totals`: oldest first, yesterday last.
-  const keys = totals.map((_, i) => addDaysToKey(todayKey, i - days));
+  const totals = buildCompleteDailySleepMinutes(sessions, days, timeZone, now);
+  const keys = totals.map((d) => d.dayKey);
 
   // A nap counts on the day it slept on, as in `getNapCountPerDay`.
   const naps = new Map<string, number>();
@@ -55,7 +52,7 @@ export function summarizePeriod(
   }
 
   const withData = totals
-    .map((d, i) => ({ minutes: Math.round(d.totalHours * 60), naps: naps.get(keys[i]) ?? 0 }))
+    .map((d) => ({ minutes: d.napMinutes + d.nightMinutes, naps: naps.get(d.dayKey) ?? 0 }))
     .filter((d) => d.minutes > 0);
   if (withData.length === 0) {
     return { daysWithData: 0, avgSleepMinutes: null, avgNapsPerDay: null, longestNightMinutes: null };

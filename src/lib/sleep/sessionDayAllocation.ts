@@ -219,8 +219,39 @@ export function buildCompleteDailySleepTotals(
   now: Date = new Date()
 ): DaySleepTotals[] {
   const counted = sessions.map((s) => withProvisionalEnd(s, now));
-  const yesterday = new Date(
+  return buildDailySleepTotalsInTimeZone(counted, days, timeZone, lastMomentOfYesterday(now, timeZone));
+}
+
+function lastMomentOfYesterday(now: Date, timeZone: string): Date {
+  return new Date(
     fromZonedTime(`${formatInTimeZone(now, timeZone, "yyyy-MM-dd")}T00:00:00`, timeZone).getTime() - 1
   );
-  return buildDailySleepTotalsInTimeZone(counted, days, timeZone, yesterday);
+}
+
+/** One complete local day of {@link buildCompleteDailySleepMinutes}, in exact minutes. */
+export type DaySleepMinutes = { dayKey: string; napMinutes: number; nightMinutes: number };
+
+/**
+ * The same `days` complete days as {@link buildCompleteDailySleepTotals} (the
+ * debt and the regression), in exact minutes instead of hours rounded to 0,1:
+ * a 2-minute day still counts, and the figures match Registro.
+ */
+export function buildCompleteDailySleepMinutes(
+  sessions: SleepSession[],
+  days: number,
+  timeZone: string,
+  now: Date = new Date()
+): DaySleepMinutes[] {
+  const keys = lastDayKeysInTimeZone(days, timeZone, lastMomentOfYesterday(now, timeZone));
+  const totals = new Map<string, DaySleepMinutes>();
+  for (const k of keys) totals.set(k, { dayKey: k, napMinutes: 0, nightMinutes: 0 });
+  for (const session of sessions) {
+    for (const alloc of allocateSessionToLocalDays(withProvisionalEnd(session, now), timeZone)) {
+      const bucket = totals.get(alloc.dayKey);
+      if (!bucket) continue;
+      bucket.napMinutes += alloc.napMinutes;
+      bucket.nightMinutes += alloc.nightMinutes;
+    }
+  }
+  return keys.map((k) => totals.get(k)!);
 }

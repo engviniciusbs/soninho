@@ -94,6 +94,14 @@ describe("summarizePeriod", () => {
     expect(r.longestNightMinutes).toBe(660);
   });
 
+  it("uses_exact_minutes_so_short_days_count_and_figures_match_registro", () => {
+    // 23/05: a 2-minute nap (0,0 h rounded) and 22/05: a 7-minute nap (0,1 h = 6 min rounded).
+    const tiny = makeSession({ type: "NAP", start_time: "2026-05-23T13:00:00Z", end_time: "2026-05-23T13:02:00Z" });
+    const seven = makeSession({ type: "NAP", start_time: "2026-05-22T13:00:00Z", end_time: "2026-05-22T13:07:00Z" });
+    expect(summarizePeriod([tiny], 7).daysWithData).toBe(1);
+    expect(summarizePeriod([seven], 7).avgSleepMinutes).toBe(7);
+  });
+
   it("uses_the_P_complete_days_before_today_like_the_debt", () => {
     // 17/05 is the 7th complete day before 24/05: inside a 7-day period.
     const nap17 = makeSession({ type: "NAP", start_time: "2026-05-17T13:00:00Z", end_time: "2026-05-17T14:00:00Z" });

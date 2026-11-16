@@ -46,4 +46,27 @@ describe("useAnalyticsData", () => {
     });
     expect(result.current.last24h.totalMinutes).toBe(35);
   });
+
+  it("the period window moves with the clock too", async () => {
+    // Started 7 days minus 1 minute ago: inside the 7-day window, for 1 more minute.
+    holder.sessions = [
+      {
+        id: "s-old",
+        baby_id: baby.id,
+        type: "NAP",
+        start_time: new Date(NOW.getTime() - 7 * 24 * 60 * 60_000 + 60_000).toISOString(),
+        end_time: new Date(NOW.getTime() - 7 * 24 * 60 * 60_000 + 30 * 60_000).toISOString(),
+        duration_min: 29,
+      } as SleepSession,
+    ];
+    const { result } = renderHookWithProviders(() => useAnalyticsData(7), {
+      baby: { activeBaby: baby, babies: [baby] },
+    });
+    await waitFor(() => expect(result.current.periodSessions).toHaveLength(1));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2 * 60_000);
+    });
+    expect(result.current.periodSessions).toHaveLength(0);
+  });
 });

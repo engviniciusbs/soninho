@@ -68,12 +68,15 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
   const last24h = useMemo(() => getLast24hStats(sessions, clockAt(tick)), [sessions, tick]);
 
   // "Maior trecho noturno" when no night touches the last 24 h.
-  const lastNightMinutes = useMemo(() => getLastFinishedNightMinutes(sessions), [sessions]);
+  const lastNightMinutes = useMemo(
+    () => getLastFinishedNightMinutes(sessions, clockAt(tick)),
+    [sessions, tick]
+  );
 
   const periodSessions = useMemo(() => {
-    const cutoff = subDays(new Date(), period);
+    const cutoff = subDays(clockAt(tick), period);
     return sessions.filter((s) => new Date(s.start_time) >= cutoff);
-  }, [sessions, period]);
+  }, [sessions, period, tick]);
 
   const statsPeriod = useMemo(
     () => getOverallStats(periodSessions),

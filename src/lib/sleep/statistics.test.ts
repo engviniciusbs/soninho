@@ -194,10 +194,20 @@ describe("getLastFinishedNightMinutes", () => {
       end_time: "2026-05-22T08:00:00Z", // 10h, ended two days ago
     });
     const running = makeSession({ type: "NIGHT_SLEEP", start_time: "2026-05-23T22:00:00Z" });
-    expect(getLastFinishedNightMinutes([older, recent, running, nap23a])).toBe(600);
+    expect(getLastFinishedNightMinutes([older, recent, running, nap23a], new Date("2026-05-24T12:00:00Z"))).toBe(600);
+  });
+
+  it("only a night that ended within the last 72 h", () => {
+    const night = makeSession({
+      type: "NIGHT_SLEEP",
+      start_time: "2026-05-20T22:00:00Z",
+      end_time: "2026-05-21T08:00:00Z", // ended 76 h before now
+    });
+    expect(getLastFinishedNightMinutes([night], new Date("2026-05-24T12:00:00Z"))).toBeNull();
+    expect(getLastFinishedNightMinutes([night], new Date("2026-05-24T07:00:00Z"))).toBe(600);
   });
 
   it("is null without a finished night", () => {
-    expect(getLastFinishedNightMinutes([nap23a, nap24])).toBeNull();
+    expect(getLastFinishedNightMinutes([nap23a, nap24], new Date("2026-05-24T12:00:00Z"))).toBeNull();
   });
 });
