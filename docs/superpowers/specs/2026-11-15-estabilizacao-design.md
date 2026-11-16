@@ -2,7 +2,7 @@
 
 - **Data:** 2026-11-15
 - **Autor:** engviniciusbs (com Claude)
-- **Status:** aprovado pelo autor em 2026-11-15
+- **Status:** aprovado pelo autor em 2026-11-15; Fase 1 concluída (PRs #1–#4) em 2026-11-16
 
 ## 1. Intenção e porquê
 

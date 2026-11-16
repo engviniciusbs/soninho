@@ -238,13 +238,21 @@ src/
 │   └── api/                   # Route Handlers (ver "Rotas da API")
 ├── components/
 │   ├── ui/                    # Primitivos shadcn/Base UI
-│   ├── sleep/ feeding/ family/ ai/ charts/ settings/ baby/ brand/ landing/
+│   ├── sleep/                 # SleepTimer em timer/*, seletores de ambiente em environment/*
+│   ├── settings/              # GeneralTab, NotificationsTab, ToolsTab, BabyProfileForm, PushNotificationsCard; family/* (convites, membros)
+│   ├── forms/                 # DateTimeRangeFields + useTimeRangeValidation (compartilhados por SleepForm/FeedingForm)
+│   ├── landing/               # Landing; sections/* (Hero, Proof, Closing…)
+│   ├── feeding/ family/ ai/ charts/ baby/ brand/
 │   ├── layout/                # Sidebar, TopBar, BottomNav, MiniTimerBar, NannyRouteGuard, navLinks
 │   └── providers/             # QueryProvider, BabyProvider, UserProfileProvider
 ├── hooks/                     # useSleepTimer, useBreastfeedingTimer, useWakeWindow, usePushNotifications…
+│   ├── useNow.ts              # Relógio compartilhado: um intervalo por cadência, seguro para hidratação
+│   ├── timer/                 # useSessionClock, useActiveSessionSync (base dos timers)
+│   └── settings/              # useBabySettings, useNotificationSettings, useSleepExport, useFamilyTeam
 ├── store/                     # Zustand: sleepStore ("soninho-timer"), feedingStore ("soninho-feeding-timer")
 ├── lib/
-│   ├── supabase/              # client.ts (browser), server.ts (cookies), admin.ts (service role), queries
+│   ├── supabase/              # client.ts (browser), server.ts (cookies), admin.ts (service role)
+│   │   └── queries/           #   por domínio: babies, sleep, family, notifications, profile (+ feedingQueries.ts)
 │   ├── sleep/                 # Regras de sono (janelas, sugestão, estatísticas, regressão…)
 │   ├── feeding/               # Intervalos, sugestão, estatísticas, tags de alimentos
 │   ├── family/                # Parentescos, mensagens e registro de atividade
@@ -347,11 +355,11 @@ Tudo em `src/lib/` é TypeScript puro e determinístico — bom ponto de partida
 ## Testes e qualidade
 
 ```bash
-npm test            # testes unitários (Vitest)
+npm test            # testes unitários e de componentes (Vitest + Testing Library; 400+ testes)
 npm run test:db     # testes do banco (pgTAP; requer Docker e `npx supabase db start`)
 ```
 
-O CI (GitHub Actions) roda lint, `tsc`, testes, build e testes do banco em todo PR. Antes de abrir PR, rode localmente:
+Os testes de componente usam jsdom por arquivo e snapshots de caracterização (`__snapshots__/`) para proteger refatorações de UI. O CI (GitHub Actions, actions fixadas por SHA) roda lint, `tsc`, testes, build e testes do banco em todo PR. Antes de abrir PR, rode localmente:
 
 ```bash
 npm run lint
