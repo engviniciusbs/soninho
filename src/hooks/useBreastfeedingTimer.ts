@@ -15,7 +15,7 @@ import { useFeedingStore, useActiveBreastTimer } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
 import { toast } from "sonner";
-import { toastNoBaby } from "@/lib/toasts/noBaby";
+import { useNoBabyToast } from "@/lib/toasts/noBaby";
 import type { BreastSide } from "@/types";
 import { breastTotalsAt, sideOf, sideStartOf } from "@/lib/feeding/breastSides";
 import { useSessionClock } from "@/hooks/timer/useSessionClock";
@@ -29,6 +29,7 @@ export function useBreastfeedingTimer() {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
+  const toastNoBaby = useNoBabyToast();
   const babyId = activeBaby?.id ?? null;
 
   // Timers are per baby: only the shown baby's running timer is used here.
@@ -145,7 +146,7 @@ export function useBreastfeedingTimer() {
       feedingType: "BREAST",
       referenceId: data.id,
     });
-  }, [activeBaby, supabase, startBreastTimer, restoreBreastSession]);
+  }, [activeBaby, toastNoBaby, supabase, startBreastTimer, restoreBreastSession]);
 
   const handleSwitchSide = useCallback(async (newSide: BreastSide) => {
     if (!babyId || !sessionId || newSide === activeSide) return;

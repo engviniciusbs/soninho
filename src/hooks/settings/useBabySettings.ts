@@ -107,8 +107,7 @@ export function useBabySettings() {
       // otherwise the RPC uses the only family they own, or creates one.
       const activeFamily = activeBaby?.family_id ?? null;
       const familyId = activeFamily && owned.includes(activeFamily) ? activeFamily : null;
-      const { sex, ...babyData } = data;
-      const { data: created, error } = await createBaby(supabase, babyData, familyId);
+      const { error } = await createBaby(supabase, data, familyId);
       if (error) {
         toast.error(
           (error as DbError)?.message === "family_required"
@@ -118,14 +117,7 @@ export function useBabySettings() {
         setIsSaving(false);
         return false;
       }
-      // The RPC does not take the sex: it is set right after, on the new row.
-      const newId = (created as { id?: string } | null)?.id;
-      const sexError = sex && newId ? (await updateBaby(supabase, newId, { sex })).error : null;
-      if (sexError) {
-        toast.error("Bebê adicionado, mas o sexo não foi salvo. Edite o bebê para tentar de novo.");
-      } else {
-        toast.success("Bebê adicionado");
-      }
+      toast.success("Bebê adicionado");
     }
 
     invalidate();

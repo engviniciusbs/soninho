@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { toastNoBaby } from "@/lib/toasts/noBaby";
+import { useNoBabyToast } from "@/lib/toasts/noBaby";
 import { createClient } from "@/lib/supabase/client";
 import { logSolidFeeding } from "@/lib/supabase/feedingQueries";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
@@ -30,6 +30,7 @@ export function SolidFeedingLog() {
   const labelId = useId();
   const customId = useId();
   const { activeBaby } = useBaby();
+  const toastNoBaby = useNoBabyToast();
   const queryClient = useQueryClient();
   const supabase = createClient();
 

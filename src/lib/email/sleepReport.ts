@@ -95,7 +95,9 @@ export function buildBabyStats(
 
   const env = computeEnvironmentCorrelation(sessions);
   const bestEnvironment = env.bestTemperature
-    ? `${env.bestTemperature.label} (qualidade ${formatDecimal(env.bestTemperature.avgQuality ?? 0)}/5)`
+    ? env.bestTemperature.avgQuality != null
+      ? `${env.bestTemperature.label} (qualidade ${formatDecimal(env.bestTemperature.avgQuality)}/5)`
+      : env.bestTemperature.label
     : null;
 
   const feedingStats = feeding

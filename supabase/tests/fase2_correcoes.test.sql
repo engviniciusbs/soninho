@@ -3,7 +3,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(38);
+select plan(42);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner o1, caregiver g1 | F2: owner o2 | F3, F4: owner o3 (two families)
@@ -60,13 +60,15 @@ select is((select sex from public.babies where id = '00000000-0000-0000-0000-000
   'existing babies keep sex null');
 
 -- -------------------------------------------------- create_baby_with_family
-select has_function('public', 'create_baby_with_family', array['text','date','text','text','uuid'],
-  'create_baby_with_family(text,date,text,text,uuid) exists');
+select has_function('public', 'create_baby_with_family', array['text','date','text','text','uuid','text'],
+  'create_baby_with_family(text,date,text,text,uuid,text) exists');
+select hasnt_function('public', 'create_baby_with_family', array['text','date','text','text','uuid'],
+  'previous 5-arg overload is gone (no ambiguous calls)');
 select hasnt_function('public', 'create_baby_with_family', array['text','date','text','text'],
   'old 4-arg overload is gone (no ambiguous calls)');
-select ok(not has_function_privilege('anon', 'public.create_baby_with_family(text,date,text,text,uuid)', 'execute'),
+select ok(not has_function_privilege('anon', 'public.create_baby_with_family(text,date,text,text,uuid,text)', 'execute'),
   'anon_cannot_execute: create_baby_with_family');
-select ok(has_function_privilege('authenticated', 'public.create_baby_with_family(text,date,text,text,uuid)', 'execute'),
+select ok(has_function_privilege('authenticated', 'public.create_baby_with_family(text,date,text,text,uuid,text)', 'execute'),
   'authenticated_can_execute: create_baby_with_family');
 
 -- owner with p_family_id -> same family
@@ -79,6 +81,16 @@ select is(tests.try_val($$select family_id::text from public.create_baby_with_fa
 select tests.logout();
 select is((select count(*)::int from public.families where created_by = '00000000-0000-0000-0000-0000000001a1'), 1,
   'no new family created for an owner');
+
+-- p_sex: saved on the new baby in the same call; anything but F/M is rejected
+select tests.login_as('00000000-0000-0000-0000-0000000001a4');
+select is(tests.try_val($$select sex from public.create_baby_with_family('Com sexo', '2026-03-01', '🍼', null, '00000000-0000-0000-0000-0000000001f3', 'F')$$),
+  'F', 'create_with_p_sex_saves_sex');
+select matches(tests.try_exec($$select public.create_baby_with_family('Sexo errado', '2026-03-01', '🍼', null, '00000000-0000-0000-0000-0000000001f3', 'X')$$),
+  '^ERR:23514', 'create_with_invalid_sex_rejected');
+select is(tests.try_val($$select coalesce(sex, 'NULL') from public.create_baby_with_family('Sem sexo', '2026-03-01', p_family_id => '00000000-0000-0000-0000-0000000001f3')$$),
+  'NULL', 'create_without_p_sex_leaves_null');
+select tests.logout();
 
 -- non-owner (caregiver) with p_family_id -> error
 select tests.login_as('00000000-0000-0000-0000-0000000001a2');

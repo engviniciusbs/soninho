@@ -8,7 +8,7 @@ import { useSleepStore, useActiveSleepTimer, type SleepType } from "@/store/slee
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsedSeconds } from "@/lib/utils";
 import { toast } from "sonner";
-import { toastNoBaby } from "@/lib/toasts/noBaby";
+import { useNoBabyToast } from "@/lib/toasts/noBaby";
 import { classifyEndResult, isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
 import { useSessionClock } from "@/hooks/timer/useSessionClock";
@@ -22,6 +22,7 @@ export function useSleepTimer() {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
+  const toastNoBaby = useNoBabyToast();
   const babyId = activeBaby?.id ?? null;
 
   // Timers are per baby: the shown baby's running timer (if any), otherwise
@@ -145,7 +146,7 @@ export function useSleepTimer() {
       sleepSessionId: data.id,
       sleepType,
     });
-  }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer, restoreFromSession]);
+  }, [activeBaby, toastNoBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer, restoreFromSession]);
 
   /**
    * Ends the running session. Returns the ended session's id/type when THIS

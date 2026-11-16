@@ -3,8 +3,8 @@
 --     baby of the author's family is filled by the controller as a data step.
 --  2. breastfeeding_sessions.side_started_at: start of the side in progress,
 --     so another device can restore and stop a session without losing time.
---  3. create_baby_with_family(..., p_family_id): a second baby joins the
---     caller's family instead of always creating a new one.
+--  3. create_baby_with_family(..., p_family_id, p_sex): a second baby joins the
+--     caller's family instead of always creating a new one; the sex is saved in the same insert.
 --  4. delete_baby(p_baby_id): owner-only; deleting the last baby of a family
 --     deletes the family (members, invites, notes and activity logs, by cascade).
 --  5. guard_family_member_change: members removed by the cascade of a family
@@ -30,19 +30,23 @@ alter table public.breastfeeding_sessions
   add column if not exists side_started_at timestamptz null;
 
 -- ---------------------------------------------------------------------------
--- 3. create_baby_with_family with optional p_family_id
+-- 3. create_baby_with_family with optional p_family_id and p_sex
 -- ---------------------------------------------------------------------------
--- Adding a parameter creates a new overload; the 4-arg version is dropped so
+-- Adding parameters creates a new overload; the 4-arg version (and the 5-arg
+-- one an earlier draft of this file created on local databases) is dropped so
 -- that calls with the old named arguments are not ambiguous. The first four
--- parameters, their defaults and the grants are unchanged.
+-- parameters, their defaults and the grants are unchanged. p_sex is saved in
+-- the same insert (atomic); babies_sex_check rejects anything but F/M.
 drop function if exists public.create_baby_with_family(text, date, text, text);
+drop function if exists public.create_baby_with_family(text, date, text, text, uuid);
 
 create or replace function public.create_baby_with_family(
   p_name text,
   p_birth_date date,
   p_avatar_emoji text default '🍼',
   p_avatar_url text default null,
-  p_family_id uuid default null
+  p_family_id uuid default null,
+  p_sex text default null
 )
 returns public.babies
 language plpgsql
@@ -89,16 +93,16 @@ begin
     values (v_family_id, v_uid, 'owner', v_user.raw_user_meta_data->>'full_name', v_user.email);
   end if;
 
-  insert into babies (user_id, name, birth_date, avatar_emoji, avatar_url, family_id)
-  values (v_uid, p_name, p_birth_date, coalesce(p_avatar_emoji, '🍼'), p_avatar_url, v_family_id)
+  insert into babies (user_id, name, birth_date, avatar_emoji, avatar_url, family_id, sex)
+  values (v_uid, p_name, p_birth_date, coalesce(p_avatar_emoji, '🍼'), p_avatar_url, v_family_id, p_sex)
   returning * into v_baby;
 
   return v_baby;
 end;
 $$;
 
-revoke execute on function public.create_baby_with_family(text, date, text, text, uuid) from public, anon;
-grant execute on function public.create_baby_with_family(text, date, text, text, uuid) to authenticated, service_role;
+revoke execute on function public.create_baby_with_family(text, date, text, text, uuid, text) from public, anon;
+grant execute on function public.create_baby_with_family(text, date, text, text, uuid, text) to authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
 -- 5. guard_family_member_change: skip the owner check when the family itself

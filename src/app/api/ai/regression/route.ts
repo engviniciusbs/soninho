@@ -9,6 +9,8 @@ import { tryConsumeAiQuota } from "@/lib/ai/quota";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { buildRegressionMessages } from "@/lib/ai/regressionPrompt";
+import { toBabySex } from "@/lib/i18n/gender";
 import type { Baby, SleepSession } from "@/types";
 import { parseLocalDate } from "@/lib/dates/localDate";
 
@@ -89,19 +91,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ ...base, explanation: null, tips: [] });
     }
 
-    const context = [
-      `Idade do bebê: ${ageWeeks} semanas (${ageMonths} meses).`,
-      regression.ageWindow
-        ? `Está na fase de ${regression.ageWindow.label}.`
-        : "Fora de janelas clássicas de regressão.",
-      regression.sleepDropHours > 0
-        ? `Queda média de ${regression.sleepDropHours}h/dia no sono recente.`
-        : "Sem queda relevante no total de sono.",
-      regression.wakeIncrease > 0
-        ? `Aumento de ~${regression.wakeIncrease} despertar(es) por noite.`
-        : "Sem aumento claro de despertares.",
-      `Meta de sono para a idade: ${schedule.totalSleepHours}h/dia; média atual ${debt.avgHours}h/dia.`,
-    ].join(" ");
+    const messages = buildRegressionMessages({
+      ageWeeks,
+      ageMonths,
+      sex: toBabySex(baby.sex),
+      ageWindowLabel: regression.ageWindow?.label ?? null,
+      sleepDropHours: regression.sleepDropHours,
+      wakeIncrease: regression.wakeIncrease,
+      targetHours: schedule.totalSleepHours,
+      avgHours: debt.avgHours,
+    });
 
     let explanation: string | null = null;
     let tips: string[] = [];
@@ -112,20 +111,7 @@ export async function POST(request: Request) {
         seed: 42,
         max_tokens: 500,
         response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content:
-              "Você é um consultor de sono infantil acolhedor e baseado em evidências. " +
-              "Responda SEMPRE em português do Brasil e SOMENTE em JSON válido com as chaves " +
-              '"explanation" (string curta, 1-2 frases, tom tranquilizador) e "tips" ' +
-              "(array de 2 a 3 strings curtas e acionáveis). Não dê diagnóstico médico.",
-          },
-          {
-            role: "user",
-            content: `Contexto do bebê: ${context}\n\nExplique de forma breve o que pode estar acontecendo e dê 2-3 dicas práticas.`,
-          },
-        ],
+        messages,
       });
 
       const raw = completion.choices[0]?.message?.content ?? "{}";

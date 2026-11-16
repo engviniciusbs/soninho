@@ -45,6 +45,18 @@ describe("SleepBarChart", () => {
     expect(ticks).not.toContain("16/11");
   });
 
+  it("y_axis_ticks_are_whole_hours", async () => {
+    const small = [
+      { date: "14/11", napHours: 0.5, nightHours: 1 },
+      { date: "15/11", napHours: 0.4, nightHours: 0.8 },
+    ];
+    const { container } = render(<SleepBarChart data={small} recommendedHours={2} />);
+    const sel = 'text.recharts-cartesian-axis-tick-value[orientation="left"]';
+    await waitFor(() => expect(container.querySelector(sel)).not.toBeNull());
+    const ticks = [...container.querySelectorAll(sel)].map((t) => t.textContent);
+    expect(ticks.every((t) => /^\d+h$/.test(t ?? ""))).toBe(true);
+  });
+
   it("hides_the_svg_from_assistive_tech_without_focusable_content_and_offers_a_table", async () => {
     const { container } = render(<SleepBarChart data={bars} recommendedHours={14} />);
     await expectNoFocusableInsideHidden(container);

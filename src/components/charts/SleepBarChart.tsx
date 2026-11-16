@@ -57,6 +57,7 @@ export function SleepBarChart({ data, recommendedHours = 14, labelledBy }: Props
               tickFormatter={(v: number) => `${v}h`}
               width={34}
               tickCount={4}
+              allowDecimals={false}
             />
             <Tooltip
               cursor={{ fill: "var(--sn-s2)", fillOpacity: 0.5 }}

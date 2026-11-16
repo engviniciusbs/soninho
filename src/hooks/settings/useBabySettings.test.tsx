@@ -193,10 +193,7 @@ describe("useBabySettings", () => {
     expect(sb.find("babies", "update")[0].ops[0]).toEqual(["update", [{ ...values, sex: "F" }]]);
   });
 
-  it("create_with_sex_sets_it_on_the_new_baby", async () => {
-    sb.respond((c) =>
-      c.target === "rpc:create_baby_with_family" ? { data: { id: "new-baby" }, error: null } : undefined
-    );
+  it("create_with_sex_sends_it_to_the_rpc_in_one_atomic_call", async () => {
     const { result } = setup();
     let ok: boolean | undefined;
     await act(async () => {
@@ -204,21 +201,18 @@ describe("useBabySettings", () => {
     });
     expect(ok).toBe(true);
     const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
-    expect(args).not.toHaveProperty("p_sex");
-    expect(sb.find("babies", "update")[0].ops.slice(0, 2)).toEqual([
-      ["update", [{ sex: "M" }]],
-      ["eq", ["id", "new-baby"]],
-    ]);
+    expect(args.p_sex).toBe("M");
+    expect(sb.find("babies", "update")).toHaveLength(0);
+    expect(toast.success).toHaveBeenCalledWith("Bebê adicionado");
   });
 
-  it("create_without_sex_makes_no_extra_write", async () => {
-    sb.respond((c) =>
-      c.target === "rpc:create_baby_with_family" ? { data: { id: "new-baby" }, error: null } : undefined
-    );
+  it("create_without_sex_sends_null", async () => {
     const { result } = setup();
     await act(async () => {
       await result.current.save({ id: null, ...values });
     });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args.p_sex).toBeNull();
     expect(sb.find("babies", "update")).toHaveLength(0);
   });
 });

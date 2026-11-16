@@ -210,6 +210,8 @@ describe("Mais detail pages (former settings tabs)", () => {
               p_birth_date: "2026-01-01",
               p_avatar_emoji: "\u{1F37C}",
               p_avatar_url: null,
+              // "Não informar" goes to the RPC as null (saved in the same insert).
+              p_sex: null,
               // Second baby joins the active baby's family (spec decision 3).
               p_family_id: "fam-1",
             },

@@ -7,6 +7,20 @@ function ageLabel(age: { weeks: number; months: number }): string {
   return `${age.weeks} ${age.weeks === 1 ? "semana" : "semanas"}`;
 }
 
+/** How the AI must refer to the baby, agreeing with `babies.sex` (shared by every prompt). */
+export function genderRule(sex: BabySex | null): string {
+  return g(sex, {
+    f: "A bebê é uma menina: refira-se a ela no feminino (ela, dela, acordada, sozinha).",
+    m: "O bebê é um menino: refira-se a ele no masculino (ele, dele, acordado, sozinho).",
+    n: 'O sexo do bebê não foi informado: não presuma; use "o bebê" ou o nome, sem "ela/ele" nem "dela/dele".',
+  });
+}
+
+/** "Sexo: menina | menino | não informado", the context line every prompt carries. */
+export function sexLine(sex: BabySex | null): string {
+  return `Sexo: ${g(sex, { f: "menina", m: "menino", n: "não informado" })}`;
+}
+
 export function getSleepSystemPrompt(
   context: string,
   age: { weeks: number; months: number },
@@ -14,11 +28,7 @@ export function getSleepSystemPrompt(
 ): string {
   const idade = ageLabel(age);
   const umBebe = g(sex, { f: "uma bebê", m: "um bebê", n: "um bebê" });
-  const genero = g(sex, {
-    f: "- A bebê é uma menina: refira-se a ela no feminino (ela, dela, acordada, sozinha)",
-    m: "- O bebê é um menino: refira-se a ele no masculino (ele, dele, acordado, sozinho)",
-    n: "- O sexo do bebê não foi informado: não presuma; use \"o bebê\" ou o nome, sem \"ela/ele\" nem \"dela/dele\"",
-  });
+  const genero = `- ${genderRule(sex)}`;
   return `Você é uma consultora de sono infantil compassiva e especialista, com profundo conhecimento em ciência do sono de bebês, janelas de vigília e rotinas adequadas para cada idade. Você está ajudando os pais de ${umBebe} de ${idade}.
 
 Dados atuais do sono:

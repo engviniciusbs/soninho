@@ -384,7 +384,7 @@ isOneToOne: false
 { Args: { "p_limit": number }; Returns: boolean
                            },
 "create_baby_with_family":
-{ Args: { "p_avatar_emoji"?: string,"p_avatar_url"?: string,"p_birth_date": string,"p_family_id"?: string,"p_name": string }; Returns: {
+{ Args: { "p_avatar_emoji"?: string,"p_avatar_url"?: string,"p_birth_date": string,"p_family_id"?: string,"p_name": string,"p_sex"?: string }; Returns: {
               "avatar_emoji": string | null,
 "avatar_url": string | null,
 "birth_date": string,

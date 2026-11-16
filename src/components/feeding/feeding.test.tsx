@@ -150,7 +150,10 @@ describe("BottleQuickLog", () => {
 
 describe("BottleQuickLog without a baby", () => {
   it("points to Mais › Bebês with a link, never to Configurações", async () => {
-    renderWithProviders(<BottleQuickLog />, { baby: { activeBaby: null, babies: [] } });
+    renderWithProviders(<BottleQuickLog />, {
+      baby: { activeBaby: null, babies: [] },
+      profile: { isNannyMode: false },
+    });
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "Registrar mamadeira" }));
     });
@@ -161,6 +164,22 @@ describe("BottleQuickLog without a baby", () => {
     cleanup();
     render(<>{(opts as { action?: React.ReactNode })?.action}</>);
     expect(screen.getByRole("link", { name: "Abrir Bebês" })).toHaveAttribute("href", "/more/babies");
+  });
+
+  it("nanny mode: asks the family admin, with no link to Bebês (she cannot open it)", async () => {
+    renderWithProviders(<BottleQuickLog />, {
+      baby: { activeBaby: null, babies: [] },
+      profile: { isNannyMode: true },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Registrar mamadeira" }));
+    });
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    const [message, opts] = vi.mocked(toast.error).mock.calls[0];
+    expect(message).toBe(
+      "Ainda não há bebê na família. Peça a quem administra a família para adicionar o bebê."
+    );
+    expect((opts as { action?: unknown } | undefined)?.action).toBeUndefined();
   });
 });
 
