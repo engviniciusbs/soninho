@@ -205,3 +205,34 @@ export const IconAlert = make(
     <path d="M12 10v4M12 17v.01" />
   </>
 );
+
+export const IconThermometer = make(
+  "IconThermometer",
+  <path d="M10 13.5V5a2 2 0 1 1 4 0v8.5a4 4 0 1 1-4 0ZM12 9v6.5" />
+);
+
+export const IconGrid = make(
+  "IconGrid",
+  <>
+    <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+  </>
+);
+
+export const IconStar = make(
+  "IconStar",
+  <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
+);
+
+export const IconTrend = make("IconTrend", <path d="M4 17l5-5 4 3.5L20 8M15 8h5v5" />);
+
+export const IconRadar = make(
+  "IconRadar",
+  <>
+    <circle cx="12" cy="12" r="8.5" />
+    <circle cx="12" cy="12" r="4.5" />
+    <path d="M12 12 18 6" />
+  </>
+);

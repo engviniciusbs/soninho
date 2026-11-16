@@ -11,31 +11,59 @@ import {
 } from "recharts";
 
 interface Props {
-  data: { date: string; avgDuration: number }[];
+  /** One point per day; `null` leaves a gap (no data that day). */
+  data: { date: string; avgDuration: number | null }[];
   label?: string;
+  /** A colour token, e.g. `var(--sn-night)`. */
   color?: string;
   unit?: string;
+  /** Fixed y range, e.g. `[1, 5]` for a 1 to 5 rating. */
+  domain?: [number, number];
 }
+
+const RULE = "var(--sn-bd)";
+const MUTED = "var(--sn-mu)";
 
 export function SleepQualityTrend({
   data,
   label = "Duração média (min)",
-  color = "#c4b5fd",
+  color = "var(--sn-pr)",
   unit = "min",
+  domain,
 }: Props) {
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-        <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 12 }} />
-        <YAxis tick={{ fill: "#94a3b8", fontSize: 12 }} unit={unit} />
+    <ResponsiveContainer width="100%" height={180}>
+      <LineChart data={data} margin={{ top: 6, right: 8, bottom: 0, left: 0 }}>
+        <CartesianGrid vertical={false} stroke={RULE} />
+        <XAxis
+          dataKey="date"
+          tick={{ fill: MUTED, fontSize: 12 }}
+          tickLine={false}
+          axisLine={{ stroke: RULE }}
+          interval="preserveStartEnd"
+          minTickGap={18}
+        />
+        <YAxis
+          tick={{ fill: MUTED, fontSize: 12 }}
+          tickLine={false}
+          axisLine={false}
+          unit={unit}
+          width={44}
+          tickCount={4}
+          domain={domain}
+          allowDecimals={false}
+        />
         <Tooltip
+          formatter={(v) => `${Number(v).toLocaleString("pt-BR")}${unit}`}
+          separator=": "
           contentStyle={{
-            backgroundColor: "#1e293b",
-            border: "1px solid #334155",
+            backgroundColor: "var(--sn-s1)",
+            border: `1px solid ${RULE}`,
             borderRadius: 12,
-            color: "#e2e8f0",
+            color: "var(--sn-tx)",
           }}
+          labelStyle={{ color: MUTED }}
+          itemStyle={{ color: "var(--sn-tx)" }}
         />
         <Line
           type="monotone"
@@ -43,7 +71,7 @@ export function SleepQualityTrend({
           name={label}
           stroke={color}
           strokeWidth={2}
-          dot={{ fill: color, r: 3 }}
+          dot={{ fill: color, stroke: color, r: 3 }}
           activeDot={{ r: 5 }}
         />
       </LineChart>

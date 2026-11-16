@@ -1,15 +1,30 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Radar, ShieldCheck, Lightbulb } from "lucide-react";
+import { IconAlert, IconRadar, IconSpark } from "@/components/brand/icons";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusPill } from "@/components/ui/status-pill";
 import { useRegression } from "@/hooks/useRegression";
 
+/** The full regression radar (Análise › Radar de regressões): calm or alert, with the explanation and tips. */
 export function RegressionRadar() {
-  const { data, isLoading } = useRegression();
+  const { data, isLoading, isPending, refetch } = useRegression();
 
-  if (isLoading) {
-    return <Skeleton className="h-28 rounded-2xl" />;
+  if (isLoading || (isPending && data === undefined)) {
+    return <Skeleton aria-busy="true" className="h-28 w-full rounded-[24px]" />;
+  }
+
+  // The request failed (`useRegression` returns null): say so, not "all calm".
+  if (data === null) {
+    return (
+      <Card role="alert" className="gap-2 px-[18px]">
+        <p className="font-sans text-[15px] font-semibold text-sn-tx">Não foi possível verificar regressões agora.</p>
+        <Button variant="secondary" size="sm" className="self-start" onClick={() => void refetch?.()}>
+          Tentar de novo
+        </Button>
+      </Card>
+    );
   }
 
   if (!data) return null;
@@ -17,78 +32,47 @@ export function RegressionRadar() {
   // ── Calm state ──────────────────────────────────────────────────────────
   if (!data.detected) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        className="rounded-2xl border border-emerald-500/20 bg-emerald-500/8 p-4"
-      >
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15">
-            <ShieldCheck className="h-5 w-5 text-emerald-400" aria-hidden="true" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold">Radar de regressões</p>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {data.summary}
-            </p>
-          </div>
+      <Card className="flex-row items-start gap-3 px-[18px]">
+        <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-xl bg-sn-s2 text-sn-ok">
+          <IconRadar size={22} />
+        </span>
+        <div className="min-w-0">
+          <p className="font-sans text-base font-bold text-sn-tx">Radar de regressões</p>
+          <p className="mt-0.5 font-sans text-[15px] font-semibold text-sn-mu">{data.summary}</p>
         </div>
-      </motion.div>
+      </Card>
     );
   }
 
   // ── Alert state ─────────────────────────────────────────────────────────
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="rounded-2xl border border-amber-500/25 bg-amber-500/8 p-4"
-    >
-      <div className="flex items-start gap-3">
-        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15">
-          <Radar className="h-5 w-5 text-amber-400" aria-hidden="true" />
-          <motion.span
-            className="absolute inset-0 rounded-xl border border-amber-400/40"
-            animate={{ scale: [1, 1.25, 1], opacity: [0.6, 0, 0.6] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-            aria-hidden="true"
-          />
+    <Card className="flex-row items-start gap-3 border-sn-warn/50 bg-sn-warn/8 px-[18px]">
+      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-xl bg-sn-warn/15 text-sn-warn">
+        <IconAlert size={22} />
+      </span>
+      <div className="min-w-0 space-y-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="font-sans text-base font-bold text-sn-tx">Radar de regressões</p>
+          {data.ageWindow && <StatusPill tone="alert">{data.ageWindow}</StatusPill>}
         </div>
 
-        <div className="min-w-0 space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-semibold">Radar de regressões</p>
-            {data.ageWindow && (
-              <span className="rounded-full border border-amber-500/25 bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-400">
-                {data.ageWindow}
-              </span>
-            )}
-          </div>
+        <p className="font-sans text-[15px] leading-relaxed font-semibold text-sn-mu">
+          {data.explanation ?? data.summary}
+        </p>
 
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {data.explanation ?? data.summary}
-          </p>
-
-          {data.tips.length > 0 && (
-            <ul className="space-y-1.5 pt-1">
-              {data.tips.map((tip, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 text-sm text-muted-foreground"
-                >
-                  <Lightbulb
-                    className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-400"
-                    aria-hidden="true"
-                  />
-                  <span>{tip}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {data.tips.length > 0 && (
+          <ul className="space-y-1.5 pt-1">
+            {data.tips.map((tip, i) => (
+              <li key={i} className="flex items-start gap-2 font-sans text-[15px] font-semibold text-sn-mu">
+                <span aria-hidden="true" className="mt-1 shrink-0 text-sn-warn">
+                  <IconSpark size={14} />
+                </span>
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </motion.div>
+    </Card>
   );
 }

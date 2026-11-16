@@ -1,4 +1,5 @@
 import * as React from "react";
+import { BigNumber } from "@/components/ui/big-number";
 import { cn } from "@/lib/utils";
 
 interface StatTileProps {
@@ -10,20 +11,25 @@ interface StatTileProps {
 }
 
 /**
- * Compact metric tile. Value uses the display font for an editorial feel.
- * Presentational only.
+ * Compact metric tile (mockup `.fig`): label, the figure in Fraunces and a
+ * worded qualifier. Presentational only.
  */
 export function StatTile({ icon, label, value, sub, className }: StatTileProps) {
   return (
-    <div className={cn("rounded-2xl surface p-4", className)}>
-      <div className="flex items-center gap-1.5 text-muted-foreground">
-        {icon && <span className="text-muted-foreground/80">{icon}</span>}
-        <span className="text-xs font-medium">{label}</span>
+    <div
+      data-slot="stat-tile"
+      className={cn("flex flex-col gap-1 rounded-[18px] border border-sn-bd bg-sn-card p-3.5", className)}
+    >
+      <div className="flex items-center gap-1.5 text-sn-mu">
+        {icon && (
+          <span aria-hidden="true" className="text-sn-pr [&_svg]:size-4">
+            {icon}
+          </span>
+        )}
+        <span className="font-sans text-sm font-bold">{label}</span>
       </div>
-      <p className="num-display mt-1.5 text-2xl font-semibold text-foreground tabular-nums">
-        {value}
-      </p>
-      {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
+      <BigNumber size="md">{value}</BigNumber>
+      {sub && <p className="font-sans text-[13px] font-semibold text-sn-mu">{sub}</p>}
     </div>
   );
 }
