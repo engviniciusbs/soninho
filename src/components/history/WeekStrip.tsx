@@ -44,7 +44,6 @@ export function WeekStrip({ selected, onSelect, timeZone }: WeekStripProps) {
   return (
     <div
       ref={scroller}
-      data-slot="week-strip"
       role="group"
       aria-label="Escolher o dia"
       className="-mx-1 mb-3 flex snap-x snap-mandatory overflow-x-auto px-1 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

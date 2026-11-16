@@ -7,6 +7,7 @@
 /* Hallmark · waive 29 · lavender glow on the moon, gold on the sun, one dark radial bloom atop the body · moon glow and the radial bloom on the body, aprovado pelo autor no mockup */
 /* Hallmark · waive 39b · the baby row is one button holding the 56px avatar, name and age · the baby row above the sleep prediction card on the app screen, aprovado pelo autor no mockup */
 /* Hallmark · dismissed 41 · --sn-pr-ink is only ever text on --sn-pr (9.0:1), never on the dark paper */
+/* Hallmark · dismissed 73 · Registro week strip: earlier days scrolled out of view are clipped by its overflow-x, so the sidebar links only cover them geometrically; checked on the 1440px shots, nothing is painted under them */
 
 @import "tailwindcss";
 @import "tw-animate-css";

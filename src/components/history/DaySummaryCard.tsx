@@ -24,23 +24,36 @@ export interface DaySummaryCardProps {
   dayStart: Date;
   dayEnd: Date;
   now: number | null;
+  /** Today is not over: the total is "so far" and only "Acima do esperado" is final. */
+  isToday?: boolean;
 }
 
 /**
- * "Sono no dia" (mockup Registro card): the total, how it compares with the
+ * "Sono no dia" ("Sono até agora" on today; mockup Registro card): the total, how it compares with the
  * age (none when nothing was slept) and the day's blocks band. A day with no
  * sleep shows what goes here instead of a zeroed total.
  */
-export function DaySummaryCard({ totalMinutes, targetHours, sessions, dayStart, dayEnd, now }: DaySummaryCardProps) {
+export function DaySummaryCard({
+  totalMinutes,
+  targetHours,
+  sessions,
+  dayStart,
+  dayEnd,
+  now,
+  isToday = false,
+}: DaySummaryCardProps) {
   const titleId = useId();
-  const status = dayStatus(totalMinutes, targetHours);
+  const computed = dayStatus(totalMinutes, targetHours);
+  // On today, "below" or "within" can still change; "above" cannot.
+  const status = isToday && computed !== "above" ? null : computed;
+  const title = isToday ? "Sono até agora" : "Sono no dia";
 
   return (
     <Card role="region" aria-labelledby={titleId} className="gap-0 px-[18px]">
       {sessions.length === 0 ? (
         <>
           <h2 id={titleId} className="font-sans text-sm font-bold text-sn-mu">
-            Sono no dia
+            {title}
           </h2>
           <p className="mt-1 font-sans text-lg font-bold text-sn-tx">Nenhum sono registrado neste dia</p>
           <p className="mt-1 font-sans text-[15px] font-semibold text-sn-mu">
@@ -52,7 +65,7 @@ export function DaySummaryCard({ totalMinutes, targetHours, sessions, dayStart, 
           <div className="flex items-start justify-between gap-2.5">
             <div>
               <h2 id={titleId} className="font-sans text-sm font-bold text-sn-mu">
-                Sono no dia
+                {title}
               </h2>
               <BigNumber className="mt-0.5">{formatMinutes(totalMinutes)}</BigNumber>
             </div>

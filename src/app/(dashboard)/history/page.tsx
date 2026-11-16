@@ -86,7 +86,7 @@ function DayView() {
   }, [dayKey, timeZone]);
 
   // From the day before, so a night that began then is included.
-  const { data: fetched = [], isLoading } = useQuery({
+  const { data: fetched = [], isLoading, isError, refetch } = useQuery({
     queryKey: ["sleep-sessions", activeBaby?.id, "day", dayKey],
     queryFn: async (): Promise<SleepSession[]> => {
       if (!activeBaby) return [];
@@ -115,13 +115,19 @@ function DayView() {
       .sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
   }, [fetched, dayStart, dayEnd, now]);
 
+  // A sleep still running counts up to now (the allocation skips open sessions).
   const totalMinutes = useMemo(
     () =>
       sessions
+        .map((s) =>
+          s.end_time || now === null
+            ? s
+            : { ...s, end_time: new Date(now).toISOString(), duration_min: (now - Date.parse(s.start_time)) / 60_000 }
+        )
         .flatMap((s) => allocateSessionToLocalDays(s, timeZone))
         .filter((a) => a.dayKey === dayKey)
         .reduce((sum, a) => sum + a.napMinutes + a.nightMinutes, 0),
-    [sessions, timeZone, dayKey]
+    [sessions, timeZone, dayKey, now]
   );
 
   const targetHours = activeBaby
@@ -149,10 +155,18 @@ function DayView() {
       <div className="flex flex-col gap-3">
         {babyLoading || isLoading ? (
           <DayFallback />
+        ) : isError ? (
+          <Card role="alert" className="gap-2 px-[18px]">
+            <p className="font-sans text-[15px] font-semibold text-sn-tx">Não foi possível carregar este dia.</p>
+            <Button variant="secondary" size="sm" className="self-start" onClick={() => void refetch()}>
+              Tentar de novo
+            </Button>
+          </Card>
         ) : (
           <>
             <DaySummaryCard
               totalMinutes={totalMinutes}
+              isToday={dayKey === todayKey}
               targetHours={targetHours}
               sessions={sessions}
               dayStart={dayStart}

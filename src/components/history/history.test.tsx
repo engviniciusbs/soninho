@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { formatInTimeZone } from "date-fns-tz";
 import { renderWithProviders } from "@/test/render";
 import type { Baby, SleepSession } from "@/types";
@@ -125,10 +125,12 @@ describe("HistoryPage", () => {
   it("shows_the_day_total_status_and_the_sessions", async () => {
     holder.sessions = [nap, night];
     mount(<HistoryPage />);
-    const summary = await screen.findByRole("region", { name: "Sono no dia" });
+    // Today is not over: the total is "so far" and a low total is not judged yet.
+    const summary = await screen.findByRole("region", { name: "Sono até agora" });
     // 40 min of nap + 6h of the night that fell on this day.
     expect(summary).toHaveTextContent("6h 40min");
-    expect(within(summary).getByText("Abaixo do esperado")).toBeInTheDocument();
+    expect(within(summary).queryByText("Abaixo do esperado")).toBeNull();
+    expect(summary.querySelector("[data-slot=status-pill]")).toBeNull();
     const list = screen.getByRole("list", { name: "Sonos do dia" });
     expect(within(list).getByRole("button", { name: /Soneca.*10:00 a 10:40, adormeceu no colo.*40 min/ })).toBeInTheDocument();
     expect(within(list).getByRole("button", { name: /Noite.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
@@ -200,5 +202,46 @@ describe("HistoryPage", () => {
     expect(within(dialog).getByText("Registrar sono passado")).toBeInTheDocument();
     expect((document.getElementById("start_date") as HTMLInputElement).value).toBe("2025-12-30");
     expect((document.getElementById("end_date") as HTMLInputElement).value).toBe("2025-12-30");
+  });
+
+  it("past_day_below_target_says_abaixo", async () => {
+    holder.search = "dia=2025-12-31";
+    // 22:00 on Dec 31 to 06:00 on Jan 1: 2h fall on Dec 31.
+    holder.sessions = [night];
+    mount(<HistoryPage />);
+    const summary = await screen.findByRole("region", { name: "Sono no dia" });
+    expect(summary).toHaveTextContent("2h");
+    expect(within(summary).getByText("Abaixo do esperado")).toBeInTheDocument();
+  });
+
+  it("today_above_target_says_acima_before_the_day_ends", async () => {
+    // 23:00 local on Jan 1.
+    vi.setSystemTime(new Date("2026-01-02T02:00:00.000Z"));
+    // 00:00 to 16:30 local: 16h30, over 14h + 1h.
+    holder.sessions = [sleep("long", "NIGHT_SLEEP", "2026-01-01T03:00:00.000Z", "2026-01-01T19:30:00.000Z")];
+    mount(<HistoryPage />);
+    const summary = await screen.findByRole("region", { name: "Sono até agora" });
+    expect(summary).toHaveTextContent("16h 30min");
+    expect(within(summary).getByText("Acima do esperado")).toBeInTheDocument();
+  });
+
+  it("running_night_counts_up_to_now_in_the_total", async () => {
+    // Asleep since 23:00 on Dec 31, still sleeping at 09:00 on Jan 1.
+    holder.sessions = [sleep("run", "NIGHT_SLEEP", "2026-01-01T02:00:00.000Z", null)];
+    mount(<HistoryPage />);
+    const summary = await screen.findByRole("region", { name: "Sono até agora" });
+    await waitFor(() => expect(summary).toHaveTextContent("9h"));
+    expect(summary).not.toHaveTextContent("0 min");
+    const list = screen.getByRole("list", { name: "Sonos do dia" });
+    expect(within(list).getByRole("button", { name: /Noite.*23:00 até agora.*Em andamento/ })).toBeInTheDocument();
+  });
+
+  it("failed_load_says_so_instead_of_an_empty_day", async () => {
+    vi.mocked(getSleepSessions).mockResolvedValueOnce({ data: null, error: { message: "boom" } } as never);
+    mount(<HistoryPage />);
+    expect(await screen.findByText("Não foi possível carregar este dia.")).toBeInTheDocument();
+    expect(screen.queryByText("Nenhum sono registrado neste dia")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+    expect(await screen.findByText("Nenhum sono registrado neste dia")).toBeInTheDocument();
   });
 });
