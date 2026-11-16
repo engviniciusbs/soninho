@@ -1,7 +1,7 @@
 "use client"
 
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import { IconAlert, IconCheck, IconInfo, IconX } from "@/components/brand/icons"
+import { IconAlert, IconCheck, IconInfo } from "@/components/brand/icons"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
@@ -12,7 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         success: <IconCheck size={16} className="text-sn-ok" />,
         info: <IconInfo size={16} className="text-sn-pr" />,
         warning: <IconAlert size={16} className="text-sn-warn" />,
-        error: <IconX size={16} className="text-sn-danger" />,
+        error: <IconAlert size={16} className="text-sn-danger" />,
         loading: (
           <span
             aria-hidden="true"
