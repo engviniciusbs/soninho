@@ -116,7 +116,7 @@ exports[`SettingsPage > saves_baby_same_payload > edit form 1`] = `
     data-slot="dialog-footer"
   >
     <button
-      class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -124,7 +124,7 @@ exports[`SettingsPage > saves_baby_same_payload > edit form 1`] = `
       Cancelar
     </button>
     <button
-      class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -133,7 +133,7 @@ exports[`SettingsPage > saves_baby_same_payload > edit form 1`] = `
     </button>
   </div>
   <button
-    class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg absolute top-2 right-2"
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
     data-slot="dialog-close"
     tabindex="0"
     type="button"
@@ -283,16 +283,16 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
         tabindex="0"
       >
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header auto-rows-min gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 flex flex-row items-center justify-between"
+            class="group/card-header @container/card-header auto-rows-min gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3 flex flex-row items-center justify-between"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -324,7 +324,7 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
               Bebês
             </div>
             <button
-              class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-7 px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5 rounded-xl gap-1"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4 rounded-xl gap-1"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -353,7 +353,7 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
             </button>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3 space-y-2"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-2"
             data-slot="card-content"
           >
             <div
@@ -398,7 +398,7 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
               >
                 <button
                   aria-label="Editar"
-                  class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 h-8 w-8 rounded-lg"
+                  class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-11 p-0 h-8 w-8 rounded-lg"
                   data-slot="button"
                   tabindex="0"
                   type="button"
@@ -426,7 +426,7 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
                 </button>
                 <button
                   aria-label="Excluir"
-                  class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-8 h-8 w-8 rounded-lg text-destructive hover:text-destructive"
+                  class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-11 p-0 h-8 w-8 rounded-lg text-destructive hover:text-destructive"
                   data-slot="button"
                   tabindex="0"
                   type="button"
@@ -474,16 +474,16 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
           data-user="user-1"
         />
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -512,11 +512,11 @@ exports[`SettingsPage > switches_tabs > general 1`] = `
             </div>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5"
             data-slot="card-content"
           >
             <button
-              class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl gap-2 text-destructive hover:text-destructive"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl gap-2 text-destructive hover:text-destructive"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -670,16 +670,16 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
         tabindex="0"
       >
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -706,7 +706,7 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
             </div>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3 space-y-4"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-4"
             data-slot="card-content"
           >
             <div
@@ -727,7 +727,7 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
                 </p>
               </div>
               <button
-                class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-7 px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5 rounded-xl gap-2"
+                class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4 rounded-xl gap-2"
                 data-slot="button"
                 tabindex="0"
                 type="button"
@@ -862,7 +862,7 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
               class="flex gap-2 pt-2"
             >
               <button
-                class="group/button inline-flex items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl flex-1 gap-2"
+                class="group/button relative inline-flex cursor-pointer items-center justify-center border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl flex-1 gap-2"
                 data-slot="button"
                 tabindex="0"
                 type="button"
@@ -870,7 +870,7 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
                 Salvar preferências
               </button>
               <button
-                class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl gap-2"
+                class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl gap-2"
                 data-slot="button"
                 tabindex="0"
                 type="button"
@@ -901,16 +901,16 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
           </div>
         </div>
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -941,7 +941,7 @@ exports[`SettingsPage > switches_tabs > notifications 1`] = `
             </div>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5"
             data-slot="card-content"
           >
             <div
@@ -1097,16 +1097,16 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
         tabindex="0"
       >
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -1137,7 +1137,7 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
             </div>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3 space-y-4"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5 space-y-4"
             data-slot="card-content"
           >
             <p
@@ -1183,7 +1183,7 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
               </div>
             </div>
             <button
-              class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl gap-2 w-full sm:w-auto"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl gap-2 w-full sm:w-auto"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -1218,16 +1218,16 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
           </div>
         </div>
         <div
-          class="group/card flex flex-col gap-4 overflow-hidden bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl rounded-2xl"
+          class="group/card flex flex-col gap-4 overflow-hidden border border-sn-bd bg-sn-s1/72 py-[18px] text-sm text-sn-tx has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3.5 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-[23px] *:[img:last-child]:rounded-b-[23px] rounded-2xl"
           data-size="default"
           data-slot="card"
         >
           <div
-            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
+            class="group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-[23px] px-[18px] group-data-[size=sm]/card:px-3.5 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3"
             data-slot="card-header"
           >
             <div
-              class="font-heading group-data-[size=sm]/card:text-sm text-sm font-medium flex items-center gap-2"
+              class="font-sans text-sn-tx group-data-[size=sm]/card:text-base text-sm font-medium flex items-center gap-2"
               data-slot="card-title"
             >
               <svg
@@ -1257,7 +1257,7 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
             </div>
           </div>
           <div
-            class="px-4 group-data-[size=sm]/card:px-3"
+            class="px-[18px] group-data-[size=sm]/card:px-3.5"
             data-slot="card-content"
           >
             <p
@@ -1266,7 +1266,7 @@ exports[`SettingsPage > switches_tabs > tools 1`] = `
               Exporte todos os registros de sono do bebê ativo em formato CSV.
             </p>
             <button
-              class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl gap-2"
+              class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl gap-2"
               data-slot="button"
               tabindex="0"
               type="button"
@@ -1430,7 +1430,7 @@ exports[`SettingsPage > uploads_avatar_same_path > form with photo 1`] = `
     data-slot="dialog-footer"
   >
     <button
-      class="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -1438,7 +1438,7 @@ exports[`SettingsPage > uploads_avatar_same_path > form with photo 1`] = `
       Cancelar
     </button>
     <button
-      class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 bg-primary text-primary-foreground [a]:hover:bg-primary/80 h-8 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -1447,7 +1447,7 @@ exports[`SettingsPage > uploads_avatar_same_path > form with photo 1`] = `
     </button>
   </div>
   <button
-    class="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50 size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg absolute top-2 right-2"
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
     data-slot="dialog-close"
     tabindex="0"
     type="button"

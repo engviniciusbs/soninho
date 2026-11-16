@@ -99,6 +99,7 @@ export function BabyAvatar({
         <button
           type="button"
           onClick={onUploadClick}
+          disabled={uploading}
           aria-label={`Alterar foto de ${label}`}
           className={cn(
             circle,
