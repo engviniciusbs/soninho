@@ -191,6 +191,21 @@ describe("FeedingTimeline (Hoje)", () => {
   });
 });
 
+describe("FeedingTimeline running feeding", () => {
+  it("a_running_breastfeed_links_to_the_timer_instead_of_editing", async () => {
+    const running = { ...breast("f-run", "2026-01-01T11:50:00.000Z", 120, 0), endTime: null } as FeedingTimelineItem;
+    holder.feedings = [running];
+    const onEdit = vi.fn();
+    mount(<FeedingTimeline onEdit={onEdit} />);
+    const today = await screen.findByRole("region", { name: "Hoje" });
+    const row = within(today).getByRole("link", { name: /Peito.*08:50, esquerdo.*Em andamento/ });
+    expect(row).toHaveAttribute("href", "/feeding?tipo=peito");
+    fireEvent.click(row);
+    expect(onEdit).not.toHaveBeenCalled();
+    expect(within(today).queryByRole("button")).toBeNull();
+  });
+});
+
 describe("FeedingPage", () => {
   it("shows_next_feeding_with_the_explanation", async () => {
     holder.suggestion = {

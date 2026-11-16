@@ -47,8 +47,12 @@ interface SleepCardProps {
 /**
  * One sleep in the Registro list (mockup `.list .item`): the type, then the
  * interval and how the baby fell asleep, and the duration. Tapping it edits
- * (and deletes, from the form).
+ * (and deletes, from the form); a running sleep links to the home instead.
  */
 export function SleepCard({ session, onEdit }: SleepCardProps) {
+  // A sleep still running is not edited here (saving would end it, deleting
+  // would remove the live timer): the row reads "Em andamento" and opens the
+  // home, where it is stopped.
+  if (!session.end_time) return <ListRow {...describeSleep(session)} href="/app" />;
   return <ListRow {...describeSleep(session)} onClick={onEdit ? () => onEdit(session) : undefined} />;
 }

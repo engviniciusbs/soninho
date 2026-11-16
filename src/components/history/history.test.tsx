@@ -274,7 +274,12 @@ describe("HistoryPage", () => {
     await waitFor(() => expect(summary).toHaveTextContent("9h"));
     expect(summary).not.toHaveTextContent("0 min");
     const list = screen.getByRole("list", { name: "Sonos do dia" });
-    expect(within(list).getByRole("button", { name: /Noite.*23:00 até agora.*Em andamento/ })).toBeInTheDocument();
+    // Still running: not editable here, the row opens the home instead.
+    const row = within(list).getByRole("link", { name: /Noite.*23:00 até agora.*Em andamento/ });
+    expect(row).toHaveAttribute("href", "/app");
+    fireEvent.click(row);
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(within(list).queryByRole("button")).toBeNull();
   });
 
   it("failed_load_says_so_instead_of_an_empty_day", async () => {

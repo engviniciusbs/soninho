@@ -557,6 +557,25 @@ describe("Home", () => {
     );
   });
 
+  it("today_card_says_em_andamento_for_a_running_breastfeed", async () => {
+    holder.feedings[helena.id] = [
+      {
+        id: "f-run",
+        type: "BREAST",
+        startTime: "2026-01-01T08:50:00-03:00",
+        endTime: null,
+        summary: "",
+        raw: { side_left_sec: 0, side_right_sec: 0 },
+      } as unknown as FeedingTimelineItem,
+    ];
+    await mount();
+
+    const today = screen.getByRole("region", { name: "Hoje" });
+    expect(within(today).getByText("Peito, 08:50")).toBeInTheDocument();
+    expect(within(today).getByText("Em andamento")).toBeInTheDocument();
+    expect(within(today).queryByText("0 min")).toBeNull();
+  });
+
   it("regression_notice_only_when_detected", async () => {
     holder.regression = { detected: false, summary: "Tudo calmo" };
     const first = await mount();

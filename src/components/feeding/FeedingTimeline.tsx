@@ -15,53 +15,13 @@ import { useNow } from "@/hooks/useNow";
 import { Card } from "@/components/ui/card";
 import { ListRow } from "@/components/ui/list-row";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDuration } from "@/lib/utils";
-import type {
-  BottleFeeding,
-  BreastfeedingSession,
-  FeedingTimelineItem,
-  FeedingType,
-  SolidFeeding,
-} from "@/types";
-
-const LABEL: Record<FeedingType, string> = {
-  BOTTLE: "Mamadeira",
-  BREAST: "Peito",
-  SOLID: "Sólidos",
-};
-
-/** "Banana", "Banana e Maçã", "Banana, Maçã e Pera". */
-function joinPt(items: string[]): string {
-  if (items.length <= 1) return items[0] ?? "";
-  return `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
-}
-
-function sidesText(raw: BreastfeedingSession): string | null {
-  const left = raw.side_left_sec > 0;
-  const right = raw.side_right_sec > 0;
-  if (left && right) return "esquerdo e direito";
-  if (left) return "esquerdo";
-  if (right) return "direito";
-  return null;
-}
+import { describeFeeding } from "@/lib/feeding/describeFeeding";
+import type { BottleFeeding, FeedingTimelineItem } from "@/types";
 
 /** Subtitle and right-hand value of one row (mockup `.list .item`). */
-function describe(item: FeedingTimelineItem, at: string): { subtitle: string; value?: string } {
-  if (item.type === "BOTTLE") {
-    return { subtitle: at, value: `${(item.raw as BottleFeeding).volume_ml} ml` };
-  }
-  if (item.type === "BREAST") {
-    const raw = item.raw as BreastfeedingSession;
-    const sides = sidesText(raw);
-    return {
-      subtitle: sides ? `${at}, ${sides}` : at,
-      value: item.endTime
-        ? formatDuration((raw.side_left_sec + raw.side_right_sec) / 60)
-        : "Em andamento",
-    };
-  }
-  const foods = joinPt((item.raw as SolidFeeding).food_tags ?? []);
-  return { subtitle: foods ? `${at}, ${foods}` : at };
+function describe(item: FeedingTimelineItem, at: string) {
+  const d = describeFeeding(item);
+  return { ...d, subtitle: d.detail ? `${at}, ${d.detail}` : at };
 }
 
 function bottleTotal(items: FeedingTimelineItem[]): number {
@@ -118,15 +78,21 @@ function Rows({
   return (
     <ul className="-my-1">
       {items.map((item) => {
-        const { subtitle, value } = describe(item, when(item.startTime));
+        const { label, subtitle, value, running } = describe(item, when(item.startTime));
         return (
           <li key={`${item.type}-${item.id}`}>
-            <ListRow
-              title={LABEL[item.type]}
-              subtitle={subtitle}
-              value={value}
-              onClick={onEdit ? () => onEdit(item) : undefined}
-            />
+            {running ? (
+              // A feeding still running is not edited here (saving would end
+              // it): the row reads "Em andamento" and opens the Peito timer.
+              <ListRow title={label} subtitle={subtitle} value={value} href="/feeding?tipo=peito" />
+            ) : (
+              <ListRow
+                title={label}
+                subtitle={subtitle}
+                value={value}
+                onClick={onEdit ? () => onEdit(item) : undefined}
+              />
+            )}
           </li>
         );
       })}
@@ -136,7 +102,8 @@ function Rows({
 
 /**
  * "Hoje" (mockup `.list`): today's entries with the day's bottle total; the
- * other days the list already loads follow below. Tapping an entry edits it.
+ * other days the list already loads follow below. Tapping an entry edits it;
+ * a feeding at the breast still running links to the Peito timer instead.
  */
 export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
   const todayId = useId();

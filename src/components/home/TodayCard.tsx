@@ -15,12 +15,8 @@ import { useNow } from "@/hooks/useNow";
 import { createClient } from "@/lib/supabase/client";
 import { getRecentSessions } from "@/lib/supabase/queries/sleep";
 import { estimateWakeTime } from "@/lib/sleep/wakeEstimate";
-import type {
-  BottleFeeding,
-  BreastfeedingSession,
-  FeedingTimelineItem,
-  SleepSession,
-} from "@/types";
+import { describeFeeding } from "@/lib/feeding/describeFeeding";
+import type { FeedingTimelineItem, SleepSession } from "@/types";
 import { formatDuration } from "@/lib/utils";
 
 /** Enough days for the last sleep and the last 7 nights of the wake estimate. */
@@ -31,16 +27,8 @@ function hhmm(iso: string): string {
 }
 
 function feedingRow(item: FeedingTimelineItem): { subtitle: string; value?: string } {
-  const at = hhmm(item.startTime);
-  if (item.type === "BOTTLE") {
-    const raw = item.raw as BottleFeeding;
-    return { subtitle: `Mamadeira, ${at}`, value: `${raw.volume_ml} ml` };
-  }
-  if (item.type === "BREAST") {
-    const raw = item.raw as BreastfeedingSession;
-    return { subtitle: `Peito, ${at}`, value: formatDuration((raw.side_left_sec + raw.side_right_sec) / 60) };
-  }
-  return { subtitle: `Sólidos, ${at}` };
+  const { label, value } = describeFeeding(item);
+  return { subtitle: `${label}, ${hhmm(item.startTime)}`, value };
 }
 
 /** "Hoje" (mockup `.list`): last sleep or the wake estimate, and the last feeding. */
