@@ -2,7 +2,7 @@
 
 - **Data:** 2026-11-16
 - **Autor:** engviniciusbs (com Claude)
-- **Status:** aguardando aprovação do autor
+- **Status:** implementado (branch `fase2/00-identidade`, Tarefas 1 a 11)
 - **Mockups aprovados:**
   - `docs/superpowers/specs/assets/2026-11-16-redesign/home.html` (home: acordado com noturno a seguir, acordado com soneca a seguir, dormindo)
   - `docs/superpowers/specs/assets/2026-11-16-redesign/paginas.html` (Comida, Comida/Peito, Registro, Análise, Mais)
