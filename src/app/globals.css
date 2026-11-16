@@ -7,6 +7,21 @@
 /* Hallmark · waive 29 · lavender glow on the moon, gold on the sun, one dark radial bloom atop the body · moon glow and the radial bloom on the body, aprovado pelo autor no mockup */
 /* Hallmark · waive 39b · the baby row is one button holding the 56px avatar, name and age · the baby row above the sleep prediction card on the app screen, aprovado pelo autor no mockup */
 /* Hallmark · dismissed 41 · --sn-pr-ink is only ever text on --sn-pr (9.0:1), never on the dark paper */
+/* Hallmark · dropped /settings, /ai-insights · viraram /more e /more/ai (as abas antigas viraram rotas em /more), com redirect em src/lib/redirects.ts */
+/* Hallmark · dropped form 1, mural da família · o mural de recados (FamilyNoteCard) saiu da home para /more/family, spec 8.10 */
+/* Hallmark · dropped linha do tempo · a SleepTimeline saiu da home e vive no Registro, um dia por vez */
+/* Hallmark · dropped lua · o nome do bebê virou o botão de troca de bebê no topo da home (spec 8.2), não um título */
+/* Hallmark · dropped #base-ui-_r_5_-hidden-input, setPeriod(p.value) · o Select de período da Análise virou SegmentedControl em ?periodo= */
+/* Hallmark · dropped _R_n5esndpknelb_, _R_175esndpknelb_, setDaysBack, setFilterType, de novembro · os Selects de dias e tipo do Registro viraram a faixa de dias e os chips ?tipo=, um dia por vez */
+/* Hallmark · dropped invalidateQueries, handleGeneratePdf, setEditItem, setEditSession · os handlers moveram das páginas para AIInsights, SleepReportPdfCard e openForm de cada tela */
+/* Hallmark · reworded "mamadeiras, peito e sólidos" to "comida" · nome da aba na navegação nova */
+/* Hallmark · reworded "últimos registros" to "hoje" · a lista de Comida mostra só o dia, como no mockup */
+/* Hallmark · reworded "registro de sono" to "registro" · nome da aba na navegação nova */
+/* Hallmark · reworded "análise de sono" to "análise" · nome da aba na navegação nova */
+/* Hallmark · dropped #profile-display-name, _R_2aal5esndpknelb_, _R_2eal5esndpknelb_, _r_4_ · a aba Geral de /settings virou rotas: o nome em /more/profile e os Selects de papel em /more/family */
+/* Hallmark · reworded "configurações" to "mais" · /settings virou a lista Mais */
+/* Hallmark · reworded "ia insights" to "resumos da ia" · /ai-insights virou /more/ai */
+/* Nota: o FAIL kept "1 field with no name on /app" é o campo do mural (form 1, acima); o linter não aceita no carimbo um campo sem nome */
 
 @import "tailwindcss";
 @import "tw-animate-css";
