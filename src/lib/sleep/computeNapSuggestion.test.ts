@@ -36,7 +36,9 @@ describe("computeNapSuggestion", () => {
     expect(r.reasoning).toContain("2 meses");
   });
 
-  it("late in the window -> suggests the window end", () => {
+  // Before: suggested the window end (10:30) here, while the home counted down
+  // to the midpoint (10:25). "Previsto" is always the midpoint.
+  it("late in the window -> still the midpoint, with the window end in the text", () => {
     const r = computeNapSuggestion({
       birthDateIso,
       lastSleepEndIso: "2026-05-24T12:00:00Z",
@@ -45,11 +47,12 @@ describe("computeNapSuggestion", () => {
     });
     expect(r).toMatchObject({
       kind: "NAP",
-      suggestedNapTime: "10:30",
+      suggestedNapTime: "10:25",
       confidence: "high",
-      minutesUntilSuggested: 3,
+      minutesUntilSuggested: 0,
+      suggestedAtIso: "2026-05-24T13:25:00.000Z",
     });
-    expect(r.reasoning).toContain("parte final da janela");
+    expect(r.reasoning).toContain("Horário previsto: 10:25; a janela vai até 10:30.");
   });
 
   it("overdue window -> 'Assim que possível', medium confidence", () => {

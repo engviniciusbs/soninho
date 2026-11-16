@@ -63,8 +63,8 @@ function buildReasoning(params: {
     }
     if (inLateWindow) {
       return lastWasNap
-        ? `Última soneca terminou às ${anchorClock}. Após a soneca da tarde, o próximo sono costuma ser o noturno. Janela sugerida: ${windowStart}–${windowEnd}; ideal até ${suggestedTime}.`
-        : `Com base no último despertar (${anchorClock}), a janela para o sono noturno é ${windowStart}–${windowEnd}. Ideal iniciar até ${suggestedTime}.`;
+        ? `Última soneca terminou às ${anchorClock}. Após a soneca da tarde, o próximo sono costuma ser o noturno. Janela sugerida: ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`
+        : `Com base no último despertar (${anchorClock}), a janela para o sono noturno é ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`;
     }
     return lastWasNap
       ? `Última soneca terminou às ${anchorClock}. Para ${rangeLabel}, após a última soneca do dia a rotina aponta para o sono noturno — janela ${windowStart}–${windowEnd}, sugerido por volta de ${suggestedTime}.`
@@ -75,7 +75,7 @@ function buildReasoning(params: {
     return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho era ${windowStart}–${windowEnd}. Esse intervalo já passou — priorize colocar o bebê para dormir agora.`;
   }
   if (inLateWindow) {
-    return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Você está na parte final da janela; ideal até ${suggestedTime}.`;
+    return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`;
   }
   return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Sugestão de horário alinhada ao centro dessa faixa.`;
 }
@@ -151,12 +151,11 @@ export function computeNapSuggestion(params: {
   const overdue = now.getTime() > windowEndAt.getTime();
   const inLateWindow = !overdue && now.getTime() > midpointRounded.getTime();
 
+  // "Previsto" is always the window's middle (the instant the home counts
+  // down to); only after the window's end is it "as soon as possible".
   if (overdue) {
     suggestedNapTime = "Assim que possível";
     confidence = "medium";
-  } else if (inLateWindow) {
-    suggestedNapTime = formatInTimeZone(windowEndAt, tz, "HH:mm");
-    confidence = "high";
   } else {
     suggestedNapTime = formatInTimeZone(midpointRounded, tz, "HH:mm");
     confidence = "high";

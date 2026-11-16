@@ -15,6 +15,10 @@ import type { AISuggestion, Baby, FeedingTimelineItem, SleepSession } from "@/ty
 import { getSleepSessionDetails, updateSleepSession } from "@/lib/supabase/queries/sleep";
 import { toast } from "sonner";
 import AppHomePage from "@/app/(dashboard)/app/page";
+import { differenceInWeeks } from "date-fns";
+import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
+import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 const holder = vi.hoisted(() => ({
   client: null as unknown,
@@ -262,6 +266,35 @@ describe("Home", () => {
       suggestedTime: "09:30",
     });
     expect(within(sheet).getByText("Obrigado pelo feedback!")).toBeInTheDocument();
+  });
+
+  it("hero_sheet_and_feedback_agree_on_the_time_late_in_the_window", async () => {
+    // Helena's wake window for her age, ending so its middle is 09:05 local.
+    const ageWeeks = differenceInWeeks(NOW, parseLocalDate(helena.birth_date));
+    const range = getWakeWindowRange(ageWeeks);
+    const midMin = Math.round((range.minMinutes + range.maxMinutes) / 2);
+    const lastEnd = new Date(NOW.getTime() + (5 - midMin) * 60_000).toISOString();
+    holder.lastSession = { id: "prev", end_time: lastEnd };
+    // The server computed it a moment later, already past the middle.
+    holder.ai = computeNapSuggestion({
+      birthDateIso: helena.birth_date,
+      lastSleepEndIso: lastEnd,
+      lastSessionType: "NAP",
+      timezone: "America/Sao_Paulo",
+      now: new Date(NOW.getTime() + 7 * 60_000),
+    });
+    await mount();
+
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("09:05")).toBeInTheDocument();
+
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    const sheet = screen.getByRole("dialog");
+    expect(within(sheet).getByText(/Horário previsto: 09:05;/)).toBeInTheDocument();
+    await click(within(sheet).getByRole("button", { name: "Útil" }));
+    const calls = (fetch as unknown as { mock: { calls: [string, RequestInit][] } }).mock.calls;
+    const vote = calls.find(([url]) => url === "/api/suggestions/feedback");
+    expect(JSON.parse(String(vote?.[1].body)).suggestedTime).toBe("09:05");
   });
 
   it("start_night_calls_handleStart_and_shows_sleeping", async () => {
