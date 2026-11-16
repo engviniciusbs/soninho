@@ -116,17 +116,33 @@ describe("WeekStrip", () => {
     fireEvent.click(days()[0]);
     expect(key(onSelect.mock.calls[0][0])).toBe("2025-12-19");
 
-    // 30 days ending Jan 1 start on Dec 3: the oldest week is Dec 3 to 9.
-    for (let i = 0; i < 5; i++) fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
-    expect(labels()).toEqual(["qua3", "qui4", "sex5", "sáb6", "dom7", "seg8", "ter9"]);
+    // 30 days ending Jan 1 start on Dec 3: four full weeks back to Dec 5, then
+    // a short page with only Dec 3 and 4, so no day shows on two pages.
+    fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
+    expect(labels()).toEqual(["sex12", "sáb13", "dom14", "seg15", "ter16", "qua17", "qui18"]);
+    fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
+    expect(labels()).toEqual(["sex5", "sáb6", "dom7", "seg8", "ter9", "qua10", "qui11"]);
+    expect(screen.getByRole("button", { name: "Semana anterior" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Semana anterior" }));
+    expect(labels()).toEqual(["qua3", "qui4"]);
+    expect(screen.getByText("3 de dezembro a 4 de dezembro")).toBeInTheDocument();
+    // The short page sits against the right edge, next to the following week.
+    expect(days()[0].style.gridColumnStart).toBe("6");
     expect(screen.getByRole("button", { name: "Semana anterior" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
+    expect(labels()).toEqual(["sex5", "sáb6", "dom7", "seg8", "ter9", "qua10", "qui11"]);
     fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
     fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
     fireEvent.click(screen.getByRole("button", { name: "Próxima semana" }));
     expect(labels()).toEqual(["sex26", "sáb27", "dom28", "seg29", "ter30", "qua31", "hoje1"]);
     expect(screen.getByRole("button", { name: "Próxima semana" })).toBeDisabled();
+  });
+
+  it("a_selected_day_on_the_short_oldest_page_opens_it", () => {
+    mount(<WeekStrip selected={new Date("2025-12-04T15:00:00.000Z")} onSelect={() => {}} timeZone={TZ} />);
+    expect(labels()).toEqual(["qua3", "qui4"]);
+    expect(screen.getByRole("button", { current: "date" })).toHaveTextContent("qui4");
   });
 
   it("a_selected_day_in_an_older_week_opens_that_week", () => {

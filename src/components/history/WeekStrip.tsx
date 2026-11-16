@@ -22,14 +22,17 @@ export interface WeekStripProps {
   timeZone: string;
 }
 
-/** Index range [start, end) of week `w` (0 = the week ending today) in `count` days. */
+/**
+ * Index range [start, end) of week `w` (0 = the week ending today) in `count`
+ * days. Pages never overlap: when `count` is not a multiple of 7, the oldest
+ * page is shorter (30 days: four weeks and the 2 oldest days).
+ */
 function weekRange(w: number, count: number): [number, number] {
   const end = count - WEEK * w;
-  const start = Math.max(0, end - WEEK);
-  return [start, start + WEEK];
+  return [Math.max(0, end - WEEK), end];
 }
 
-const lastWeek = (count: number) => Math.ceil((count - WEEK) / WEEK);
+const lastWeek = (count: number) => Math.ceil(count / WEEK) - 1;
 
 function weekOf(index: number, count: number): number {
   for (let w = 0; w <= lastWeek(count); w++) {
@@ -40,9 +43,11 @@ function weekOf(index: number, count: number): number {
 }
 
 /**
- * Day picker (mockup `.week`): exactly seven days, the current week ending
- * today ("hoje"). "Semana anterior" and "Próxima semana" page back up to 30
- * days; a selected day in an older week opens that week. `onSelect` gets the
+ * Day picker (mockup `.week`): seven days, the current week ending today
+ * ("hoje"). "Semana anterior" and "Próxima semana" page back up to 30 days;
+ * the oldest page holds only the days left, set against the right edge so
+ * each day keeps its column next to the following week. A selected day in an
+ * older week opens that week. `onSelect` gets the
  * start of the tapped day in `timeZone`.
  */
 export function WeekStrip({ selected, onSelect, timeZone }: WeekStripProps) {
@@ -87,7 +92,7 @@ export function WeekStrip({ selected, onSelect, timeZone }: WeekStripProps) {
         </Button>
       </div>
       <div role="group" aria-label="Escolher o dia" className="grid grid-cols-7">
-        {shown.map((k) => {
+        {shown.map((k, i) => {
           const start = fromZonedTime(`${k}T00:00:00`, timeZone);
           // Noon keeps the weekday right whatever the offset.
           const noon = fromZonedTime(`${k}T12:00:00`, timeZone);
@@ -101,6 +106,7 @@ export function WeekStrip({ selected, onSelect, timeZone }: WeekStripProps) {
               aria-current={isSelected ? "date" : undefined}
               aria-label={isToday ? `Hoje, ${formatInTimeZone(noon, timeZone, "d 'de' MMMM", { locale: ptBR })}` : dayName}
               onClick={() => onSelect(start)}
+              style={i === 0 && shown.length < WEEK ? { gridColumnStart: WEEK - shown.length + 1 } : undefined}
               className={cn(
                 "flex min-h-11 cursor-pointer flex-col items-center gap-1 rounded-2xl py-2 font-sans text-xs font-bold outline-none",
                 "transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.96] motion-reduce:transition-none",
