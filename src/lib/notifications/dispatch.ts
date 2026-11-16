@@ -69,7 +69,7 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
   // 3. Babies of those families.
   const babies = await selectIn<SelectAlertsInput["babies"][number]>(
     uniq(members.map((m) => m.family_id)),
-    (ids) => supabase.from("babies").select("id, family_id, birth_date, name").in("family_id", ids)
+    (ids) => supabase.from("babies").select("id, family_id, birth_date, name, sex").in("family_id", ids)
   );
   if (babies.length === 0) return 0;
   const babyIds = babies.map((b) => b.id);

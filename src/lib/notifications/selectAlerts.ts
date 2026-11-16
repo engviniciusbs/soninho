@@ -2,7 +2,8 @@ import { differenceInMinutes, differenceInWeeks, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
 import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
-import type { SleepSession, SleepType } from "@/types";
+import type { BabySex, SleepSession, SleepType } from "@/types";
+import { g, toBabySex } from "@/lib/i18n/gender";
 
 export const DEFAULT_TIMEZONE = "America/Sao_Paulo";
 export const DEFAULT_QUIET_START = "22:00";
@@ -33,7 +34,7 @@ export type SelectAlertsInput = {
   now: Date;
   prefs: AlertPref[];
   members: { family_id: string; user_id: string; role: "owner" | "caregiver" | "viewer" }[];
-  babies: { id: string; family_id: string; birth_date: string; name: string }[];
+  babies: { id: string; family_id: string; birth_date: string; name: string; sex?: BabySex | null }[];
   lastEnded: Record<
     string,
     { sessionId: string; endTime: string; type?: SleepType | null } | undefined
@@ -142,7 +143,11 @@ export function selectAlerts(input: SelectAlertsInput): PlannedAlert[] {
         alert = {
           eventType: "OVERDUE",
           title: "Passou da janela de sono",
-          body: `Já passou ${elapsed - range.maxMinutes} min da janela ideal. O bebê pode estar muito cansado.`,
+          body: `Já passou ${elapsed - range.maxMinutes} min da janela ideal. ${baby.name} pode estar ${g(toBabySex(baby.sex), {
+            f: "muito cansada",
+            m: "muito cansado",
+            n: "com muito sono",
+          })}.`,
           tag: `overdue-${baby.id}`,
         };
       } else if (elapsed >= range.maxMinutes - alertBefore) {

@@ -182,7 +182,9 @@ describe("selectAlerts", () => {
       eventType: "OVERDUE",
       dedupeKey: `${BABY}:${SESSION}:OVERDUE:owner-1`,
       title: "Passou da janela de sono",
-      body: "Já passou 7 min da janela ideal. O bebê pode estar muito cansado.",
+      // Before: "O bebê pode estar muito cansado." for every baby. Now the
+      // copy follows babies.sex (H); with sex null it is the neutral form.
+      body: "Já passou 7 min da janela ideal. Bia pode estar com muito sono.",
       tag: `overdue-${BABY}`,
     });
 
@@ -190,6 +192,17 @@ describe("selectAlerts", () => {
       input({ lastEnded: { [BABY]: { sessionId: SESSION, endTime: endedMinutesAgo(MAX) } } })
     );
     expect(atMax.eventType).toBe("OVERDUE");
+  });
+
+  it("overdue_body_agrees_with_the_baby_sex", () => {
+    const at = { lastEnded: { [BABY]: { sessionId: SESSION, endTime: endedMinutesAgo(MAX + 7) } } };
+    const body = (sex: "F" | "M" | null) =>
+      selectAlerts(
+        input({ ...at, babies: [{ id: BABY, family_id: FAMILY, birth_date: BIRTH, name: "Bia", sex }] })
+      )[0].body;
+    expect(body("F")).toBe("Já passou 7 min da janela ideal. Bia pode estar muito cansada.");
+    expect(body("M")).toBe("Já passou 7 min da janela ideal. Bia pode estar muito cansado.");
+    expect(body(null)).toBe("Já passou 7 min da janela ideal. Bia pode estar com muito sono.");
   });
 
   it("dedupes_per_user", () => {
