@@ -28,6 +28,9 @@ import { PostSleepReview } from "./PostSleepReview";
 import { useBackdate } from "./timer/useBackdate";
 
 const ASAP = "Assim que possível";
+/** Local hours in which the type selector may follow a NAP suggestion: [05:00, 19:00). */
+const AUTO_SWITCH_FROM_HOUR = 5;
+const AUTO_SWITCH_UNTIL_HOUR = 19;
 
 /** What the open session holds for the fields editable during a sleep. */
 interface SessionFields {
@@ -66,17 +69,21 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   const backdate = useBackdate();
 
   // The selector follows each new suggestion's kind once; the user can still
-  // change it afterwards.
+  // change it afterwards. Switching to Soneca only happens between 05:00 and
+  // 19:00: at night a waking must not turn the selector into a nap.
   const appliedSuggestion = useRef<string | null>(null);
   const aiKind = ai?.kind;
   const aiTime = ai?.suggestedNapTime;
+  const hour = now == null ? null : new Date(now).getHours();
   useEffect(() => {
-    if (!aiKind || isRunning) return;
+    if (!aiKind || isRunning || hour == null) return;
+    const daytime = hour >= AUTO_SWITCH_FROM_HOUR && hour < AUTO_SWITCH_UNTIL_HOUR;
+    if (aiKind === "NAP" && !daytime) return;
     const key = `${activeBaby?.id}:${aiKind}:${aiTime}`;
     if (appliedSuggestion.current === key) return;
     appliedSuggestion.current = key;
     if (aiKind !== sleepType) setSleepType(aiKind);
-  }, [aiKind, aiTime, activeBaby?.id, isRunning, sleepType, setSleepType]);
+  }, [aiKind, aiTime, activeBaby?.id, isRunning, hour, sleepType, setSleepType]);
 
   async function onStart() {
     await handleStart(backdate.resolveStartIso());

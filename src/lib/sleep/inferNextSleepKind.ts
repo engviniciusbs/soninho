@@ -1,8 +1,21 @@
+import { addMinutes } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
 import type { SleepSession, SleepType } from "@/types";
 
 export type NextSleepKind = SleepType;
+
+/** The session fields the inference reads. */
+type RecentSession = Pick<SleepSession, "type" | "start_time" | "end_time">;
+
+/** A night that ended in [19:00, 05:00) local was a night waking, not the morning. */
+const NIGHT_WAKING_FROM = 19;
+const NIGHT_WAKING_UNTIL = 5;
+/** A wake window ending at or after this local hour leads into the night. */
+const BEDTIME_WINDOW_END = 18;
+/** After a late wake from the night, from this hour on the next sleep is the night. */
+const EVENING_HOUR = 17;
 
 function localHour(iso: string, tz: string): number {
   const h = Number(formatInTimeZone(new Date(iso), tz, "H"));
@@ -30,7 +43,7 @@ function expectedMaxNaps(ageWeeks: number): number {
 }
 
 function countTodayNaps(
-  sessions: SleepSession[],
+  sessions: RecentSession[],
   tz: string,
   now: Date
 ): number {
@@ -45,7 +58,7 @@ function countTodayNaps(
 
 /** Median night-sleep start hour from recent history (needs ≥3 nights). */
 function medianBedtimeHour(
-  sessions: SleepSession[],
+  sessions: RecentSession[],
   tz: string
 ): number | null {
   const hours = sessions
@@ -61,7 +74,7 @@ function medianBedtimeHour(
 export function inferNextSleepKind(params: {
   lastSessionType: SleepType | null;
   lastSleepEndIso: string;
-  recentSessions: SleepSession[];
+  recentSessions: RecentSession[];
   ageWeeks: number;
   timezone: string;
   windowStartHour: number;
@@ -73,13 +86,20 @@ export function inferNextSleepKind(params: {
   const lastEndHour = localHour(params.lastSleepEndIso, tz);
   const nowHour = localHour(now.toISOString(), tz);
 
+  // A sleep that ended between 19:00 and 05:00 is a night waking: the baby
+  // goes back to the night sleep.
+  if (lastEndHour >= NIGHT_WAKING_FROM || lastEndHour < NIGHT_WAKING_UNTIL) {
+    return "NIGHT_SLEEP";
+  }
+
+  // The wake window runs into the evening → bedtime, whatever time it is now.
+  if (params.windowEndHour >= BEDTIME_WINDOW_END) return "NIGHT_SLEEP";
+
   if (params.lastSessionType === "NIGHT_SLEEP") {
     // Woke from night sleep this morning → next sleep is a nap.
     if (lastEndHour < 13) return "NAP";
-    // Unusual late wake — still nap unless it's already evening with none today.
-    const napsToday = countTodayNaps(params.recentSessions, tz, now);
-    if (napsToday === 0 && nowHour >= 17) return "NIGHT_SLEEP";
-    return "NAP";
+    // Unusual late wake: a nap, unless it's already evening.
+    return nowHour >= EVENING_HOUR ? "NIGHT_SLEEP" : "NAP";
   }
 
   const napsToday = countTodayNaps(params.recentSessions, tz, now);
@@ -93,9 +113,6 @@ export function inferNextSleepKind(params: {
   // Already had enough naps today.
   if (napsToday >= maxNaps) return "NIGHT_SLEEP";
 
-  // Wake window falls in typical bedtime range.
-  if (params.windowEndHour >= 18 && nowHour >= 16) return "NIGHT_SLEEP";
-
   // Matches the baby's own bedtime pattern (±90 min).
   if (medianBedtime != null) {
     const midpoint = (params.windowStartHour + params.windowEndHour) / 2;
@@ -103,4 +120,31 @@ export function inferNextSleepKind(params: {
   }
 
   return "NAP";
+}
+
+function clockHourAt(at: Date, tz: string): number {
+  const [h, m] = formatInTimeZone(at, tz, "HH:mm").split(":").map(Number);
+  return h + m / 60;
+}
+
+/**
+ * {@link inferNextSleepKind} with the wake window taken from the age table
+ * ({@link getWakeWindowRange}), anchored at the last sleep's end. Shared by the
+ * home suggestion and the push alerts so both apply the same rule.
+ */
+export function inferNextSleepKindForAge(params: {
+  lastSessionType: SleepType | null;
+  lastSleepEndIso: string;
+  recentSessions: RecentSession[];
+  ageWeeks: number;
+  timezone: string;
+  now?: Date;
+}): NextSleepKind {
+  const range = getWakeWindowRange(params.ageWeeks);
+  const anchor = new Date(params.lastSleepEndIso);
+  return inferNextSleepKind({
+    ...params,
+    windowStartHour: clockHourAt(addMinutes(anchor, range.minMinutes), params.timezone),
+    windowEndHour: clockHourAt(addMinutes(anchor, range.maxMinutes), params.timezone),
+  });
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { selectAlerts, type AlertPref, type SelectAlertsInput } from "./selectAlerts";
+import { isInQuietHours, selectAlerts, type AlertPref, type SelectAlertsInput } from "./selectAlerts";
 
 // 2026-11-16 12:00 in America/Sao_Paulo (UTC-3).
 const NOW = new Date("2026-11-16T15:00:00Z");
@@ -83,7 +83,15 @@ describe("selectAlerts", () => {
     ];
 
     // 12:00 SP, 00:00 Tokyo (inside 22-07 across midnight), 07:00 LA (end is exclusive).
-    const noon = selectAlerts(input({ prefs, members }));
+    // Ended 10:00 SP = 05:00 LA: the next-sleep inference runs in each
+    // recipient's timezone, and an end before 05:00 would be a night waking.
+    const noon = selectAlerts(
+      input({
+        prefs,
+        members,
+        lastEnded: { [BABY]: { sessionId: SESSION, endTime: endedMinutesAgo(MAX - 15) } },
+      })
+    );
     expect(noon.map((a) => a.userId).sort()).toEqual(["la", "sp"]);
 
     // 22:30 SP (quiet, after start), 10:30 Tokyo, 17:30 LA.
@@ -96,7 +104,11 @@ describe("selectAlerts", () => {
         lastEnded: { [BABY]: { sessionId: SESSION, endTime: endedMinutesAgo(MAX - 10, late) } },
       })
     );
-    expect(night.map((a) => a.userId).sort()).toEqual(["la", "lunch", "tokyo"]);
+    // "lunch" is outside its quiet hours, but in SP the baby woke at 20:15:
+    // the next sleep is the night, so no nap alert (spec #6). Before this
+    // change it expected an alert for "lunch" too.
+    expect(isInQuietHours(late, "America/Sao_Paulo", "11:30", "13:00")).toBe(false);
+    expect(night.map((a) => a.userId).sort()).toEqual(["la", "tokyo"]);
   });
 
   it("uses default quiet hours and timezone when unset or invalid", () => {
@@ -209,5 +221,45 @@ describe("selectAlerts", () => {
       })
     );
     expect(alerts.map((a) => a.userId)).toEqual(["owner-1"]);
+  });
+
+  describe("next sleep is the night (9 months)", () => {
+    // 39 weeks at 2026-11-16 -> wake window 180–240 min.
+    const nineMonths = [{ id: BABY, family_id: FAMILY, birth_date: "2026-02-16", name: "Bia" }];
+    const napEnded15h = {
+      [BABY]: { sessionId: SESSION, endTime: "2026-11-16T18:00:00Z", type: "NAP" as const },
+    };
+    const at = (localNow: string, alert_before_minutes = 15) =>
+      selectAlerts(
+        input({
+          now: new Date(`2026-11-16T${localNow}:00-03:00`),
+          prefs: [pref("owner-1", { alert_before_minutes })],
+          babies: nineMonths,
+          lastEnded: napEnded15h,
+        })
+      );
+
+    it("last sleep ended 15:00, now 18:10 -> no alert", () => {
+      expect(at("18:10")).toEqual([]);
+    });
+
+    it("no NAP_SOON nor OVERDUE before the night", () => {
+      expect(at("18:10", 60)).toEqual([]); // inside a 60-min heads-up
+      expect(at("18:50")).toEqual([]); // inside the default 15-min heads-up
+      expect(at("19:10")).toEqual([]); // past the window
+    });
+
+    it("a morning nap still alerts", () => {
+      const alerts = selectAlerts(
+        input({
+          now: new Date("2026-11-16T12:50:00-03:00"),
+          babies: nineMonths,
+          lastEnded: {
+            [BABY]: { sessionId: SESSION, endTime: "2026-11-16T09:00:00-03:00", type: "NAP" },
+          },
+        })
+      );
+      expect(alerts.map((a) => a.eventType)).toEqual(["NAP_SOON"]);
+    });
   });
 });

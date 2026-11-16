@@ -228,4 +228,39 @@ describe("SleepTimer (characterization)", () => {
     const expected = format(new Date(NOW.getTime() + minutes * 60_000), "HH:mm");
     expect(screen.getByText(expected)).toBeInTheDocument();
   });
+
+  describe("auto-switch of the type selector", () => {
+    const napSuggestion = {
+      windowStart: "02:20",
+      suggestedNapTime: "02:30",
+      windowEnd: "02:40",
+      kind: "NAP",
+    } as Partial<AISuggestion>;
+
+    it("does not switch to Soneca at 02:05", async () => {
+      vi.setSystemTime(new Date("2026-01-01T05:05:00.000Z")); // 02:05 local
+      useSleepStore.setState({ draft: { ...EMPTY_SLEEP_DRAFT, sleepType: "NIGHT_SLEEP" } });
+      holder.ai = napSuggestion;
+      await mount();
+
+      expect(screen.getByRole("radio", { name: /Noturno/, checked: true })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /Iniciar sono noturno/i })).toBeInTheDocument();
+    });
+
+    it("switches to Noturno at 02:05 when the suggestion is the night", async () => {
+      vi.setSystemTime(new Date("2026-01-01T05:05:00.000Z")); // 02:05 local
+      holder.ai = { ...napSuggestion, kind: "NIGHT_SLEEP" };
+      await mount();
+
+      expect(screen.getByRole("radio", { name: /Noturno/, checked: true })).toBeInTheDocument();
+    });
+
+    it("switches during the day (09:00)", async () => {
+      useSleepStore.setState({ draft: { ...EMPTY_SLEEP_DRAFT, sleepType: "NIGHT_SLEEP" } });
+      holder.ai = { ...napSuggestion, suggestedNapTime: "09:30" };
+      await mount();
+
+      expect(screen.getByRole("radio", { name: /Soneca/, checked: true })).toBeInTheDocument();
+    });
+  });
 });

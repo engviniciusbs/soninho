@@ -142,4 +142,33 @@ describe("computeNapSuggestion", () => {
       suggestedNapTime: "18:40",
     });
   });
+
+  describe("night wakings (9 months)", () => {
+    const nineMonths = "2025-08-24"; // 39 weeks before 2026-05-24
+
+    it("night ended at 23:00 -> NIGHT_SLEEP, minutes roll to the next day", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: nineMonths,
+        lastSleepEndIso: "2026-05-25T02:00:00Z", // 23:00 local
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: tz,
+        now: new Date("2026-05-25T02:10:00Z"), // 23:10 local
+      });
+      expect(r.kind).toBe("NIGHT_SLEEP");
+      expect(r.suggestedNapTime).toBe("02:30");
+      expect(r.minutesUntilSuggested).toBe(200);
+    });
+
+    it("night ended at 02:00, now 02:05 -> NIGHT_SLEEP", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: nineMonths,
+        lastSleepEndIso: "2026-05-24T05:00:00Z", // 02:00 local
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: tz,
+        now: new Date("2026-05-24T05:05:00Z"), // 02:05 local
+      });
+      expect(r.kind).toBe("NIGHT_SLEEP");
+      expect(r.minutesUntilSuggested).toBe(205);
+    });
+  });
 });

@@ -1,18 +1,13 @@
 import { addMinutes, differenceInWeeks, parse } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
-import { inferNextSleepKind } from "@/lib/sleep/inferNextSleepKind";
+import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
 import type { AISuggestion, SleepSession, SleepType } from "@/types";
 import { parseLocalDate } from "@/lib/dates/localDate";
 
 function roundToNearest5Minutes(d: Date): Date {
   const step = 5 * 60 * 1000;
   return new Date(Math.round(d.getTime() / step) * step);
-}
-
-function clockHour(clock: string): number {
-  const [h, m] = clock.split(":").map(Number);
-  return h + (m ?? 0) / 60;
 }
 
 function minutesUntilClock(
@@ -25,7 +20,12 @@ function minutesUntilClock(
     parse(`${dayStr} ${clock}`, "yyyy-MM-dd HH:mm", new Date()),
     tz
   );
-  return Math.max(0, Math.round((target.getTime() - now.getTime()) / 60000));
+  const minutes = Math.round((target.getTime() - now.getTime()) / 60000);
+  // Wake windows are at most a few hours long: a clock more than half a day
+  // behind is tomorrow's (a window crossing midnight). A clock just behind is
+  // the HH:mm truncation of a time still ahead by seconds.
+  if (minutes < -12 * 60) return minutes + 24 * 60;
+  return Math.max(0, minutes);
 }
 
 function buildReasoning(params: {
@@ -143,14 +143,12 @@ export function computeNapSuggestion(params: {
   const windowEnd = formatInTimeZone(windowEndAt, tz, "HH:mm");
   const anchorClock = formatInTimeZone(anchor, tz, "HH:mm");
 
-  const kind = inferNextSleepKind({
+  const kind = inferNextSleepKindForAge({
     lastSessionType: params.lastSessionType ?? null,
     lastSleepEndIso: params.lastSleepEndIso,
     recentSessions,
     ageWeeks,
     timezone: tz,
-    windowStartHour: clockHour(windowStart),
-    windowEndHour: clockHour(windowEnd),
     now,
   });
 
