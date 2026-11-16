@@ -54,11 +54,15 @@ export async function subscribeToPush(): Promise<boolean> {
 }
 
 /** Deactivates the row (needs the session) and drops the browser subscription. */
-async function cancelSubscription(subscription: PushSubscription): Promise<void> {
+async function cancelSubscription(
+  subscription: PushSubscription,
+  signal?: AbortSignal
+): Promise<void> {
   await fetch("/api/notifications/subscribe", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ endpoint: subscription.endpoint }),
+    signal,
   });
 
   await subscription.unsubscribe();
@@ -74,13 +78,14 @@ export async function unsubscribeFromPush(): Promise<boolean> {
 /**
  * Sign-out: cancels this device's push, if any. Looks the worker up with
  * `getRegistration` (never waits on `serviceWorker.ready`, which hangs when
- * no worker was ever registered).
+ * no worker was ever registered); the DELETE gives up after 5 s.
  */
 export async function unsubscribeThisDevice(): Promise<void> {
   if (!isPushSupported()) return;
   const reg = await navigator.serviceWorker.getRegistration();
   const subscription = await reg?.pushManager.getSubscription();
-  if (subscription) await cancelSubscription(subscription);
+  // A slow or hanging network never holds the sign-out for more than 5 s.
+  if (subscription) await cancelSubscription(subscription, AbortSignal.timeout(5000));
 }
 
 export function isPushSupported(): boolean {

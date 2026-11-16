@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
@@ -50,17 +51,35 @@ export async function signOutEverywhere(supabase = createClient()): Promise<void
 export function SignOutButton() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [signingOut, setSigningOut] = useState(false);
+  // A ref, not the state: a second tap before the re-render must not run it again.
+  const running = useRef(false);
 
   async function handleLogout() {
-    await signOutEverywhere();
-    // Nothing of this user's data stays cached for the next one.
-    queryClient.clear();
-    router.push("/login");
-    router.refresh();
+    if (running.current) return;
+    running.current = true;
+    setSigningOut(true);
+    try {
+      await signOutEverywhere();
+      // Nothing of this user's data stays cached for the next one.
+      queryClient.clear();
+      router.push("/login");
+      router.refresh();
+    } catch {
+      // The session could not be ended (offline): the button works again.
+      running.current = false;
+      setSigningOut(false);
+    }
   }
 
   return (
-    <Button variant="destructive" size="md" onClick={handleLogout} className="w-full">
+    <Button
+      variant="destructive"
+      size="md"
+      onClick={handleLogout}
+      loading={signingOut}
+      className="w-full"
+    >
       <IconLogout />
       Sair da conta
     </Button>

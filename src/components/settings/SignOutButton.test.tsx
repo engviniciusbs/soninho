@@ -107,6 +107,23 @@ describe("signOutEverywhere", () => {
     expect(holder.calls).toEqual(["fetch DELETE", "unsubscribe", "signOut"]);
   });
 
+  it("o DELETE do push desiste em 5 s para não prender a saída", async () => {
+    // The 5 s elapse at once: the signal it hands out is already aborted.
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation(() => AbortSignal.abort());
+    // A request that never answers, except by its abort signal.
+    fetchMock.mockImplementationOnce(
+      (_url: string, init?: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          if (init?.signal?.aborted) reject(new Error("aborted"));
+          init?.signal?.addEventListener("abort", () => reject(new Error("aborted")));
+        })
+    );
+    await signOutEverywhere();
+    expect(timeout).toHaveBeenCalledWith(5000);
+    expect(fetchMock.mock.calls[0][1]?.signal).toBeInstanceOf(AbortSignal);
+    expect(holder.signOut).toHaveBeenCalled();
+  });
+
   it("limpa os timers locais e o gate de regressão", async () => {
     await signOutEverywhere();
     expect(localStorage.getItem("soninho-timer")).toBeNull();
@@ -142,5 +159,25 @@ describe("SignOutButton", () => {
     expect(unsubscribe).toHaveBeenCalled();
     expect(holder.signOut).toHaveBeenCalled();
     expect(localStorage.getItem("soninho-timer")).toBeNull();
+  });
+
+  it("mostra que está saindo e não sai duas vezes", async () => {
+    let finish: () => void = () => {};
+    holder.signOut.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = () => resolve({ error: null });
+        })
+    );
+    renderWithProviders(<SignOutButton />);
+    const button = screen.getByRole("button", { name: "Sair da conta" });
+    fireEvent.click(button);
+    await waitFor(() => expect(holder.signOut).toHaveBeenCalledTimes(1));
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(button);
+    finish();
+    await waitFor(() => expect(holder.push).toHaveBeenCalledWith("/login"));
+    expect(holder.signOut).toHaveBeenCalledTimes(1);
   });
 });
