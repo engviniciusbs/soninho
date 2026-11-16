@@ -23,12 +23,16 @@ import { formatLocalDate } from "@/lib/dates/localDate";
 
 /** Babies list (Mais › Bebês) with the add, edit, photo and delete dialogs. */
 export function BabiesSettings() {
-  const { babies, remove } = useBabySettings();
+  const { babies, remove, canDelete } = useBabySettings();
   const { isLoading } = useBaby();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<BabyRow | null>(null);
   const [formSession, setFormSession] = useState(0);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const deleting = babies.find((b) => b.id === deleteId) ?? null;
+  // Mirrors delete_baby: the family's last baby takes the family with it.
+  const lastOfFamily =
+    !!deleting?.family_id && babies.filter((b) => b.family_id === deleting.family_id).length === 1;
 
   function openForm(baby: BabyRow | null) {
     setEditing(baby);
@@ -76,19 +80,21 @@ export function BabiesSettings() {
                         variant="icon"
                         size="icon"
                         onClick={() => openForm(baby)}
-                        aria-label="Editar"
+                        aria-label={`Editar ${baby.name}`}
                       >
                         <IconPen size={20} />
                       </Button>
-                      <Button
-                        variant="icon"
-                        size="icon"
-                        className="text-sn-danger"
-                        onClick={() => setDeleteId(baby.id)}
-                        aria-label="Excluir"
-                      >
-                        <IconTrash size={20} />
-                      </Button>
+                      {canDelete(baby) && (
+                        <Button
+                          variant="icon"
+                          size="icon"
+                          className="text-sn-danger"
+                          onClick={() => setDeleteId(baby.id)}
+                          aria-label={`Excluir ${baby.name}`}
+                        >
+                          <IconTrash size={20} />
+                        </Button>
+                      )}
                     </span>
                   }
                 />
@@ -115,8 +121,11 @@ export function BabiesSettings() {
           <DialogHeader>
             <DialogTitle>Excluir bebê</DialogTitle>
             <DialogDescription>
-              Todos os registros de sono deste bebê serão excluídos permanentemente. Esta ação não
-              pode ser desfeita.
+              Todos os registros de sono e alimentação de {deleting?.name ?? "este bebê"} serão
+              excluídos permanentemente.
+              {lastOfFamily &&
+                " Como é o último bebê da família, a família, os convites e os recados também serão excluídos."}{" "}
+              Esta ação não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">

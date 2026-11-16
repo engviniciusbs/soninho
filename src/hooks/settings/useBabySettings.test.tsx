@@ -113,13 +113,75 @@ describe("useBabySettings", () => {
     expect(result.current.isUploading).toBe(false);
   });
 
-  it("removes_baby", async () => {
-    const { result } = setup();
-    await act(() => result.current.remove("baby-1"));
-    expect(sb.find("babies", "delete")[0].ops).toEqual([
-      ["delete", []],
-      ["eq", ["id", "baby-1"]],
-    ]);
+  it("removes_baby_through_delete_baby_rpc", async () => {
+    const { result, queryClient } = setup();
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.remove("baby-1");
+    });
+    expect(ok).toBe(true);
+    expect(sb.find("babies", "delete")).toHaveLength(0);
+    expect(sb.find("rpc:delete_baby")[0].ops).toEqual([["rpc", [{ p_baby_id: "baby-1" }]]]);
     expect(toast.success).toHaveBeenCalledWith("Bebê excluído");
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["babies"] });
+  });
+
+  it("delete_refused_is_an_error_not_a_success", async () => {
+    sb.respond((c) =>
+      c.target === "rpc:delete_baby"
+        ? { data: null, error: { code: "42501", message: "forbidden_baby_delete" } }
+        : undefined
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.remove("baby-1");
+    });
+    expect(ok).toBe(false);
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith("Só quem é dono da família pode excluir o bebê");
+  });
+
+  it("second_baby_joins_the_active_babys_family_when_owner", async () => {
+    sb.respond((c) =>
+      c.target === "family_members"
+        ? { data: [{ family_id: "fam-F" }, { family_id: "fam-G" }], error: null }
+        : undefined
+    );
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: { ...baby, family_id: "fam-F" }, babies: [{ ...baby, family_id: "fam-F" }] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const owned = sb.find("family_members")[0].ops;
+    expect(owned).toContainEqual(["eq", ["user_id", "user-1"]]);
+    expect(owned).toContainEqual(["eq", ["role", "owner"]]);
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args.p_family_id).toBe("fam-F");
+  });
+
+  it("omits_family_when_not_owner_of_the_active_babys_family", async () => {
+    sb.respond((c) => (c.target === "family_members" ? { data: [], error: null } : undefined));
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: { ...baby, family_id: "fam-X" }, babies: [{ ...baby, family_id: "fam-X" }] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args).not.toHaveProperty("p_family_id");
+  });
+
+  it("first_baby_omits_family", async () => {
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: null, babies: [] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args).not.toHaveProperty("p_family_id");
   });
 });

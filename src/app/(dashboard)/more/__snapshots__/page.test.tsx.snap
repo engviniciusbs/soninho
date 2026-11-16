@@ -142,7 +142,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > general 
                 class="flex gap-1"
               >
                 <button
-                  aria-label="Editar"
+                  aria-label="Editar Lia"
                   class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0"
                   data-slot="button"
                   tabindex="0"
@@ -166,7 +166,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > general 
                   </svg>
                 </button>
                 <button
-                  aria-label="Excluir"
+                  aria-label="Excluir Lia"
                   class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 text-sn-danger"
                   data-slot="button"
                   tabindex="0"
