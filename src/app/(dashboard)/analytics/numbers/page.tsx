@@ -12,12 +12,12 @@ const NO_DATA = "Sem dados";
 export default function AnalyticsNumbersPage() {
   return (
     <AnalyticsDetail title="Mais números" emptyWhen="history">
-      {({ last24h, schedule, sleepDebt, statsPeriod, todayNaps, yesterdayNaps }, period) => (
+      {({ last24h, lastNightMinutes, schedule, sleepDebt, statsPeriod, todayNaps, yesterdayNaps }, period) => (
         <div className="grid grid-cols-2 gap-3">
           <StatTile
             icon={<IconClock />}
             label="Sono 24h"
-            value={last24h.totalSleepMinutes > 0 ? formatDuration(last24h.totalSleepMinutes) : NO_DATA}
+            value={last24h.totalMinutes > 0 ? formatDuration(last24h.totalMinutes) : NO_DATA}
             sub={`Meta: ${formatHours(schedule.totalSleepHours)}`}
           />
           <StatTile
@@ -51,8 +51,14 @@ export default function AnalyticsNumbersPage() {
           <StatTile
             icon={<IconChart />}
             label="Maior trecho noturno"
-            value={last24h.longestStretch > 0 ? formatDuration(last24h.longestStretch) : NO_DATA}
-            sub="Últimas 24h"
+            value={
+              last24h.longestNightMinutes > 0
+                ? formatDuration(last24h.longestNightMinutes)
+                : lastNightMinutes
+                  ? formatDuration(lastNightMinutes)
+                  : NO_DATA
+            }
+            sub={last24h.longestNightMinutes === 0 && lastNightMinutes ? "Última noite" : "Últimas 24h"}
             className="col-span-2"
           />
         </div>

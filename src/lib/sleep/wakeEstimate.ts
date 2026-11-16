@@ -3,6 +3,9 @@ import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 const MIN_NIGHTS = 3;
 const MAX_NIGHTS = 7;
 const DAY_MIN = 24 * 60;
+/** Only ends in [04:00, 10:00] count as the morning wake; others are night wakings. */
+const MORNING_FROM = 4 * 60;
+const MORNING_UNTIL = 10 * 60;
 
 function minutesOfDay(date: Date, timeZone: string): number {
   const [h, m] = formatInTimeZone(date, timeZone, "HH:mm").split(":").map(Number);
@@ -15,7 +18,8 @@ function pad(n: number): string {
 
 /**
  * Estima o próximo despertar pela média circular (sen/cos) do horário em que
- * as últimas noites terminaram. Menos de 3 noites com fim: null.
+ * as últimas noites terminaram. Só contam fins entre 04:00 e 10:00 locais;
+ * um fim fora disso é um despertar de madrugada. Menos de 3 noites: null.
  */
 export function estimateWakeTime(
   nights: { start: string; end: string | null }[],
@@ -25,6 +29,10 @@ export function estimateWakeTime(
   const ends = nights
     .map((n) => (n.end ? new Date(n.end) : null))
     .filter((d): d is Date => d !== null && !Number.isNaN(d.getTime()))
+    .filter((d) => {
+      const m = minutesOfDay(d, timeZone);
+      return m >= MORNING_FROM && m <= MORNING_UNTIL;
+    })
     .sort((a, b) => b.getTime() - a.getTime())
     .slice(0, MAX_NIGHTS);
   if (ends.length < MIN_NIGHTS) return null;

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
 
 type InsightSection = "todayAssessment" | "patternRecognition" | "weeklyTrends" | "recommendations";
 
@@ -26,6 +27,10 @@ const TABS: { value: InsightTab; label: string; sections: InsightSection[] }[] =
   { value: "recommendations", label: "Recomendações", sections: ["recommendations"] },
 ];
 
+/** The server refused: today's AI quota is used up. */
+class AiQuotaError extends Error {}
+
+
 async function fetchInsight(babyId: string, section: InsightSection): Promise<string> {
   const res = await fetch("/api/ai/chat", {
     method: "POST",
@@ -41,6 +46,7 @@ async function fetchInsight(babyId: string, section: InsightSection): Promise<st
     }),
   });
 
+  if (res.status === 429) throw new AiQuotaError(AI_QUOTA_EXCEEDED_MESSAGE);
   if (!res.ok) throw new Error("Failed to fetch insight");
 
   const reader = res.body?.getReader();
@@ -92,6 +98,8 @@ function InsightCard({ section, babyId }: { section: InsightSection; babyId: str
     queryFn: () => fetchInsight(babyId, section),
     staleTime: 10 * 60 * 1000,
     enabled: !!babyId,
+    // Each attempt may spend the daily quota; a 429 never heals by retrying.
+    retry: false,
   });
 
   return (
@@ -122,7 +130,9 @@ function InsightCard({ section, babyId }: { section: InsightSection; babyId: str
           </div>
         ) : error ? (
           <p className="text-base text-sn-mu">
-            Não foi possível gerar esta análise. Toque em regenerar para tentar de novo.
+            {error instanceof AiQuotaError
+              ? AI_QUOTA_EXCEEDED_MESSAGE
+              : "Não foi possível gerar esta análise. Toque em regenerar para tentar de novo."}
           </p>
         ) : (
           <p className="text-base leading-relaxed whitespace-pre-wrap text-sn-tx">{data}</p>

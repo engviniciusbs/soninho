@@ -11,6 +11,8 @@ export interface UnifiedActivityItem {
   kind: "sleep" | "feeding";
   action: string;
   created_at: string;
+  /** Who acted: the client skips its own actions. */
+  actor_user_id: string;
   actor_name: string | null;
   actor_relation: string | null;
   sleep_type?: "NAP" | "NIGHT_SLEEP" | null;
@@ -51,6 +53,7 @@ export async function GET(req: NextRequest) {
     kind: "sleep",
     action: row.action,
     created_at: row.created_at,
+    actor_user_id: row.actor_user_id,
     actor_name: row.actor_name,
     actor_relation: row.actor_relation,
     sleep_type: row.sleep_type,
@@ -61,6 +64,7 @@ export async function GET(req: NextRequest) {
     kind: "feeding",
     action: row.action,
     created_at: row.created_at,
+    actor_user_id: row.actor_user_id,
     actor_name: row.actor_name,
     actor_relation: row.actor_relation,
     feeding_type: row.feeding_type,

@@ -36,7 +36,9 @@ describe("computeNapSuggestion", () => {
     expect(r.reasoning).toContain("2 meses");
   });
 
-  it("late in the window -> suggests the window end", () => {
+  // Before: suggested the window end (10:30) here, while the home counted down
+  // to the midpoint (10:25). "Previsto" is always the midpoint.
+  it("late in the window -> still the midpoint, with the window end in the text", () => {
     const r = computeNapSuggestion({
       birthDateIso,
       lastSleepEndIso: "2026-05-24T12:00:00Z",
@@ -45,11 +47,12 @@ describe("computeNapSuggestion", () => {
     });
     expect(r).toMatchObject({
       kind: "NAP",
-      suggestedNapTime: "10:30",
+      suggestedNapTime: "10:25",
       confidence: "high",
-      minutesUntilSuggested: 3,
+      minutesUntilSuggested: 0,
+      suggestedAtIso: "2026-05-24T13:25:00.000Z",
     });
-    expect(r.reasoning).toContain("parte final da janela");
+    expect(r.reasoning).toContain("Horário previsto: 10:25; a janela vai até 10:30.");
   });
 
   it("overdue window -> 'Assim que possível', medium confidence", () => {
@@ -83,6 +86,9 @@ describe("computeNapSuggestion", () => {
         "Sem um sono concluído recente, não dá para estimar a janela. Registre o fim da última soneca ou do sono noturno.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      suggestedAtIso: null,
+      windowStartIso: null,
+      windowEndIso: null,
     });
   });
 
@@ -140,6 +146,82 @@ describe("computeNapSuggestion", () => {
       windowStart: "18:30",
       windowEnd: "18:45",
       suggestedNapTime: "18:40",
+    });
+  });
+
+  describe("night wakings (9 months)", () => {
+    const nineMonths = "2025-08-24"; // 39 weeks before 2026-05-24
+
+    it("night ended at 23:00 -> NIGHT_SLEEP, minutes roll to the next day", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: nineMonths,
+        lastSleepEndIso: "2026-05-25T02:00:00Z", // 23:00 local
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: tz,
+        now: new Date("2026-05-25T02:10:00Z"), // 23:10 local
+      });
+      expect(r.kind).toBe("NIGHT_SLEEP");
+      expect(r.suggestedNapTime).toBe("02:30");
+      expect(r.minutesUntilSuggested).toBe(200);
+    });
+
+    it("night ended at 02:00, now 02:05 -> NIGHT_SLEEP", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: nineMonths,
+        lastSleepEndIso: "2026-05-24T05:00:00Z", // 02:00 local
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: tz,
+        now: new Date("2026-05-24T05:05:00Z"), // 02:05 local
+      });
+      expect(r.kind).toBe("NIGHT_SLEEP");
+      expect(r.minutesUntilSuggested).toBe(205);
+    });
+  });
+
+  describe("day rollover across a DST change (America/New_York)", () => {
+    // 2026-11-01 02:00 EDT the clocks fall back to 01:00 EST: that night has
+    // 25 hours, so "tomorrow's 02:00" is not 24 h after today's.
+    it("minutes to a clock after the fall-back count the extra hour", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: "2026-01-31", // 39 weeks before 2026-10-31
+        lastSleepEndIso: "2026-11-01T03:30:00Z", // 23:30 EDT on Oct 31
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: "America/New_York",
+        now: new Date("2026-11-01T03:40:00Z"), // 23:40 EDT
+      });
+      expect(r.suggestedNapTime).toBe("02:00"); // 07:00Z = 02:00 EST
+      expect(r.suggestedAtIso).toBe("2026-11-01T07:00:00.000Z");
+      expect(r.minutesUntilSuggested).toBe(200);
+    });
+  });
+
+  describe("absolute times for the client clock (spec #2)", () => {
+    const base = {
+      birthDateIso,
+      lastSleepEndIso: "2026-05-24T12:00:00Z", // 09:00 local, 75-90 min window
+      timezone: tz,
+    };
+
+    it("returns the suggested time and the window as ISO instants", () => {
+      const r = computeNapSuggestion({ ...base, now: new Date("2026-05-24T12:30:00Z") });
+      expect(r).toMatchObject({
+        suggestedAtIso: "2026-05-24T13:25:00.000Z", // 10:25 local
+        windowStartIso: "2026-05-24T13:15:00.000Z",
+        windowEndIso: "2026-05-24T13:30:00.000Z",
+      });
+    });
+
+    it("the instant does not depend on when it was asked", () => {
+      const early = computeNapSuggestion({ ...base, now: new Date("2026-05-24T12:30:00Z") });
+      const late = computeNapSuggestion({ ...base, now: new Date("2026-05-24T13:27:00Z") });
+      const overdue = computeNapSuggestion({ ...base, now: new Date("2026-05-24T14:00:00Z") });
+      expect(late.suggestedAtIso).toBe(early.suggestedAtIso);
+      expect(overdue.suggestedAtIso).toBe(early.suggestedAtIso);
+    });
+
+    it("no history -> no instants", () => {
+      const r = computeNapSuggestion({ ...base, lastSleepEndIso: null });
+      expect(r.suggestedAtIso).toBeNull();
     });
   });
 });

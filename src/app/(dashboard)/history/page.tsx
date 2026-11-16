@@ -11,6 +11,8 @@ import { allocateSessionToLocalDays, lastDayKeysInTimeZone } from "@/lib/sleep/s
 import { getAgeSchedule } from "@/lib/sleep/schedules";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { useNow } from "@/hooks/useNow";
+import { useCanWrite } from "@/hooks/useCanWrite";
+import { ViewOnlyNotice } from "@/components/family/ViewOnlyNotice";
 import { WeekStrip, WEEK_STRIP_DAYS } from "@/components/history/WeekStrip";
 import { DaySummaryCard } from "@/components/history/DaySummaryCard";
 import { SleepCard } from "@/components/sleep/SleepCard";
@@ -23,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { IconPlus } from "@/components/brand/icons";
 import type { SleepSession } from "@/types";
 import { withProvisionalEnd } from "@/lib/sleep/provisional";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 type Filter = "todos" | "sonecas" | "noite";
 
@@ -61,6 +64,7 @@ function timeZoneNow(): string {
 /** The chosen day (`?dia=AAAA-MM-DD`, today when absent or out of the strip) and the filter (`?tipo=`). */
 function DayView() {
   const { activeBaby, isLoading: babyLoading } = useBaby();
+  const { canWrite, isLoading: roleLoading } = useCanWrite();
   const supabase = createClient();
   const timeZone = timeZoneNow();
   const now = useNow(60_000);
@@ -128,7 +132,7 @@ function DayView() {
   );
 
   const targetHours = activeBaby
-    ? getAgeSchedule(differenceInWeeks(new Date(), new Date(activeBaby.birth_date))).totalSleepHours
+    ? getAgeSchedule(differenceInWeeks(new Date(), parseLocalDate(activeBaby.birth_date))).totalSleepHours
     : 0;
 
   const listed = filter.type ? sessions.filter((s) => s.type === filter.type) : sessions;
@@ -150,6 +154,7 @@ function DayView() {
       />
 
       <div className="flex flex-col gap-3">
+        {!roleLoading && !canWrite && <ViewOnlyNotice />}
         {babyLoading || isLoading ? (
           <DayFallback />
         ) : isError ? (
@@ -194,7 +199,7 @@ function DayView() {
                     <ul aria-label="Sonos do dia" className="divide-y divide-sn-bd">
                       {listed.map((s) => (
                         <li key={s.id}>
-                          <SleepCard session={s} onEdit={openForm} />
+                          <SleepCard session={s} sex={activeBaby?.sex} onEdit={canWrite ? openForm : undefined} />
                         </li>
                       ))}
                     </ul>
@@ -205,21 +210,25 @@ function DayView() {
           </>
         )}
 
-        <Button variant="secondary" className="w-full" onClick={() => openForm(null)}>
-          <IconPlus size={20} />
-          Adicionar sono
-        </Button>
+        {canWrite && (
+          <Button variant="secondary" className="w-full" onClick={() => openForm(null)}>
+            <IconPlus size={20} />
+            Adicionar sono
+          </Button>
+        )}
       </div>
 
-      <SleepForm
-        open={showForm}
-        onClose={() => {
-          setShowForm(false);
-          setEditSession(null);
-        }}
-        session={editSession}
-        day={dayKey === todayKey ? undefined : dayKey}
-      />
+      {canWrite && (
+        <SleepForm
+          open={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditSession(null);
+          }}
+          session={editSession}
+          day={dayKey === todayKey ? undefined : dayKey}
+        />
+      )}
     </>
   );
 }

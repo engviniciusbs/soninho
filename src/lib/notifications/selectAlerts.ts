@@ -1,6 +1,9 @@
 import { differenceInMinutes, differenceInWeeks, parseISO } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
+import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
+import type { BabySex, SleepSession, SleepType } from "@/types";
+import { g, toBabySex } from "@/lib/i18n/gender";
 
 export const DEFAULT_TIMEZONE = "America/Sao_Paulo";
 export const DEFAULT_QUIET_START = "22:00";
@@ -31,8 +34,13 @@ export type SelectAlertsInput = {
   now: Date;
   prefs: AlertPref[];
   members: { family_id: string; user_id: string; role: "owner" | "caregiver" | "viewer" }[];
-  babies: { id: string; family_id: string; birth_date: string; name: string }[];
-  lastEnded: Record<string, { sessionId: string; endTime: string } | undefined>;
+  babies: { id: string; family_id: string; birth_date: string; name: string; sex?: BabySex | null }[];
+  lastEnded: Record<
+    string,
+    { sessionId: string; endTime: string; type?: SleepType | null } | undefined
+  >;
+  /** Completed sessions per baby (recent), used to infer the next sleep's kind. */
+  recentSessions?: Record<string, Pick<SleepSession, "type" | "start_time" | "end_time">[]>;
   activeBabyIds: Set<string>;
 };
 
@@ -62,11 +70,18 @@ export function isInQuietHours(now: Date, timezone: string, start: string, end: 
   return current >= s || current < e;
 }
 
-function prefIsQuiet(now: Date, pref: AlertPref): boolean {
-  const tz = pref.timezone && isValidTimeZone(pref.timezone) ? pref.timezone : DEFAULT_TIMEZONE;
+export function prefTimeZone(pref: Pick<AlertPref, "timezone">): string {
+  return pref.timezone && isValidTimeZone(pref.timezone) ? pref.timezone : DEFAULT_TIMEZONE;
+}
+
+/** Quiet hours of a preference row, with the app defaults for unset fields. */
+export function prefIsQuiet(
+  now: Date,
+  pref: Pick<AlertPref, "quiet_hours_start" | "quiet_hours_end" | "timezone">
+): boolean {
   return isInQuietHours(
     now,
-    tz,
+    prefTimeZone(pref),
     pref.quiet_hours_start || DEFAULT_QUIET_START,
     pref.quiet_hours_end || DEFAULT_QUIET_END
   );
@@ -102,26 +117,43 @@ export function selectAlerts(input: SelectAlertsInput): PlannedAlert[] {
     const last = input.lastEnded[baby.id];
     if (!last) continue;
 
-    const range = getWakeWindowRange(differenceInWeeks(now, parseISO(baby.birth_date)));
+    const ageWeeks = differenceInWeeks(now, parseISO(baby.birth_date));
+    const range = getWakeWindowRange(ageWeeks);
     const elapsed = differenceInMinutes(now, parseISO(last.endTime));
 
     for (const userId of recipients) {
       const pref = eligiblePrefs.get(userId)!;
       const alertBefore = pref.alert_before_minutes || DEFAULT_ALERT_BEFORE_MINUTES;
 
+      // Nap alerts only: when the next sleep is the night, none is sent (same
+      // inference as the home suggestion).
+      const nextKind = inferNextSleepKindForAge({
+        lastSessionType: last.type ?? null,
+        lastSleepEndIso: last.endTime,
+        recentSessions: input.recentSessions?.[baby.id] ?? [],
+        ageWeeks,
+        timezone: prefTimeZone(pref),
+        now,
+      });
+      if (nextKind === "NIGHT_SLEEP") continue;
+
       let alert: Omit<PlannedAlert, "dedupeKey" | "userId" | "babyId" | "sessionId"> | null =
         null;
       if (elapsed >= range.maxMinutes) {
         alert = {
           eventType: "OVERDUE",
-          title: "⚠️ Passou da janela de sono!",
-          body: `Já passou ${elapsed - range.maxMinutes} min da janela ideal. O bebê pode estar muito cansado.`,
+          title: "Passou da janela de sono",
+          body: `Já passou ${elapsed - range.maxMinutes} min da janela ideal. ${baby.name} pode estar ${g(toBabySex(baby.sex), {
+            f: "muito cansada",
+            m: "muito cansado",
+            n: "com muito sono",
+          })}.`,
           tag: `overdue-${baby.id}`,
         };
       } else if (elapsed >= range.maxMinutes - alertBefore) {
         alert = {
           eventType: "NAP_SOON",
-          title: "🌙 Hora da soneca chegando!",
+          title: "Hora da soneca chegando",
           body: `Faltam ~${range.maxMinutes - elapsed} min para a janela de sono. Prepare o ambiente!`,
           tag: `nap-soon-${baby.id}`,
         };

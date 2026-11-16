@@ -12,7 +12,7 @@ vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 
 const baby = { id: "baby-1", name: "Lia" } as Baby;
-const values = { name: "Lia", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null };
+const values = { name: "Lia", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null, sex: null };
 let sb: RecordingSupabase;
 
 beforeEach(() => {
@@ -85,6 +85,21 @@ describe("useBabySettings", () => {
     expect(result.current.isSaving).toBe(false);
   });
 
+  it("family_required_explains_how_to_pick_the_family", async () => {
+    sb.respond((c) =>
+      c.target.startsWith("rpc:") ? { data: null, error: { message: "family_required" } } : undefined
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ id: null, ...values });
+    });
+    expect(ok).toBe(false);
+    expect(toast.error).toHaveBeenCalledWith(
+      "Você é dono de mais de uma família. Troque para um bebê da família onde quer adicionar o novo bebê e tente de novo."
+    );
+  });
+
   it("update_error_keeps_form_open_with_toast", async () => {
     sb.respond((c) => (c.target === "babies" ? { data: null, error: { message: "x" } } : undefined));
     const { result } = setup();
@@ -113,13 +128,107 @@ describe("useBabySettings", () => {
     expect(result.current.isUploading).toBe(false);
   });
 
-  it("removes_baby", async () => {
-    const { result } = setup();
-    await act(() => result.current.remove("baby-1"));
-    expect(sb.find("babies", "delete")[0].ops).toEqual([
-      ["delete", []],
-      ["eq", ["id", "baby-1"]],
-    ]);
+  it("removes_baby_through_delete_baby_rpc", async () => {
+    const { result, queryClient } = setup();
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.remove("baby-1");
+    });
+    expect(ok).toBe(true);
+    expect(sb.find("babies", "delete")).toHaveLength(0);
+    expect(sb.find("rpc:delete_baby")[0].ops).toEqual([["rpc", [{ p_baby_id: "baby-1" }]]]);
     expect(toast.success).toHaveBeenCalledWith("Bebê excluído");
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["babies"] });
+  });
+
+  it("delete_refused_is_an_error_not_a_success", async () => {
+    sb.respond((c) =>
+      c.target === "rpc:delete_baby"
+        ? { data: null, error: { code: "42501", message: "forbidden_baby_delete" } }
+        : undefined
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.remove("baby-1");
+    });
+    expect(ok).toBe(false);
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith("Só quem é dono da família pode excluir o bebê");
+  });
+
+  it("second_baby_joins_the_active_babys_family_when_owner", async () => {
+    sb.respond((c) =>
+      c.target === "family_members"
+        ? { data: [{ family_id: "fam-F" }, { family_id: "fam-G" }], error: null }
+        : undefined
+    );
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: { ...baby, family_id: "fam-F" }, babies: [{ ...baby, family_id: "fam-F" }] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const owned = sb.find("family_members")[0].ops;
+    expect(owned).toContainEqual(["eq", ["user_id", "user-1"]]);
+    expect(owned).toContainEqual(["eq", ["role", "owner"]]);
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args.p_family_id).toBe("fam-F");
+  });
+
+  it("omits_family_when_not_owner_of_the_active_babys_family", async () => {
+    sb.respond((c) => (c.target === "family_members" ? { data: [], error: null } : undefined));
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: { ...baby, family_id: "fam-X" }, babies: [{ ...baby, family_id: "fam-X" }] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args).not.toHaveProperty("p_family_id");
+  });
+
+  it("first_baby_omits_family", async () => {
+    const { result } = renderHookWithProviders(() => useBabySettings(), {
+      baby: { activeBaby: null, babies: [] },
+    });
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args).not.toHaveProperty("p_family_id");
+  });
+
+  it("edit_saves_the_sex", async () => {
+    const { result } = setup();
+    await act(async () => {
+      await result.current.save({ id: "baby-1", ...values, sex: "F" });
+    });
+    expect(sb.find("babies", "update")[0].ops[0]).toEqual(["update", [{ ...values, sex: "F" }]]);
+  });
+
+  it("create_with_sex_sends_it_to_the_rpc_in_one_atomic_call", async () => {
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.save({ id: null, ...values, sex: "M" });
+    });
+    expect(ok).toBe(true);
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args.p_sex).toBe("M");
+    expect(sb.find("babies", "update")).toHaveLength(0);
+    expect(toast.success).toHaveBeenCalledWith("Bebê adicionado");
+  });
+
+  it("create_without_sex_sends_null", async () => {
+    const { result } = setup();
+    await act(async () => {
+      await result.current.save({ id: null, ...values });
+    });
+    const [args] = sb.find("rpc:create_baby_with_family")[0].ops[0][1] as [Record<string, unknown>];
+    expect(args.p_sex).toBeNull();
+    expect(sb.find("babies", "update")).toHaveLength(0);
   });
 });
+

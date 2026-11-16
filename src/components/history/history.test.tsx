@@ -11,12 +11,16 @@ import HistoryPage from "@/app/(dashboard)/history/page";
 const holder = vi.hoisted(() => ({
   sessions: [] as unknown[],
   search: "",
+  canWrite: true,
 }));
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => ({}) }));
 vi.mock("@/lib/supabase/queries/sleep", () => ({
   getSleepSessions: vi.fn(async () => ({ data: holder.sessions, error: null })),
   deleteSleepSession: vi.fn(async () => ({ error: null })),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(holder.search),
@@ -69,6 +73,7 @@ beforeEach(() => {
   vi.setSystemTime(NOW);
   holder.sessions = [];
   holder.search = "";
+  holder.canWrite = true;
   window.history.replaceState(null, "", "/history");
 });
 
@@ -174,7 +179,7 @@ describe("HistoryPage", () => {
     expect(summary.querySelector("[data-slot=status-pill]")).toBeNull();
     const list = screen.getByRole("list", { name: "Sonos do dia" });
     expect(within(list).getByRole("button", { name: /Soneca.*10:00 a 10:40, adormeceu no colo.*40 min/ })).toBeInTheDocument();
-    expect(within(list).getByRole("button", { name: /Noite.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
+    expect(within(list).getByRole("button", { name: /Sono noturno.*22:00 a 06:00.*8h/ })).toBeInTheDocument();
     expect(list.textContent).not.toContain("·");
   });
 
@@ -198,7 +203,7 @@ describe("HistoryPage", () => {
     const list = await screen.findByRole("list", { name: "Sonos do dia" });
     const rows = within(list).getAllByRole("button");
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent("Noite");
+    expect(rows[0]).toHaveTextContent("Sono noturno");
     expect(screen.getByRole("button", { name: "Noite" })).toHaveAttribute("aria-pressed", "true");
   });
 
@@ -223,7 +228,7 @@ describe("HistoryPage", () => {
     const list = await screen.findByRole("list", { name: "Sonos do dia" });
     fireEvent.click(within(list).getByRole("button", { name: /Soneca/ }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Editar registro")).toBeInTheDocument();
+    expect(within(dialog).getByText("Editar sono")).toBeInTheDocument();
     expect((document.getElementById("start_time_input") as HTMLInputElement).value).toBe("10:00");
     expect((document.getElementById("end_time_input") as HTMLInputElement).value).toBe("10:40");
 
@@ -275,7 +280,7 @@ describe("HistoryPage", () => {
     expect(summary).not.toHaveTextContent("0 min");
     const list = screen.getByRole("list", { name: "Sonos do dia" });
     // Still running: not editable here, the row opens the home instead.
-    const row = within(list).getByRole("link", { name: /Noite.*23:00 até agora.*Em andamento/ });
+    const row = within(list).getByRole("link", { name: /Sono noturno.*23:00 até agora.*Em andamento/ });
     expect(row).toHaveAttribute("href", "/app");
     fireEvent.click(row);
     expect(screen.queryByRole("dialog")).toBeNull();
@@ -296,5 +301,19 @@ describe("HistoryPage", () => {
     mount(<HistoryPage />);
     expect(await screen.findByRole("button", { current: "date" })).toHaveTextContent("qua10");
     expect(screen.getByRole("button", { name: "Próxima semana" })).toBeEnabled();
+  });
+});
+
+describe("HistoryPage para quem só vê", () => {
+  it("lista os sonos sem Adicionar, Editar ou Excluir", async () => {
+    holder.canWrite = false;
+    holder.sessions = [night, nap];
+    mount(<HistoryPage />);
+    const list = await screen.findByRole("list", { name: "Sonos do dia" });
+
+    expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+    expect(within(list).queryAllByRole("button")).toHaveLength(0);
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Adicionar|Registrar|Editar|Excluir/ })).not.toBeInTheDocument();
   });
 });

@@ -1,4 +1,5 @@
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
+import { addDaysToKey, localDayKey } from "@/lib/dates/localDate";
 import type { SleepSession } from "@/types";
 import {
   allocateSessionToLocalDays,
@@ -7,27 +8,29 @@ import {
 
 export const DEFAULT_REPORT_TIMEZONE = "America/Sao_Paulo";
 
-function shiftKey(key: string, deltaDays: number): string {
-  const d = new Date(`${key}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + deltaDays);
-  return d.toISOString().slice(0, 10);
-}
-
-export function getReportPeriod(
-  now: Date,
-  days: number,
-  timeZone: string
-): {
+export interface ReportPeriod {
   startUtc: Date;
   endUtc: Date;
   startKey: string;
   endKey: string;
   label: string;
-} {
-  const endKey = formatInTimeZone(now, timeZone, "yyyy-MM-dd");
-  const startKey = shiftKey(endKey, -(days - 1));
+}
+
+/**
+ * The last `days` local days. By default they end today; with `endsYesterday`
+ * (weekly e-mail) they end on the last complete local day.
+ */
+export function getReportPeriod(
+  now: Date,
+  days: number,
+  timeZone: string,
+  opts: { endsYesterday?: boolean } = {}
+): ReportPeriod {
+  const todayKey = localDayKey(now, timeZone);
+  const endKey = opts.endsYesterday ? addDaysToKey(todayKey, -1) : todayKey;
+  const startKey = addDaysToKey(endKey, -(days - 1));
   const startUtc = fromZonedTime(`${startKey}T00:00:00`, timeZone);
-  const endUtc = fromZonedTime(`${shiftKey(endKey, 1)}T00:00:00`, timeZone);
+  const endUtc = fromZonedTime(`${addDaysToKey(endKey, 1)}T00:00:00`, timeZone);
   const dm = (k: string) => `${k.slice(8, 10)}/${k.slice(5, 7)}`;
   return {
     startUtc,

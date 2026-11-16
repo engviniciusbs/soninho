@@ -1,10 +1,16 @@
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { getSleepSystemPrompt } from "@/lib/ai/prompts";
-import { buildSleepContext } from "@/lib/ai/analyzeSleep";
+import { toBabySex } from "@/lib/i18n/gender";
+import { babyAgeOn, buildSleepContext } from "@/lib/ai/analyzeSleep";
 import { createClient } from "@/lib/supabase/server";
 import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { chatRequestSchema } from "@/lib/ai/chatSchema";
-import { consumeAiQuota, AI_QUOTA_EXCEEDED_MESSAGE } from "@/lib/ai/quota";
+import {
+  consumeAiQuota,
+  isAiQuotaExhausted,
+  AI_QUOTA_EXCEEDED_MESSAGE,
+} from "@/lib/ai/quota";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { Baby, SleepSession } from "@/types";
 
 export async function POST(request: Request) {
@@ -28,7 +34,8 @@ export async function POST(request: Request) {
     if (!role) {
       return new Response("Forbidden", { status: 403 });
     }
-    if (!(await consumeAiQuota(supabase))) {
+    // Over the limit: answer before spending anything on OpenAI.
+    if (await isAiQuotaExhausted(createAdminClient(), user.id)) {
       return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
     }
     const { data: babyData, error: babyError } = await supabase
@@ -71,13 +78,14 @@ export async function POST(request: Request) {
       }`;
     }
 
+    const timezone = "America/Sao_Paulo";
     const context = buildSleepContext(
       baby,
       (sessionsData ?? []) as SleepSession[],
-      "America/Sao_Paulo",
+      timezone,
       feedbackSummary
     );
-    const systemPrompt = getSleepSystemPrompt(context);
+    const systemPrompt = getSleepSystemPrompt(context, babyAgeOn(baby.birth_date, timezone), toBabySex(baby.sex));
 
     const stream = await openai.chat.completions.create({
       model: OPENAI_MODEL,
@@ -88,6 +96,21 @@ export async function POST(request: Request) {
         ...parsed.data.messages,
       ],
     });
+
+    // Charged only once OpenAI accepted the request: a failure before the
+    // stream (thrown above) costs the family nothing. The atomic consume is
+    // the real gate (two requests may pass the pre-check together).
+    let charged: boolean;
+    try {
+      charged = await consumeAiQuota(supabase);
+    } catch (err) {
+      stream.controller.abort();
+      throw err;
+    }
+    if (!charged) {
+      stream.controller.abort();
+      return Response.json({ error: AI_QUOTA_EXCEEDED_MESSAGE }, { status: 429 });
+    }
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({

@@ -10,12 +10,14 @@ export interface SegmentedOption<T extends string> {
   icon?: ReactNode
 }
 
-export interface SegmentedControlProps<T extends string> {
+/** The group is named by a string or by the id of a visible label. */
+type GroupName = { "aria-label": string; "aria-labelledby"?: never } | { "aria-labelledby": string; "aria-label"?: never }
+
+export type SegmentedControlProps<T extends string> = GroupName & {
   value: T
   onChange: (v: T) => void
   options: SegmentedOption<T>[]
   size?: "md" | "sm"
-  "aria-label": string
   className?: string
 }
 
@@ -29,6 +31,7 @@ export function SegmentedControl<T extends string>({
   options,
   size = "md",
   "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
   className,
 }: SegmentedControlProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
@@ -70,6 +73,7 @@ export function SegmentedControl<T extends string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       data-slot="segmented-control"
       data-size={size}
       className={cn(

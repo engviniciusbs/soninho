@@ -132,7 +132,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > general 
               <span
                 class="truncate font-sans text-[13px] font-semibold text-sn-mu"
               >
-                Nascimento: 31/10/2025
+                Nascimento: 01/11/2025
               </span>
             </span>
             <span
@@ -142,7 +142,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > general 
                 class="flex gap-1"
               >
                 <button
-                  aria-label="Editar"
+                  aria-label="Editar Lia"
                   class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0"
                   data-slot="button"
                   tabindex="0"
@@ -166,7 +166,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > general 
                   </svg>
                 </button>
                 <button
-                  aria-label="Excluir"
+                  aria-label="Excluir Lia"
                   class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-transparent font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-11 p-0 text-sn-danger"
                   data-slot="button"
                   tabindex="0"
@@ -589,7 +589,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > tools 1`
           <p
             class="text-base text-sn-mu"
           >
-            Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono total por dia, média de soneca, maior trecho noturno, aderência à meta e melhor ambiente, para todos os bebês da conta.
+            Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono total por dia, média de soneca, maior trecho noturno, aderência à meta e melhor ambiente, para todos os bebês da conta. O período conta só dias completos, até ontem.
           </p>
           <div
             class="space-y-2"
@@ -718,7 +718,7 @@ exports[`Mais detail pages (former settings tabs) > renders_each_page > tools 1`
 exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > edit form 1`] = `
 <div
   aria-labelledby="base-ui-id2"
-  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md"
+  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
   data-base-ui-focusable=""
   data-open=""
   data-slot="dialog-content"
@@ -732,7 +732,7 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
     data-slot="dialog-header"
   >
     <h2
-      class="font-heading text-base leading-none font-medium"
+      class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
       data-slot="dialog-title"
       id="base-ui-id2"
     >
@@ -743,7 +743,7 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
     class="space-y-4"
   >
     <div
-      class="flex flex-col items-center gap-2 py-2"
+      class="flex flex-col items-center gap-2 py-1"
     >
       <div
         class="relative inline-flex shrink-0"
@@ -751,7 +751,7 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
       >
         <button
           aria-label="Alterar foto de Lia"
-          class="relative block shrink-0 overflow-hidden rounded-full size-20 group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+          class="relative block shrink-0 overflow-hidden rounded-full size-20 group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
         >
           <span
@@ -766,31 +766,31 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-camera size-5 text-sn-tx"
+              class="text-sn-tx"
               fill="none"
-              height="24"
+              focusable="false"
+              height="20"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="20"
             >
               <path
-                d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"
+                d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.5-2.5h5.4L16.2 7h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z"
               />
               <circle
                 cx="12"
-                cy="13"
-                r="3"
+                cy="12.75"
+                r="3.25"
               />
             </svg>
           </span>
         </button>
       </div>
       <p
-        class="text-xs text-muted-foreground"
+        class="font-sans text-sm font-semibold text-sn-mu"
       >
         Toque para adicionar uma foto
       </p>
@@ -801,37 +801,93 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
         type="file"
       />
     </div>
-    <input
-      autocomplete="off"
-      class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
-      data-slot="input"
-      id="base-ui-id3"
-      placeholder="Nome do bebê"
-      value="Lia"
-    />
     <div
       class="space-y-1"
     >
       <label
-        class="text-xs text-muted-foreground"
+        class="font-sans text-sm font-bold text-sn-mu"
+        for="id3"
+      >
+        Nome
+      </label>
+      <input
+        autocomplete="off"
+        class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
+        data-slot="input"
+        id="id3"
+        placeholder="Nome do bebê"
+        value="Lia"
+      />
+    </div>
+    <div
+      class="space-y-1"
+    >
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="id4"
+      >
+        Sexo
+      </p>
+      <div
+        aria-labelledby="id4"
+        class="flex w-full rounded-full border border-sn-bd bg-sn-s1 p-[5px]"
+        data-size="sm"
+        data-slot="segmented-control"
+        role="radiogroup"
+      >
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menina
+        </button>
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menino
+        </button>
+        <button
+          aria-checked="true"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="0"
+          type="button"
+        >
+          Não informar
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-1"
+    >
+      <label
+        class="font-sans text-sm font-bold text-sn-mu"
+        for="id5"
       >
         Data de nascimento
       </label>
       <input
-        class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+        class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
         data-slot="input"
-        id="base-ui-id4"
+        id="id5"
         type="date"
         value="2025-11-01"
       />
     </div>
   </div>
   <div
-    class="-mx-4 -mb-4 flex flex-col-reverse rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end gap-2"
+    class="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"
     data-slot="dialog-footer"
   >
     <button
-      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -839,7 +895,7 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
       Cancelar
     </button>
     <button
-      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -848,29 +904,25 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
     </button>
   </div>
   <button
-    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
     data-slot="dialog-close"
     tabindex="0"
     type="button"
   >
     <svg
       aria-hidden="true"
-      class="lucide lucide-x"
       fill="none"
+      focusable="false"
       height="24"
       stroke="currentColor"
       stroke-linecap="round"
       stroke-linejoin="round"
-      stroke-width="2"
+      stroke-width="1.8"
       viewBox="0 0 24 24"
       width="24"
-      xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M18 6 6 18"
-      />
-      <path
-        d="m6 6 12 12"
+        d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
       />
     </svg>
     <span
@@ -885,7 +937,7 @@ exports[`Mais detail pages (former settings tabs) > saves_baby_same_payload > ed
 exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > form with photo 1`] = `
 <div
   aria-labelledby="base-ui-id2"
-  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 rounded-2xl max-w-md"
+  class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
   data-base-ui-focusable=""
   data-open=""
   data-slot="dialog-content"
@@ -899,7 +951,7 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
     data-slot="dialog-header"
   >
     <h2
-      class="font-heading text-base leading-none font-medium"
+      class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
       data-slot="dialog-title"
       id="base-ui-id2"
     >
@@ -910,7 +962,7 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
     class="space-y-4"
   >
     <div
-      class="flex flex-col items-center gap-2 py-2"
+      class="flex flex-col items-center gap-2 py-1"
     >
       <div
         class="relative inline-flex shrink-0"
@@ -918,7 +970,7 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
       >
         <button
           aria-label="Alterar foto de Bebê"
-          class="relative block shrink-0 overflow-hidden rounded-full size-20 border border-sn-bd group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50"
+          class="relative block shrink-0 overflow-hidden rounded-full size-20 border border-sn-bd group cursor-pointer transition-transform duration-150 active:scale-95 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
         >
           <img
@@ -937,36 +989,38 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
           >
             <svg
               aria-hidden="true"
-              class="lucide lucide-camera size-5 text-sn-tx"
+              class="text-sn-tx"
               fill="none"
-              height="24"
+              focusable="false"
+              height="20"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="1.8"
               viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              width="20"
             >
               <path
-                d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z"
+                d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.3l1.5-2.5h5.4L16.2 7h2.3A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9Z"
               />
               <circle
                 cx="12"
-                cy="13"
-                r="3"
+                cy="12.75"
+                r="3.25"
               />
             </svg>
           </span>
         </button>
       </div>
       <p
-        class="text-xs text-muted-foreground"
+        class="font-sans text-sm font-semibold text-sn-mu"
       >
         Toque para alterar a foto
       </p>
       <button
-        class="text-xs text-destructive hover:underline"
+        class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent font-bold aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 h-9 gap-1.5 px-3 text-sm after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 text-sn-danger hover:bg-sn-danger/10"
+        data-slot="button"
+        tabindex="0"
         type="button"
       >
         Remover foto
@@ -978,37 +1032,93 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
         type="file"
       />
     </div>
-    <input
-      autocomplete="off"
-      class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
-      data-slot="input"
-      id="base-ui-id3"
-      placeholder="Nome do bebê"
-      value=""
-    />
     <div
       class="space-y-1"
     >
       <label
-        class="text-xs text-muted-foreground"
+        class="font-sans text-sm font-bold text-sn-mu"
+        for="id3"
+      >
+        Nome
+      </label>
+      <input
+        autocomplete="off"
+        class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
+        data-slot="input"
+        id="id3"
+        placeholder="Nome do bebê"
+        value=""
+      />
+    </div>
+    <div
+      class="space-y-1"
+    >
+      <p
+        class="font-sans text-sm font-bold text-sn-mu"
+        id="id4"
+      >
+        Sexo
+      </p>
+      <div
+        aria-labelledby="id4"
+        class="flex w-full rounded-full border border-sn-bd bg-sn-s1 p-[5px]"
+        data-size="sm"
+        data-slot="segmented-control"
+        role="radiogroup"
+      >
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menina
+        </button>
+        <button
+          aria-checked="false"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="-1"
+          type="button"
+        >
+          Menino
+        </button>
+        <button
+          aria-checked="true"
+          class="flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 font-sans font-bold whitespace-nowrap text-sn-tx outline-none select-none transition-transform duration-(--sn-dur-micro) ease-sn-out active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr hover:bg-sn-s2 aria-checked:bg-sn-pr aria-checked:text-sn-pr-ink aria-checked:hover:bg-sn-pr disabled:pointer-events-none disabled:opacity-55 [&_svg]:pointer-events-none [&_svg]:shrink-0 py-2.5 text-sm [&_svg:not([class*='size-'])]:size-4"
+          role="radio"
+          tabindex="0"
+          type="button"
+        >
+          Não informar
+        </button>
+      </div>
+    </div>
+    <div
+      class="space-y-1"
+    >
+      <label
+        class="font-sans text-sm font-bold text-sn-mu"
+        for="id5"
       >
         Data de nascimento
       </label>
       <input
-        class="h-8 w-full min-w-0 border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-xl"
+        class="w-full min-w-0 border bg-transparent py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 h-11 rounded-xl border-sn-mu/70 px-3"
         data-slot="input"
-        id="base-ui-id4"
+        id="id5"
         type="date"
         value=""
       />
     </div>
   </div>
   <div
-    class="-mx-4 -mb-4 flex flex-col-reverse rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end gap-2"
+    class="flex flex-col-reverse gap-2 pt-1 sm:flex-row sm:justify-end"
     data-slot="dialog-footer"
   >
     <button
-      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-14 px-6 text-lg rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 border-[1.5px] border-sn-pr bg-transparent text-sn-tx font-extrabold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/12 aria-pressed:bg-sn-pr/15 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -1016,7 +1126,7 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
       Cancelar
     </button>
     <button
-      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-14 px-6 text-lg rounded-xl"
+      class="group/button relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-sn-pr text-sn-pr-ink font-extrabold hover:bg-sn-pr/88 aria-expanded:bg-sn-pr/88 aria-pressed:bg-sn-pr/88 h-11 gap-2 px-4 text-[15px] [&_svg:not([class*='size-'])]:size-4"
       data-slot="button"
       tabindex="0"
       type="button"
@@ -1025,29 +1135,25 @@ exports[`Mais detail pages (former settings tabs) > uploads_avatar_same_path > f
     </button>
   </div>
   <button
-    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+    class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
     data-slot="dialog-close"
     tabindex="0"
     type="button"
   >
     <svg
       aria-hidden="true"
-      class="lucide lucide-x"
       fill="none"
+      focusable="false"
       height="24"
       stroke="currentColor"
       stroke-linecap="round"
       stroke-linejoin="round"
-      stroke-width="2"
+      stroke-width="1.8"
       viewBox="0 0 24 24"
       width="24"
-      xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M18 6 6 18"
-      />
-      <path
-        d="m6 6 12 12"
+        d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
       />
     </svg>
     <span

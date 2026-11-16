@@ -1,9 +1,12 @@
+/** Prefix of every regression gate key (cleared on sign-out). */
+export const REGRESSION_AI_KEY_PREFIX = "soninho-regression-ai:";
+
 /** localStorage key marking that the AI explanation was already requested for a baby today. */
 export function regressionAiKey(babyId: string, now: Date = new Date()): string {
   const y = now.getFullYear();
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
-  return `soninho-regression-ai:${babyId}:${y}-${m}-${d}`;
+  return `${REGRESSION_AI_KEY_PREFIX}${babyId}:${y}-${m}-${d}`;
 }
 
 type StorageLike = Pick<Storage, "getItem" | "setItem">;

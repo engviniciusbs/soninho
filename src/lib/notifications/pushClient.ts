@@ -53,18 +53,46 @@ export async function subscribeToPush(): Promise<boolean> {
   return res.ok;
 }
 
+/**
+ * Deactivates the row (needs the session) and drops the browser subscription.
+ * The browser side is dropped whatever the DELETE does (offline, timeout):
+ * the device must not keep receiving pushes after leaving. The DELETE error
+ * still propagates.
+ */
+async function cancelSubscription(
+  subscription: PushSubscription,
+  signal?: AbortSignal
+): Promise<void> {
+  try {
+    await fetch("/api/notifications/subscribe", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ endpoint: subscription.endpoint }),
+      signal,
+    });
+  } finally {
+    await subscription.unsubscribe();
+  }
+}
+
 export async function unsubscribeFromPush(): Promise<boolean> {
   const subscription = await getExistingSubscription();
   if (!subscription) return true;
-
-  await fetch("/api/notifications/subscribe", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ endpoint: subscription.endpoint }),
-  });
-
-  await subscription.unsubscribe();
+  await cancelSubscription(subscription);
   return true;
+}
+
+/**
+ * Sign-out: cancels this device's push, if any. Looks the worker up with
+ * `getRegistration` (never waits on `serviceWorker.ready`, which hangs when
+ * no worker was ever registered); the DELETE gives up after 5 s.
+ */
+export async function unsubscribeThisDevice(): Promise<void> {
+  if (!isPushSupported()) return;
+  const reg = await navigator.serviceWorker.getRegistration();
+  const subscription = await reg?.pushManager.getSubscription();
+  // A slow or hanging network never holds the sign-out for more than 5 s.
+  if (subscription) await cancelSubscription(subscription, AbortSignal.timeout(5000));
 }
 
 export function isPushSupported(): boolean {

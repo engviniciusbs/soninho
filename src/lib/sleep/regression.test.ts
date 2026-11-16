@@ -5,6 +5,8 @@ import {
   detectRegression,
 } from "@/lib/sleep/regression";
 import { makeSession } from "@/lib/sleep/__fixtures__/session";
+import { SP, regularBaby, spAt } from "@/lib/sleep/__fixtures__/regularBaby";
+import { buildCompleteDailySleepTotals } from "@/lib/sleep/sessionDayAllocation";
 import type { SleepSession } from "@/types";
 
 const NOW = new Date("2026-05-24T15:00:00Z"); // 12:00 local
@@ -33,8 +35,9 @@ function birthForAge(weeks: number): string {
 
 describe("computeSleepDebt", () => {
   it("averages only days with data and compares with the age target", () => {
-    // 2 days with data (2h and 4h) + 5 empty days in the 7-day window.
-    const sessions = [dayNap("2026-05-23", 2), dayNap("2026-05-24", 4)];
+    // 2 days with data (2h and 4h) + 5 empty days in the 7 complete days
+    // before today (24/05, still running, is never counted).
+    const sessions = [dayNap("2026-05-22", 2), dayNap("2026-05-23", 4)];
     expect(computeSleepDebt(sessions, 4, 7)).toEqual({
       targetHours: 16,
       avgHours: 3,
@@ -44,7 +47,7 @@ describe("computeSleepDebt", () => {
   });
 
   it("uses the target for the given age", () => {
-    const r = computeSleepDebt([dayNap("2026-05-24", 14)], 30, 7);
+    const r = computeSleepDebt([dayNap("2026-05-23", 14)], 30, 7);
     expect(r).toEqual({
       targetHours: 14,
       avgHours: 14,
@@ -64,7 +67,7 @@ describe("computeSleepDebt", () => {
 
   it("negative debt when sleeping more than the target", () => {
     const r = computeSleepDebt(
-      [dayNap("2026-05-24", 8), dayNap("2026-05-24", 8)],
+      [dayNap("2026-05-23", 8), dayNap("2026-05-23", 8)],
       30,
       7
     );
@@ -73,9 +76,10 @@ describe("computeSleepDebt", () => {
 });
 
 describe("detectRegression", () => {
-  // recentDays = 3 -> days 19-21 are "prior", 22-24 are "recent".
-  const priorDays = ["2026-05-19", "2026-05-20", "2026-05-21"];
-  const recentDays = ["2026-05-22", "2026-05-23", "2026-05-24"];
+  // recentDays = 3 -> complete days 18-20 are "prior", 21-23 are "recent"
+  // (today, 24/05, is still running and never counted).
+  const priorDays = ["2026-05-18", "2026-05-19", "2026-05-20"];
+  const recentDays = ["2026-05-21", "2026-05-22", "2026-05-23"];
   const dropping = [
     ...priorDays.map((d) => dayNap(d, 10)),
     ...recentDays.map((d) => dayNap(d, 5)),
@@ -129,6 +133,16 @@ describe("detectRegression", () => {
     expect(r.summary).toBe("Mudança no padrão: queda de 5h/dia no sono recente.");
   });
 
+  it("a fractional drop reads as a duration (1h 30min), never 1.5h", () => {
+    const partial = [
+      ...priorDays.map((d) => dayNap(d, 10)),
+      ...recentDays.map((d) => dayNap(d, 8.5)),
+    ];
+    const r = detectRegression(birthForAge(25), partial, 3);
+    expect(r.sleepDropHours).toBe(1.5);
+    expect(r.summary).toBe("Mudança no padrão: queda de 1h 30min/dia no sono recente.");
+  });
+
   it("window boundaries are inclusive (14 and 20 in, 13 and 21 out)", () => {
     expect(detectRegression(birthForAge(14), [], 3).ageWindow).not.toBeNull();
     expect(detectRegression(birthForAge(20), [], 3).ageWindow).not.toBeNull();
@@ -137,13 +151,14 @@ describe("detectRegression", () => {
   });
 
   it("insufficient data -> not detected with explanatory summary", () => {
-    const r = detectRegression(birthForAge(16), [dayNap("2026-05-24", 5)], 3);
+    const r = detectRegression(birthForAge(16), [dayNap("2026-05-23", 5)], 3);
     expect(r.detected).toBe(false);
     expect(r.summary).toBe("Dados insuficientes para avaliar regressão.");
   });
 
   it("more night wake-ups inside a window -> detected as fragmented sleep", () => {
-    // Stable naps plus one short night per day in the recent 3 days.
+    // Stable naps plus one short night per day in the recent 3 days
+    // (02:00Z is 23:00 local of the day before: 21, 22 and 23/05).
     const nights = ["2026-05-22", "2026-05-23", "2026-05-24"].map((d) =>
       makeSession({
         type: "NIGHT_SLEEP",
@@ -155,5 +170,54 @@ describe("detectRegression", () => {
     expect(r.wakeIncrease).toBe(1);
     expect(r.detected).toBe(true);
     expect(r.summary).toBe("Regressão dos 4 meses provável: sono mais fragmentado.");
+  });
+});
+
+describe("honest numbers: complete local days and running sleep", () => {
+  // 40 weeks old: inside "Regressão dos 8–10 meses", age target 13,5 h/day.
+  const BIRTH = "2026-02-09";
+  const AGE_WEEKS = 40;
+
+  it("a regular baby at 07:00 is not a regression and has no debt", () => {
+    const now = spAt("2026-11-16", "07:00");
+    vi.setSystemTime(now);
+    const sessions = regularBaby("2026-11-16", 14);
+    const r = detectRegression(BIRTH, sessions, 5, { timeZone: SP, now });
+    expect(r.detected).toBe(false);
+    expect(r.sleepDropHours).toBe(0);
+    const debt = computeSleepDebt(sessions, AGE_WEEKS, 7, { timeZone: SP, now });
+    expect(Math.abs(debt.debtHours * 60)).toBeLessThan(30);
+    expect(debt.avgHours).toBe(13.5);
+  });
+
+  it("at 22:30 in São Paulo (01:30 UTC) today is the local day, left out", () => {
+    const now = new Date("2026-11-17T01:30:00Z"); // 16/11 22:30 local
+    vi.setSystemTime(now);
+    const sessions = regularBaby("2026-11-16", 14, { todayNaps: true, runningSince: "18:30" });
+    expect(detectRegression(BIRTH, sessions, 5, { timeZone: SP, now }).detected).toBe(false);
+    const debt = computeSleepDebt(sessions, AGE_WEEKS, 7, { timeZone: SP, now });
+    expect(debt).toMatchObject({ avgHours: 13.5, daysAnalyzed: 7 });
+  });
+
+  it("a night still running fills the complete day it started on", () => {
+    // Night from 15/11 18:30 not yet ended at 16/11 05:00: 15/11 still gets 5,5 h of it.
+    const now = spAt("2026-11-16", "05:00");
+    vi.setSystemTime(now);
+    const sessions = regularBaby("2026-11-15", 14, { todayNaps: true, runningSince: "18:30" });
+    const debt = computeSleepDebt(sessions, AGE_WEEKS, 7, { timeZone: SP, now });
+    expect(debt.avgHours).toBe(13.5);
+  });
+});
+
+describe("buildCompleteDailySleepTotals", () => {
+  it("lists only complete local days in the given timezone", () => {
+    const now = new Date("2026-11-17T01:30:00Z"); // 16/11 22:30 in São Paulo
+    const sessions = regularBaby("2026-11-16", 5, { todayNaps: true, runningSince: "18:30" });
+    const totals = buildCompleteDailySleepTotals(sessions, 3, SP, now);
+    expect(totals.map((d) => [d.date, d.totalHours])).toEqual([
+      ["13/11", 13.5],
+      ["14/11", 13.5],
+      ["15/11", 13.5],
+    ]);
   });
 });

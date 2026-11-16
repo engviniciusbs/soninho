@@ -1,22 +1,28 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { startSleepSession, endSleepSession, getActiveSleepSession, getSleepSessionStatus } from "@/lib/supabase/queries/sleep";
 import { useSleepStore, useActiveSleepTimer, type SleepType } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { formatElapsedSeconds } from "@/lib/utils";
 import { toast } from "sonner";
+import { useNoBabyToast } from "@/lib/toasts/noBaby";
 import { classifyEndResult, isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
 import { useSessionClock } from "@/hooks/timer/useSessionClock";
 import { useActiveSessionSync } from "@/hooks/timer/useActiveSessionSync";
+import { invalidateSleepQueries as invalidateSleep } from "@/lib/query/invalidateSleep";
+
+/** How often a phone with no local timer looks for a sleep started elsewhere. */
+export const OPEN_SESSION_POLL_MS = 30_000;
 
 export function useSleepTimer() {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
+  const toastNoBaby = useNoBabyToast();
   const babyId = activeBaby?.id ?? null;
 
   // Timers are per baby: the shown baby's running timer (if any), otherwise
@@ -46,26 +52,36 @@ export function useSleepTimer() {
   const elapsed = elapsedSec === null ? "00:00:00" : formatElapsedSeconds(elapsedSec);
 
   const invalidateSleepQueries = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
-    queryClient.invalidateQueries({ queryKey: ["last-session"] });
-    queryClient.invalidateQueries({ queryKey: ["last-session-key"] });
-    queryClient.invalidateQueries({ queryKey: ["ai-suggestion"] });
-  }, [queryClient]);
+    if (babyId) void invalidateSleep(queryClient, babyId);
+  }, [queryClient, babyId]);
 
-  // Restore the shown baby's open session from Supabase when it has no local
-  // timer (mount, baby switch, or after a local timer was dropped).
-  useEffect(() => {
-    if (!babyId || isRunning) return;
-    const id = babyId;
-    async function restore() {
-      const { data } = await getActiveSleepSession(supabase, id);
+  // Without a local timer, look for the shown baby's open session: on mount,
+  // on a baby switch, after a local timer was dropped, and every 30 s while
+  // the page is visible (react-query pauses the interval in the background
+  // and refetches on focus), so a sleep started on another phone shows up.
+  // Read-only; once a timer exists the query is disabled and
+  // useActiveSessionSync takes over. Adoption happens in the queryFn, so only
+  // a fresh answer adopts: cached data about a session that has since ended
+  // is never applied again.
+  useQuery({
+    queryKey: ["open-sleep-session", babyId],
+    queryFn: async () => {
+      const id = babyId as string;
+      const { data, error } = await getActiveSleepSession(supabase, id);
+      if (error) throw error;
       // Don't clobber a timer started locally while the request was in flight.
       if (data && !useSleepStore.getState().timers[id]) {
         restoreFromSession(id, data.id, data.start_time, data.type as SleepType);
       }
-    }
-    void restore();
-  }, [babyId, isRunning, supabase, restoreFromSession]);
+      return data?.id ?? null;
+    },
+    enabled: !!babyId && !isRunning,
+    refetchInterval: OPEN_SESSION_POLL_MS,
+    refetchIntervalInBackground: false,
+    retry: false, // the next poll is the retry
+    staleTime: 0,
+    gcTime: 0,
+  });
 
   useActiveSessionSync({
     queryKey: "active-session-live",
@@ -87,7 +103,7 @@ export function useSleepTimer() {
 
   const handleStart = useCallback(async (startTimeIso?: string) => {
     if (!activeBaby) {
-      toast.error("Adicione um bebê primeiro nas configurações");
+      toastNoBaby();
       return;
     }
     const baby = activeBaby;
@@ -130,7 +146,7 @@ export function useSleepTimer() {
       sleepSessionId: data.id,
       sleepType,
     });
-  }, [activeBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer, restoreFromSession]);
+  }, [activeBaby, toastNoBaby, sleepType, notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog, supabase, startTimer, restoreFromSession]);
 
   /**
    * Ends the running session. Returns the ended session's id/type when THIS

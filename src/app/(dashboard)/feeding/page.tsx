@@ -15,6 +15,8 @@ import { SolidFeedingLog } from "@/components/feeding/SolidFeedingLog";
 import { FeedingSuggestionCard } from "@/components/feeding/FeedingSuggestionCard";
 import { FeedingTimeline, useDeleteFeeding } from "@/components/feeding/FeedingTimeline";
 import { FeedingForm } from "@/components/feeding/FeedingForm";
+import { ViewOnlyNotice } from "@/components/family/ViewOnlyNotice";
+import { useCanWrite } from "@/hooks/useCanWrite";
 import type { FeedingTimelineItem } from "@/types";
 
 type Tab = "mamadeira" | "peito" | "solidos";
@@ -94,6 +96,7 @@ function TabsFallback() {
 
 export default function FeedingPage() {
   const { isLoading } = useBaby();
+  const { canWrite, isLoading: roleLoading } = useCanWrite();
   const deleteFeeding = useDeleteFeeding();
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<FeedingTimelineItem | null>(null);
@@ -120,29 +123,38 @@ export default function FeedingPage() {
       <PageTitle>Comida</PageTitle>
 
       <div className="flex flex-col gap-3">
+        {!roleLoading && !canWrite && <ViewOnlyNotice />}
+
         <FeedingSuggestionCard />
 
-        <Suspense fallback={<TabsFallback />}>
-          <FeedingTabs />
-        </Suspense>
+        {/* A viewer sees the suggestion and the history, nothing to record or edit. */}
+        {canWrite && (
+          <>
+            <Suspense fallback={<TabsFallback />}>
+              <FeedingTabs />
+            </Suspense>
 
-        <Button variant="ghost" className="mx-auto" onClick={() => openForm(null)}>
-          <IconPen size={18} />
-          Registrar mamada passada
-        </Button>
+            <Button variant="ghost" className="mx-auto" onClick={() => openForm(null)}>
+              <IconPen size={18} />
+              Registrar mamada passada
+            </Button>
+          </>
+        )}
 
-        <FeedingTimeline onEdit={openForm} />
+        <FeedingTimeline onEdit={canWrite ? openForm : undefined} readOnly={!canWrite} />
       </div>
 
-      <FeedingForm
-        open={showForm}
-        onClose={() => {
-          setShowForm(false);
-          setEditItem(null);
-        }}
-        item={editItem}
-        onDelete={deleteFeeding}
-      />
+      {canWrite && (
+        <FeedingForm
+          open={showForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditItem(null);
+          }}
+          item={editItem}
+          onDelete={deleteFeeding}
+        />
+      )}
     </div>
   );
 }

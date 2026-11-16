@@ -1,4 +1,5 @@
-import type { HowFellAsleep, WakeReason } from "@/types";
+import type { BabySex, HowFellAsleep, WakeReason } from "@/types";
+import { g } from "@/lib/i18n/gender";
 
 export interface CaptureOption<T extends string> {
   value: T;
@@ -6,38 +7,45 @@ export interface CaptureOption<T extends string> {
   emoji: string;
 }
 
-/** How the baby fell asleep — used in PostSleepReview, SleepForm and SleepCard. */
-export const HOW_FELL_ASLEEP_OPTIONS: CaptureOption<HowFellAsleep>[] = [
-  { value: "peito", label: "No peito", emoji: "🤱" },
-  { value: "mamadeira", label: "Mamadeira", emoji: "🍼" },
-  { value: "colo", label: "No colo", emoji: "🤗" },
-  { value: "berco", label: "Sozinho no berço", emoji: "🛏️" },
-  { value: "carrinho", label: "No carrinho", emoji: "👶" },
-  { value: "movimento", label: "Em movimento", emoji: "🚗" },
-];
+/** How the baby fell asleep, in agreement with `babies.sex` (neutral when null). */
+export function howFellAsleepOptions(sex: BabySex | null | undefined): CaptureOption<HowFellAsleep>[] {
+  return [
+    { value: "peito", label: "No peito", emoji: "🤱" },
+    { value: "mamadeira", label: "Mamadeira", emoji: "🍼" },
+    { value: "colo", label: "No colo", emoji: "🤗" },
+    {
+      value: "berco",
+      label: g(sex, { f: "Sozinha no berço", m: "Sozinho no berço", n: "No berço, sem ajuda" }),
+      emoji: "🛏️",
+    },
+    { value: "carrinho", label: "No carrinho", emoji: "👶" },
+    { value: "movimento", label: "Em movimento", emoji: "🚗" },
+  ];
+}
 
-/** Reason the baby woke up — mainly relevant for night sleep. */
-export const WAKE_REASON_OPTIONS: CaptureOption<WakeReason>[] = [
-  { value: "fome", label: "Fome", emoji: "🍼" },
-  { value: "fralda", label: "Fralda", emoji: "💧" },
-  { value: "barulho", label: "Barulho", emoji: "🔊" },
-  { value: "sozinho", label: "Acordou sozinho", emoji: "😊" },
-  { value: "desconforto", label: "Desconforto", emoji: "😣" },
-  { value: "outro", label: "Outro", emoji: "❓" },
-];
+/** Reason the baby woke up (mainly night sleep), in agreement with `babies.sex`. */
+export function wakeReasonOptions(sex: BabySex | null | undefined): CaptureOption<WakeReason>[] {
+  return [
+    { value: "fome", label: "Fome", emoji: "🍼" },
+    { value: "fralda", label: "Fralda", emoji: "💧" },
+    { value: "barulho", label: "Barulho", emoji: "🔊" },
+    {
+      value: "sozinho",
+      label: g(sex, { f: "Acordou sozinha", m: "Acordou sozinho", n: "Acordou por conta própria" }),
+      emoji: "😊",
+    },
+    { value: "desconforto", label: "Desconforto", emoji: "😣" },
+    { value: "outro", label: "Outro", emoji: "❓" },
+  ];
+}
 
-export const HOW_FELL_ASLEEP_LABELS: Record<string, string> = Object.fromEntries(
-  HOW_FELL_ASLEEP_OPTIONS.map((o) => [o.value, o.label])
-);
+const toLabels = <T extends string>(options: CaptureOption<T>[]): Record<string, string> =>
+  Object.fromEntries(options.map((o) => [o.value, o.label]));
 
-export const WAKE_REASON_LABELS: Record<string, string> = Object.fromEntries(
-  WAKE_REASON_OPTIONS.map((o) => [o.value, o.label])
-);
+export function howFellAsleepLabels(sex: BabySex | null | undefined): Record<string, string> {
+  return toLabels(howFellAsleepOptions(sex));
+}
 
-export const HOW_FELL_ASLEEP_EMOJI: Record<string, string> = Object.fromEntries(
-  HOW_FELL_ASLEEP_OPTIONS.map((o) => [o.value, o.emoji])
-);
-
-export const WAKE_REASON_EMOJI: Record<string, string> = Object.fromEntries(
-  WAKE_REASON_OPTIONS.map((o) => [o.value, o.emoji])
-);
+export function wakeReasonLabels(sex: BabySex | null | undefined): Record<string, string> {
+  return toLabels(wakeReasonOptions(sex));
+}

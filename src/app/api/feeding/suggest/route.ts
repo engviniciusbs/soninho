@@ -7,6 +7,7 @@ import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { getRecentMilkFeedTimes } from "@/lib/supabase/feedingQueries";
 import { computeFeedingSuggestion } from "@/lib/feeding/computeFeedingSuggestion";
 import type { Baby } from "@/types";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 const requestSchema = z.object({
   babyId: zUuid,
@@ -50,7 +51,7 @@ export async function POST(request: Request) {
     const baby = babyData as Baby;
 
     const recentFeedTimes = await getRecentMilkFeedTimes(supabase, baby.id, 8);
-    const ageWeeks = differenceInWeeks(new Date(), new Date(baby.birth_date));
+    const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(baby.birth_date));
 
     const suggestion = computeFeedingSuggestion({
       ageWeeks,

@@ -4,6 +4,7 @@ import {
   formatSleepActivityMessage,
   formatFeedingActivityMessage,
 } from "@/lib/family/activityMessages";
+import { prefIsQuiet } from "@/lib/notifications/selectAlerts";
 import type { SleepType, FeedingType } from "@/types";
 
 async function getFamilyRecipients(
@@ -37,6 +38,9 @@ async function getFamilyRecipients(
   return recipientIds;
 }
 
+/** Payload `type` of family pushes; only OVERDUE alerts stay on screen (sw.js). */
+export const FAMILY_ACTIVITY_PUSH_TYPE = "FAMILY_ACTIVITY";
+
 async function pushToRecipients(
   supabase: ReturnType<typeof createAdminClient>,
   recipientIds: Set<string>,
@@ -45,16 +49,28 @@ async function pushToRecipients(
   const webpush = getWebPush();
   if (!webpush) return 0;
 
+  const now = new Date();
+  const { data: prefRows } = await supabase
+    .from("notification_preferences")
+    .select("user_id, enabled, quiet_hours_start, quiet_hours_end, timezone")
+    .in("user_id", [...recipientIds]);
+  const prefsByUser = new Map((prefRows ?? []).map((p) => [p.user_id, p]));
+
   let sent = 0;
 
   for (const userId of recipientIds) {
-    const { data: prefs } = await supabase
-      .from("notification_preferences")
-      .select("enabled")
-      .eq("user_id", userId)
-      .maybeSingle();
-
+    // No row means the defaults: alerts on, quiet hours 22:00 to 07:00.
+    const prefs = prefsByUser.get(userId);
     if (prefs && prefs.enabled === false) continue;
+    if (
+      prefIsQuiet(now, {
+        quiet_hours_start: prefs?.quiet_hours_start ?? null,
+        quiet_hours_end: prefs?.quiet_hours_end ?? null,
+        timezone: prefs?.timezone ?? null,
+      })
+    ) {
+      continue;
+    }
 
     const { data: subs } = await supabase
       .from("push_subscriptions")
@@ -121,6 +137,7 @@ export async function notifyFamilySleepActivity(
   );
 
   const payload = JSON.stringify({
+    type: FAMILY_ACTIVITY_PUSH_TYPE,
     title,
     body,
     icon: PUSH_ICON,
@@ -174,6 +191,7 @@ export async function notifyFamilyFeedingActivity(
   );
 
   const payload = JSON.stringify({
+    type: FAMILY_ACTIVITY_PUSH_TYPE,
     title: FEEDING_TITLES[feedingType],
     body,
     icon: PUSH_ICON,

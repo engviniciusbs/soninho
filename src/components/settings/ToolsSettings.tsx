@@ -55,7 +55,8 @@ export function ToolsSettings() {
         <p className="text-base text-sn-mu">
           Receba agora no seu e-mail o mesmo resumo do relatório semanal: sono
           total por dia, média de soneca, maior trecho noturno, aderência à meta
-          e melhor ambiente, para todos os bebês da conta.
+          e melhor ambiente, para todos os bebês da conta. O período conta só
+          dias completos, até ontem.
         </p>
 
         <PeriodPicker

@@ -21,12 +21,13 @@ export function HomeTopBar() {
   const now = useNow(1000);
   return (
     <div className="mb-4 flex items-center justify-between">
-      <p className="flex items-center gap-2.5 font-display text-[22px] font-bold text-sn-tx">
+      {/* On desktop the sidebar already carries the brand. */}
+      <p className="flex items-center gap-2.5 font-display text-[22px] font-bold text-sn-tx md:hidden">
         <SoninhoLogoMark size={26} />
         Soninho
       </p>
       <time
-        className="font-sans text-[15px] font-semibold text-sn-mu tabular-nums"
+        className="ml-auto font-sans text-[15px] font-semibold text-sn-mu tabular-nums"
         dateTime={now === null ? undefined : new Date(now).toISOString()}
       >
         {now === null ? null : format(now, "HH:mm")}

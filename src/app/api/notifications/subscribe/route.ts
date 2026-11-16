@@ -57,13 +57,14 @@ export async function POST(req: NextRequest) {
     return dbErrorToResponse(error);
   }
 
-  // Ensure default notification preferences exist
+  // Create the default preference row only when missing: the page re-syncs the
+  // subscription on every load and must not turn alerts back on.
   await supabase.from("notification_preferences").upsert(
     {
       user_id: user.id,
       enabled: true,
     },
-    { onConflict: "user_id" }
+    { onConflict: "user_id", ignoreDuplicates: true }
   );
 
   return NextResponse.json({ ok: true });

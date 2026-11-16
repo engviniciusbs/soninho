@@ -2,6 +2,7 @@ import { addMinutes } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { getDefaultFeedingIntervalMinutes } from "@/lib/feeding/feedingIntervals";
 import type { FeedingSuggestion } from "@/types";
+import { formatDuration } from "@/lib/utils";
 
 function average(nums: number[]): number {
   return nums.reduce((a, b) => a + b, 0) / nums.length;
@@ -75,7 +76,7 @@ export function computeFeedingSuggestion(params: {
     ? 0
     : Math.round((nextFeedAt.getTime() - now.getTime()) / 60000);
 
-  const intervalLabel = `${Math.round(avgIntervalMinutes / 60 * 10) / 10}h`;
+  const intervalLabel = formatDuration(avgIntervalMinutes);
   const reasoning = overdue
     ? `Última mamada foi às ${lastFeedClock}. ${
         usedHistory

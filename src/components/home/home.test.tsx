@@ -15,6 +15,10 @@ import type { AISuggestion, Baby, FeedingTimelineItem, SleepSession } from "@/ty
 import { getSleepSessionDetails, updateSleepSession } from "@/lib/supabase/queries/sleep";
 import { toast } from "sonner";
 import AppHomePage from "@/app/(dashboard)/app/page";
+import { differenceInWeeks } from "date-fns";
+import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
+import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 const holder = vi.hoisted(() => ({
   client: null as unknown,
@@ -26,6 +30,7 @@ const holder = vi.hoisted(() => ({
   notes: null as unknown,
   toasts: vi.fn(),
   noDbRestore: false,
+  canWrite: true,
 }));
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
@@ -61,6 +66,9 @@ vi.mock("@/hooks/useAISuggestions", () => ({
 }));
 vi.mock("@/hooks/useRegression", () => ({
   useRegression: () => ({ data: holder.regression, isLoading: false }),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("@/hooks/useFamilyActivityToasts", () => ({
   useFamilyActivityToasts: (enabled: boolean) => holder.toasts(enabled),
@@ -115,6 +123,7 @@ beforeEach(() => {
   holder.feedings = {};
   holder.toasts.mockClear();
   holder.noDbRestore = false;
+  holder.canWrite = true;
   // Back to the real read (a test may have failed or delayed it).
   vi.mocked(getSleepSessionDetails).mockReset();
   holder.lastSession = {
@@ -206,6 +215,10 @@ const nightAi = {
   reasoning: "Ela costuma dormir neste horário.",
   confidence: "high",
   minutesUntilSuggested: 30,
+  // The instant the home counts down to with its own clock (09:30 local).
+  suggestedAtIso: "2026-01-01T12:30:00.000Z",
+  windowStartIso: "2026-01-01T12:20:00.000Z",
+  windowEndIso: "2026-01-01T12:50:00.000Z",
 } as AISuggestion;
 
 describe("Home", () => {
@@ -253,6 +266,35 @@ describe("Home", () => {
       suggestedTime: "09:30",
     });
     expect(within(sheet).getByText("Obrigado pelo feedback!")).toBeInTheDocument();
+  });
+
+  it("hero_sheet_and_feedback_agree_on_the_time_late_in_the_window", async () => {
+    // Helena's wake window for her age, ending so its middle is 09:05 local.
+    const ageWeeks = differenceInWeeks(NOW, parseLocalDate(helena.birth_date));
+    const range = getWakeWindowRange(ageWeeks);
+    const midMin = Math.round((range.minMinutes + range.maxMinutes) / 2);
+    const lastEnd = new Date(NOW.getTime() + (5 - midMin) * 60_000).toISOString();
+    holder.lastSession = { id: "prev", end_time: lastEnd };
+    // The server computed it a moment later, already past the middle.
+    holder.ai = computeNapSuggestion({
+      birthDateIso: helena.birth_date,
+      lastSleepEndIso: lastEnd,
+      lastSessionType: "NAP",
+      timezone: "America/Sao_Paulo",
+      now: new Date(NOW.getTime() + 7 * 60_000),
+    });
+    await mount();
+
+    const hero = screen.getByRole("region", { name: "Previsão de sono" });
+    expect(within(hero).getByText("09:05")).toBeInTheDocument();
+
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    const sheet = screen.getByRole("dialog");
+    expect(within(sheet).getByText(/Horário previsto: 09:05;/)).toBeInTheDocument();
+    await click(within(sheet).getByRole("button", { name: "Útil" }));
+    const calls = (fetch as unknown as { mock: { calls: [string, RequestInit][] } }).mock.calls;
+    const vote = calls.find(([url]) => url === "/api/suggestions/feedback");
+    expect(JSON.parse(String(vote?.[1].body)).suggestedTime).toBe("09:05");
   });
 
   it("start_night_calls_handleStart_and_shows_sleeping", async () => {
@@ -353,7 +395,7 @@ describe("Home", () => {
 
     expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "22°C" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "TOG 1.0" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "TOG 1,0" })).toBeInTheDocument();
 
     await click(screen.getByRole("button", { name: "Ambiente" }));
     await click(screen.getByRole("button", { name: "Pronto" }));
@@ -383,7 +425,7 @@ describe("Home", () => {
     await mount();
 
     await click(screen.getByRole("button", { name: "Ambiente" }));
-    await click(screen.getByRole("button", { name: "TOG 2.5" }));
+    await click(screen.getByRole("button", { name: "TOG 2,5" }));
     await click(screen.getByRole("button", { name: "Pronto" }));
     await flush();
 
@@ -614,7 +656,7 @@ describe("Home", () => {
     expect(screen.getByRole("button", { name: "Ver todos" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Ver registro/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Por que esse horário?" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Tempo acordada")).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Tempo acordad[ao]$/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Ver análise/ })).not.toBeInTheDocument();
     // The prediction itself stays.
     expect(screen.getByRole("region", { name: "Previsão de sono" })).toBeInTheDocument();
@@ -657,5 +699,61 @@ describe("Home", () => {
       "href",
       "/more/babies"
     );
+  });
+
+  it("viewer_sees_the_data_but_no_start_or_stop", async () => {
+    holder.canWrite = false;
+    holder.ai = nightAi;
+    await mount();
+
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Previsão de sono" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Iniciar/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Começou antes/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup", { name: "Tipo de sono" })).not.toBeInTheDocument();
+  });
+
+  it("viewer_sees_a_running_sleep_without_acordou_or_edits", async () => {
+    holder.canWrite = false;
+    seedRunning(helena.id, "NAP", 600);
+    await mount();
+
+    expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Acordou/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Anotar algo/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Ambiente|Temperatura|TOG/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+  });
+
+  it("viewer_running_sleep_chips_keep_their_spacing", async () => {
+    holder.canWrite = false;
+    // Started on another phone, with the room temperature recorded.
+    fake.seed(TABLE, {
+      id: "s-2",
+      baby_id: helena.id,
+      type: "NAP",
+      start_time: new Date(NOW.getTime() - 600_000).toISOString(),
+      room_temp_celsius: 22,
+    });
+    await mount();
+    const chip = screen.getByText("22°C");
+    expect(chip.closest("div.flex-wrap")).toHaveClass("mb-3.5");
+  });
+
+  it("viewer_why_sheet_has_no_feedback_buttons", async () => {
+    holder.canWrite = false;
+    holder.ai = nightAi;
+    await mount();
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    const sheet = screen.getByRole("dialog");
+    expect(within(sheet).getByText("Ela costuma dormir neste horário.")).toBeInTheDocument();
+    expect(within(sheet).queryByRole("button", { name: "Útil" })).not.toBeInTheDocument();
+    expect(within(sheet).queryByRole("button", { name: "Não útil" })).not.toBeInTheDocument();
+    expect(within(sheet).queryByText("Foi útil?")).not.toBeInTheDocument();
+  });
+
+  it("writer_sees_no_view_only_notice", async () => {
+    await mount();
+    expect(screen.queryByText("Você tem acesso só para ver")).not.toBeInTheDocument();
   });
 });

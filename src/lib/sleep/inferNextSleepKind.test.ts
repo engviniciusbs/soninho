@@ -53,7 +53,9 @@ describe("inferNextSleepKind", () => {
       ).toBe("NIGHT_SLEEP");
     });
 
-    it("late wake but a nap already today -> NAP", () => {
+    // Before: asserted NAP at 17:30 because a nap had happened today. At 17:30
+    // the next sleep is the night, whatever the nap count.
+    it("late wake, evening, a nap already today -> NIGHT_SLEEP", () => {
       expect(
         inferNextSleepKind(
           base({
@@ -69,7 +71,7 @@ describe("inferNextSleepKind", () => {
             ],
           })
         )
-      ).toBe("NAP");
+      ).toBe("NIGHT_SLEEP");
     });
 
     it("late wake before 17:00 -> NAP", () => {
@@ -160,5 +162,136 @@ describe("inferNextSleepKind", () => {
       const open = nights(3).map((s, i) => (i === 0 ? { ...s, end_time: null } : s));
       expect(inferNextSleepKind({ ...params, recentSessions: open })).toBe("NAP");
     });
+  });
+
+  describe("night wakings", () => {
+    it("night ended at 23:00 -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-25T02:00:00Z", // 23:00 local
+            now: new Date("2026-05-25T02:10:00Z"), // 23:10 local
+            windowStartHour: 0.25,
+            windowEndHour: 0.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    it("night ended at 02:00 -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T05:00:00Z", // 02:00 local
+            now: new Date("2026-05-24T05:05:00Z"), // 02:05 local
+            windowStartHour: 3.25,
+            windowEndHour: 3.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    // The parent forgot to log the resumed night: at 09:00, seven hours after
+    // the 02:00 waking, it is morning — not still "the night".
+    it("night ended at 02:00, now 09:00 (resumed night not logged) -> NAP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T05:00:00Z", // 02:00 local
+            now: new Date("2026-05-24T12:00:00Z"), // 09:00 local
+            windowStartHour: 3.25,
+            windowEndHour: 3.5,
+          })
+        )
+      ).toBe("NAP");
+    });
+
+    it("night ended at 23:00, now 04:30 (still night hours) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-25T02:00:00Z", // 23:00 local
+            now: new Date("2026-05-25T07:30:00Z"), // 04:30 local
+            windowStartHour: 0.25,
+            windowEndHour: 0.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    it("night ended at 04:00, now 06:00 (within 6 h of the waking) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:00:00Z", // 04:00 local
+            now: new Date("2026-05-24T09:00:00Z"), // 06:00 local
+            windowStartHour: 5.25,
+            windowEndHour: 5.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    it("woke at 04:45, now 07:30 (the hold ends at 07:00) -> NAP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:45:00Z", // 04:45 local
+            now: new Date("2026-05-24T10:30:00Z"), // 07:30 local
+            windowStartHour: 7.75,
+            windowEndHour: 8,
+          })
+        )
+      ).toBe("NAP");
+    });
+
+    it("woke at 04:45, now 06:30 (before 07:00) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:45:00Z", // 04:45 local
+            now: new Date("2026-05-24T09:30:00Z"), // 06:30 local
+            windowStartHour: 7.75,
+            windowEndHour: 8,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    it("night ended at 05:00 (morning) -> NAP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T08:00:00Z", // 05:00 local
+            now: new Date("2026-05-24T08:10:00Z"),
+            windowStartHour: 6.25,
+            windowEndHour: 6.5,
+          })
+        )
+      ).toBe("NAP");
+    });
+  });
+
+  it("nap ended 15:00, now 15:10, < 3 nights, window 18:00-19:00 -> NIGHT_SLEEP", () => {
+    expect(
+      inferNextSleepKind(
+        base({
+          ageWeeks: 10,
+          lastSleepEndIso: "2026-05-24T18:00:00Z", // 15:00 local
+          now: new Date("2026-05-24T18:10:00Z"), // 15:10 local
+          recentSessions: nights(2),
+          windowStartHour: 18,
+          windowEndHour: 19,
+        })
+      )
+    ).toBe("NIGHT_SLEEP");
   });
 });

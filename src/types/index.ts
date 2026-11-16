@@ -1,6 +1,11 @@
 import type { Database } from "./database";
 
-export type Baby = Database["public"]["Tables"]["babies"]["Row"];
+/** babies.sex: 'F' (menina), 'M' (menino) or null (não informado). */
+export type BabySex = "F" | "M";
+
+export type Baby = Omit<Database["public"]["Tables"]["babies"]["Row"], "sex"> & {
+  sex: BabySex | null;
+};
 export type BabyInsert = Database["public"]["Tables"]["babies"]["Insert"];
 export type BabyUpdate = Database["public"]["Tables"]["babies"]["Update"];
 
@@ -82,6 +87,15 @@ export interface AISuggestion {
   confidence: "high" | "medium" | "low";
   /** Minutes until suggested time (0 when overdue or "Assim que possível"). */
   minutesUntilSuggested: number;
+  /**
+   * The predicted instant (ISO), the middle of the wake window. The home
+   * counts down to it with its own clock. Null without a finished sleep;
+   * absent in responses cached before it existed.
+   */
+  suggestedAtIso?: string | null;
+  /** The wake window's bounds as ISO instants (null without a finished sleep). */
+  windowStartIso?: string | null;
+  windowEndIso?: string | null;
 }
 
 export interface SleepStats {

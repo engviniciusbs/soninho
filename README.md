@@ -13,7 +13,7 @@ Monitor de sono e alimentação do bebê para famílias. Pais e cuidadores regis
 - **Revisão pós-sono**: qualidade (1–5), como adormeceu, motivo do despertar, temperatura do quarto, clima, saco de dormir/TOG e roupa — com **recomendação de roupa** pela temperatura.
 - **Alimentação**: timer de amamentação por lado (esquerdo/direito), mamadeira (fórmula / leite materno / misto, em ml) e introdução alimentar com tags de alimentos e reação (inclusive alergia). Sugestão da próxima mamada pelo intervalo médio recente.
 - **Família compartilhada**: convite por link (token hex de 48 caracteres; tokens base64 antigos continuam válidos; a página do convite mostra estados específicos: usado, expirado, revogado ou inexistente) com papéis (`owner`, `caregiver`, `viewer`), parentesco (mãe, pai, avó, babá…), mural de recados e toasts/push quando outro cuidador inicia ou encerra um sono/mamada.
-- **Modo babá**: interface reduzida (só Início e Mais › Perfil).
+- **Modo babá**: interface reduzida: Início, Comida e Mais › Notificações e Perfil.
 - **Visual**: tema escuro único (azul-noite e lavanda), Fraunces nos títulos e números, Nunito no texto; menu de cinco abas (Início, Comida, Registro, Análise, Mais).
 - **Análises**: gráfico de barras de sono diário, tendência de qualidade, heatmap de horários de soneca, correlação ambiente × sono, dívida de sono e radar de regressão.
 - **IA (OpenAI `gpt-4o-mini`)**: chat com consultora de sono com streaming, insights (avaliação do dia, padrões, tendências, recomendações) e análise de regressão do sono. **Cota diária de 50 chamadas por usuário** (dia de `America/Sao_Paulo`), somando chat e regressão; a sugestão de soneca é determinística e não consome cota. O chat aceita no máximo 20 mensagens de até 2000 caracteres (o cliente corta o histórico); ao estourar a cota a API responde 429 e o app mostra "Limite diário de uso da IA atingido…".
@@ -296,9 +296,9 @@ Componente ──(TanStack Query / fetch)──▶ Route Handler /api/* ──�
 | --- | --- |
 | `owner` | tudo, incluindo convidar, mudar papéis e remover membros |
 | `caregiver` | registrar sono/alimentação e recados |
-| `viewer` | apenas visualizar |
+| `viewer` | apenas visualizar ("Só visualizar": as telas mostram os dados sem botões de escrita; o RLS é a barreira real) |
 
-`ui_mode = 'nanny'` (Modo babá) limita a navegação a `/app` e `/more`, onde só aparece o Perfil (`NannyRouteGuard` + `getNavLinks`).
+`ui_mode = 'nanny'` (Modo babá) limita a navegação a `/app`, `/feeding` e `/more`, onde aparecem Notificações e Perfil (`NannyRouteGuard` + `nannyAccess.ts` + `getNavLinks`). Outras rotas, como `/history`, `/analytics` e `/more/family`, voltam para `/app`.
 
 ## Rotas da API
 

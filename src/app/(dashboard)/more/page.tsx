@@ -30,6 +30,13 @@ interface MoreGroup {
   items: MoreItem[];
 }
 
+const NOTIFICATIONS_ITEM: MoreItem = {
+  href: "/more/notifications",
+  title: "Notificações",
+  subtitle: "Alertas de soneca e e-mail semanal",
+  icon: IconBell,
+};
+
 const PROFILE_ITEM: MoreItem = {
   href: "/more/profile",
   title: "Perfil e preferências",
@@ -77,12 +84,7 @@ function buildGroups(activeName: string | null, babyNames: string[]): MoreGroup[
     {
       title: "Conta",
       items: [
-        {
-          href: "/more/notifications",
-          title: "Notificações",
-          subtitle: "Alertas de soneca e e-mail semanal",
-          icon: IconBell,
-        },
+        NOTIFICATIONS_ITEM,
         {
           href: "/more/reports",
           title: "Relatórios e exportar",
@@ -95,8 +97,8 @@ function buildGroups(activeName: string | null, babyNames: string[]): MoreGroup[
   ];
 }
 
-/** The nanny only sees her own profile (spec §8.2). */
-const NANNY_GROUPS: MoreGroup[] = [{ title: "Conta", items: [PROFILE_ITEM] }];
+/** The nanny sees her notifications and her own profile (fase 2, decisão 1). */
+const NANNY_GROUPS: MoreGroup[] = [{ title: "Conta", items: [NOTIFICATIONS_ITEM, PROFILE_ITEM] }];
 
 /** Loading shape: three group headings over cards of 2, 2 and 3 rows. */
 function MoreSkeleton() {

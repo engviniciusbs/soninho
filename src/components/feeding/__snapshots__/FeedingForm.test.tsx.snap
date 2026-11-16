@@ -21,7 +21,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -38,7 +38,7 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -52,11 +52,11 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Editar registro
+          Editar alimentação
         </h2>
       </div>
       <form
@@ -183,24 +183,27 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
               >
                 Leite materno
               </span>
-              <svg
+              <span
                 aria-hidden="true"
-                class="lucide lucide-chevron-down pointer-events-none size-4 text-muted-foreground"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                class="pointer-events-none flex text-sn-mu"
               >
-                <path
-                  d="m6 9 6 6 6-6"
-                />
-                ▼
-              </svg>
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  focusable="false"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="m5 9 7 7 7-7"
+                  />
+                </svg>
+              </span>
             </button>
             <input
               aria-hidden="true"
@@ -255,29 +258,25 @@ exports[`FeedingForm > edit_prefills_all_fields BOTTLE > edit BOTTLE 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span
@@ -320,7 +319,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -337,7 +336,7 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -351,11 +350,11 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Editar registro
+          Editar alimentação
         </h2>
       </div>
       <form
@@ -561,29 +560,25 @@ exports[`FeedingForm > edit_prefills_all_fields BREAST > edit BREAST 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span
@@ -626,7 +621,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -643,7 +638,7 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -657,11 +652,11 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
-          Editar registro
+          Editar alimentação
         </h2>
       </div>
       <form
@@ -970,24 +965,27 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
             >
               Gostou
             </span>
-            <svg
+            <span
               aria-hidden="true"
-              class="lucide lucide-chevron-down pointer-events-none size-4 text-muted-foreground"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              class="pointer-events-none flex text-sn-mu"
             >
-              <path
-                d="m6 9 6 6 6-6"
-              />
-              ▼
-            </svg>
+              <svg
+                aria-hidden="true"
+                fill="none"
+                focusable="false"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+                width="16"
+              >
+                <path
+                  d="m5 9 7 7 7-7"
+                />
+              </svg>
+            </span>
           </button>
           <input
             aria-hidden="true"
@@ -1041,29 +1039,25 @@ exports[`FeedingForm > edit_prefills_all_fields SOLID > edit SOLID 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span
@@ -1106,7 +1100,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -1123,7 +1117,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -1137,7 +1131,7 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -1265,24 +1259,27 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
               >
                 Fórmula
               </span>
-              <svg
+              <span
                 aria-hidden="true"
-                class="lucide lucide-chevron-down pointer-events-none size-4 text-muted-foreground"
-                fill="none"
-                height="24"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-                width="24"
-                xmlns="http://www.w3.org/2000/svg"
+                class="pointer-events-none flex text-sn-mu"
               >
-                <path
-                  d="m6 9 6 6 6-6"
-                />
-                ▼
-              </svg>
+                <svg
+                  aria-hidden="true"
+                  fill="none"
+                  focusable="false"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.8"
+                  viewBox="0 0 24 24"
+                  width="16"
+                >
+                  <path
+                    d="m5 9 7 7 7-7"
+                  />
+                </svg>
+              </span>
             </button>
             <input
               aria-hidden="true"
@@ -1337,29 +1334,25 @@ exports[`FeedingForm > renders_create_BOTTLE > create BOTTLE 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span
@@ -1402,7 +1395,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -1419,7 +1412,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -1433,7 +1426,7 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -1640,29 +1633,25 @@ exports[`FeedingForm > renders_create_BREAST > create BREAST 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span
@@ -1705,7 +1694,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
     />
     <div
       aria-hidden="true"
-      class="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
+      class="fixed inset-0 isolate z-50 bg-sn-bg/70 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0"
       data-base-ui-inert=""
       data-open=""
       data-slot="dialog-overlay"
@@ -1722,7 +1711,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
     />
     <div
       aria-labelledby="base-ui-id3"
-      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 text-sm text-popover-foreground ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0"
+      class="fixed top-1/2 left-1/2 z-50 grid w-full -translate-x-1/2 -translate-y-1/2 gap-4 rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] font-sans text-sm text-sn-tx duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 max-h-[90dvh] max-w-md overflow-y-auto"
       data-base-ui-focusable=""
       data-open=""
       data-slot="dialog-content"
@@ -1736,7 +1725,7 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
         data-slot="dialog-header"
       >
         <h2
-          class="font-display text-[22px] leading-tight font-bold text-sn-tx"
+          class="pr-10 font-display text-[22px] leading-tight font-bold text-sn-tx"
           data-slot="dialog-title"
           id="base-ui-id3"
         >
@@ -1986,24 +1975,27 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
             >
               Reação do bebê (opcional)
             </span>
-            <svg
+            <span
               aria-hidden="true"
-              class="lucide lucide-chevron-down pointer-events-none size-4 text-muted-foreground"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
+              class="pointer-events-none flex text-sn-mu"
             >
-              <path
-                d="m6 9 6 6 6-6"
-              />
-              ▼
-            </svg>
+              <svg
+                aria-hidden="true"
+                fill="none"
+                focusable="false"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+                viewBox="0 0 24 24"
+                width="16"
+              >
+                <path
+                  d="m5 9 7 7 7-7"
+                />
+              </svg>
+            </span>
           </button>
           <input
             aria-hidden="true"
@@ -2057,29 +2049,25 @@ exports[`FeedingForm > renders_create_SOLID > create SOLID 1`] = `
         </div>
       </form>
       <button
-        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-pr font-bold hover:bg-sn-pr/10 aria-expanded:bg-sn-pr/10 aria-pressed:bg-sn-pr/15 size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2 right-2"
+        class="group/button inline-flex shrink-0 cursor-pointer items-center justify-center gap-2.5 rounded-full border border-transparent bg-clip-padding font-sans whitespace-nowrap no-underline outline-none select-none transition-[transform,opacity] duration-(--sn-dur-micro) ease-sn-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sn-pr active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-55 data-disabled:pointer-events-none data-disabled:opacity-55 aria-busy:cursor-progress aria-invalid:border-sn-danger aria-invalid:text-sn-danger [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-transparent text-sn-tx font-bold hover:bg-sn-s2 aria-expanded:bg-sn-s2 aria-pressed:bg-sn-s2 aria-pressed:text-sn-pr size-9 p-0 after:absolute after:-inset-1 [&_svg:not([class*='size-'])]:size-4 absolute top-2.5 right-2.5"
         data-slot="dialog-close"
         tabindex="0"
         type="button"
       >
         <svg
           aria-hidden="true"
-          class="lucide lucide-x"
           fill="none"
+          focusable="false"
           height="24"
           stroke="currentColor"
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.8"
           viewBox="0 0 24 24"
           width="24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M18 6 6 18"
-          />
-          <path
-            d="m6 6 12 12"
+            d="M6.5 6.5 17.5 17.5M17.5 6.5 6.5 17.5"
           />
         </svg>
         <span

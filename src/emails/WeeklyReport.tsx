@@ -16,6 +16,13 @@ import {
   Text,
 } from "@react-email/components";
 import { emailTheme, fontLink } from "@/emails/theme";
+import { formatDuration } from "@/lib/utils";
+import { formatDecimal } from "@/lib/format/number";
+
+/** A count per day with a pt-BR comma, at most one decimal ("2,5", "2"). */
+const dec = (n: number) => formatDecimal(n);
+/** Hours (possibly fractional) as a duration: 13.5 → "13h 30min". */
+const hours = (h: number) => formatDuration(h * 60);
 
 export interface WeeklyReportBabyStats {
   name: string;
@@ -23,7 +30,8 @@ export interface WeeklyReportBabyStats {
   ageLabel: string;
   avgTotalHours: number;
   targetTotalHours: number;
-  avgNapHours: number;
+  /** Average length of one nap, in minutes. */
+  avgNapMinutes: number;
   napCountAvg: number;
   longestNightHours: number;
   adherencePct: number;
@@ -279,6 +287,8 @@ function StatCell({
 }
 
 function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
+  // No sleep logged in the period: dashes, never a "0 min" or "0%" that looks measured.
+  const hasSleep = baby.avgTotalHours > 0;
   return (
     <Section style={babyCard}>
       <div style={babyHeader}>
@@ -294,33 +304,32 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
           <div style={progressFill(baby.adherencePct)} />
         </div>
         <Text style={progressMeta}>
-          {baby.adherencePct}% · meta {baby.targetTotalHours}h/dia · média{" "}
-          {baby.avgTotalHours.toFixed(1)}h
+          {hasSleep
+            ? `${baby.adherencePct}% da meta de ${hours(baby.targetTotalHours)} por dia, média de ${hours(baby.avgTotalHours)}`
+            : `Sem sono registrado no período. Meta de ${hours(baby.targetTotalHours)} por dia.`}
         </Text>
       </Section>
 
       <Row>
         <StatCell
           label="Sono total"
-          value={baby.avgTotalHours.toFixed(1)}
-          unit="h/dia"
+          value={hasSleep ? hours(baby.avgTotalHours) : "–"}
+          unit={hasSleep ? "por dia" : undefined}
         />
         <StatCell
           label="Sonecas"
-          value={baby.napCountAvg.toFixed(1)}
-          unit="/ dia"
+          value={hasSleep ? dec(baby.napCountAvg) : "–"}
+          unit={hasSleep ? "/ dia" : undefined}
         />
       </Row>
       <Row>
         <StatCell
           label="Média soneca"
-          value={baby.avgNapHours.toFixed(1)}
-          unit="h"
+          value={baby.avgNapMinutes > 0 ? formatDuration(baby.avgNapMinutes) : "–"}
         />
         <StatCell
-          label="Trecho noturno"
-          value={baby.longestNightHours.toFixed(1)}
-          unit="h máx."
+          label="Maior trecho noturno"
+          value={baby.longestNightHours > 0 ? hours(baby.longestNightHours) : "–"}
         />
       </Row>
 
@@ -341,14 +350,14 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
             {baby.feeding.avgBottlesPerDay > 0 ? (
               <StatCell
                 label="Mamadeiras"
-                value={baby.feeding.avgBottlesPerDay.toFixed(1)}
-                unit={`· ${Math.round(baby.feeding.avgBottleVolumeMlPerDay)}ml`}
+                value={dec(baby.feeding.avgBottlesPerDay)}
+                unit={`/ dia, ${Math.round(baby.feeding.avgBottleVolumeMlPerDay)} ml`}
               />
             ) : null}
             {baby.feeding.avgBreastfeedsPerDay > 0 ? (
               <StatCell
                 label="Mamadas no peito"
-                value={baby.feeding.avgBreastfeedsPerDay.toFixed(1)}
+                value={dec(baby.feeding.avgBreastfeedsPerDay)}
                 unit="/ dia"
               />
             ) : null}
@@ -357,7 +366,7 @@ function BabySection({ baby }: { baby: WeeklyReportBabyStats }) {
             <Row>
               <StatCell
                 label="Refeições de sólidos"
-                value={baby.feeding.avgSolidMealsPerDay.toFixed(1)}
+                value={dec(baby.feeding.avgSolidMealsPerDay)}
                 unit="/ dia"
               />
             </Row>
@@ -444,8 +453,8 @@ export default function WeeklyReport({
             {footerNote ? null : (
               <>
                 <br />
-                Para desativar o resumo semanal automático, acesse Configurações
-                → Notificações.
+                Para desativar o resumo semanal automático, acesse Mais →
+                Notificações.
               </>
             )}
           </Text>

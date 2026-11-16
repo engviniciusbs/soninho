@@ -3,6 +3,7 @@ import { IconMinus, IconPlus } from "@/components/brand/icons";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { cn } from "@/lib/utils";
+import { formatDecimal } from "@/lib/format/number";
 import { FIELD_LABEL } from "./options";
 
 /** Colour of the reading, from the tokens; the number itself carries the meaning. */
@@ -34,7 +35,6 @@ export function TempStepper({
           variant="secondary"
           size="icon"
           aria-label="Diminuir temperatura"
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(Math.max(10, temp - 0.5)); }}
           onClick={() => onChange(Math.max(10, temp - 0.5))}
         >
           <IconMinus size={20} />
@@ -46,7 +46,7 @@ export function TempStepper({
             aria-live="polite"
             aria-atomic="true"
           >
-            {value === null ? "—" : temp.toFixed(1)}
+            {value === null ? "—" : formatDecimal(temp, 1, { fixed: true })}
           </span>
           <span className="font-sans text-base font-bold text-sn-mu">°C</span>
         </div>
@@ -55,7 +55,6 @@ export function TempStepper({
           variant="secondary"
           size="icon"
           aria-label="Aumentar temperatura"
-          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(Math.min(40, temp + 0.5)); }}
           onClick={() => onChange(Math.min(40, temp + 0.5))}
         >
           <IconPlus size={20} />
@@ -70,7 +69,6 @@ export function TempStepper({
             aria-label={`Definir temperatura como ${t}°C`}
             selected={value === t}
             onClick={() => onChange(t)}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(t); }}
           >
             {t}°
           </Chip>
@@ -81,7 +79,6 @@ export function TempStepper({
             size="xs"
             aria-label="Limpar temperatura"
             onClick={() => onChange(null)}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onChange(null); }}
           >
             Limpar
           </Button>

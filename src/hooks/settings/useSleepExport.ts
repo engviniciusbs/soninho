@@ -22,6 +22,33 @@ function sessionsToCsv(sessions: SleepSession[]): string {
   return toCsv([CSV_HEADERS, ...rows]);
 }
 
+/** PostgREST caps every answer at 1000 rows; pages are fetched with `.range()`. */
+const PAGE_SIZE = 1000;
+
+/**
+ * Every sleep session of the baby, newest first. Throws on any page error.
+ * Reads until an empty page: a server with a lower `max_rows` answers pages
+ * shorter than asked that are not the end, so a short page never stops it.
+ */
+async function fetchAllSessions(babyId: string): Promise<SleepSession[]> {
+  const supabase = createClient();
+  const all: SleepSession[] = [];
+  for (let from = 0; ; from = all.length) {
+    const { data, error } = await supabase
+      .from("sleep_sessions")
+      .select("*")
+      .eq("baby_id", babyId)
+      .order("start_time", { ascending: false })
+      // id breaks start_time ties so no row repeats or goes missing across pages
+      .order("id", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    const page = (data ?? []) as SleepSession[];
+    if (page.length === 0) return all;
+    all.push(...page);
+  }
+}
+
 /**
  * CSV export of the active baby's sleep sessions. Page-level so the in-flight
  * flag survives switching tabs mid-request.
@@ -35,19 +62,13 @@ export function useSleepExport() {
     setExporting(true);
 
     try {
-      const { data } = (await createClient()
-        .from("sleep_sessions")
-        .select("*")
-        .eq("baby_id", activeBaby.id)
-        .order("start_time", { ascending: false })) as { data: SleepSession[] | null };
-
-      if (!data || data.length === 0) {
+      const sessions = await fetchAllSessions(activeBaby.id);
+      if (sessions.length === 0) {
         toast.info("Nenhum registro para exportar");
-        setExporting(false);
         return;
       }
 
-      const blob = new Blob([sessionsToCsv(data)], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([sessionsToCsv(sessions)], { type: "text/csv;charset=utf-8;" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -57,10 +78,10 @@ export function useSleepExport() {
 
       toast.success("Dados exportados com sucesso");
     } catch {
-      toast.error("Erro ao exportar dados");
+      toast.error("Não foi possível exportar");
+    } finally {
+      setExporting(false);
     }
-
-    setExporting(false);
   }
 
   return { exporting, exportCsv, canExport: !!activeBaby };

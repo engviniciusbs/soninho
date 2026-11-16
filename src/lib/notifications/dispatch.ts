@@ -11,6 +11,7 @@ import {
   type SelectAlertsInput,
 } from "@/lib/notifications/selectAlerts";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { SleepType } from "@/types";
 
 /** Completed sessions older than this are not considered (wake windows max out at 4h). */
 const LAST_SESSION_LOOKBACK_MS = 24 * 60 * 60 * 1000;
@@ -68,7 +69,7 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
   // 3. Babies of those families.
   const babies = await selectIn<SelectAlertsInput["babies"][number]>(
     uniq(members.map((m) => m.family_id)),
-    (ids) => supabase.from("babies").select("id, family_id, birth_date, name").in("family_id", ids)
+    (ids) => supabase.from("babies").select("id, family_id, birth_date, name, sex").in("family_id", ids)
   );
   if (babies.length === 0) return 0;
   const babyIds = babies.map((b) => b.id);
@@ -76,10 +77,16 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
 
   // 4–6. Recent completed sessions, open sessions and recipients' subscriptions, in parallel.
   const [ended, open, subs] = await Promise.all([
-    selectIn<{ id: string; baby_id: string; end_time: string }>(babyIds, (ids) =>
+    selectIn<{
+      id: string;
+      baby_id: string;
+      type: SleepType;
+      start_time: string;
+      end_time: string;
+    }>(babyIds, (ids) =>
       supabase
         .from("sleep_sessions")
-        .select("id, baby_id, end_time")
+        .select("id, baby_id, type, start_time, end_time")
         .in("baby_id", ids)
         .not("end_time", "is", null)
         .gte("end_time", since)
@@ -100,11 +107,13 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
   ]);
 
   const lastEnded: SelectAlertsInput["lastEnded"] = {};
+  const recentSessions: NonNullable<SelectAlertsInput["recentSessions"]> = {};
   for (const s of ended) {
     const current = lastEnded[s.baby_id];
     if (!current || Date.parse(s.end_time) > Date.parse(current.endTime)) {
-      lastEnded[s.baby_id] = { sessionId: s.id, endTime: s.end_time };
+      lastEnded[s.baby_id] = { sessionId: s.id, endTime: s.end_time, type: s.type };
     }
+    (recentSessions[s.baby_id] ??= []).push(s);
   }
 
   const subsByUser = new Map<string, PushSubscriptionRow[]>();
@@ -121,6 +130,7 @@ export async function dispatchNotifications(now: Date = new Date()): Promise<num
     members,
     babies,
     lastEnded,
+    recentSessions,
     activeBabyIds: new Set(open.map((s) => s.baby_id)),
   }).filter((a) => subsByUser.has(a.userId));
   if (alerts.length === 0) return 0;

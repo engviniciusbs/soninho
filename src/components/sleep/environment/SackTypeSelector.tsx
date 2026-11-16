@@ -23,7 +23,6 @@ export function SackTypeSelector({
               aria-pressed={isActive}
               aria-label={`${SACK_LABELS[sv]}${tog ? ` (TOG ${tog})` : ""}`}
               onClick={() => onSelect(sv)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onSelect(sv); }}
               className={cn(TILE, "px-1", isActive ? TILE_ON : TILE_OFF)}
             >
               <span className="text-[13px] leading-tight font-bold">{shortLabel}</span>

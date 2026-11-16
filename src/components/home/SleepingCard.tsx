@@ -17,6 +17,10 @@ import { IconPen, IconStop } from "@/components/brand/icons";
 import { EnvironmentPicker, type EnvironmentData } from "@/components/sleep/EnvironmentPicker";
 import { SleepNotes } from "@/components/sleep/timer/SleepNotes";
 import { elapsedToSeconds } from "./format";
+import { formatDecimal } from "@/lib/format/number";
+
+const tempText = (t: number) => `${formatDecimal(t)}°C`;
+const togText = (t: number) => `TOG ${formatDecimal(t, 1, { fixed: true })}`;
 
 export interface SleepingCardProps {
   sleepType: "NAP" | "NIGHT_SLEEP";
@@ -35,12 +39,14 @@ export interface SleepingCardProps {
   onNotesOpen: () => void;
   onNotesDone: () => void;
   onStop: () => Promise<void>;
+  /** A viewer: the sleep is shown, but not stopped, noted or edited. */
+  readOnly?: boolean;
 }
 
 /** Running sleep (mockup "Dormindo"): ring with the time, environment chips, "Acordou". */
 export function SleepingCard({
   sleepType, elapsed, since, environment, onEnvironmentChange, onEnvironmentOpen, onEnvironmentDone,
-  notes, onNotesChange, onNotesOpen, onNotesDone, onStop,
+  notes, onNotesChange, onNotesOpen, onNotesDone, onStop, readOnly = false,
 }: SleepingCardProps) {
   const [envOpen, setEnvOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -98,22 +104,34 @@ export function SleepingCard({
         )}
       </Ring>
 
-      <div className="mb-3.5 flex flex-wrap justify-center gap-2">
-        <Chip onClick={openEnv}>
-          {temp !== null ? `${temp}°C` : "Temperatura"}
-        </Chip>
-        <Chip onClick={openEnv}>{tog !== null ? `TOG ${tog.toFixed(1)}` : "TOG"}</Chip>
-        <Chip onClick={openEnv}>Ambiente</Chip>
-      </div>
+      {readOnly ? (
+        // Only what was recorded; nothing to tap.
+        (temp !== null || tog !== null) && (
+          <div className="mb-3.5 flex flex-wrap justify-center gap-2">
+            {temp !== null && <Chip>{tempText(temp)}</Chip>}
+            {tog !== null && <Chip>{togText(tog)}</Chip>}
+          </div>
+        )
+      ) : (
+        <>
+          <div className="mb-3.5 flex flex-wrap justify-center gap-2">
+            <Chip onClick={openEnv}>
+              {temp !== null ? tempText(temp) : "Temperatura"}
+            </Chip>
+            <Chip onClick={openEnv}>{tog !== null ? togText(tog) : "TOG"}</Chip>
+            <Chip onClick={openEnv}>Ambiente</Chip>
+          </div>
 
-      <Button variant="secondary" className="w-full" onClick={stop} loading={stopping}>
-        {!stopping && <IconStop size={20} />}
-        Acordou
-      </Button>
-      <Button variant="ghost" className="mt-2" onClick={openNotes}>
-        <IconPen size={18} />
-        Anotar algo
-      </Button>
+          <Button variant="secondary" className="w-full" onClick={stop} loading={stopping}>
+            {!stopping && <IconStop size={20} />}
+            Acordou
+          </Button>
+          <Button variant="ghost" className="mt-2" onClick={openNotes}>
+            <IconPen size={18} />
+            Anotar algo
+          </Button>
+        </>
+      )}
 
       <Sheet open={envOpen} onOpenChange={closeEnv}>
         <SheetContent side="bottom" className="mx-auto max-w-[480px] overflow-y-auto">

@@ -45,12 +45,24 @@ describe("SleepBarChart", () => {
     expect(ticks).not.toContain("16/11");
   });
 
+  it("y_axis_ticks_are_whole_hours", async () => {
+    const small = [
+      { date: "14/11", napHours: 0.5, nightHours: 1 },
+      { date: "15/11", napHours: 0.4, nightHours: 0.8 },
+    ];
+    const { container } = render(<SleepBarChart data={small} recommendedHours={2} />);
+    const sel = 'text.recharts-cartesian-axis-tick-value[orientation="left"]';
+    await waitFor(() => expect(container.querySelector(sel)).not.toBeNull());
+    const ticks = [...container.querySelectorAll(sel)].map((t) => t.textContent);
+    expect(ticks.every((t) => /^\d+h$/.test(t ?? ""))).toBe(true);
+  });
+
   it("hides_the_svg_from_assistive_tech_without_focusable_content_and_offers_a_table", async () => {
     const { container } = render(<SleepBarChart data={bars} recommendedHours={14} />);
     await expectNoFocusableInsideHidden(container);
     const table = screen.getByRole("table", { name: "Sono por dia" });
     const rows = within(table).getAllByRole("row").map((r) => r.textContent);
-    expect(rows).toEqual(["DiaNoiteSonecas", "14/1110,9h2,5h", "15/1111h2h", "hoje6h0h"]);
+    expect(rows).toEqual(["DiaNoiteSonecas", "14/1110h 54min2h 30min", "15/1111h2h", "hoje6h0 min"]);
   });
 });
 
@@ -66,7 +78,7 @@ describe("SleepQualityTrend", () => {
     await expectNoFocusableInsideHidden(container);
     const table = screen.getByRole("table", { name: "Duração média das sonecas" });
     const rows = within(table).getAllByRole("row").map((r) => r.textContent);
-    expect(rows).toEqual(["DiaValor", "14/1148min", "15/11sem dado", "hoje40min"]);
+    expect(rows).toEqual(["DiaValor", "14/1148 min", "15/11sem dado", "hoje40 min"]);
   });
 
   it("names_the_table_by_the_visible_title_and_the_measure", () => {

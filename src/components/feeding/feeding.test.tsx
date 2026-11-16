@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { act, cleanup, fireEvent, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { useState } from "react";
 import { renderWithProviders } from "@/test/render";
 import type { Baby, FeedingSuggestion, FeedingTimelineItem } from "@/types";
@@ -10,12 +10,14 @@ import { BreastfeedingTimer } from "./BreastfeedingTimer";
 import { FeedingTimeline } from "./FeedingTimeline";
 import FeedingPage from "@/app/(dashboard)/feeding/page";
 import { useFeedingStore } from "@/store/feedingStore";
+import { toast } from "sonner";
 
 const holder = vi.hoisted(() => ({
   feedings: [] as unknown[],
   suggestion: undefined as unknown,
   suggestionLoading: false,
   search: "",
+  canWrite: true,
   breast: {
     isRunning: true,
     initialSide: "LEFT" as "LEFT" | "RIGHT",
@@ -33,6 +35,9 @@ vi.mock("@/lib/supabase/feedingQueries", () => ({
   deleteBottleFeeding: vi.fn(async () => ({ error: null })),
   deleteBreastfeedingSession: vi.fn(async () => ({ error: null })),
   deleteSolidFeeding: vi.fn(async () => ({ error: null })),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("@/lib/family/recordFeedingActivity", () => ({ recordFeedingActivity: vi.fn() }));
 vi.mock("@/hooks/useFeedingSuggestion", () => ({
@@ -99,6 +104,7 @@ beforeEach(() => {
   holder.suggestion = undefined;
   holder.suggestionLoading = false;
   holder.search = "";
+  holder.canWrite = true;
   holder.breast.isRunning = true;
   holder.breast.initialSide = "LEFT";
   window.history.replaceState(null, "", "/feeding");
@@ -139,6 +145,41 @@ describe("BottleQuickLog", () => {
       volume_ml: 130,
       milk_type: "BREAST_MILK",
     });
+  });
+});
+
+describe("BottleQuickLog without a baby", () => {
+  it("points to Mais › Bebês with a link, never to Configurações", async () => {
+    renderWithProviders(<BottleQuickLog />, {
+      baby: { activeBaby: null, babies: [] },
+      profile: { isNannyMode: false },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Registrar mamadeira" }));
+    });
+    expect(logBottleFeeding).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    const [message, opts] = vi.mocked(toast.error).mock.calls[0];
+    expect(message).toBe("Adicione um bebê em Mais › Bebês");
+    cleanup();
+    render(<>{(opts as { action?: React.ReactNode })?.action}</>);
+    expect(screen.getByRole("link", { name: "Abrir Bebês" })).toHaveAttribute("href", "/more/babies");
+  });
+
+  it("nanny mode: asks the family admin, with no link to Bebês (she cannot open it)", async () => {
+    renderWithProviders(<BottleQuickLog />, {
+      baby: { activeBaby: null, babies: [] },
+      profile: { isNannyMode: true },
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Registrar mamadeira" }));
+    });
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    const [message, opts] = vi.mocked(toast.error).mock.calls[0];
+    expect(message).toBe(
+      "Ainda não há bebê na família. Peça a quem administra a família para adicionar o bebê."
+    );
+    expect((opts as { action?: unknown } | undefined)?.action).toBeUndefined();
   });
 });
 
@@ -202,6 +243,16 @@ describe("FeedingTimeline running feeding", () => {
     expect(row).toHaveAttribute("href", "/feeding?tipo=peito");
     fireEvent.click(row);
     expect(onEdit).not.toHaveBeenCalled();
+    expect(within(today).queryByRole("button")).toBeNull();
+  });
+
+  it("a_viewer_sees_the_running_breastfeed_as_plain_text_no_link", async () => {
+    const running = { ...breast("f-run", "2026-01-01T11:50:00.000Z", 120, 0), endTime: null } as FeedingTimelineItem;
+    holder.feedings = [running];
+    mount(<FeedingTimeline readOnly />);
+    const today = await screen.findByRole("region", { name: "Hoje" });
+    expect(within(today).getByText("Em andamento")).toBeInTheDocument();
+    expect(within(today).queryByRole("link")).toBeNull();
     expect(within(today).queryByRole("button")).toBeNull();
   });
 });
@@ -284,12 +335,36 @@ describe("FeedingPage", () => {
     const today = await screen.findByRole("region", { name: "Hoje" });
     fireEvent.click(within(today).getByRole("button", { name: /Mamadeira.*06:30.*180 ml/ }));
     const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("Editar registro")).toBeInTheDocument();
+    expect(within(dialog).getByText("Editar alimentação")).toBeInTheDocument();
     fireEvent.click(within(dialog).getByRole("button", { name: "Excluir" }));
     expect(deleteBottleFeeding).not.toHaveBeenCalled();
     await act(async () => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Confirmar exclusão" }));
     });
     expect(deleteBottleFeeding).toHaveBeenCalledWith(expect.anything(), "b-1");
+  });
+});
+
+describe("FeedingPage para quem só vê", () => {
+  it("mostra os registros sem Registrar, Iniciar, Editar ou Excluir", async () => {
+    holder.canWrite = false;
+    holder.breast.isRunning = false;
+    holder.feedings = [bottle("b1", "2026-01-01T11:00:00.000Z", 120)];
+    mount(<FeedingPage />);
+    const today = await screen.findByRole("region", { name: "Hoje" });
+
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(within(today).getByText("120 ml no total")).toBeInTheDocument();
+    expect(within(today).queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryByRole("button", { name: /Registrar|Iniciar|Editar|Excluir/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup", { name: "Tipo de alimentação" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/registre uma mamada passada/)).not.toBeInTheDocument();
+  });
+
+  it("quem registra não vê o aviso", async () => {
+    mount(<FeedingPage />);
+    await act(async () => {});
+    expect(screen.queryByText("Você tem acesso só para ver")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Registrar mamada passada/ })).toBeInTheDocument();
   });
 });

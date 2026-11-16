@@ -44,7 +44,7 @@ describe("EnvironmentPicker", () => {
     expect(container).toMatchSnapshot("empty");
 
     rerender(<EnvironmentPicker value={FILLED} onChange={() => {}} />);
-    expect(screen.getByText("17.0")).toBeInTheDocument();
+    expect(screen.getByText("17,0")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Frio" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("group", { name: "TOG do saquinho" })).toBeInTheDocument();
     expect(screen.getByText("Sugestão de roupa")).toBeInTheDocument();
@@ -63,11 +63,13 @@ describe("EnvironmentPicker", () => {
     fireEvent.click(screen.getByRole("button", { name: "Chuvoso" }));
     fireEvent.click(screen.getByRole("button", { name: /^Saquinho soft\/fleece/ }));
     rerender(<EnvironmentPicker value={FILLED} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "TOG 2.5" }));
+    fireEvent.click(screen.getByRole("button", { name: "TOG 2,5" }));
     fireEvent.click(screen.getByRole("button", { name: "Frio" }));
     fireEvent.click(screen.getByRole("button", { name: "Diminuir temperatura" }));
     fireEvent.click(screen.getByRole("button", { name: "Limpar temperatura" }));
-    fireEvent.keyDown(screen.getByRole("button", { name: "TOG 1" }), { key: "Enter" });
+    // Keys reach the tiles as the native button's click (spec #22: no extra
+    // onKeyDown; Enter firing once is covered in environment/keyboard.test.tsx).
+    fireEvent.click(screen.getByRole("button", { name: "TOG 1" }));
     expect(onChange.mock.calls).toMatchSnapshot();
   });
 });

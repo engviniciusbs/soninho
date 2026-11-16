@@ -1,5 +1,6 @@
 -- Seed LOCAL com dados fictícios. Roda no `npx supabase db reset`. Nunca aplicar em produção.
--- Usuários: teste@soninho.local / soninho-local (owner) e baba@soninho.local / soninho-local (babá).
+-- Usuários (senha soninho-local): teste@soninho.local (owner), baba@soninho.local (babá) e
+-- viewer@soninho.local (só visualizar).
 -- Horários em America/Sao_Paulo.
 
 select setseed(0.42);
@@ -8,6 +9,7 @@ do $seed$
 declare
   v_owner uuid := '00000000-0000-4000-8000-000000000001';
   v_nanny uuid := '00000000-0000-4000-8000-000000000002';
+  v_viewer uuid := '00000000-0000-4000-8000-000000000003';
   v_family uuid := '00000000-0000-4000-8000-0000000000f1';
   v_baby uuid := '00000000-0000-4000-8000-0000000000b1';
   v_pw text := crypt('soninho-local', gen_salt('bf'));
@@ -16,7 +18,8 @@ begin
   for u in
     select * from (values
       (v_owner, 'teste@soninho.local'),
-      (v_nanny, 'baba@soninho.local')
+      (v_nanny, 'baba@soninho.local'),
+      (v_viewer, 'viewer@soninho.local')
     ) as t(id, email)
   loop
     insert into auth.users (
@@ -41,11 +44,13 @@ begin
   insert into public.families (id, name, created_by) values (v_family, 'Família da Lua', v_owner);
   insert into public.family_members (family_id, user_id, role, display_name, email) values
     (v_family, v_owner, 'owner', 'Teste', 'teste@soninho.local'),
-    (v_family, v_nanny, 'caregiver', 'Babá', 'baba@soninho.local');
+    (v_family, v_nanny, 'caregiver', 'Babá', 'baba@soninho.local'),
+    (v_family, v_viewer, 'viewer', 'Avó', 'viewer@soninho.local');
 
   insert into public.user_profiles (user_id, display_name, family_relation, ui_mode) values
     (v_owner, 'Teste', 'mãe', 'standard'),
-    (v_nanny, 'Babá', 'babá', 'nanny');
+    (v_nanny, 'Babá', 'babá', 'nanny'),
+    (v_viewer, 'Avó', 'avó', 'standard');
 
   insert into public.babies (id, user_id, family_id, name, birth_date, avatar_emoji)
   values (v_baby, v_owner, v_family, 'Lua', (current_date - interval '9 months')::date, '🌙');

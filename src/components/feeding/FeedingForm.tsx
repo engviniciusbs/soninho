@@ -84,8 +84,15 @@ const MILK_TYPE_ITEMS: Record<MilkType, string> = {
   MIXED: "Misto",
 };
 
+/** The select's "no reaction" item: picking it clears the field (saved as null), as in SleepForm. */
+const REACTION_NONE = "none";
+const REACTION_NONE_LABEL = "Não informar";
+
 /** Labels the closed select shows for each reaction value. */
-const REACTION_ITEMS = Object.fromEntries(REACTION_OPTIONS.map((o) => [o.value, o.label]));
+const REACTION_ITEMS = {
+  [REACTION_NONE]: REACTION_NONE_LABEL,
+  ...Object.fromEntries(REACTION_OPTIONS.map((o) => [o.value, o.label])),
+};
 
 const formSchema = z.object({
   start_date: z.string().min(1),
@@ -146,11 +153,9 @@ const FIELD = "h-11 rounded-xl border-sn-mu/70 px-3";
 export function FeedingForm({ open, onClose, item, onDelete }: FeedingFormProps) {
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto rounded-[24px] border border-sn-bd bg-sn-s1 p-[18px] ring-0">
+      <DialogContent className="max-h-[90dvh] max-w-md overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display text-[22px] leading-tight font-bold text-sn-tx">
-            {item ? "Editar registro" : "Registrar mamada passada"}
-          </DialogTitle>
+          <DialogTitle>{item ? "Editar alimentação" : "Registrar mamada passada"}</DialogTitle>
         </DialogHeader>
 
         {/* The popup's content mounts on every opening, so the form starts
@@ -428,11 +433,16 @@ function FeedingFormBody({ onClose, item, onDelete }: Omit<FeedingFormProps, "op
               Adicionar
             </Button>
           </div>
-          <Select items={REACTION_ITEMS} value={reaction ?? ""} onValueChange={(v) => v && setValue("reaction", v)}>
+          <Select
+            items={REACTION_ITEMS}
+            value={reaction ?? ""}
+            onValueChange={(v) => setValue("reaction", !v || v === REACTION_NONE ? "" : v)}
+          >
             <SelectTrigger className="w-full rounded-xl data-[size=default]:h-11" aria-label="Reação do bebê">
               <SelectValue placeholder="Reação do bebê (opcional)" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={REACTION_NONE}>{REACTION_NONE_LABEL}</SelectItem>
               {REACTION_OPTIONS.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>
                   {opt.label}

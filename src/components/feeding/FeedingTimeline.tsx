@@ -64,16 +64,20 @@ export function useDeleteFeeding() {
 
 interface FeedingTimelineProps {
   onEdit?: (item: FeedingTimelineItem) => void;
+  /** A viewer: the empty day does not invite to record. */
+  readOnly?: boolean;
 }
 
 function Rows({
   items,
   onEdit,
   when,
+  readOnly,
 }: {
   items: FeedingTimelineItem[];
   onEdit?: (item: FeedingTimelineItem) => void;
   when: (iso: string) => string;
+  readOnly: boolean;
 }) {
   return (
     <ul className="-my-1">
@@ -81,16 +85,17 @@ function Rows({
         const { label, subtitle, value, running } = describe(item, when(item.startTime));
         return (
           <li key={`${item.type}-${item.id}`}>
-            {running ? (
+            {running && !readOnly ? (
               // A feeding still running is not edited here (saving would end
               // it): the row reads "Em andamento" and opens the Peito timer.
+              // A viewer has no timer to open: the row stays plain.
               <ListRow title={label} subtitle={subtitle} value={value} href="/feeding?tipo=peito" />
             ) : (
               <ListRow
                 title={label}
                 subtitle={subtitle}
                 value={value}
-                onClick={onEdit ? () => onEdit(item) : undefined}
+                onClick={onEdit && !running ? () => onEdit(item) : undefined}
               />
             )}
           </li>
@@ -105,7 +110,7 @@ function Rows({
  * other days the list already loads follow below. Tapping an entry edits it;
  * a feeding at the breast still running links to the Peito timer instead.
  */
-export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
+export function FeedingTimeline({ onEdit, readOnly = false }: FeedingTimelineProps = {}) {
   const todayId = useId();
   const earlierId = useId();
   const { data: items = [], isLoading } = useFeedingTimeline(3);
@@ -136,10 +141,12 @@ export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
         </div>
         {today.length === 0 ? (
           <p className="py-2 font-sans text-[15px] font-semibold text-sn-mu">
-            Nada registrado hoje. Use o registro acima, ou registre uma mamada passada.
+            {readOnly
+              ? "Nada registrado hoje."
+              : "Nada registrado hoje. Use o registro acima, ou registre uma mamada passada."}
           </p>
         ) : (
-          <Rows items={today} onEdit={onEdit} when={(iso) => format(new Date(iso), "HH:mm")} />
+          <Rows items={today} onEdit={onEdit} readOnly={readOnly} when={(iso) => format(new Date(iso), "HH:mm")} />
         )}
       </Card>
 
@@ -153,6 +160,7 @@ export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
           <Rows
             items={earlier}
             onEdit={onEdit}
+            readOnly={readOnly}
             when={(iso) => {
               const d = new Date(iso);
               return `${isSameDay(d, subDays(now, 1)) ? "Ontem" : format(d, "dd/MM")}, ${format(d, "HH:mm")}`;

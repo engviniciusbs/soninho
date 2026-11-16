@@ -15,7 +15,7 @@ self.addEventListener("push", (event) => {
     };
   }
 
-  const { title = "Soninho", body, icon = "/icon.svg", badge, tag, url = "/" } = payload;
+  const { type, title = "Soninho", body, icon = "/icon.svg", badge, tag, url = "/" } = payload;
 
   event.waitUntil(
     self.registration.showNotification(title, {
@@ -24,7 +24,8 @@ self.addEventListener("push", (event) => {
       badge: badge || icon,
       tag: tag || "soninho-default",
       data: { url },
-      requireInteraction: true,
+      // Only an overdue nap needs to stay on screen; the rest close by themselves.
+      requireInteraction: type === "OVERDUE",
       vibrate: [200, 100, 200],
     })
   );
@@ -36,11 +37,16 @@ self.addEventListener("notificationclick", (event) => {
   const url = event.notification.data?.url || "/";
 
   event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clientList) => {
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && "focus" in client) {
-          client.navigate(url);
-          return client.focus();
+          try {
+            // navigate() rejects for a window this worker does not control.
+            const navigated = await client.navigate(url);
+            return (navigated || client).focus();
+          } catch {
+            break;
+          }
         }
       }
       return self.clients.openWindow(url);

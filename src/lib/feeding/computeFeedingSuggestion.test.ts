@@ -46,6 +46,18 @@ describe("computeFeedingSuggestion", () => {
     });
   });
 
+  it("states a fractional interval as a duration (2h 30min), never 2.5h", () => {
+    const r = computeFeedingSuggestion({
+      ageWeeks: 8,
+      recentFeedTimes: ["2026-05-24T18:00:00Z", "2026-05-24T15:30:00Z", "2026-05-24T13:00:00Z"],
+      timezone: tz,
+      now: new Date("2026-05-24T19:00:00Z"),
+    });
+    expect(r.avgIntervalMinutes).toBe(150);
+    expect(r.reasoning).toContain("~2h 30min");
+    expect(r.reasoning).not.toMatch(/\d\.\d/);
+  });
+
   it("gives medium confidence when gaps vary widely", () => {
     // gaps 60 and 240 -> avg 150, stddev 90 > 45
     const result = computeFeedingSuggestion({

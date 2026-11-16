@@ -6,19 +6,40 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toChatPayload, CHAT_MAX_CONTENT } from "@/lib/ai/chatSchema";
 import { IconSend, IconSpark } from "@/components/brand/icons";
+import { g } from "@/lib/i18n/gender";
+import type { BabySex } from "@/types";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-/** Suggested questions: a short button label; the full question is what gets sent. */
-const QUICK_QUESTIONS = [
-  { label: "Por que acorda tão cedo?", question: "Por que minha bebê acorda cedo demais?" },
-  { label: "Horário normal para a idade?", question: "Esse horário de sono é normal para a idade dela?" },
-  { label: "Como prolongar as sonecas?", question: "Como prolongar as sonecas?" },
-  { label: "Que horas dormir hoje?", question: "Qual deve ser o horário de dormir hoje à noite?" },
-];
+/**
+ * Suggested questions: a short button label; the full question is what gets
+ * sent. The question agrees with `babies.sex`, and is neutral when it is null.
+ */
+export function quickQuestions(sex: BabySex | null | undefined) {
+  return [
+    {
+      label: "Por que acorda tão cedo?",
+      question: g(sex, {
+        f: "Por que minha bebê acorda cedo demais?",
+        m: "Por que meu bebê acorda cedo demais?",
+        n: "Por que o sono termina tão cedo de manhã?",
+      }),
+    },
+    {
+      label: "Horário normal para a idade?",
+      question: g(sex, {
+        f: "Esse horário de sono é normal para a idade dela?",
+        m: "Esse horário de sono é normal para a idade dele?",
+        n: "Esse horário de sono é normal para esta idade?",
+      }),
+    },
+    { label: "Como prolongar as sonecas?", question: "Como prolongar as sonecas?" },
+    { label: "Que horas dormir hoje?", question: "Qual deve ser o horário de dormir hoje à noite?" },
+  ];
+}
 
 export function AIChat() {
   const { activeBaby } = useBaby();
@@ -142,7 +163,7 @@ export function AIChat() {
               </p>
             </div>
             <div className="flex w-full flex-col gap-2">
-              {QUICK_QUESTIONS.map(({ label, question }) => (
+              {quickQuestions(activeBaby?.sex).map(({ label, question }) => (
                 <button
                   key={question}
                   type="button"

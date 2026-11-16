@@ -71,7 +71,7 @@ export function UserProfileSettings() {
       <CardHeader>
         <CardTitle>Seu perfil na família</CardTitle>
         <CardDescription className="text-base font-normal">
-          Como você aparece para quem cuida do bebê junto com você, nas notificações e no mural.
+          Como você aparece para quem cuida do bebê junto com você, nas notificações e nos recados.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">

@@ -15,6 +15,9 @@ const requestSchema = z.object({
 /**
  * Next-sleep suggestion (nap vs. night) using wake-window math plus schedule/history.
  * Same {@link getWakeWindowRange} table as WakeWindowBadge — no LLM drift.
+ * The response carries absolute instants (suggestedAtIso, windowStartIso,
+ * windowEndIso): the client derives "em X min" and "atrasado" from its own
+ * clock, so a cached answer never freezes the home.
  */
 export async function POST(request: Request) {
   try {

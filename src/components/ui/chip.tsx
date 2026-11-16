@@ -1,4 +1,4 @@
-import type { KeyboardEventHandler, ReactNode } from "react"
+import type { ReactNode } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -10,7 +10,6 @@ export interface ChipProps {
   className?: string
   /** Accessible name when the visible text is short ("26°" for "Definir temperatura como 26°C"). */
   "aria-label"?: string
-  onKeyDown?: KeyboardEventHandler<HTMLButtonElement>
 }
 
 const BASE =
@@ -27,7 +26,6 @@ export function Chip({
   children,
   className,
   "aria-label": ariaLabel,
-  onKeyDown,
 }: ChipProps) {
   if (!onClick) {
     return (
@@ -44,7 +42,6 @@ export function Chip({
       aria-label={ariaLabel}
       disabled={disabled}
       onClick={onClick}
-      onKeyDown={onKeyDown}
       className={cn(
         BASE,
         LOOK(selected),

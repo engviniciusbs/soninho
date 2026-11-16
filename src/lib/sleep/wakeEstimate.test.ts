@@ -27,13 +27,39 @@ describe("estimateWakeTime", () => {
     expect(formatInTimeZone(r!, TZ, "yyyy-MM-dd HH:mm")).toBe("2026-03-11 06:10");
   });
 
-  it("usa média circular perto da meia-noite", () => {
+  // Antes: afirmava 00:00 como despertar médio. Fins perto da meia-noite são
+  // despertares noturnos, não o fim da noite, e ficam de fora.
+  it("ignora fins de noite fora de 04:00–10:00", () => {
     const r = estimateWakeTime(
       [night("2026-03-07T23:50:00"), night("2026-03-09T00:10:00"), night("2026-03-09T00:00:00")],
       now,
       TZ,
     );
-    expect(formatInTimeZone(r!, TZ, "HH:mm")).toBe("00:00");
+    expect(r).toBeNull();
+  });
+
+  it("um despertar às 02:00 não puxa a média", () => {
+    const r = estimateWakeTime(
+      [
+        night("2026-03-06T02:00:00"),
+        night("2026-03-07T06:00:00"),
+        night("2026-03-08T06:00:00"),
+        night("2026-03-09T06:00:00"),
+        night("2026-03-09T10:30:00"),
+      ],
+      now,
+      TZ,
+    );
+    expect(formatInTimeZone(r!, TZ, "yyyy-MM-dd HH:mm")).toBe("2026-03-11 06:00");
+  });
+
+  it("aceita os limites 04:00 e 10:00", () => {
+    const r = estimateWakeTime(
+      [night("2026-03-07T04:00:00"), night("2026-03-08T10:00:00"), night("2026-03-09T07:00:00")],
+      now,
+      TZ,
+    );
+    expect(formatInTimeZone(r!, TZ, "HH:mm")).toBe("07:00");
   });
 
   it("ignora noites sem fim", () => {

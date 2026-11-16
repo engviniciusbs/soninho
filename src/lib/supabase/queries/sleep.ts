@@ -1,3 +1,4 @@
+import { startOfDay, subDays } from "date-fns";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { clampEndTime } from "../sessionTime";
 
@@ -132,14 +133,19 @@ export async function deleteSleepSession(supabase: Client, sessionId: string) {
   return supabase.from("sleep_sessions").delete().eq("id", sessionId);
 }
 
+/**
+ * Sessions started since local midnight of today − `days` − 1: the oldest
+ * complete day of a `days`-day period is whole, and a night that began the
+ * evening before it comes along.
+ */
 export async function getRecentSessions(
   supabase: Client,
   babyId: string,
   days: number = 7
 ) {
-  const from = new Date();
-  from.setDate(from.getDate() - days);
-  return getSleepSessions(supabase, babyId, from, new Date());
+  const now = new Date();
+  const from = startOfDay(subDays(now, days + 1));
+  return getSleepSessions(supabase, babyId, from, now);
 }
 
 // ── Sleep activity log ──────────────────────────────────────────────────────

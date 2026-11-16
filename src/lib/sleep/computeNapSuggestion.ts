@@ -1,30 +1,31 @@
 import { addMinutes, differenceInWeeks, parse } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
-import { getWakeWindowRange } from "@/lib/sleep/wakeWindows";
-import { inferNextSleepKind } from "@/lib/sleep/inferNextSleepKind";
+import { getWakeWindowRange, wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
+import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
 import type { AISuggestion, SleepSession, SleepType } from "@/types";
-
-function roundToNearest5Minutes(d: Date): Date {
-  const step = 5 * 60 * 1000;
-  return new Date(Math.round(d.getTime() / step) * step);
-}
-
-function clockHour(clock: string): number {
-  const [h, m] = clock.split(":").map(Number);
-  return h + (m ?? 0) / 60;
-}
+import { addDaysToKey, localDayKey, parseLocalDate } from "@/lib/dates/localDate";
 
 function minutesUntilClock(
   clock: string,
   tz: string,
   now: Date
 ): number {
-  const dayStr = formatInTimeZone(now, tz, "yyyy-MM-dd");
-  const target = fromZonedTime(
-    parse(`${dayStr} ${clock}`, "yyyy-MM-dd HH:mm", new Date()),
-    tz
-  );
-  return Math.max(0, Math.round((target.getTime() - now.getTime()) / 60000));
+  const dayKey = localDayKey(now, tz);
+  const minutesOn = (key: string) => {
+    const target = fromZonedTime(
+      parse(`${key} ${clock}`, "yyyy-MM-dd HH:mm", new Date()),
+      tz
+    );
+    return Math.round((target.getTime() - now.getTime()) / 60000);
+  };
+  const minutes = minutesOn(dayKey);
+  // Wake windows are at most a few hours long: a clock more than half a day
+  // behind is tomorrow's (a window crossing midnight). Tomorrow's local date is
+  // resolved in the zone, so a DST change that night (23 or 25 h) still counts
+  // right. A clock just behind is the HH:mm truncation of a time still ahead
+  // by seconds.
+  if (minutes < -12 * 60) return minutesOn(addDaysToKey(dayKey, 1));
+  return Math.max(0, minutes);
 }
 
 function buildReasoning(params: {
@@ -62,8 +63,8 @@ function buildReasoning(params: {
     }
     if (inLateWindow) {
       return lastWasNap
-        ? `Última soneca terminou às ${anchorClock}. Após a soneca da tarde, o próximo sono costuma ser o noturno. Janela sugerida: ${windowStart}–${windowEnd}; ideal até ${suggestedTime}.`
-        : `Com base no último despertar (${anchorClock}), a janela para o sono noturno é ${windowStart}–${windowEnd}. Ideal iniciar até ${suggestedTime}.`;
+        ? `Última soneca terminou às ${anchorClock}. Após a soneca da tarde, o próximo sono costuma ser o noturno. Janela sugerida: ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`
+        : `Com base no último despertar (${anchorClock}), a janela para o sono noturno é ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`;
     }
     return lastWasNap
       ? `Última soneca terminou às ${anchorClock}. Para ${rangeLabel}, após a última soneca do dia a rotina aponta para o sono noturno — janela ${windowStart}–${windowEnd}, sugerido por volta de ${suggestedTime}.`
@@ -74,10 +75,12 @@ function buildReasoning(params: {
     return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho era ${windowStart}–${windowEnd}. Esse intervalo já passou — priorize colocar o bebê para dormir agora.`;
   }
   if (inLateWindow) {
-    return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Você está na parte final da janela; ideal até ${suggestedTime}.`;
+    return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Horário previsto: ${suggestedTime}; a janela vai até ${windowEnd}.`;
   }
   return `Último sono terminou às ${anchorClock}. Para ${rangeLabel} (${band}), a janela do Soninho é ${windowStart}–${windowEnd}. Sugestão de horário alinhada ao centro dessa faixa.`;
 }
+
+const NO_INSTANTS = { suggestedAtIso: null, windowStartIso: null, windowEndIso: null };
 
 /**
  * Next-sleep suggestion aligned with {@link getWakeWindowRange} (same table as WakeWindowBadge).
@@ -105,6 +108,7 @@ export function computeNapSuggestion(params: {
         "Sem um sono concluído recente, não dá para estimar a janela. Registre o fim da última soneca ou do sono noturno.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      ...NO_INSTANTS,
     };
   }
 
@@ -118,38 +122,27 @@ export function computeNapSuggestion(params: {
       reasoning: "Data do último sono inválida. Verifique o registro.",
       confidence: "low",
       minutesUntilSuggested: 0,
+      ...NO_INSTANTS,
     };
   }
 
-  const ageWeeks = differenceInWeeks(now, new Date(params.birthDateIso));
+  const ageWeeks = differenceInWeeks(now, parseLocalDate(params.birthDateIso));
   const range = getWakeWindowRange(ageWeeks);
 
   const windowStartAt = addMinutes(anchor, range.minMinutes);
   const windowEndAt = addMinutes(anchor, range.maxMinutes);
-  const midpointAt = addMinutes(
-    anchor,
-    Math.round((range.minMinutes + range.maxMinutes) / 2)
-  );
-  let midpointRounded = roundToNearest5Minutes(midpointAt);
-  if (midpointRounded.getTime() < windowStartAt.getTime()) {
-    midpointRounded = windowStartAt;
-  }
-  if (midpointRounded.getTime() > windowEndAt.getTime()) {
-    midpointRounded = windowEndAt;
-  }
+  const midpointRounded = new Date(wakeWindowMidpoint(anchor.getTime(), range));
 
   const windowStart = formatInTimeZone(windowStartAt, tz, "HH:mm");
   const windowEnd = formatInTimeZone(windowEndAt, tz, "HH:mm");
   const anchorClock = formatInTimeZone(anchor, tz, "HH:mm");
 
-  const kind = inferNextSleepKind({
+  const kind = inferNextSleepKindForAge({
     lastSessionType: params.lastSessionType ?? null,
     lastSleepEndIso: params.lastSleepEndIso,
     recentSessions,
     ageWeeks,
     timezone: tz,
-    windowStartHour: clockHour(windowStart),
-    windowEndHour: clockHour(windowEnd),
     now,
   });
 
@@ -158,12 +151,11 @@ export function computeNapSuggestion(params: {
   const overdue = now.getTime() > windowEndAt.getTime();
   const inLateWindow = !overdue && now.getTime() > midpointRounded.getTime();
 
+  // "Previsto" is always the window's middle (the instant the home counts
+  // down to); only after the window's end is it "as soon as possible".
   if (overdue) {
     suggestedNapTime = "Assim que possível";
     confidence = "medium";
-  } else if (inLateWindow) {
-    suggestedNapTime = formatInTimeZone(windowEndAt, tz, "HH:mm");
-    confidence = "high";
   } else {
     suggestedNapTime = formatInTimeZone(midpointRounded, tz, "HH:mm");
     confidence = "high";
@@ -196,5 +188,10 @@ export function computeNapSuggestion(params: {
     reasoning,
     confidence,
     minutesUntilSuggested,
+    // The ideal instant (the window's middle), the same whenever it is asked:
+    // the client counts down to it and calls it overdue once it has passed.
+    suggestedAtIso: midpointRounded.toISOString(),
+    windowStartIso: windowStartAt.toISOString(),
+    windowEndIso: windowEndAt.toISOString(),
   };
 }

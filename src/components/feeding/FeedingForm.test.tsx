@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 import { renderWithProviders } from "@/test/render";
 import { createRecordingSupabase, type RecordingSupabase } from "@/test/recordingSupabase";
@@ -83,7 +84,7 @@ describe("FeedingForm", () => {
 
   it.each(["BOTTLE", "BREAST", "SOLID"])("edit_prefills_all_fields %s", async (type) => {
     await mount(items[type]);
-    expect(screen.getByText("Editar registro")).toBeInTheDocument();
+    expect(screen.getByText("Editar alimentação")).toBeInTheDocument();
     expect(field("start_date").value).toBe("2026-01-01");
     expect(field("start_time_input").value).toBe("07:20");
     if (type === "BOTTLE") {
@@ -179,6 +180,20 @@ describe("FeedingForm", () => {
         ["single", []],
       ],
     ]);
+  });
+
+  it("reaction_can_be_cleared_back_to_not_informed", async () => {
+    await mount(items.SOLID);
+    fireEvent.click(screen.getByLabelText("Reação do bebê"));
+    const options = await screen.findAllByRole("option", { name: "Não informar" });
+    await userEvent.click(options[options.length - 1]);
+    await waitFor(() =>
+      expect(screen.getByLabelText("Reação do bebê")).toHaveTextContent("Reação do bebê (opcional)")
+    );
+    submit();
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    const [update] = ops("solid_feedings")[0];
+    expect(update[1][0]).toMatchObject({ reaction: null });
   });
 
   it("edit_breast_submits_update", async () => {

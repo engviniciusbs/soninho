@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { getRecentSessions } from "@/lib/supabase/queries/sleep";
 import { useBaby } from "@/components/providers/BabyProvider";
+import { useNow } from "@/hooks/useNow";
 import { getBabyAge } from "@/lib/utils";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
 import {
@@ -13,6 +14,7 @@ import {
   getLongestNightStretch,
   getNapPatternHeatmap,
   getLast24hStats,
+  getLastFinishedNightMinutes,
   getOverallStats,
 } from "@/lib/sleep/statistics";
 import { computeSleepDebt } from "@/lib/sleep/regression";
@@ -22,6 +24,11 @@ import { getDailyQuality, summarizePeriod } from "@/lib/sleep/periodSummary";
 import { format, subDays, startOfDay, eachDayOfInterval, isYesterday, isToday } from "date-fns";
 import type { SleepSession } from "@/types";
 import type { AnalyticsPeriod } from "@/components/analytics/period";
+
+/** The shared clock's instant, or the current time before it starts ticking. */
+function clockAt(tick: number | null): Date {
+  return tick === null ? new Date() : new Date(tick);
+}
 
 /**
  * The fetch and every calculation of the Análise screen, moved verbatim from
@@ -52,12 +59,24 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
     : 12;
   const schedule = getAgeSchedule(ageWeeks);
 
-  const last24h = useMemo(() => getLast24hStats(sessions), [sessions]);
+  // A minute tick: "Sono 24h", the debt and the period keep moving with the
+  // clock (a sleep running, midnight passing) while the query stays cached.
+  // null until the clock store starts (first render): read the time then.
+  const tick = useNow(60_000);
+
+  // Overlap with the last 24 h, the sleep in progress included up to now.
+  const last24h = useMemo(() => getLast24hStats(sessions, clockAt(tick)), [sessions, tick]);
+
+  // "Maior trecho noturno" when no night touches the last 24 h.
+  const lastNightMinutes = useMemo(
+    () => getLastFinishedNightMinutes(sessions, clockAt(tick)),
+    [sessions, tick]
+  );
 
   const periodSessions = useMemo(() => {
-    const cutoff = subDays(new Date(), period);
+    const cutoff = subDays(clockAt(tick), period);
     return sessions.filter((s) => new Date(s.start_time) >= cutoff);
-  }, [sessions, period]);
+  }, [sessions, period, tick]);
 
   const statsPeriod = useMemo(
     () => getOverallStats(periodSessions),
@@ -65,8 +84,13 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
   );
 
   const sleepDebt = useMemo(
-    () => computeSleepDebt(sessions, ageWeeks, period),
-    [sessions, ageWeeks, period]
+    // Only complete local days: today, still running, would read as a debt.
+    () =>
+      computeSleepDebt(sessions, ageWeeks, period, {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        now: clockAt(tick),
+      }),
+    [sessions, ageWeeks, period, tick]
   );
 
   const envCorrelation = useMemo(
@@ -141,8 +165,8 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
 
   // New for the redesign: the three figures and the quality trend (pure, tested).
   const periodSummary = useMemo(
-    () => summarizePeriod(sessions, period),
-    [sessions, period]
+    () => summarizePeriod(sessions, period, clockAt(tick)),
+    [sessions, period, tick]
   );
 
   const dailyQuality = useMemo(
@@ -158,6 +182,7 @@ export function useAnalyticsData(period: AnalyticsPeriod) {
     ageWeeks,
     schedule,
     last24h,
+    lastNightMinutes,
     periodSessions,
     statsPeriod,
     sleepDebt,

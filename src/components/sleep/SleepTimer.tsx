@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useSleepTimer } from "@/hooks/useSleepTimer";
 import { useWakeWindow } from "@/hooks/useWakeWindow";
 import { useAISuggestions } from "@/hooks/useAISuggestions";
+import { wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
 import { useNow } from "@/hooks/useNow";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { useActiveSleepTimer } from "@/store/sleepStore";
@@ -27,7 +28,9 @@ import type { EnvironmentData } from "./EnvironmentPicker";
 import { PostSleepReview } from "./PostSleepReview";
 import { useBackdate } from "./timer/useBackdate";
 
-const ASAP = "Assim que possível";
+/** Local hours in which the type selector may follow a NAP suggestion: [05:00, 19:00). */
+const AUTO_SWITCH_FROM_HOUR = 5;
+const AUTO_SWITCH_UNTIL_HOUR = 19;
 
 /** What the open session holds for the fields editable during a sleep. */
 interface SessionFields {
@@ -40,7 +43,11 @@ interface SessionFields {
 type FieldKey = keyof SessionFields;
 const ENV_KEYS: FieldKey[] = ["room_temp_celsius", "weather_condition", "sleep_sack_type", "sleep_sack_tog"];
 
-export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
+/**
+ * `canWrite` false (a viewer, or while the role loads): the sleep is shown
+ * but not started, stopped or edited.
+ */
+export function SleepTimer({ nanny = false, canWrite = true }: { nanny?: boolean; canWrite?: boolean }) {
   const {
     isRunning, elapsed, sleepType,
     notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog,
@@ -51,7 +58,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   const { activeBaby } = useBaby();
   const timer = useActiveSleepTimer(activeBaby?.id);
   const {
-    elapsedMinutes, status, range, minutesUntilNextNap, lastSleepEnd, isLoading: wwLoading,
+    elapsedMinutes, status, range, lastSleepEnd, isLoading: wwLoading,
   } = useWakeWindow();
   const { data: ai } = useAISuggestions();
   // Same 60s clock as the wake window; null on the server and the first
@@ -66,17 +73,21 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
   const backdate = useBackdate();
 
   // The selector follows each new suggestion's kind once; the user can still
-  // change it afterwards.
+  // change it afterwards. Switching to Soneca only happens between 05:00 and
+  // 19:00: at night a waking must not turn the selector into a nap.
   const appliedSuggestion = useRef<string | null>(null);
   const aiKind = ai?.kind;
   const aiTime = ai?.suggestedNapTime;
+  const hour = now == null ? null : new Date(now).getHours();
   useEffect(() => {
-    if (!aiKind || isRunning) return;
+    if (!aiKind || isRunning || hour == null) return;
+    const daytime = hour >= AUTO_SWITCH_FROM_HOUR && hour < AUTO_SWITCH_UNTIL_HOUR;
+    if (aiKind === "NAP" && !daytime) return;
     const key = `${activeBaby?.id}:${aiKind}:${aiTime}`;
     if (appliedSuggestion.current === key) return;
     appliedSuggestion.current = key;
     if (aiKind !== sleepType) setSleepType(aiKind);
-  }, [aiKind, aiTime, activeBaby?.id, isRunning, sleepType, setSleepType]);
+  }, [aiKind, aiTime, activeBaby?.id, isRunning, hour, sleepType, setSleepType]);
 
   async function onStart() {
     await handleStart(backdate.resolveStartIso());
@@ -219,21 +230,26 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
     for (const k of candidates) edited.current.delete(k);
   }
 
-  /* ── Next sleep: the AI suggestion, else the wake-window fallback ── */
+  /* ── Next sleep: the AI suggestion, else the wake-window fallback ──
+   * Both give an absolute instant; "em X min" and "overdue" come from the
+   * 60 s clock, so the card keeps moving while the suggestion is cached. */
   const kind = ai?.kind ?? "NAP";
+  let targetMs: number | null = null;
+  if (ai?.suggestedAtIso) {
+    targetMs = Date.parse(ai.suggestedAtIso);
+  } else if (!wwLoading && now !== null) {
+    // The middle of the wake window, as the suggestion: from the end of the
+    // last sleep, or from now when there is none.
+    const anchor = lastSleepEnd ? Date.parse(lastSleepEnd) : now;
+    targetMs = wakeWindowMidpoint(anchor, range);
+  }
   let time: string | null = null;
   let minutesUntil: number | null = null;
   let overdue = false;
-  if (ai) {
-    // Time and "overdue" both come from the suggestion itself.
-    const aiMinutes = ai.minutesUntilSuggested ?? minutesUntilNextNap;
-    overdue = ai.suggestedNapTime === ASAP || aiMinutes <= 0;
-    time = overdue ? "Agora" : ai.suggestedNapTime;
-    minutesUntil = overdue ? null : aiMinutes;
-  } else if (!wwLoading && now !== null) {
-    overdue = minutesUntilNextNap <= 0;
-    time = overdue ? "Agora" : format(new Date(now + minutesUntilNextNap * 60_000), "HH:mm");
-    minutesUntil = overdue ? null : minutesUntilNextNap;
+  if (targetMs !== null && now !== null) {
+    overdue = targetMs <= now;
+    time = overdue ? "Agora" : format(new Date(targetMs), "HH:mm");
+    minutesUntil = overdue ? null : (targetMs - now) / 60_000;
   }
 
   return (
@@ -255,6 +271,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
           onNotesOpen={() => void syncFromSession(["notes"])}
           onNotesDone={() => void saveChanged(["notes"], "a nota")}
           onStop={onStop}
+          readOnly={!canWrite}
         />
       ) : (
         <>
@@ -272,14 +289,17 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
               range={range}
               hasLastSleep={lastSleepEnd !== null}
               isLoading={wwLoading}
+              sex={activeBaby?.sex}
             />
           )}
-          <StartSleepControls
-            sleepType={sleepType}
-            onSleepTypeChange={setSleepType}
-            onStart={onStart}
-            backdate={backdate}
-          />
+          {canWrite && (
+            <StartSleepControls
+              sleepType={sleepType}
+              onSleepTypeChange={setSleepType}
+              onStart={onStart}
+              backdate={backdate}
+            />
+          )}
           {!nanny && (
             <WhyThisTimeSheet
               open={whyOpen}
@@ -287,6 +307,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
               suggestion={ai}
               baby={activeBaby}
               range={range}
+              canVote={canWrite}
             />
           )}
         </>

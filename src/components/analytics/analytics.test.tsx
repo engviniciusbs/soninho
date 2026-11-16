@@ -42,7 +42,7 @@ function fakeData(overrides: Record<string, unknown> = {}) {
     refetch: vi.fn(),
     ageWeeks: 24,
     schedule: { totalSleepHours: 14 },
-    last24h: { totalSleepMinutes: 760, napCount: 3, avgNapDuration: 50, longestStretch: 400 },
+    last24h: { totalMinutes: 760, longestNightMinutes: 400 },
     statsPeriod: { totalSleepMinutes: 5000, napCount: 17, avgNapDuration: 52, longestStretch: 600 },
     sleepDebt: { targetHours: 14, avgHours: 12.5, debtHours: 1.5, daysAnalyzed: 6 },
     envCorrelation: { temperature: [bucket], sleepSackTog: [], weather: [], bestTemperature: bucket },
@@ -132,7 +132,7 @@ describe("AnalyticsPage", () => {
       sessions: [],
       periodSessions: [],
       periodSummary: { daysWithData: 0, avgSleepMinutes: null, avgNapsPerDay: null, longestNightMinutes: null },
-      last24h: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
+      last24h: { totalMinutes: 0, longestNightMinutes: 0 },
       dailyTotals: [{ date: "15/11", totalHours: 0, napHours: 0, nightHours: 0 }],
     });
     const { container } = mount(<AnalyticsPage />);
@@ -214,19 +214,23 @@ describe("Analytics detail pages", () => {
     const tile = (label: string) => screen.getByText(label).closest("[data-slot=stat-tile]") as HTMLElement;
     expect(tile("Sono 24h")).toHaveTextContent("12h 40min");
     expect(tile("Sono 24h")).toHaveTextContent("Meta: 14h");
-    expect(tile("Débito de sono")).toHaveTextContent("-1,5h");
-    expect(tile("Débito de sono")).toHaveTextContent("Média 12,5h/dia");
+    expect(tile("Débito de sono")).toHaveTextContent("-1h 30min");
+    expect(tile("Débito de sono")).toHaveTextContent("Média 12h 30min/dia");
     expect(tile("Média de soneca")).toHaveTextContent("52 min");
     expect(tile("Média de soneca")).toHaveTextContent("17 sonecas em 14 dias");
     expect(tile("Sonecas hoje")).toHaveTextContent("2");
     expect(tile("Sonecas hoje")).toHaveTextContent("Ontem: 3");
     expect(tile("Maior trecho noturno")).toHaveTextContent("6h 40min");
     expect(tile("Maior trecho noturno")).toHaveTextContent("Últimas 24h");
+    // Hours are always a duration ("10h 54min"), never a decimal ("10,9h").
+    for (const label of ["Sono 24h", "Débito de sono", "Média de soneca", "Maior trecho noturno"]) {
+      expect(tile(label).textContent).not.toMatch(/\d+[,.]\d+\s*h/);
+    }
   });
 
   it("numbers_with_an_empty_window_read_sem_dados_not_zero", () => {
     holder.data = fakeData({
-      last24h: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
+      last24h: { totalMinutes: 0, longestNightMinutes: 0 },
       statsPeriod: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
     });
     mount(<NumbersPage />);
@@ -235,6 +239,18 @@ describe("Analytics detail pages", () => {
       expect(tile(label)).toHaveTextContent("Sem dados");
       expect(tile(label)).not.toHaveTextContent(/\b0 ?min/);
     }
+  });
+
+  it("numbers_longest_night_falls_back_to_the_last_night", () => {
+    holder.data = fakeData({
+      last24h: { totalMinutes: 120, longestNightMinutes: 0 },
+      lastNightMinutes: 600,
+    });
+    mount(<NumbersPage />);
+    const tile = screen.getByText("Maior trecho noturno").closest("[data-slot=stat-tile]") as HTMLElement;
+    expect(tile).toHaveTextContent("10h");
+    expect(tile).toHaveTextContent("Última noite");
+    expect(tile).not.toHaveTextContent("Sem dados");
   });
 
   it("numbers_debt_reads_em_dia_and_sem_dados_like_today", () => {

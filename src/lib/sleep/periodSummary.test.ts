@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getDailyQuality, summarizePeriod } from "@/lib/sleep/periodSummary";
 import { makeSession } from "@/lib/sleep/__fixtures__/session";
+import { computeSleepDebt } from "@/lib/sleep/regression";
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -82,14 +83,36 @@ describe("summarizePeriod", () => {
     expect(r.avgSleepMinutes).toBe(60);
   });
 
+  // Before: the period was P days with today in it (P - 1 complete days), one
+  // day fewer than the debt. Now it is the P complete days before today, the
+  // same days as the debt (buildCompleteDailySleepTotals).
   it("ignores_days_before_the_period", () => {
-    // 1 day: only today, which is never complete.
-    expect(summarizePeriod([night22, nap23a], 1).daysWithData).toBe(0);
-    // 2 days: 23/05 and today. The night of 22/05 counts its part on 23/05 and is the longest night.
-    const r = summarizePeriod([night22, nap23a], 2);
+    // 1 day: only yesterday, 23/05. The night of 22/05 counts its part on 23/05 and is the longest night.
+    const r = summarizePeriod([night22, nap23a], 1);
     expect(r.daysWithData).toBe(1);
     expect(r.avgSleepMinutes).toBe(360 + 60);
     expect(r.longestNightMinutes).toBe(660);
+  });
+
+  it("uses_exact_minutes_so_short_days_count_and_figures_match_registro", () => {
+    // 23/05: a 2-minute nap (0,0 h rounded) and 22/05: a 7-minute nap (0,1 h = 6 min rounded).
+    const tiny = makeSession({ type: "NAP", start_time: "2026-05-23T13:00:00Z", end_time: "2026-05-23T13:02:00Z" });
+    const seven = makeSession({ type: "NAP", start_time: "2026-05-22T13:00:00Z", end_time: "2026-05-22T13:07:00Z" });
+    expect(summarizePeriod([tiny], 7).daysWithData).toBe(1);
+    expect(summarizePeriod([seven], 7).avgSleepMinutes).toBe(7);
+  });
+
+  it("uses_the_P_complete_days_before_today_like_the_debt", () => {
+    // 17/05 is the 7th complete day before 24/05: inside a 7-day period.
+    const nap17 = makeSession({ type: "NAP", start_time: "2026-05-17T13:00:00Z", end_time: "2026-05-17T14:00:00Z" });
+    const r = summarizePeriod([nap17], 7);
+    expect(r.daysWithData).toBe(1);
+    expect(r.avgSleepMinutes).toBe(60);
+    expect(r.avgNapsPerDay).toBe(1);
+    expect(computeSleepDebt([nap17], 10, 7, { timeZone: "America/Sao_Paulo" }).daysAnalyzed).toBe(1);
+    // 16/05 is outside it.
+    const nap16 = makeSession({ type: "NAP", start_time: "2026-05-16T13:00:00Z", end_time: "2026-05-16T14:00:00Z" });
+    expect(summarizePeriod([nap16], 7).daysWithData).toBe(0);
   });
 });
 

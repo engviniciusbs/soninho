@@ -8,6 +8,7 @@ import {
   markRegressionAiRequested,
   shouldMarkRegressionAi,
 } from "@/lib/sleep/regressionAiGate";
+import { localDayKey } from "@/lib/dates/localDate";
 
 export interface RegressionResponse {
   detected: boolean;
@@ -48,8 +49,13 @@ export function useRegression() {
     staleTime: 2 * 60 * 1000,
   });
 
+  // The result depends on the local day too (only complete days count), so
+  // a new day asks again even with no new sleep logged.
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const today = localDayKey(new Date(), timezone);
+
   return useQuery<RegressionResponse | null>({
-    queryKey: ["regression", activeBaby?.id, lastSessionKey],
+    queryKey: ["regression", activeBaby?.id, lastSessionKey, today],
     queryFn: async () => {
       if (!activeBaby) return null;
       // The LLM explanation (which consumes shared AI quota) is requested at
@@ -60,7 +66,7 @@ export function useRegression() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           babyId: activeBaby.id,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          timezone,
           withAi,
         }),
       });

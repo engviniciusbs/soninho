@@ -5,6 +5,8 @@ import { SleepTimer } from "@/components/sleep/SleepTimer";
 import { useUserProfile } from "@/components/providers/UserProfileProvider";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { useFamilyActivityToasts } from "@/hooks/useFamilyActivityToasts";
+import { useCanWrite } from "@/hooks/useCanWrite";
+import { ViewOnlyNotice } from "@/components/family/ViewOnlyNotice";
 import { Skeleton } from "@/components/ui/skeleton";
 import { buttonVariants } from "@/components/ui/button";
 import { IconPlus } from "@/components/brand/icons";
@@ -18,6 +20,7 @@ import { RegressionNotice } from "@/components/home/RegressionNotice";
 export default function AppHomePage() {
   const { activeBaby, isLoading, babies } = useBaby();
   const { isNannyMode } = useUserProfile();
+  const { canWrite, isLoading: roleLoading } = useCanWrite();
   // Toasts when another caregiver starts or stops a sleep.
   useFamilyActivityToasts(true);
 
@@ -76,7 +79,8 @@ export default function AppHomePage() {
       <BabySwitcher />
       {/* key: a baby switch remounts the home's local UI state (sheets, back-date). */}
       <div key={activeBaby?.id} className="flex flex-col gap-3">
-        <SleepTimer nanny={isNannyMode} />
+        {!roleLoading && !canWrite && <ViewOnlyNotice />}
+        <SleepTimer nanny={isNannyMode} canWrite={canWrite} />
         {isNannyMode && <NannyNotesCard />}
         <TodayCard nanny={isNannyMode} />
         {!isNannyMode && <RegressionNotice />}

@@ -1,6 +1,7 @@
 import { addDays, format, max, min, startOfDay, subDays, eachDayOfInterval } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import type { SleepSession } from "@/types";
+import { withProvisionalEnd } from "@/lib/sleep/provisional";
 
 export type DaySleepAllocation = {
   /** Local calendar day (yyyy-MM-dd) */
@@ -203,4 +204,54 @@ function buildDailySleepTotalsInTimeZone(
       nightHours: parseFloat((nightMin / 60).toFixed(1)),
     };
   });
+}
+
+/**
+ * Sleep per local day for the `days` complete days before today in
+ * `timeZone` (today, still running, is left out). A sleep still running counts
+ * up to `now` ({@link withProvisionalEnd}), so a night that crossed midnight
+ * fills the day it started on. Used by the sleep debt and the regression.
+ */
+export function buildCompleteDailySleepTotals(
+  sessions: SleepSession[],
+  days: number,
+  timeZone: string,
+  now: Date = new Date()
+): DaySleepTotals[] {
+  const counted = sessions.map((s) => withProvisionalEnd(s, now));
+  return buildDailySleepTotalsInTimeZone(counted, days, timeZone, lastMomentOfYesterday(now, timeZone));
+}
+
+function lastMomentOfYesterday(now: Date, timeZone: string): Date {
+  return new Date(
+    fromZonedTime(`${formatInTimeZone(now, timeZone, "yyyy-MM-dd")}T00:00:00`, timeZone).getTime() - 1
+  );
+}
+
+/** One complete local day of {@link buildCompleteDailySleepMinutes}, in exact minutes. */
+export type DaySleepMinutes = { dayKey: string; napMinutes: number; nightMinutes: number };
+
+/**
+ * The same `days` complete days as {@link buildCompleteDailySleepTotals} (the
+ * debt and the regression), in exact minutes instead of hours rounded to 0,1:
+ * a 2-minute day still counts, and the figures match Registro.
+ */
+export function buildCompleteDailySleepMinutes(
+  sessions: SleepSession[],
+  days: number,
+  timeZone: string,
+  now: Date = new Date()
+): DaySleepMinutes[] {
+  const keys = lastDayKeysInTimeZone(days, timeZone, lastMomentOfYesterday(now, timeZone));
+  const totals = new Map<string, DaySleepMinutes>();
+  for (const k of keys) totals.set(k, { dayKey: k, napMinutes: 0, nightMinutes: 0 });
+  for (const session of sessions) {
+    for (const alloc of allocateSessionToLocalDays(withProvisionalEnd(session, now), timeZone)) {
+      const bucket = totals.get(alloc.dayKey);
+      if (!bucket) continue;
+      bucket.napMinutes += alloc.napMinutes;
+      bucket.nightMinutes += alloc.nightMinutes;
+    }
+  }
+  return keys.map((k) => totals.get(k)!);
 }

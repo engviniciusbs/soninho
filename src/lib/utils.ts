@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { differenceInWeeks, differenceInMonths } from "date-fns";
+import { parseLocalDate } from "@/lib/dates/localDate";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -34,7 +35,7 @@ export function formatElapsedSeconds(totalSec: number): string {
 }
 
 export function getBabyAge(birthDate: string) {
-  const birth = new Date(birthDate);
+  const birth = parseLocalDate(birthDate);
   const now = new Date();
   return {
     weeks: differenceInWeeks(now, birth),

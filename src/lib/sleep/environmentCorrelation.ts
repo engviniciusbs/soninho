@@ -1,7 +1,8 @@
 import type { SleepSession } from "@/types";
+import { formatDecimal } from "@/lib/format/number";
 
 export interface EnvironmentBucket {
-  /** Bucket key, e.g. "18–20°C", "TOG 1.0", "rainy". */
+  /** Bucket key, e.g. "18–20°C", "TOG 1,0", "rainy". */
   label: string;
   /** Number of completed sessions in this bucket. */
   count: number;
@@ -79,7 +80,7 @@ export function computeEnvironmentCorrelation(
       (byTemp.get(key) ?? byTemp.set(key, []).get(key)!).push(s);
     }
     if (s.sleep_sack_tog != null) {
-      const key = `TOG ${s.sleep_sack_tog}`;
+      const key = `TOG ${formatDecimal(s.sleep_sack_tog)}`;
       (byTog.get(key) ?? byTog.set(key, []).get(key)!).push(s);
     }
     if (s.weather_condition) {

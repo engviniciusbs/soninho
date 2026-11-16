@@ -5,7 +5,7 @@ import {
   View,
   StyleSheet,
 } from "@react-pdf/renderer";
-import { differenceInWeeks, parseISO, format } from "date-fns";
+import { differenceInWeeks, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { SleepSession } from "@/types";
 import {
@@ -15,6 +15,12 @@ import {
 } from "@/lib/sleep/statistics";
 import { computeEnvironmentCorrelation } from "@/lib/sleep/environmentCorrelation";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
+import { parseLocalDate } from "@/lib/dates/localDate";
+import { formatDuration } from "@/lib/utils";
+import { formatDecimal } from "@/lib/format/number";
+
+/** Hours (possibly fractional) as a duration: 10.9 → "10h 54min", never "10.9h". */
+export const reportHours = (h: number) => formatDuration(h * 60);
 
 export interface SleepReportData {
   babyName: string;
@@ -43,7 +49,7 @@ export function buildSleepReportData(
   baby: { name: string; birth_date: string },
   periodDays: number
 ): SleepReportData {
-  const ageWeeks = differenceInWeeks(new Date(), parseISO(baby.birth_date));
+  const ageWeeks = differenceInWeeks(new Date(), parseLocalDate(baby.birth_date));
   const schedule = getAgeSchedule(ageWeeks);
 
   const daily = getDailyTotals(sessions, periodDays);
@@ -70,7 +76,9 @@ export function buildSleepReportData(
 
   const env = computeEnvironmentCorrelation(sessions);
   const bestEnvironment = env.bestTemperature
-    ? `${env.bestTemperature.label} (qualidade média ${env.bestTemperature.avgQuality}/5)`
+    ? env.bestTemperature.avgQuality != null
+      ? `${env.bestTemperature.label} (qualidade média ${formatDecimal(env.bestTemperature.avgQuality)}/5)`
+      : env.bestTemperature.label
     : null;
 
   const periodStart = daily[0]?.date ?? "";
@@ -78,7 +86,7 @@ export function buildSleepReportData(
 
   return {
     babyName: baby.name,
-    birthDate: format(parseISO(baby.birth_date), "dd/MM/yyyy"),
+    birthDate: format(parseLocalDate(baby.birth_date), "dd/MM/yyyy"),
     ageLabel: schedule.ageLabel,
     periodDays,
     periodLabel: `${periodStart} – ${periodEnd}`,
@@ -299,27 +307,27 @@ export function SleepReportPdf({ data }: { data: SleepReportData }) {
         <Text style={styles.sectionTitle}>Resumo do período</Text>
         <View style={styles.statGrid}>
           <Stat
-            value={`${data.avgTotalHours.toFixed(1)}h`}
+            value={reportHours(data.avgTotalHours)}
             label="Sono total / dia"
-            target={`Meta: ${data.targetTotalHours}h`}
+            target={`Meta: ${reportHours(data.targetTotalHours)}`}
           />
           <Stat
             value={`${data.adherencePct}%`}
             label="Aderência à meta"
           />
           <Stat
-            value={`${data.avgNapHours.toFixed(1)}h`}
+            value={reportHours(data.avgNapHours)}
             label="Média de soneca / dia"
           />
           <Stat
-            value={data.napCountAvg.toFixed(1)}
+            value={formatDecimal(data.napCountAvg)}
             label="Sonecas / dia"
             target={`Esperado: ${data.napCountTarget}`}
           />
           <Stat
-            value={`${data.longestNightHours.toFixed(1)}h`}
+            value={reportHours(data.longestNightHours)}
             label="Maior trecho noturno"
-            target={`Ref: ${data.targetNightHours}h`}
+            target={`Ref: ${reportHours(data.targetNightHours)}`}
           />
           <Stat
             value={`${data.totalSessions}`}
@@ -339,13 +347,13 @@ export function SleepReportPdf({ data }: { data: SleepReportData }) {
             <View style={styles.tr} key={i}>
               <Text style={[styles.td, styles.col1]}>{d.date}</Text>
               <Text style={[styles.td, styles.col2]}>
-                {d.totalHours.toFixed(1)}h
+                {reportHours(d.totalHours)}
               </Text>
               <Text style={[styles.td, styles.col3]}>
-                {d.napHours.toFixed(1)}h
+                {reportHours(d.napHours)}
               </Text>
               <Text style={[styles.td, styles.col4]}>
-                {d.nightHours.toFixed(1)}h
+                {reportHours(d.nightHours)}
               </Text>
             </View>
           ))}

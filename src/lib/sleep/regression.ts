@@ -1,7 +1,23 @@
 import { differenceInWeeks } from "date-fns";
 import type { SleepSession } from "@/types";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
-import { buildDailySleepTotals } from "@/lib/sleep/sessionDayAllocation";
+import { formatDuration } from "@/lib/utils";
+import { buildCompleteDailySleepTotals } from "@/lib/sleep/sessionDayAllocation";
+import { addDaysToKey, localDayKey, parseLocalDate } from "@/lib/dates/localDate";
+
+/** Where and when the days are measured. */
+export interface LocalDayOptions {
+  /** IANA timezone of the family's days (default: this runtime's). */
+  timeZone?: string;
+  now?: Date;
+}
+
+function resolve(opts: LocalDayOptions): { timeZone: string; now: Date } {
+  return {
+    timeZone: opts.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+    now: opts.now ?? new Date(),
+  };
+}
 
 export interface SleepDebt {
   /** Recommended total sleep per day (hours) for the baby's age. */
@@ -10,23 +26,28 @@ export interface SleepDebt {
   avgHours: number;
   /** Positive = sleeping less than recommended (a debt), in hours/day. */
   debtHours: number;
-  /** Number of full days analysed (with at least some sleep logged). */
+  /** Number of complete days analysed (with at least some sleep logged). */
   daysAnalyzed: number;
 }
 
 /**
  * Sleep debt = how far the recent daily average is below the age-appropriate
- * target. Uses {@link buildDailySleepTotals} so night sleep crossing midnight
- * is allocated correctly. Only counts days that actually have data to avoid
- * penalising gaps where the family simply didn't log.
+ * target, over the last `days` complete local days (today, still running, is
+ * left out: at 07:00 it holds only the end of the night). Uses
+ * {@link buildCompleteDailySleepTotals}, so night sleep crossing midnight is
+ * split by day and a sleep still running counts up to now. Only counts days
+ * that actually have data to avoid penalising gaps where the family simply
+ * didn't log.
  */
 export function computeSleepDebt(
   sessions: SleepSession[],
   ageWeeks: number,
-  days: number = 7
+  days: number = 7,
+  opts: LocalDayOptions = {}
 ): SleepDebt {
+  const { timeZone, now } = resolve(opts);
   const schedule = getAgeSchedule(ageWeeks);
-  const totals = buildDailySleepTotals(sessions, days);
+  const totals = buildCompleteDailySleepTotals(sessions, days, timeZone, now);
 
   const daysWithData = totals.filter((d) => d.totalHours > 0);
   const avgHours =
@@ -78,21 +99,25 @@ export interface RegressionResult {
  *  2. A measurable recent drop in total sleep AND/OR rise in night wake-ups
  *     compared with the preceding period.
  *
- * `recentDays` is compared against the equally-sized window before it.
+ * The last `recentDays` complete local days are compared against the
+ * equally-sized window before them. Today is never part of it: in the morning
+ * it holds only the end of the night and would read as a drop.
  */
 export function detectRegression(
   birthDateIso: string,
   sessions: SleepSession[],
-  recentDays: number = 5
+  recentDays: number = 5,
+  opts: LocalDayOptions = {}
 ): RegressionResult {
-  const ageWeeks = differenceInWeeks(new Date(), new Date(birthDateIso));
+  const { timeZone, now } = resolve(opts);
+  const ageWeeks = differenceInWeeks(now, parseLocalDate(birthDateIso));
   const ageWindow =
     REGRESSION_WINDOWS.find(
       (w) => ageWeeks >= w.minWeeks && ageWeeks <= w.maxWeeks
     ) ?? null;
 
   // Compare recent window vs the preceding window of equal length.
-  const totals = buildDailySleepTotals(sessions, recentDays * 2);
+  const totals = buildCompleteDailySleepTotals(sessions, recentDays * 2, timeZone, now);
   const prior = totals.slice(0, recentDays);
   const recent = totals.slice(recentDays);
 
@@ -108,15 +133,16 @@ export function detectRegression(
   const sleepDropHours =
     priorAvg > 0 ? parseFloat((priorAvg - recentAvg).toFixed(1)) : 0;
 
-  // Night wake-ups per night (number of NIGHT_SLEEP segments / nights).
+  // Night wake-ups per night: finished NIGHT_SLEEP segments per complete
+  // local day, by the day each segment started on.
+  const todayKey = localDayKey(now, timeZone);
   const nightWakes = (windowDays: number, offsetDays: number) => {
-    const now = new Date();
-    const end = new Date(now.getTime() - offsetDays * 86_400_000);
-    const start = new Date(end.getTime() - windowDays * 86_400_000);
+    const endKey = addDaysToKey(todayKey, -offsetDays); // exclusive
+    const startKey = addDaysToKey(endKey, -windowDays);
     const nights = sessions.filter((s) => {
       if (s.type !== "NIGHT_SLEEP" || s.duration_min == null) return false;
-      const t = new Date(s.start_time);
-      return t >= start && t < end;
+      const key = localDayKey(new Date(s.start_time), timeZone);
+      return key >= startKey && key < endKey;
     }).length;
     return nights / windowDays;
   };
@@ -134,15 +160,16 @@ export function detectRegression(
 
   const detected = enoughData && hasSignal && (ageWindow != null || hasSleepDrop);
 
+  const dropText = `${formatDuration(sleepDropHours * 60)}/dia`;
   let summary: string;
   if (!enoughData) {
     summary = "Dados insuficientes para avaliar regressão.";
   } else if (detected && ageWindow) {
     summary = `${ageWindow.label} provável: ${
-      hasSleepDrop ? `queda de ${sleepDropHours}h/dia no sono` : "sono mais fragmentado"
+      hasSleepDrop ? `queda de ${dropText} no sono` : "sono mais fragmentado"
     }.`;
   } else if (detected) {
-    summary = `Mudança no padrão: queda de ${sleepDropHours}h/dia no sono recente.`;
+    summary = `Mudança no padrão: queda de ${dropText} no sono recente.`;
   } else if (ageWindow) {
     summary = `Fase de ${ageWindow.label} — padrão ainda estável.`;
   } else {

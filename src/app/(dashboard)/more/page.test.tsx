@@ -45,6 +45,7 @@ const baby = {
   birth_date: "2025-11-01",
   avatar_emoji: "\u{1F98A}",
   avatar_url: null,
+  family_id: "fam-1",
 } as Baby;
 const PREFS = {
   enabled: false,
@@ -65,6 +66,8 @@ beforeEach(() => {
     if (c.target === "notification_preferences" && c.ops.some(([m]) => m === "maybeSingle")) {
       return { data: PREFS, error: null };
     }
+    // The signed-in user owns Lia's family (may delete her).
+    if (c.target === "family_members") return { data: [{ family_id: "fam-1" }], error: null };
     return undefined;
   });
   holder.client = sb.client;
@@ -134,6 +137,8 @@ describe("Mais detail pages (former settings tabs)", () => {
   it("renders_each_page", async () => {
     let { container } = await mount(BabiesPage);
     expect(screen.getByText("Lia")).toBeInTheDocument();
+    // Delete shows once the owned families load (the user owns Lia's family).
+    await screen.findByRole("button", { name: "Excluir Lia" });
     expect(stable(container)).toMatchSnapshot("general");
 
     ({ container } = await openPage(FamilyPage));
@@ -161,7 +166,7 @@ describe("Mais detail pages (former settings tabs)", () => {
 
     // Edit: trimmed name; the stored avatar_emoji and avatar_url (null) ride along
     // unchanged (the emoji picker left the form in the redesign, spec §8.10).
-    await user.click(screen.getByRole("button", { name: "Editar" }));
+    await user.click(screen.getByRole("button", { name: "Editar Lia" }));
     const dialog = await screen.findByRole("dialog");
     await settle();
     expect(stable(dialog)).toMatchSnapshot("edit form");
@@ -172,7 +177,8 @@ describe("Mais detail pages (former settings tabs)", () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê atualizado"));
     expect(sb.find("babies", "update").map((c) => c.ops)).toEqual([
       [
-        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "\u{1F98A}", avatar_url: null }]],
+        // The form now also edits the sex ("Não informar" is null).
+        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "\u{1F98A}", avatar_url: null, sex: null }]],
         ["eq", ["id", "baby-1"]],
         ["select", []],
         ["single", []],
@@ -195,7 +201,23 @@ describe("Mais detail pages (former settings tabs)", () => {
     await user.click(screen.getByRole("button", { name: "Salvar" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê adicionado"));
     expect(sb.find("rpc:create_baby_with_family").map((c) => c.ops)).toEqual([
-      [["rpc", [{ p_name: "Theo", p_birth_date: "2026-01-01", p_avatar_emoji: "\u{1F37C}", p_avatar_url: null }]]],
+      [
+        [
+          "rpc",
+          [
+            {
+              p_name: "Theo",
+              p_birth_date: "2026-01-01",
+              p_avatar_emoji: "\u{1F37C}",
+              p_avatar_url: null,
+              // "Não informar" goes to the RPC as null (saved in the same insert).
+              p_sex: null,
+              // Second baby joins the active baby's family (spec decision 3).
+              p_family_id: "fam-1",
+            },
+          ],
+        ],
+      ],
     ]);
   });
 
@@ -292,8 +314,12 @@ describe("Mais detail pages (former settings tabs)", () => {
   });
 
   it("export_csv_same_content", async () => {
+    // Honours .range(): the rows on the first page, then an empty page (the
+    // export now reads until an empty page, so a mock that answered the same
+    // rows for every range would never end).
     sb.respond((c) =>
-      c.target === "sleep_sessions"
+      c.target === "sleep_sessions" &&
+      (c.ops.find(([m]) => m === "range")?.[1] as [number, number] | undefined)?.[0] === 0
         ? {
             data: [
               {
@@ -317,7 +343,9 @@ describe("Mais detail pages (former settings tabs)", () => {
             ],
             error: null,
           }
-        : undefined
+        : c.target === "sleep_sessions"
+          ? { data: [], error: null }
+          : undefined
     );
     let blob: Blob | null = null;
     vi.stubGlobal("URL", Object.assign(URL, {
@@ -336,7 +364,20 @@ describe("Mais detail pages (former settings tabs)", () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Dados exportados com sucesso"));
 
     expect(sb.find("sleep_sessions").map((c) => c.ops)).toEqual([
-      [["select", ["*"]], ["eq", ["baby_id", "baby-1"]], ["order", ["start_time", { ascending: false }]]],
+      [
+        ["select", ["*"]],
+        ["eq", ["baby_id", "baby-1"]],
+        ["order", ["start_time", { ascending: false }]],
+        ["order", ["id", { ascending: true }]],
+        ["range", [0, 999]],
+      ],
+      [
+        ["select", ["*"]],
+        ["eq", ["baby_id", "baby-1"]],
+        ["order", ["start_time", { ascending: false }]],
+        ["order", ["id", { ascending: true }]],
+        ["range", [2, 1001]],
+      ],
     ]);
     expect(click).toHaveBeenCalledTimes(1);
     expect(blob!.type).toBe("text/csv;charset=utf-8;");
