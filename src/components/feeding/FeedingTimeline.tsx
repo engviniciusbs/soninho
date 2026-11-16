@@ -72,10 +72,12 @@ function Rows({
   items,
   onEdit,
   when,
+  readOnly,
 }: {
   items: FeedingTimelineItem[];
   onEdit?: (item: FeedingTimelineItem) => void;
   when: (iso: string) => string;
+  readOnly: boolean;
 }) {
   return (
     <ul className="-my-1">
@@ -83,16 +85,17 @@ function Rows({
         const { label, subtitle, value, running } = describe(item, when(item.startTime));
         return (
           <li key={`${item.type}-${item.id}`}>
-            {running ? (
+            {running && !readOnly ? (
               // A feeding still running is not edited here (saving would end
               // it): the row reads "Em andamento" and opens the Peito timer.
+              // A viewer has no timer to open: the row stays plain.
               <ListRow title={label} subtitle={subtitle} value={value} href="/feeding?tipo=peito" />
             ) : (
               <ListRow
                 title={label}
                 subtitle={subtitle}
                 value={value}
-                onClick={onEdit ? () => onEdit(item) : undefined}
+                onClick={onEdit && !running ? () => onEdit(item) : undefined}
               />
             )}
           </li>
@@ -143,7 +146,7 @@ export function FeedingTimeline({ onEdit, readOnly = false }: FeedingTimelinePro
               : "Nada registrado hoje. Use o registro acima, ou registre uma mamada passada."}
           </p>
         ) : (
-          <Rows items={today} onEdit={onEdit} when={(iso) => format(new Date(iso), "HH:mm")} />
+          <Rows items={today} onEdit={onEdit} readOnly={readOnly} when={(iso) => format(new Date(iso), "HH:mm")} />
         )}
       </Card>
 
@@ -157,6 +160,7 @@ export function FeedingTimeline({ onEdit, readOnly = false }: FeedingTimelinePro
           <Rows
             items={earlier}
             onEdit={onEdit}
+            readOnly={readOnly}
             when={(iso) => {
               const d = new Date(iso);
               return `${isSameDay(d, subDays(now, 1)) ? "Ontem" : format(d, "dd/MM")}, ${format(d, "HH:mm")}`;

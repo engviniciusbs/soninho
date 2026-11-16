@@ -307,6 +307,7 @@ export function SleepTimer({ nanny = false, canWrite = true }: { nanny?: boolean
               suggestion={ai}
               baby={activeBaby}
               range={range}
+              canVote={canWrite}
             />
           )}
         </>

@@ -725,6 +725,33 @@ describe("Home", () => {
     expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
   });
 
+  it("viewer_running_sleep_chips_keep_their_spacing", async () => {
+    holder.canWrite = false;
+    // Started on another phone, with the room temperature recorded.
+    fake.seed(TABLE, {
+      id: "s-2",
+      baby_id: helena.id,
+      type: "NAP",
+      start_time: new Date(NOW.getTime() - 600_000).toISOString(),
+      room_temp_celsius: 22,
+    });
+    await mount();
+    const chip = screen.getByText("22°C");
+    expect(chip.closest("div.flex-wrap")).toHaveClass("mb-3.5");
+  });
+
+  it("viewer_why_sheet_has_no_feedback_buttons", async () => {
+    holder.canWrite = false;
+    holder.ai = nightAi;
+    await mount();
+    await click(screen.getByRole("button", { name: "Por que esse horário?" }));
+    const sheet = screen.getByRole("dialog");
+    expect(within(sheet).getByText("Ela costuma dormir neste horário.")).toBeInTheDocument();
+    expect(within(sheet).queryByRole("button", { name: "Útil" })).not.toBeInTheDocument();
+    expect(within(sheet).queryByRole("button", { name: "Não útil" })).not.toBeInTheDocument();
+    expect(within(sheet).queryByText("Foi útil?")).not.toBeInTheDocument();
+  });
+
   it("writer_sees_no_view_only_notice", async () => {
     await mount();
     expect(screen.queryByText("Você tem acesso só para ver")).not.toBeInTheDocument();

@@ -107,7 +107,7 @@ export function SleepingCard({
       {readOnly ? (
         // Only what was recorded; nothing to tap.
         (temp !== null || tog !== null) && (
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="mb-3.5 flex flex-wrap justify-center gap-2">
             {temp !== null && <Chip>{tempText(temp)}</Chip>}
             {tog !== null && <Chip>{togText(tog)}</Chip>}
           </div>

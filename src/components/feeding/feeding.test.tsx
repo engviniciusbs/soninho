@@ -245,6 +245,16 @@ describe("FeedingTimeline running feeding", () => {
     expect(onEdit).not.toHaveBeenCalled();
     expect(within(today).queryByRole("button")).toBeNull();
   });
+
+  it("a_viewer_sees_the_running_breastfeed_as_plain_text_no_link", async () => {
+    const running = { ...breast("f-run", "2026-01-01T11:50:00.000Z", 120, 0), endTime: null } as FeedingTimelineItem;
+    holder.feedings = [running];
+    mount(<FeedingTimeline readOnly />);
+    const today = await screen.findByRole("region", { name: "Hoje" });
+    expect(within(today).getByText("Em andamento")).toBeInTheDocument();
+    expect(within(today).queryByRole("link")).toBeNull();
+    expect(within(today).queryByRole("button")).toBeNull();
+  });
 });
 
 describe("FeedingPage", () => {
