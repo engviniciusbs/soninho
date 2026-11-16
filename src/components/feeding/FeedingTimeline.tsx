@@ -64,6 +64,8 @@ export function useDeleteFeeding() {
 
 interface FeedingTimelineProps {
   onEdit?: (item: FeedingTimelineItem) => void;
+  /** A viewer: the empty day does not invite to record. */
+  readOnly?: boolean;
 }
 
 function Rows({
@@ -105,7 +107,7 @@ function Rows({
  * other days the list already loads follow below. Tapping an entry edits it;
  * a feeding at the breast still running links to the Peito timer instead.
  */
-export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
+export function FeedingTimeline({ onEdit, readOnly = false }: FeedingTimelineProps = {}) {
   const todayId = useId();
   const earlierId = useId();
   const { data: items = [], isLoading } = useFeedingTimeline(3);
@@ -136,7 +138,9 @@ export function FeedingTimeline({ onEdit }: FeedingTimelineProps = {}) {
         </div>
         {today.length === 0 ? (
           <p className="py-2 font-sans text-[15px] font-semibold text-sn-mu">
-            Nada registrado hoje. Use o registro acima, ou registre uma mamada passada.
+            {readOnly
+              ? "Nada registrado hoje."
+              : "Nada registrado hoje. Use o registro acima, ou registre uma mamada passada."}
           </p>
         ) : (
           <Rows items={today} onEdit={onEdit} when={(iso) => format(new Date(iso), "HH:mm")} />

@@ -22,8 +22,8 @@ describe("getNavLinks", () => {
     ]);
   });
 
-  it("no modo babá mostra só Início e Mais", () => {
-    expect(getNavLinks(true).map((l) => l.href)).toEqual(["/app", "/more"]);
+  it("no modo babá mostra Início, Comida e Mais", () => {
+    expect(getNavLinks(true).map((l) => l.href)).toEqual(["/app", "/feeding", "/more"]);
   });
 
   it("exporta as 5 abas com ícone", () => {

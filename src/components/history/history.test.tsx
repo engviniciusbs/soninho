@@ -11,12 +11,16 @@ import HistoryPage from "@/app/(dashboard)/history/page";
 const holder = vi.hoisted(() => ({
   sessions: [] as unknown[],
   search: "",
+  canWrite: true,
 }));
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => ({}) }));
 vi.mock("@/lib/supabase/queries/sleep", () => ({
   getSleepSessions: vi.fn(async () => ({ data: holder.sessions, error: null })),
   deleteSleepSession: vi.fn(async () => ({ error: null })),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(holder.search),
@@ -69,6 +73,7 @@ beforeEach(() => {
   vi.setSystemTime(NOW);
   holder.sessions = [];
   holder.search = "";
+  holder.canWrite = true;
   window.history.replaceState(null, "", "/history");
 });
 
@@ -296,5 +301,19 @@ describe("HistoryPage", () => {
     mount(<HistoryPage />);
     expect(await screen.findByRole("button", { current: "date" })).toHaveTextContent("qua10");
     expect(screen.getByRole("button", { name: "Próxima semana" })).toBeEnabled();
+  });
+});
+
+describe("HistoryPage para quem só vê", () => {
+  it("lista os sonos sem Adicionar, Editar ou Excluir", async () => {
+    holder.canWrite = false;
+    holder.sessions = [night, nap];
+    mount(<HistoryPage />);
+    const list = await screen.findByRole("list", { name: "Sonos do dia" });
+
+    expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+    expect(within(list).queryAllByRole("button")).toHaveLength(0);
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Adicionar|Registrar|Editar|Excluir/ })).not.toBeInTheDocument();
   });
 });

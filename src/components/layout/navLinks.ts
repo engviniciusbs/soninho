@@ -23,9 +23,9 @@ export const ALL_NAV_LINKS: NavLink[] = [
   { href: "/more", label: "Mais", icon: IconMore },
 ];
 
-const NANNY_TABS = new Set(["/app", "/more"]);
+const NANNY_TABS = new Set(["/app", "/feeding", "/more"]);
 
-/** Modo babá: só Início (timer e recados) e Mais (onde ela vê só o Perfil). */
+/** Modo babá: Início (timer e recados), Comida e Mais (onde ela vê Notificações e Perfil). */
 export function getNavLinks(nannyMode: boolean): NavLink[] {
   if (!nannyMode) return ALL_NAV_LINKS;
   return ALL_NAV_LINKS.filter((l) => NANNY_TABS.has(l.href));

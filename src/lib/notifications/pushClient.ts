@@ -53,10 +53,8 @@ export async function subscribeToPush(): Promise<boolean> {
   return res.ok;
 }
 
-export async function unsubscribeFromPush(): Promise<boolean> {
-  const subscription = await getExistingSubscription();
-  if (!subscription) return true;
-
+/** Deactivates the row (needs the session) and drops the browser subscription. */
+async function cancelSubscription(subscription: PushSubscription): Promise<void> {
   await fetch("/api/notifications/subscribe", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
@@ -64,7 +62,25 @@ export async function unsubscribeFromPush(): Promise<boolean> {
   });
 
   await subscription.unsubscribe();
+}
+
+export async function unsubscribeFromPush(): Promise<boolean> {
+  const subscription = await getExistingSubscription();
+  if (!subscription) return true;
+  await cancelSubscription(subscription);
   return true;
+}
+
+/**
+ * Sign-out: cancels this device's push, if any. Looks the worker up with
+ * `getRegistration` (never waits on `serviceWorker.ready`, which hangs when
+ * no worker was ever registered).
+ */
+export async function unsubscribeThisDevice(): Promise<void> {
+  if (!isPushSupported()) return;
+  const reg = await navigator.serviceWorker.getRegistration();
+  const subscription = await reg?.pushManager.getSubscription();
+  if (subscription) await cancelSubscription(subscription);
 }
 
 export function isPushSupported(): boolean {

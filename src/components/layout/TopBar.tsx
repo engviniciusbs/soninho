@@ -1,10 +1,8 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -12,25 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IconLogout } from "@/components/brand/icons";
 
 /**
- * Faixa do topo: só o seletor de bebê e o sair. A marca fica na Sidebar
+ * Faixa do topo: só o seletor de bebê. A marca fica na Sidebar
  * (desktop) e, na home, dentro da própria página; as outras páginas têm o
  * título em `PageTitle`. Na home (`/app`) ela some: a página tem a marca, o
  * relógio e o seletor de bebê. Sair fica em Mais › Perfil.
  */
 export function TopBar() {
   const { babies, activeBaby, setActiveBaby } = useBaby();
-  const router = useRouter();
   const pathname = usePathname();
-  const supabase = createClient();
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
-  }
 
   if (pathname === "/app") return null;
 
@@ -67,16 +56,6 @@ export function TopBar() {
           </SelectContent>
         </Select>
       )}
-
-      <Button
-        variant="icon"
-        size="icon"
-        onClick={handleLogout}
-        className="text-sn-mu hover:text-sn-tx"
-        aria-label="Sair da conta"
-      >
-        <IconLogout size={22} />
-      </Button>
     </header>
   );
 }

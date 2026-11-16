@@ -16,6 +16,7 @@ const holder = vi.hoisted(() => ({
   suggestion: undefined as unknown,
   suggestionLoading: false,
   search: "",
+  canWrite: true,
   breast: {
     isRunning: true,
     initialSide: "LEFT" as "LEFT" | "RIGHT",
@@ -33,6 +34,9 @@ vi.mock("@/lib/supabase/feedingQueries", () => ({
   deleteBottleFeeding: vi.fn(async () => ({ error: null })),
   deleteBreastfeedingSession: vi.fn(async () => ({ error: null })),
   deleteSolidFeeding: vi.fn(async () => ({ error: null })),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("@/lib/family/recordFeedingActivity", () => ({ recordFeedingActivity: vi.fn() }));
 vi.mock("@/hooks/useFeedingSuggestion", () => ({
@@ -99,6 +103,7 @@ beforeEach(() => {
   holder.suggestion = undefined;
   holder.suggestionLoading = false;
   holder.search = "";
+  holder.canWrite = true;
   holder.breast.isRunning = true;
   holder.breast.initialSide = "LEFT";
   window.history.replaceState(null, "", "/feeding");
@@ -291,5 +296,29 @@ describe("FeedingPage", () => {
       fireEvent.click(within(dialog).getByRole("button", { name: "Confirmar exclusão" }));
     });
     expect(deleteBottleFeeding).toHaveBeenCalledWith(expect.anything(), "b-1");
+  });
+});
+
+describe("FeedingPage para quem só vê", () => {
+  it("mostra os registros sem Registrar, Iniciar, Editar ou Excluir", async () => {
+    holder.canWrite = false;
+    holder.breast.isRunning = false;
+    holder.feedings = [bottle("b1", "2026-01-01T11:00:00.000Z", 120)];
+    mount(<FeedingPage />);
+    const today = await screen.findByRole("region", { name: "Hoje" });
+
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(within(today).getByText("120 ml no total")).toBeInTheDocument();
+    expect(within(today).queryAllByRole("button")).toHaveLength(0);
+    expect(screen.queryByRole("button", { name: /Registrar|Iniciar|Editar|Excluir/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup", { name: "Tipo de alimentação" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/registre uma mamada passada/)).not.toBeInTheDocument();
+  });
+
+  it("quem registra não vê o aviso", async () => {
+    mount(<FeedingPage />);
+    await act(async () => {});
+    expect(screen.queryByText("Você tem acesso só para ver")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Registrar mamada passada/ })).toBeInTheDocument();
   });
 });

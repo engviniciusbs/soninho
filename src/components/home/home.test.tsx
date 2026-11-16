@@ -26,6 +26,7 @@ const holder = vi.hoisted(() => ({
   notes: null as unknown,
   toasts: vi.fn(),
   noDbRestore: false,
+  canWrite: true,
 }));
 
 vi.mock("@/lib/supabase/client", () => ({ createClient: () => holder.client }));
@@ -61,6 +62,9 @@ vi.mock("@/hooks/useAISuggestions", () => ({
 }));
 vi.mock("@/hooks/useRegression", () => ({
   useRegression: () => ({ data: holder.regression, isLoading: false }),
+}));
+vi.mock("@/hooks/useCanWrite", () => ({
+  useCanWrite: () => ({ canWrite: holder.canWrite, isLoading: false }),
 }));
 vi.mock("@/hooks/useFamilyActivityToasts", () => ({
   useFamilyActivityToasts: (enabled: boolean) => holder.toasts(enabled),
@@ -115,6 +119,7 @@ beforeEach(() => {
   holder.feedings = {};
   holder.toasts.mockClear();
   holder.noDbRestore = false;
+  holder.canWrite = true;
   // Back to the real read (a test may have failed or delayed it).
   vi.mocked(getSleepSessionDetails).mockReset();
   holder.lastSession = {
@@ -661,5 +666,34 @@ describe("Home", () => {
       "href",
       "/more/babies"
     );
+  });
+
+  it("viewer_sees_the_data_but_no_start_or_stop", async () => {
+    holder.canWrite = false;
+    holder.ai = nightAi;
+    await mount();
+
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Previsão de sono" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Iniciar/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Começou antes/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup", { name: "Tipo de sono" })).not.toBeInTheDocument();
+  });
+
+  it("viewer_sees_a_running_sleep_without_acordou_or_edits", async () => {
+    holder.canWrite = false;
+    seedRunning(helena.id, "NAP", 600);
+    await mount();
+
+    expect(screen.getByText("Soneca em andamento")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Acordou/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Anotar algo/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Ambiente|Temperatura|TOG/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Você tem acesso só para ver")).toBeInTheDocument();
+  });
+
+  it("writer_sees_no_view_only_notice", async () => {
+    await mount();
+    expect(screen.queryByText("Você tem acesso só para ver")).not.toBeInTheDocument();
   });
 });

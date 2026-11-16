@@ -40,13 +40,15 @@ describe("MorePage", () => {
     expect(within(babies).getByText("Lua, Theo")).toBeInTheDocument();
   });
 
-  it("shows only the profile to the nanny", () => {
+  it("shows notifications and the profile to the nanny", () => {
     renderWithProviders(<MorePage />, {
       baby: { activeBaby: lua, babies: [lua] },
       profile: { isNannyMode: true },
     });
     expect(screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent)).toEqual(["Conta"]);
-    expect(hrefs()).toEqual(["/more/profile"]);
+    expect(hrefs()).toEqual(["/more/notifications", "/more/profile"]);
+    expect(screen.getByRole("link", { name: /Notificações/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Perfil/ })).toBeInTheDocument();
   });
 
   it("shows a skeleton, not the items, while the profile loads", () => {

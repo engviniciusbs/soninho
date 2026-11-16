@@ -43,7 +43,11 @@ interface SessionFields {
 type FieldKey = keyof SessionFields;
 const ENV_KEYS: FieldKey[] = ["room_temp_celsius", "weather_condition", "sleep_sack_type", "sleep_sack_tog"];
 
-export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
+/**
+ * `canWrite` false (a viewer, or while the role loads): the sleep is shown
+ * but not started, stopped or edited.
+ */
+export function SleepTimer({ nanny = false, canWrite = true }: { nanny?: boolean; canWrite?: boolean }) {
   const {
     isRunning, elapsed, sleepType,
     notes, roomTemp, weatherCondition, sleepSackType, sleepSackTog,
@@ -267,6 +271,7 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
           onNotesOpen={() => void syncFromSession(["notes"])}
           onNotesDone={() => void saveChanged(["notes"], "a nota")}
           onStop={onStop}
+          readOnly={!canWrite}
         />
       ) : (
         <>
@@ -286,12 +291,14 @@ export function SleepTimer({ nanny = false }: { nanny?: boolean }) {
               isLoading={wwLoading}
             />
           )}
-          <StartSleepControls
-            sleepType={sleepType}
-            onSleepTypeChange={setSleepType}
-            onStart={onStart}
-            backdate={backdate}
-          />
+          {canWrite && (
+            <StartSleepControls
+              sleepType={sleepType}
+              onSleepTypeChange={setSleepType}
+              onStart={onStart}
+              backdate={backdate}
+            />
+          )}
           {!nanny && (
             <WhyThisTimeSheet
               open={whyOpen}
