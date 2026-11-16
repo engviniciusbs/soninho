@@ -175,6 +175,23 @@ describe("computeNapSuggestion", () => {
     });
   });
 
+  describe("day rollover across a DST change (America/New_York)", () => {
+    // 2026-11-01 02:00 EDT the clocks fall back to 01:00 EST: that night has
+    // 25 hours, so "tomorrow's 02:00" is not 24 h after today's.
+    it("minutes to a clock after the fall-back count the extra hour", () => {
+      const r = computeNapSuggestion({
+        birthDateIso: "2026-01-31", // 39 weeks before 2026-10-31
+        lastSleepEndIso: "2026-11-01T03:30:00Z", // 23:30 EDT on Oct 31
+        lastSessionType: "NIGHT_SLEEP",
+        timezone: "America/New_York",
+        now: new Date("2026-11-01T03:40:00Z"), // 23:40 EDT
+      });
+      expect(r.suggestedNapTime).toBe("02:00"); // 07:00Z = 02:00 EST
+      expect(r.suggestedAtIso).toBe("2026-11-01T07:00:00.000Z");
+      expect(r.minutesUntilSuggested).toBe(200);
+    });
+  });
+
   describe("absolute times for the client clock (spec #2)", () => {
     const base = {
       birthDateIso,

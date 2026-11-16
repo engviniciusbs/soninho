@@ -3,23 +3,28 @@ import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { getWakeWindowRange, wakeWindowMidpoint } from "@/lib/sleep/wakeWindows";
 import { inferNextSleepKindForAge } from "@/lib/sleep/inferNextSleepKind";
 import type { AISuggestion, SleepSession, SleepType } from "@/types";
-import { parseLocalDate } from "@/lib/dates/localDate";
+import { addDaysToKey, localDayKey, parseLocalDate } from "@/lib/dates/localDate";
 
 function minutesUntilClock(
   clock: string,
   tz: string,
   now: Date
 ): number {
-  const dayStr = formatInTimeZone(now, tz, "yyyy-MM-dd");
-  const target = fromZonedTime(
-    parse(`${dayStr} ${clock}`, "yyyy-MM-dd HH:mm", new Date()),
-    tz
-  );
-  const minutes = Math.round((target.getTime() - now.getTime()) / 60000);
+  const dayKey = localDayKey(now, tz);
+  const minutesOn = (key: string) => {
+    const target = fromZonedTime(
+      parse(`${key} ${clock}`, "yyyy-MM-dd HH:mm", new Date()),
+      tz
+    );
+    return Math.round((target.getTime() - now.getTime()) / 60000);
+  };
+  const minutes = minutesOn(dayKey);
   // Wake windows are at most a few hours long: a clock more than half a day
-  // behind is tomorrow's (a window crossing midnight). A clock just behind is
-  // the HH:mm truncation of a time still ahead by seconds.
-  if (minutes < -12 * 60) return minutes + 24 * 60;
+  // behind is tomorrow's (a window crossing midnight). Tomorrow's local date is
+  // resolved in the zone, so a DST change that night (23 or 25 h) still counts
+  // right. A clock just behind is the HH:mm truncation of a time still ahead
+  // by seconds.
+  if (minutes < -12 * 60) return minutesOn(addDaysToKey(dayKey, 1));
   return Math.max(0, minutes);
 }
 

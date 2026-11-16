@@ -193,6 +193,50 @@ describe("inferNextSleepKind", () => {
       ).toBe("NIGHT_SLEEP");
     });
 
+    // The parent forgot to log the resumed night: at 09:00, seven hours after
+    // the 02:00 waking, it is morning — not still "the night".
+    it("night ended at 02:00, now 09:00 (resumed night not logged) -> NAP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T05:00:00Z", // 02:00 local
+            now: new Date("2026-05-24T12:00:00Z"), // 09:00 local
+            windowStartHour: 3.25,
+            windowEndHour: 3.5,
+          })
+        )
+      ).toBe("NAP");
+    });
+
+    it("night ended at 23:00, now 04:30 (still night hours) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-25T02:00:00Z", // 23:00 local
+            now: new Date("2026-05-25T07:30:00Z"), // 04:30 local
+            windowStartHour: 0.25,
+            windowEndHour: 0.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
+    it("night ended at 04:00, now 06:00 (within 6 h of the waking) -> NIGHT_SLEEP", () => {
+      expect(
+        inferNextSleepKind(
+          base({
+            lastSessionType: "NIGHT_SLEEP",
+            lastSleepEndIso: "2026-05-24T07:00:00Z", // 04:00 local
+            now: new Date("2026-05-24T09:00:00Z"), // 06:00 local
+            windowStartHour: 5.25,
+            windowEndHour: 5.5,
+          })
+        )
+      ).toBe("NIGHT_SLEEP");
+    });
+
     it("night ended at 05:00 (morning) -> NAP", () => {
       expect(
         inferNextSleepKind(

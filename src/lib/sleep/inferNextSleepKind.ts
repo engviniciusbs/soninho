@@ -12,6 +12,8 @@ type RecentSession = Pick<SleepSession, "type" | "start_time" | "end_time">;
 /** A night that ended in [19:00, 05:00) local was a night waking, not the morning. */
 const NIGHT_WAKING_FROM = 19;
 const NIGHT_WAKING_UNTIL = 5;
+/** The night-waking rule holds this long after the waking outside night hours. */
+const NIGHT_WAKING_HOLD_MS = 6 * 60 * 60_000;
 /** A wake window ending at or after this local hour leads into the night. */
 const BEDTIME_WINDOW_END = 18;
 /** After a late wake from the night, from this hour on the next sleep is the night. */
@@ -87,9 +89,15 @@ export function inferNextSleepKind(params: {
   const nowHour = localHour(now.toISOString(), tz);
 
   // A sleep that ended between 19:00 and 05:00 is a night waking: the baby
-  // goes back to the night sleep.
-  if (lastEndHour >= NIGHT_WAKING_FROM || lastEndHour < NIGHT_WAKING_UNTIL) {
-    return "NIGHT_SLEEP";
+  // goes back to the night sleep. Only while it is still night (or shortly
+  // after the waking): if the resumed night was never logged, by mid-morning
+  // the next sleep is a nap again.
+  const isNightHour = (h: number) => h >= NIGHT_WAKING_FROM || h < NIGHT_WAKING_UNTIL;
+  if (isNightHour(lastEndHour)) {
+    const sinceWakingMs = now.getTime() - Date.parse(params.lastSleepEndIso);
+    if (isNightHour(nowHour) || sinceWakingMs <= NIGHT_WAKING_HOLD_MS) {
+      return "NIGHT_SLEEP";
+    }
   }
 
   // The wake window runs into the evening → bedtime, whatever time it is now.
