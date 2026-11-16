@@ -18,12 +18,13 @@ import {
 } from "@/components/ui/dialog";
 import type { Baby } from "@/types";
 
-const EMOJIS = ["🍼", "👶", "🌙", "⭐", "💤", "🧸", "🎀", "🦊", "🐰", "🐻"];
 const REQUIRED_MESSAGE = "Preencha nome e data de nascimento";
 
 const babySchema = z.object({
   name: z.string().trim().min(1, REQUIRED_MESSAGE),
   birth_date: z.string().min(1, REQUIRED_MESSAGE),
+  // No longer edited here (the avatar shows the photo or the initial); the
+  // stored value rides along unchanged so the payload keeps its shape.
   avatar_emoji: z.string(),
   avatar_url: z.string().nullable(),
 });
@@ -70,9 +71,9 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
       avatar_url: baby?.avatar_url ?? null,
     },
   });
-  const [name, emoji, avatarUrl] = useWatch({
+  const [name, avatarUrl] = useWatch({
     control,
-    name: ["name", "avatar_emoji", "avatar_url"],
+    name: ["name", "avatar_url"],
   });
 
   // Busy from the click on, validation included, as before the form moved to RHF.
@@ -99,9 +100,8 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
         <div className="flex flex-col items-center gap-2 py-2">
           <BabyAvatar
             avatarUrl={avatarUrl}
-            emoji={emoji}
-            name={name || "Bebê"}
-            size="xl"
+            name={name}
+            size="lg"
             editable
             uploading={isUploading}
             onUploadClick={() => fileInputRef.current?.click()}
@@ -159,25 +159,6 @@ function BabyFields({ baby, onDone }: { baby: Baby | null; onDone: () => void })
               />
             )}
           />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Emoji (fallback sem foto)</label>
-          <div className="flex flex-wrap gap-2">
-            {EMOJIS.map((e) => (
-              <button
-                key={e}
-                type="button"
-                onClick={() => setValue("avatar_emoji", e)}
-                className={`flex h-10 w-10 items-center justify-center rounded-xl text-xl transition-all ${
-                  emoji === e
-                    ? "bg-primary/20 ring-2 ring-primary"
-                    : "bg-secondary hover:bg-secondary/80"
-                }`}
-              >
-                {e}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
       <DialogFooter className="gap-2">

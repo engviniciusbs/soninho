@@ -146,7 +146,8 @@ describe("SettingsPage", () => {
     const { user, queryClient } = await mount();
     const invalidate = vi.spyOn(queryClient, "invalidateQueries");
 
-    // Edit: trimmed name, chosen emoji, existing avatar_url (null) kept.
+    // Edit: trimmed name; the stored avatar_emoji and avatar_url (null) ride along
+    // unchanged (the emoji picker left the form in the redesign, spec §8.10).
     await user.click(screen.getByRole("button", { name: "Editar" }));
     const dialog = await screen.findByRole("dialog");
     await settle();
@@ -154,12 +155,11 @@ describe("SettingsPage", () => {
     const name = screen.getByPlaceholderText("Nome do bebê");
     await user.clear(name);
     await user.type(name, "  Lia Maria  ");
-    await user.click(screen.getByRole("button", { name: "🌙" }));
     await user.click(screen.getByRole("button", { name: "Salvar" }));
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bebê atualizado"));
     expect(sb.find("babies", "update").map((c) => c.ops)).toEqual([
       [
-        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "🌙", avatar_url: null }]],
+        ["update", [{ name: "Lia Maria", birth_date: "2025-11-01", avatar_emoji: "🦊", avatar_url: null }]],
         ["eq", ["id", "baby-1"]],
         ["select", []],
         ["single", []],

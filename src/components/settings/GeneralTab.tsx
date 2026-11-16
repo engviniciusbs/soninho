@@ -74,7 +74,6 @@ export function GeneralTab({ currentUserId }: { currentUserId: string | null }) 
                 <div className="flex items-center gap-3">
                   <BabyAvatar
                     avatarUrl={baby.avatar_url}
-                    emoji={baby.avatar_emoji ?? "🍼"}
                     name={baby.name}
                     size="md"
                   />

@@ -55,7 +55,6 @@ export default function FeedingPage() {
           leading={
             <BabyAvatar
               avatarUrl={activeBaby?.avatar_url}
-              emoji={activeBaby?.avatar_emoji ?? "🍼"}
               name={activeBaby?.name}
               size="md"
             />
