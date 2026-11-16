@@ -155,7 +155,7 @@ describe("selectAlerts", () => {
       sessionId: SESSION,
       eventType: "NAP_SOON",
       dedupeKey: `${BABY}:${SESSION}:NAP_SOON:owner-1`,
-      title: "🌙 Hora da soneca chegando!",
+      title: "Hora da soneca chegando",
       body: "Faltam ~15 min para a janela de sono. Prepare o ambiente!",
       tag: `nap-soon-${BABY}`,
     });
@@ -181,7 +181,7 @@ describe("selectAlerts", () => {
       sessionId: SESSION,
       eventType: "OVERDUE",
       dedupeKey: `${BABY}:${SESSION}:OVERDUE:owner-1`,
-      title: "⚠️ Passou da janela de sono!",
+      title: "Passou da janela de sono",
       body: "Já passou 7 min da janela ideal. O bebê pode estar muito cansado.",
       tag: `overdue-${BABY}`,
     });

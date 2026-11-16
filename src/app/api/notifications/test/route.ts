@@ -28,7 +28,7 @@ export async function POST() {
   }
 
   const payload = JSON.stringify({
-    title: "🧪 Teste — Soninho",
+    title: "Teste do Soninho",
     body: "As notificações estão funcionando! Você receberá alertas sobre sonecas.",
     icon: PUSH_ICON,
     tag: "test-notification",

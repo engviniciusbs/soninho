@@ -206,6 +206,8 @@ describe("deliverAlerts payload and TTL", () => {
       unknown,
     ];
     expect(JSON.parse(payload).icon).toBe("/brand/soninho-mark@2x.png");
+    // sw.js keeps only OVERDUE on screen (requireInteraction), so it needs the type.
+    expect(JSON.parse(payload).type).toBe(alert("u1").eventType);
     expect(options).toEqual({ timeout: 10_000, TTL: 900 });
   });
 

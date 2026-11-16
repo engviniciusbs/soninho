@@ -69,11 +69,15 @@ export function isInQuietHours(now: Date, timezone: string, start: string, end: 
   return current >= s || current < e;
 }
 
-function prefTimeZone(pref: AlertPref): string {
+export function prefTimeZone(pref: Pick<AlertPref, "timezone">): string {
   return pref.timezone && isValidTimeZone(pref.timezone) ? pref.timezone : DEFAULT_TIMEZONE;
 }
 
-function prefIsQuiet(now: Date, pref: AlertPref): boolean {
+/** Quiet hours of a preference row, with the app defaults for unset fields. */
+export function prefIsQuiet(
+  now: Date,
+  pref: Pick<AlertPref, "quiet_hours_start" | "quiet_hours_end" | "timezone">
+): boolean {
   return isInQuietHours(
     now,
     prefTimeZone(pref),
@@ -137,14 +141,14 @@ export function selectAlerts(input: SelectAlertsInput): PlannedAlert[] {
       if (elapsed >= range.maxMinutes) {
         alert = {
           eventType: "OVERDUE",
-          title: "⚠️ Passou da janela de sono!",
+          title: "Passou da janela de sono",
           body: `Já passou ${elapsed - range.maxMinutes} min da janela ideal. O bebê pode estar muito cansado.`,
           tag: `overdue-${baby.id}`,
         };
       } else if (elapsed >= range.maxMinutes - alertBefore) {
         alert = {
           eventType: "NAP_SOON",
-          title: "🌙 Hora da soneca chegando!",
+          title: "Hora da soneca chegando",
           body: `Faltam ~${range.maxMinutes - elapsed} min para a janela de sono. Prepare o ambiente!`,
           tag: `nap-soon-${baby.id}`,
         };

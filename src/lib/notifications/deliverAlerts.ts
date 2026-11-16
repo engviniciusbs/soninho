@@ -109,6 +109,7 @@ export async function deliverAlerts(opts: {
 
   const jobs = alerts.flatMap((alert) => {
     const payload = JSON.stringify({
+      type: alert.eventType,
       title: alert.title,
       body: alert.body,
       icon: PUSH_ICON,
