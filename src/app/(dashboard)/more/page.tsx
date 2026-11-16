@@ -123,8 +123,10 @@ function MoreSkeleton() {
 }
 
 export default function MorePage() {
-  const { isNannyMode, isLoading } = useUserProfile();
-  const { activeBaby, babies } = useBaby();
+  const { isNannyMode, isLoading: profileLoading } = useUserProfile();
+  const { activeBaby, babies, isLoading: babiesLoading } = useBaby();
+  // Both feed the list: the profile picks the groups, the babies the subtitles.
+  const isLoading = profileLoading || babiesLoading;
   const groups = isNannyMode
     ? NANNY_GROUPS
     : buildGroups(activeBaby?.name ?? null, babies.map((b) => b.name));

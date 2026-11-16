@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useBabySettings } from "@/hooks/settings/useBabySettings";
+import { useBaby } from "@/components/providers/BabyProvider";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BabyAvatar } from "@/components/baby/BabyAvatar";
 import { BabyProfileForm } from "@/components/settings/BabyProfileForm";
 import { IconPen, IconPlus, IconTrash } from "@/components/brand/icons";
@@ -21,6 +23,7 @@ import type { Baby as BabyRow } from "@/types";
 /** Babies list (Mais › Bebês) with the add, edit, photo and delete dialogs. */
 export function BabiesSettings() {
   const { babies, remove } = useBabySettings();
+  const { isLoading } = useBaby();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<BabyRow | null>(null);
   const [formSession, setFormSession] = useState(0);
@@ -35,6 +38,20 @@ export function BabiesSettings() {
   async function handleDelete(id: string) {
     await remove(id);
     setDeleteId(null);
+  }
+
+  if (isLoading) {
+    return (
+      <Card className="gap-0 px-3.5 py-1" role="status" aria-label="Carregando bebês">
+        <div className="flex items-center gap-3.5 px-1 py-3">
+          <Skeleton className="size-[38px] shrink-0 rounded-full" />
+          <div className="flex flex-1 flex-col gap-1.5">
+            <Skeleton className="h-4 w-2/5" />
+            <Skeleton className="h-3 w-3/5" />
+          </div>
+        </div>
+      </Card>
+    );
   }
 
   return (

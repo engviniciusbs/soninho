@@ -58,6 +58,15 @@ describe("MorePage", () => {
     expect(screen.queryAllByRole("link")).toHaveLength(0);
   });
 
+  it("keeps the skeleton while the babies load, never a false empty subtitle", () => {
+    renderWithProviders(<MorePage />, {
+      baby: { activeBaby: null, babies: [], isLoading: true },
+      profile: {},
+    });
+    expect(screen.getByRole("status", { name: "Carregando" })).toBeInTheDocument();
+    expect(screen.queryByText("Adicione o primeiro bebê")).not.toBeInTheDocument();
+  });
+
   it("falls back when there is no baby yet", () => {
     renderWithProviders(<MorePage />, { baby: { activeBaby: null, babies: [] }, profile: {} });
     expect(screen.getByText("Converse sobre o sono do bebê")).toBeInTheDocument();
