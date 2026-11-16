@@ -58,8 +58,9 @@ Spec: `docs/superpowers/specs/2026-11-16-correcoes-fase2-design.md`. Resolvido n
 
 ### Ficou para depois (follow-ups)
 - Avatar do bebê fica no bucket público depois da exclusão (limpar o storage no `delete_baby` ou numa rotina).
-- Precisão: Análise arredonda cada dia a 0,1 h (`buildCompleteDailySleepTotals`) enquanto Registro e e-mail usam minutos exatos; "sono por dia" e a média do débito podem diferir por alguns minutos.
+- Precisão: os números do período já usam minutos exatos, mas o débito e a regressão ainda arredondam cada dia a 0,1 h (`buildCompleteDailySleepTotals`); "sono por dia" e a média do débito podem diferir por alguns minutos.
 - Consultas do resumo semanal por e-mail não são paginadas (limite de 1000 linhas do PostgREST).
+- Mais › Bebês: o lápis some só para os bebês da família ativa em que a pessoa é viewer; para outras famílias a tela não sabe o papel (falha aberta).
 - Fim da janela de soneca: a regra "última soneca terminou depois do corte → noite" ainda olha só a hora do fim, sem checar se foi hoje (mesmo tipo de regra sem limite da madrugada, caso raro).
 - Peito (baixo, a família não amamenta mais): toast errado ao parar logo depois de trocar de lado; divisão com troca antiga; editar `start_time` de sessão aberta.
 - `FeedingSuggestionCard` com contagem congelada (o PR de comida vai substituir); `last-session-key` sem polling para registros manuais de outro celular.
