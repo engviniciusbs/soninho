@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateTimeRangeFields } from "@/components/forms/DateTimeRangeFields";
+import {
+  useTimeRangeValidation,
+  type TimeRangeNames,
+} from "@/components/forms/useTimeRangeValidation";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -73,6 +78,42 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const RANGE_NAMES: TimeRangeNames<FormData> = {
+  startDate: "start_date",
+  startTime: "start_time_input",
+  endDate: "end_date",
+  endTime: "end_time_input",
+};
+
+function envFromSession(s?: SleepSession | null): EnvironmentData {
+  return s
+    ? {
+        room_temp_celsius: s.room_temp_celsius ?? null,
+        weather_condition: s.weather_condition ?? null,
+        sleep_sack_type: s.sleep_sack_type ?? null,
+        sleep_sack_tog: s.sleep_sack_tog ?? null,
+        clothing_description: s.clothing_description ?? null,
+      }
+    : EMPTY_ENV;
+}
+
+function buildFormValues(s?: SleepSession | null): FormData {
+  const start = s ? new Date(s.start_time) : new Date();
+  const end = s?.end_time ? new Date(s.end_time) : new Date();
+  return {
+    type: (s?.type ?? "NAP") as "NAP" | "NIGHT_SLEEP",
+    start_date: toLocalDateString(start),
+    start_time_input: toLocalTimeString(start),
+    end_date: toLocalDateString(end),
+    end_time_input: toLocalTimeString(end),
+    quality: s?.quality?.toString() ?? "",
+    how_fell_asleep: s?.how_fell_asleep ?? "",
+    wake_reason: s?.wake_reason ?? "",
+    notes: s?.notes ?? "",
+    location: s?.location ?? "",
+  };
+}
+
 interface SleepFormProps {
   open: boolean;
   onClose: () => void;
@@ -80,79 +121,51 @@ interface SleepFormProps {
 }
 
 export function SleepForm({ open, onClose, session }: SleepFormProps) {
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {session ? "Editar registro" : "Registrar sono manualmente"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* The popup's content mounts on every opening, so the form starts
+            from `session` (or "now") each time without a reset effect. */}
+        <SleepFormBody onClose={onClose} session={session} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SleepFormBody({ onClose, session }: Omit<SleepFormProps, "open">) {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
   const [envOpen, setEnvOpen] = useState(false);
-  const [envData, setEnvData] = useState<EnvironmentData>(
-    session
-      ? {
-          room_temp_celsius: session.room_temp_celsius ?? null,
-          weather_condition: session.weather_condition ?? null,
-          sleep_sack_type: session.sleep_sack_type ?? null,
-          sleep_sack_tog: session.sleep_sack_tog ?? null,
-          clothing_description: session.clothing_description ?? null,
-        }
-      : EMPTY_ENV
-  );
+  const [envData, setEnvData] = useState<EnvironmentData>(() => envFromSession(session));
 
   const isEdit = !!session;
-
-  function buildFormValues(s?: SleepSession | null) {
-    const start = s ? new Date(s.start_time) : new Date();
-    const end = s?.end_time ? new Date(s.end_time) : new Date();
-    return {
-      type: (s?.type ?? "NAP") as "NAP" | "NIGHT_SLEEP",
-      start_date: toLocalDateString(start),
-      start_time_input: toLocalTimeString(start),
-      end_date: toLocalDateString(end),
-      end_time_input: toLocalTimeString(end),
-      quality: s?.quality?.toString() ?? "",
-      how_fell_asleep: s?.how_fell_asleep ?? "",
-      wake_reason: s?.wake_reason ?? "",
-      notes: s?.notes ?? "",
-      location: s?.location ?? "",
-    };
-  }
 
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
-    reset,
+    control,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: buildFormValues(session),
   });
 
-  // Re-populate the form whenever the dialog opens or the session changes.
-  // useForm's defaultValues are only applied on first mount, so we must
-  // call reset() explicitly each time.
-  useEffect(() => {
-    if (open) {
-      reset(buildFormValues(session));
-      setEnvData(
-        session
-          ? {
-              room_temp_celsius: session.room_temp_celsius ?? null,
-              weather_condition: session.weather_condition ?? null,
-              sleep_sack_type: session.sleep_sack_type ?? null,
-              sleep_sack_tog: session.sleep_sack_tog ?? null,
-              clothing_description: session.clothing_description ?? null,
-            }
-          : EMPTY_ENV
-      );
-      setEnvOpen(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, session?.id]);
+  useTimeRangeValidation(control, RANGE_NAMES, { clearErrors });
 
-  // eslint-disable-next-line react-hooks/incompatible-library -- reactCompiler is not enabled (next.config.ts), so "compilation skipped" has no runtime effect; RHF watch() is used intentionally (TODO(PR4): consider useWatch).
-  const selectedType = watch("type");
+  const [selectedType, quality, howFellAsleep, wakeReason] = useWatch({
+    control,
+    name: ["type", "quality", "how_fell_asleep", "wake_reason"],
+  });
 
   // Count how many env fields are filled
   const envFilled = [
@@ -221,231 +234,163 @@ export function SleepForm({ open, onClose, session }: SleepFormProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Editar registro" : "Registrar sono manualmente"}
-          </DialogTitle>
-        </DialogHeader>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Select
+        value={selectedType}
+        onValueChange={(v) =>
+          setValue("type", v as "NAP" | "NIGHT_SLEEP")
+        }
+      >
+        <SelectTrigger className="rounded-xl" aria-label="Tipo de sono">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="NAP">Soneca</SelectItem>
+          <SelectItem value="NIGHT_SLEEP">Sono noturno</SelectItem>
+        </SelectContent>
+      </Select>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Select
-            value={selectedType}
-            onValueChange={(v) =>
-              setValue("type", v as "NAP" | "NIGHT_SLEEP")
-            }
-          >
-            <SelectTrigger className="rounded-xl" aria-label="Tipo de sono">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="NAP">Soneca</SelectItem>
-              <SelectItem value="NIGHT_SLEEP">Sono noturno</SelectItem>
-            </SelectContent>
-          </Select>
+      <DateTimeRangeFields control={control} names={RANGE_NAMES} />
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label htmlFor="start_date" className="text-xs text-muted-foreground">
-                Data início
-              </label>
-              <Input
-                id="start_date"
-                type="date"
-                {...register("start_date")}
-                className="rounded-xl"
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="start_time_input" className="text-xs text-muted-foreground">
-                Hora início
-              </label>
-              <Input
-                id="start_time_input"
-                type="time"
-                {...register("start_time_input")}
-                className="rounded-xl"
-                autoComplete="off"
-              />
-            </div>
+      <Select
+        value={quality ?? ""}
+        onValueChange={(v) => v && setValue("quality", v)}
+      >
+        <SelectTrigger className="rounded-xl" aria-label="Qualidade do sono">
+          <SelectValue placeholder="Qualidade (opcional)" />
+        </SelectTrigger>
+        <SelectContent>
+          {[1, 2, 3, 4, 5].map((q) => (
+            <SelectItem key={q} value={q.toString()}>
+              {"⭐".repeat(q)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select
+        value={howFellAsleep ?? ""}
+        onValueChange={(v) => v && setValue("how_fell_asleep", v)}
+      >
+        <SelectTrigger className="rounded-xl" aria-label="Como adormeceu">
+          <SelectValue placeholder="Como adormeceu? (opcional)" />
+        </SelectTrigger>
+        <SelectContent>
+          {HOW_FELL_ASLEEP_OPTIONS.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.emoji} {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {selectedType === "NIGHT_SLEEP" && (
+        <Select
+          value={wakeReason ?? ""}
+          onValueChange={(v) => v && setValue("wake_reason", v)}
+        >
+          <SelectTrigger className="rounded-xl" aria-label="Motivo do despertar">
+            <SelectValue placeholder="Por que acordou? (opcional)" />
+          </SelectTrigger>
+          <SelectContent>
+            {WAKE_REASON_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.emoji} {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
+      <div className="space-y-1">
+        <label htmlFor="location" className="sr-only">Local</label>
+        <Input
+          id="location"
+          placeholder="Local (berço, braço, carrinho…)"
+          {...register("location")}
+          className="rounded-xl"
+          autoComplete="off"
+        />
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="notes" className="sr-only">Notas</label>
+        <Textarea
+          id="notes"
+          placeholder="Notas (opcional)"
+          {...register("notes")}
+          className="rounded-xl resize-none"
+          rows={2}
+        />
+      </div>
+
+      {/* ── Environment section ── */}
+      <div className="rounded-xl border border-border/50 overflow-hidden">
+        <button
+          type="button"
+          aria-expanded={envOpen}
+          aria-controls="env-section"
+          onClick={() => setEnvOpen(!envOpen)}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setEnvOpen(!envOpen); }}
+          className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          style={{ touchAction: "manipulation" }}
+        >
+          <div className="flex items-center gap-2">
+            <Leaf className="h-4 w-4 text-emerald-400" aria-hidden="true" />
+            <span className="text-sm font-medium">Condições do ambiente</span>
+            {envFilled > 0 && (
+              <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[11px] font-medium text-primary">
+                {envFilled} preenchido{envFilled > 1 ? "s" : ""}
+              </span>
+            )}
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label htmlFor="end_date" className="text-xs text-muted-foreground">
-                Data fim
-              </label>
-              <Input
-                id="end_date"
-                type="date"
-                {...register("end_date")}
-                className="rounded-xl"
-                autoComplete="off"
-              />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="end_time_input" className="text-xs text-muted-foreground">
-                Hora fim
-              </label>
-              <Input
-                id="end_time_input"
-                type="time"
-                {...register("end_time_input", { onChange: () => clearErrors("end_time_input") })}
-                aria-invalid={!!errors.end_time_input}
-                className="rounded-xl"
-                autoComplete="off"
-              />
-              {errors.end_time_input?.message && (
-                <p role="alert" className="text-xs text-destructive">
-                  {errors.end_time_input.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <Select
-            value={watch("quality") ?? ""}
-            onValueChange={(v) => v && setValue("quality", v)}
+          <motion.div
+            animate={{ rotate: envOpen ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
           >
-            <SelectTrigger className="rounded-xl" aria-label="Qualidade do sono">
-              <SelectValue placeholder="Qualidade (opcional)" />
-            </SelectTrigger>
-            <SelectContent>
-              {[1, 2, 3, 4, 5].map((q) => (
-                <SelectItem key={q} value={q.toString()}>
-                  {"⭐".repeat(q)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          </motion.div>
+        </button>
 
-          <Select
-            value={watch("how_fell_asleep") ?? ""}
-            onValueChange={(v) => v && setValue("how_fell_asleep", v)}
-          >
-            <SelectTrigger className="rounded-xl" aria-label="Como adormeceu">
-              <SelectValue placeholder="Como adormeceu? (opcional)" />
-            </SelectTrigger>
-            <SelectContent>
-              {HOW_FELL_ASLEEP_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.emoji} {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {selectedType === "NIGHT_SLEEP" && (
-            <Select
-              value={watch("wake_reason") ?? ""}
-              onValueChange={(v) => v && setValue("wake_reason", v)}
+        <AnimatePresence initial={false}>
+          {envOpen && (
+            <motion.div
+              id="env-section"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className={cn("overflow-hidden border-t border-border/40")}
             >
-              <SelectTrigger className="rounded-xl" aria-label="Motivo do despertar">
-                <SelectValue placeholder="Por que acordou? (opcional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {WAKE_REASON_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.emoji} {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          <div className="space-y-1">
-            <label htmlFor="location" className="sr-only">Local</label>
-            <Input
-              id="location"
-              placeholder="Local (berço, braço, carrinho…)"
-              {...register("location")}
-              className="rounded-xl"
-              autoComplete="off"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label htmlFor="notes" className="sr-only">Notas</label>
-            <Textarea
-              id="notes"
-              placeholder="Notas (opcional)"
-              {...register("notes")}
-              className="rounded-xl resize-none"
-              rows={2}
-            />
-          </div>
-
-          {/* ── Environment section ── */}
-          <div className="rounded-xl border border-border/50 overflow-hidden">
-            <button
-              type="button"
-              aria-expanded={envOpen}
-              aria-controls="env-section"
-              onClick={() => setEnvOpen(!envOpen)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setEnvOpen(!envOpen); }}
-              className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-              style={{ touchAction: "manipulation" }}
-            >
-              <div className="flex items-center gap-2">
-                <Leaf className="h-4 w-4 text-emerald-400" aria-hidden="true" />
-                <span className="text-sm font-medium">Condições do ambiente</span>
-                {envFilled > 0 && (
-                  <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[11px] font-medium text-primary">
-                    {envFilled} preenchido{envFilled > 1 ? "s" : ""}
-                  </span>
-                )}
+              <div className="p-4">
+                <EnvironmentPicker value={envData} onChange={setEnvData} />
               </div>
-              <motion.div
-                animate={{ rotate: envOpen ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-              </motion.div>
-            </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-            <AnimatePresence initial={false}>
-              {envOpen && (
-                <motion.div
-                  id="env-section"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: "easeInOut" }}
-                  className={cn("overflow-hidden border-t border-border/40")}
-                >
-                  <div className="p-4">
-                    <EnvironmentPicker value={envData} onChange={setEnvData} />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="rounded-xl"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="rounded-xl"
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? "Salvando…"
-                : isEdit
-                  ? "Atualizar"
-                  : "Registrar"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+      <div className="flex gap-2 justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onClose}
+          className="rounded-xl"
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          className="rounded-xl"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? "Salvando…"
+            : isEdit
+              ? "Atualizar"
+              : "Registrar"}
+        </Button>
+      </div>
+    </form>
   );
 }

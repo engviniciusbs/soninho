@@ -1,24 +1,17 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import {
-  startSleepSession,
-  endSleepSession,
-  getActiveSleepSession,
-  getSleepSessionStatus,
-} from "@/lib/supabase/queries";
+import { startSleepSession, endSleepSession, getActiveSleepSession, getSleepSessionStatus } from "@/lib/supabase/queries/sleep";
 import { useSleepStore, useActiveSleepTimer, type SleepType } from "@/store/sleepStore";
 import { useBaby } from "@/components/providers/BabyProvider";
-import { formatElapsed } from "@/lib/utils";
+import { formatElapsedSeconds } from "@/lib/utils";
 import { toast } from "sonner";
-import {
-  classifyEndResult,
-  classifyLiveSession,
-  isUniqueViolation,
-} from "@/lib/supabase/sessionConflict";
+import { classifyEndResult, isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { recordSleepActivity } from "@/lib/family/recordSleepActivity";
+import { useSessionClock } from "@/hooks/timer/useSessionClock";
+import { useActiveSessionSync } from "@/hooks/timer/useActiveSessionSync";
 
 export function useSleepTimer() {
   const supabase = createClient();
@@ -48,20 +41,9 @@ export function useSleepTimer() {
   const setSleepSackType = useCallback((v: string | null) => updateDraft(babyId, { sleepSackType: v }), [updateDraft, babyId]);
   const setSleepSackTog = useCallback((v: number | null) => updateDraft(babyId, { sleepSackTog: v }), [updateDraft, babyId]);
 
-  // Last interval tick, tagged with the startTime it was computed for. The
-  // displayed value is derived in render: "00:00:00" while stopped and until
-  // the first tick of the current run (same UX as the previous reset-in-effect).
-  const [tick, setTick] = useState<{ startTime: string; value: string } | null>(null);
-
-  useEffect(() => {
-    if (!startTime) return;
-    const interval = setInterval(() => {
-      setTick({ startTime, value: formatElapsed(startTime) });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [startTime]);
-
-  const elapsed = startTime && tick?.startTime === startTime ? tick.value : "00:00:00";
+  // Shared clock: "00:00:00" while stopped and until the clock's first value.
+  const { elapsedSec } = useSessionClock(startTime);
+  const elapsed = elapsedSec === null ? "00:00:00" : formatElapsedSeconds(elapsedSec);
 
   const invalidateSleepQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ["sleep-sessions"] });
@@ -85,31 +67,23 @@ export function useSleepTimer() {
     void restore();
   }, [babyId, isRunning, supabase, restoreFromSession]);
 
-  // Poll the running session (by id) every 20s. Only an error-free response
-  // can stop the local timer; a network error keeps it (see classifyLiveSession).
-  const { data: live } = useQuery({
-    queryKey: ["active-session-live", babyId, sessionId],
-    queryFn: async () => {
-      const result = await getSleepSessionStatus(supabase, sessionId!);
-      return { sessionId: sessionId!, status: classifyLiveSession(result, babyId!) };
-    },
-    enabled: !!babyId && !!sessionId,
-    refetchInterval: 20_000,
-    staleTime: 0,
-  });
-
-  useEffect(() => {
-    if (!babyId || !live || live.sessionId !== sessionId) return;
-    if (live.status === "ended") {
+  useActiveSessionSync({
+    queryKey: "active-session-live",
+    babyId,
+    sessionId,
+    fetchStatus: (id) => getSleepSessionStatus(supabase, id),
+    onEnded: () => {
+      if (!babyId) return;
       stopTimer(babyId);
       invalidateSleepQueries();
       toast.info("Sono finalizado por outro cuidador(a)");
-    } else if (live.status === "mismatch") {
+    },
+    onMismatch: () => {
       // Stale local state pointing at another baby's session: drop it; the
       // restore effect then loads this baby's real open session, if any.
-      stopTimer(babyId);
-    }
-  }, [live, babyId, sessionId, stopTimer, invalidateSleepQueries]);
+      if (babyId) stopTimer(babyId);
+    },
+  });
 
   const handleStart = useCallback(async (startTimeIso?: string) => {
     if (!activeBaby) {

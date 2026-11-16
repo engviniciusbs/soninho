@@ -9,18 +9,18 @@ import {
 } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { getBabies } from "@/lib/supabase/queries";
+import { getBabies } from "@/lib/supabase/queries/babies";
 import { useSleepStore } from "@/store/sleepStore";
 import type { Baby } from "@/types";
 
-interface BabyContextValue {
+export interface BabyContextValue {
   babies: Baby[];
   activeBaby: Baby | null;
   setActiveBaby: (baby: Baby) => void;
   isLoading: boolean;
 }
 
-const BabyContext = createContext<BabyContextValue>({
+export const BabyContext = createContext<BabyContextValue>({
   babies: [],
   activeBaby: null,
   setActiveBaby: () => {},
@@ -32,7 +32,8 @@ export function useBaby() {
 }
 
 export function BabyProvider({ children }: { children: ReactNode }) {
-  const supabase = createClient();
+  // One browser client per provider instance (keeps the effect deps stable).
+  const [supabase] = useState(() => createClient());
   const queryClient = useQueryClient();
   // The selected baby is persisted in the sleep store (it does not own the
   // timers, which are keyed by baby id).
@@ -65,8 +66,7 @@ export function BabyProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [supabase, queryClient]);
 
   const { data: babies = [], isPending } = useQuery({
     // Include sessionUserId so a different user never reads another user's cached babies

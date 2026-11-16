@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   shouldRequestRegressionAi,
   markRegressionAiRequested,
+  shouldMarkRegressionAi,
 } from "@/lib/sleep/regressionAiGate";
 
 interface RegressionResponse {
@@ -63,7 +64,7 @@ export function RegressionRadar() {
       });
       if (!res.ok) return null;
       const json: RegressionResponse = await res.json();
-      if (withAi && json.detected && json.explanation) {
+      if (shouldMarkRegressionAi(withAi, json)) {
         markRegressionAiRequested(activeBaby.id);
       }
       return json;

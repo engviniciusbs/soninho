@@ -1,0 +1,684 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SleepTimer (characterization) > renders_advanced_controls 1`] = `
+<div
+  class="overflow-hidden w-full max-w-[300px] space-y-3"
+  style="opacity: 0; height: 0px;"
+>
+  <div>
+    <p
+      class="mb-2 text-center text-[10px] font-medium tracking-widest uppercase text-white/25"
+    >
+      Iniciou há quanto tempo?
+    </p>
+    <div
+      class="flex flex-wrap justify-center gap-1.5"
+    >
+      <button
+        aria-pressed="false"
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55"
+        style=""
+      >
+        Agora
+      </button>
+      <button
+        aria-pressed="false"
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55"
+      >
+        5 min
+      </button>
+      <button
+        aria-pressed="false"
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55"
+      >
+        10 min
+      </button>
+      <button
+        aria-pressed="false"
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55"
+      >
+        15 min
+      </button>
+      <button
+        aria-pressed="false"
+        class="rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring border border-white/10 text-white/35 hover:border-white/20 hover:text-white/55"
+      >
+        30 min
+      </button>
+      <button
+        aria-pressed="true"
+        class="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-white"
+        style="background-color: rgb(245, 158, 11);"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-clock h-3 w-3"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+          />
+          <path
+            d="M12 6v6l4 2"
+          />
+        </svg>
+        Horário
+      </button>
+    </div>
+    <div
+      class="overflow-hidden mt-2 flex items-center justify-center gap-2"
+      style="opacity: 0; height: 0px;"
+    >
+      <label
+        class="text-xs text-white/30"
+        for="backdate-time"
+      >
+        Às:
+      </label>
+      <input
+        class="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-ring"
+        id="backdate-time"
+        style="color-scheme: dark;"
+        type="time"
+        value="09:00"
+      />
+    </div>
+  </div>
+  <div
+    class="rounded-2xl overflow-hidden"
+    style="background: rgba(255, 255, 255, 0.04);"
+  >
+    <button
+      class="flex w-full items-center justify-between px-4 py-2.5 text-left hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      type="button"
+    >
+      <div
+        class="flex items-center gap-2"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-leaf h-3.5 w-3.5 text-emerald-400"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20"
+          />
+          <path
+            d="M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13"
+          />
+        </svg>
+        <span
+          class="text-xs font-medium text-white/40"
+        >
+          Condições do ambiente
+        </span>
+      </div>
+      <span
+        class="flex"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-chevron-down h-3.5 w-3.5 text-white/25"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+          />
+        </svg>
+      </span>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`SleepTimer (characterization) > renders_idle_state 1`] = `
+<div
+  class="flex flex-col items-center gap-4 select-none"
+>
+  <div
+    class="relative mx-auto"
+    style="width: 288px; height: 288px;"
+  >
+    <svg
+      aria-hidden="true"
+      class="absolute inset-0"
+      height="288"
+      style="overflow: visible;"
+      viewBox="0 0 288 288"
+      width="288"
+    >
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="112"
+        stroke="rgba(255,255,255,0.07)"
+        stroke-dasharray="3 10"
+        stroke-width="1"
+      />
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="96"
+        stroke="rgba(255,255,255,0.035)"
+        stroke-width="0.75"
+      />
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        opacity="0.75"
+        r="112"
+        stroke="#34d399"
+        stroke-dasharray="0 703.71675"
+        stroke-dashoffset="175.92918860102841"
+        stroke-linecap="round"
+        stroke-width="2.5"
+        transform="rotate(-90, 144, 144)"
+      />
+      <circle
+        cx="223.19595949289334"
+        cy="223.1959594928933"
+        fill="white"
+        opacity="0.3"
+        r="2.5"
+      />
+    </svg>
+    <div
+      class="absolute"
+      style="left: 48.3143px; top: 37.7303px; transform: translateY(10px) scale(0.5); opacity: 0;"
+    >
+      <div
+        class="flex items-center gap-1 rounded-full px-2.5 py-[5px] text-[11px] font-semibold tabular-nums backdrop-blur-sm whitespace-nowrap bg-white/[0.07] text-white/80"
+        style="border: 1px dashed rgba(255, 255, 255, 0.2); box-shadow: rgba(255, 255, 255, 0.04) 0px 0px 12px;"
+      >
+        <span
+          class="text-[10px] leading-none"
+        >
+          ☁️
+        </span>
+        09:45
+      </div>
+    </div>
+    <div
+      class="absolute inset-0 flex items-center justify-center"
+    >
+      <button
+        aria-label="Iniciar soneca"
+        class="relative flex flex-col items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        style="width: 156px; height: 156px;"
+        tabindex="0"
+      >
+        <div
+          class="absolute inset-0 rounded-full"
+          style="background: radial-gradient(circle at 50% center, rgba(255, 255, 255, 0.024) 0%, transparent 80%); border: 1px solid rgba(255, 255, 255, 0.06);"
+        />
+        <div
+          class="relative flex flex-col items-center gap-1 text-center px-2"
+          style="opacity: 0; transform: translateY(6px);"
+        >
+          <span
+            class="text-[10px] font-medium text-white/35 leading-tight"
+          >
+            próxima soneca
+          </span>
+          <span
+            class="font-bold tabular-nums leading-none tracking-tight"
+            style="font-size: 24px; color: white; opacity: 0; transform: scale(0.8);"
+          >
+            45 min
+          </span>
+          <span
+            class="text-[9px] text-white/20 tracking-wide mt-0.5"
+          >
+            toque para iniciar
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div
+    class="flex w-full max-w-[300px] items-center gap-2"
+  >
+    <div
+      aria-label="Tipo de sono"
+      class="flex flex-1 rounded-full p-0.5"
+      role="group"
+      style="background: rgba(255, 255, 255, 0.06);"
+    >
+      <button
+        aria-pressed="true"
+        class="relative flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-white cursor-pointer"
+      >
+        <div
+          class="absolute inset-0 rounded-full"
+          style="background-color: rgb(245, 158, 11); opacity: 1;"
+        />
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-sun relative z-10 h-3.5 w-3.5"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="4"
+          />
+          <path
+            d="M12 2v2"
+          />
+          <path
+            d="M12 20v2"
+          />
+          <path
+            d="m4.93 4.93 1.41 1.41"
+          />
+          <path
+            d="m17.66 17.66 1.41 1.41"
+          />
+          <path
+            d="M2 12h2"
+          />
+          <path
+            d="M20 12h2"
+          />
+          <path
+            d="m6.34 17.66-1.41 1.41"
+          />
+          <path
+            d="m19.07 4.93-1.41 1.41"
+          />
+        </svg>
+        <span
+          class="relative z-10"
+        >
+          Soneca
+        </span>
+      </button>
+      <button
+        aria-pressed="false"
+        class="relative flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-white/35 cursor-pointer"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-moon relative z-10 h-3.5 w-3.5"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+          />
+        </svg>
+        <span
+          class="relative z-10"
+        >
+          Noturno
+        </span>
+      </button>
+    </div>
+    <button
+      aria-expanded="false"
+      aria-label="Opções avançadas"
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/35 hover:text-white/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      style="background: rgba(255, 255, 255, 0.06);"
+    >
+      <span
+        class="flex"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-chevron-down h-4 w-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+          />
+        </svg>
+      </span>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`SleepTimer (characterization) > renders_running_session_from_store 1`] = `
+<div
+  class="flex flex-col items-center gap-4 select-none"
+>
+  <div
+    class="relative mx-auto"
+    style="width: 288px; height: 288px;"
+  >
+    <svg
+      aria-hidden="true"
+      class="absolute inset-0"
+      height="288"
+      style="overflow: visible;"
+      viewBox="0 0 288 288"
+      width="288"
+    >
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="112"
+        stroke="rgba(255,255,255,0.07)"
+        stroke-dasharray="3 10"
+        stroke-width="1"
+      />
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="96"
+        stroke="rgba(255,255,255,0.035)"
+        stroke-width="0.75"
+      />
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="112"
+        stroke="#f59e0b"
+        stroke-dasharray="0 703.71675"
+        stroke-dashoffset="175.92918860102841"
+        stroke-linecap="round"
+        stroke-width="2.5"
+        style="filter: drop-shadow(rgb(245, 158, 11) 0px 0px 8px);"
+        transform="rotate(-90, 144, 144)"
+      />
+      <circle
+        cx="144"
+        cy="144"
+        fill="none"
+        r="112"
+        stroke="#f59e0b"
+        stroke-dasharray="506.6760631709618 703.7167544041137"
+        stroke-dashoffset="175.92918860102841"
+        stroke-linecap="round"
+        stroke-width="6"
+        style="opacity: 0.15;"
+        transform="rotate(-90, 144, 144)"
+      />
+      <circle
+        cx="223.19595949289334"
+        cy="223.1959594928933"
+        fill="white"
+        opacity="0.3"
+        r="2.5"
+      />
+    </svg>
+    <div
+      class="absolute"
+      style="left: 48.3143px; top: 37.7303px; transform: translateY(10px) scale(0.5); opacity: 0;"
+    >
+      <div
+        class="flex items-center gap-1 rounded-full px-2.5 py-[5px] text-[11px] font-semibold tabular-nums backdrop-blur-sm whitespace-nowrap bg-white/[0.07] text-white/80"
+        style="border: 1px dashed rgba(255, 255, 255, 0.2); box-shadow: rgba(255, 255, 255, 0.04) 0px 0px 12px;"
+      >
+        <span
+          class="text-[10px] leading-none"
+        >
+          ☁️
+        </span>
+        09:45
+      </div>
+    </div>
+    <div
+      class="absolute inset-0 flex items-center justify-center"
+    >
+      <button
+        aria-label="Parar sono"
+        class="relative flex flex-col items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+        style="width: 156px; height: 156px;"
+        tabindex="0"
+      >
+        <div
+          class="absolute inset-0 rounded-full"
+          style="background: radial-gradient(circle at 50% center, rgba(245, 158, 11, 0.5) 0%, transparent 70%); opacity: 0.3; transform: none;"
+        />
+        <div
+          class="absolute inset-0 rounded-full"
+          style="background: radial-gradient(circle at 50% center, rgba(245, 158, 11, 0.1) 0%, rgba(255, 255, 255, 0.01) 80%); border: 1px solid rgba(255, 255, 255, 0.06);"
+        />
+        <div
+          class="relative flex flex-col items-center gap-1.5 text-center"
+          style="opacity: 0; transform: translateY(6px);"
+        >
+          <span
+            class="text-[9px] font-bold tracking-[0.2em] uppercase"
+            style="color: rgb(245, 158, 11); opacity: 0.8;"
+          >
+            SONECA
+          </span>
+          <span
+            class="text-[26px] font-bold tabular-nums leading-none tracking-tight"
+            style="color: white; text-shadow: rgba(245, 158, 11, 0.5) 0px 0px 28px;"
+          >
+            00:12:34
+          </span>
+          <span
+            class="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[9px] font-semibold text-white/45"
+            style="background: rgba(255, 255, 255, 0.07);"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-square h-2.5 w-2.5 fill-white/50 text-white/50"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect
+                height="18"
+                rx="2"
+                width="18"
+                x="3"
+                y="3"
+              />
+            </svg>
+            parar
+          </span>
+        </div>
+      </button>
+    </div>
+  </div>
+  <div
+    class="flex w-full max-w-[300px] items-center gap-2"
+  >
+    <div
+      aria-label="Tipo de sono"
+      class="flex flex-1 rounded-full p-0.5"
+      role="group"
+      style="background: rgba(255, 255, 255, 0.06);"
+    >
+      <button
+        aria-pressed="true"
+        class="relative flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-white opacity-50 cursor-not-allowed"
+        disabled=""
+      >
+        <div
+          class="absolute inset-0 rounded-full"
+          style="background-color: rgb(245, 158, 11); opacity: 1;"
+        />
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-sun relative z-10 h-3.5 w-3.5"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx="12"
+            cy="12"
+            r="4"
+          />
+          <path
+            d="M12 2v2"
+          />
+          <path
+            d="M12 20v2"
+          />
+          <path
+            d="m4.93 4.93 1.41 1.41"
+          />
+          <path
+            d="m17.66 17.66 1.41 1.41"
+          />
+          <path
+            d="M2 12h2"
+          />
+          <path
+            d="M20 12h2"
+          />
+          <path
+            d="m6.34 17.66-1.41 1.41"
+          />
+          <path
+            d="m19.07 4.93-1.41 1.41"
+          />
+        </svg>
+        <span
+          class="relative z-10"
+        >
+          Soneca
+        </span>
+      </button>
+      <button
+        aria-pressed="false"
+        class="relative flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring text-white/35 opacity-50 cursor-not-allowed"
+        disabled=""
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-moon relative z-10 h-3.5 w-3.5"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"
+          />
+        </svg>
+        <span
+          class="relative z-10"
+        >
+          Noturno
+        </span>
+      </button>
+    </div>
+    <button
+      aria-expanded="false"
+      aria-label="Opções avançadas"
+      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/35 hover:text-white/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      style="background: rgba(255, 255, 255, 0.06);"
+    >
+      <span
+        class="flex"
+      >
+        <svg
+          aria-hidden="true"
+          class="lucide lucide-chevron-down h-4 w-4"
+          fill="none"
+          height="24"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+          width="24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+          />
+        </svg>
+      </span>
+    </button>
+  </div>
+  <div
+    class="w-full max-w-[300px] overflow-hidden"
+    style="opacity: 0; height: 0px;"
+  >
+    <label
+      class="sr-only"
+      for="sleep-notes"
+    >
+      Notas sobre o sono
+    </label>
+    <textarea
+      class="flex field-sizing-content min-h-16 w-full border px-2.5 py-2 transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 rounded-2xl resize-none text-sm border-white/10 bg-white/5 placeholder:text-white/20"
+      data-slot="textarea"
+      id="sleep-notes"
+      placeholder="Notas rápidas…"
+      rows="2"
+    />
+  </div>
+</div>
+`;

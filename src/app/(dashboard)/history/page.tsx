@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
-import { getSleepSessions } from "@/lib/supabase/queries";
+import { getSleepSessions } from "@/lib/supabase/queries/sleep";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { SleepCard } from "@/components/sleep/SleepCard";
 import { SleepForm } from "@/components/sleep/SleepForm";

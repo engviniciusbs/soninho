@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import {
   startBreastfeedingSession,
@@ -10,16 +10,14 @@ import {
   getActiveBreastfeedingSession,
   getBreastfeedingSessionStatus,
 } from "@/lib/supabase/feedingQueries";
-import {
-  classifyEndResult,
-  classifyLiveSession,
-  isUniqueViolation,
-} from "@/lib/supabase/sessionConflict";
+import { classifyEndResult, isUniqueViolation } from "@/lib/supabase/sessionConflict";
 import { useFeedingStore, useActiveBreastTimer } from "@/store/feedingStore";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { recordFeedingActivity } from "@/lib/family/recordFeedingActivity";
 import { toast } from "sonner";
 import type { BreastSide } from "@/types";
+import { useSessionClock } from "@/hooks/timer/useSessionClock";
+import { useActiveSessionSync } from "@/hooks/timer/useActiveSessionSync";
 
 function secondsSince(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
@@ -46,40 +44,19 @@ export function useBreastfeedingTimer() {
   const sideRightSec = timer?.sideRightSec ?? 0;
   const sideStartedAt = timer?.sideStartedAt ?? null;
 
-  // Last interval tick, tagged with the side segment it was computed for.
-  // While stopped (or before the first tick of a segment) the live counters
-  // are the stored totals, derived in render instead of copied by an effect.
-  const [tick, setTick] = useState<{
-    sideStartedAt: string;
-    activeSide: BreastSide;
-    left: number;
-    right: number;
-  } | null>(null);
+  // Live counters, derived in render from the shared clock: the stored total
+  // of each side plus, for the active side, the seconds of the current
+  // segment. While stopped (or before the clock's first value) they are the
+  // stored totals.
+  const { elapsedSec: segmentSec } = useSessionClock(isRunning ? sideStartedAt : null);
+  const extraSec = segmentSec ?? 0;
+  const liveLeftSec = activeSide === "LEFT" ? sideLeftSec + extraSec : sideLeftSec;
+  const liveRightSec = activeSide === "RIGHT" ? sideRightSec + extraSec : sideRightSec;
 
-  const ticking = isRunning && !!sideStartedAt;
-  const tickIsCurrent =
-    ticking && tick?.sideStartedAt === sideStartedAt && tick.activeSide === activeSide;
-  const liveLeftSec = tickIsCurrent ? tick.left : sideLeftSec;
-  const liveRightSec = tickIsCurrent ? tick.right : sideRightSec;
-
-  // TODO(PR4): replace this interval + immediate tick() with a shared clock via
-  // useSyncExternalStore so the live counters can be fully derived in render.
-  useEffect(() => {
-    if (!isRunning || !sideStartedAt) return;
-    const startedAt = sideStartedAt;
-    function tick() {
-      const extra = secondsSince(startedAt);
-      setTick({
-        sideStartedAt: startedAt,
-        activeSide,
-        left: activeSide === "LEFT" ? sideLeftSec + extra : sideLeftSec,
-        right: activeSide === "RIGHT" ? sideRightSec + extra : sideRightSec,
-      });
-    }
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [isRunning, sideStartedAt, activeSide, sideLeftSec, sideRightSec]);
+  const invalidateFeedingQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
+    queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
+  }, [queryClient]);
 
   // Restore the shown baby's open session when it has no local timer
   // (mount, baby switch, or after a local timer was dropped).
@@ -103,31 +80,22 @@ export function useBreastfeedingTimer() {
     void restore();
   }, [babyId, isRunning, supabase, restoreBreastSession]);
 
-  // Multi-caregiver sync: poll the running session (by id) every 20s. Only an
-  // error-free response can stop the local timer; a network error keeps it.
-  const { data: live } = useQuery({
-    queryKey: ["active-breastfeeding-live", babyId, sessionId],
-    queryFn: async () => {
-      const result = await getBreastfeedingSessionStatus(supabase, sessionId!);
-      return { sessionId: sessionId!, status: classifyLiveSession(result, babyId!) };
-    },
-    enabled: !!babyId && !!sessionId,
-    refetchInterval: 20_000,
-    staleTime: 0,
-  });
-
-  useEffect(() => {
-    if (!babyId || !live || live.sessionId !== sessionId) return;
-    if (live.status === "ended") {
+  useActiveSessionSync({
+    queryKey: "active-breastfeeding-live",
+    babyId,
+    sessionId,
+    fetchStatus: (id) => getBreastfeedingSessionStatus(supabase, id),
+    onEnded: () => {
+      if (!babyId) return;
       stopBreastTimer(babyId);
-      queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
-      queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
+      invalidateFeedingQueries();
       toast.info("Mamada finalizada por outro cuidador(a)");
-    } else if (live.status === "mismatch") {
+    },
+    onMismatch: () => {
       // Stale local state pointing at another baby's session: drop it.
-      stopBreastTimer(babyId);
-    }
-  }, [live, babyId, sessionId, stopBreastTimer, queryClient]);
+      if (babyId) stopBreastTimer(babyId);
+    },
+  });
 
   const handleStart = useCallback(async (side: BreastSide = "LEFT") => {
     if (!activeBaby) {
@@ -208,8 +176,7 @@ export function useBreastfeedingTimer() {
     }
     const syncEnded = (alreadyEnded: boolean) => {
       stopBreastTimer(babyId);
-      queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
-      queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
+      invalidateFeedingQueries();
       if (alreadyEnded) toast.success("Mamada já estava finalizada ✨");
     };
     if (!current || current.end_time) {
@@ -243,8 +210,7 @@ export function useBreastfeedingTimer() {
     stopBreastTimer(babyId);
 
     toast.success("Mamada registrada com sucesso ✨");
-    queryClient.invalidateQueries({ queryKey: ["feeding-timeline"] });
-    queryClient.invalidateQueries({ queryKey: ["feeding-suggestion"] });
+    invalidateFeedingQueries();
 
     if (activeBaby) {
       void recordFeedingActivity({
@@ -257,7 +223,7 @@ export function useBreastfeedingTimer() {
     }
 
     return { endedSessionId: endedId };
-  }, [babyId, sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, stopBreastTimer, queryClient, activeBaby]);
+  }, [babyId, sessionId, activeSide, sideStartedAt, sideLeftSec, sideRightSec, supabase, stopBreastTimer, invalidateFeedingQueries, activeBaby]);
 
   return {
     isRunning,

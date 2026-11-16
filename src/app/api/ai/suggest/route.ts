@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { zTimeZone, zUuid } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
-import { getLastSleepSession, getRecentSessions, getUserRoleForBaby } from "@/lib/supabase/queries";
+import { getLastSleepSession, getRecentSessions } from "@/lib/supabase/queries/sleep";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 import { computeNapSuggestion } from "@/lib/sleep/computeNapSuggestion";
 import type { Baby, SleepSession } from "@/types";
 

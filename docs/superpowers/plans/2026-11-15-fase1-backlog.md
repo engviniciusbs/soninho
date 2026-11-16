@@ -24,7 +24,8 @@ Tudo da lista original foi tratado: tokens hex com `encodeURIComponent`, allowli
 - Headers anti-cache do `setAll` aplicados no `proxy.ts`.
 - **Testes** ainda pendentes: limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
 
-## PR 4 — Refatoração
+## PR 4 — Refatoração ✅ (concluído no #4)
+Itens abaixo tratados (timers com `useNow`, split do SleepTimer/Settings/queries, formulários compartilhados, zero `eslint-disable`, calendar removido, CI fixado por SHA, testes de componente).
 - Card de regressão: marcar a chave diária também quando a IA falhar (hoje uma falha da OpenAI faz cada abertura gastar cota); erro do RPC da cota não deveria esconder o card.
 - Formulários: limpar o erro de "fim antes do início" também ao mudar a data de fim. (herdado dos PRs 1–2)
 - `useWatch` no lugar de `watch()` em `SleepForm`/`FeedingForm`; remover os `eslint-disable` com `TODO(PR4)`.
@@ -35,6 +36,11 @@ Tudo da lista original foi tratado: tokens hex com `encodeURIComponent`, allowli
 - Justificar ou remover os `eslint-disable exhaustive-deps` antigos (`SleepForm.tsx:148`, `BabyProvider.tsx:65`).
 - `react-day-picker` e `src/components/ui/calendar.tsx` não são usados: remover, ou usar na Fase 2.
 - CI: `actions/checkout` e `setup-node` v7 e fixar por SHA.
+
+## Para a Fase 2
+- Selects fechados mostram o valor cru (ex.: `NIGHT_SLEEP`) em vez do rótulo em PT-BR.
+- Task 8 (menores): o teste de cota usa spy em `console`; `useSleepExport` deveria resetar o estado num `finally`.
+- Testes pendentes herdados do PR 2: limites exatos das faixas de intervalo de mamada (13/19/27/39 semanas), limites de 20 min/8 h dos intervalos válidos, empate `now == sugerido`.
 
 ## Ações operacionais pendentes
 - Ligar **"Leaked password protection"** em Supabase → Authentication → Passwords. Não foi possível automatizar: o token da CLI fica no keyring. Pode exigir plano pago.

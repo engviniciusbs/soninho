@@ -40,3 +40,15 @@ export function markRegressionAiRequested(
     /* storage unavailable: ignore */
   }
 }
+
+/**
+ * Whether a finished request should burn today's AI slot: any `withAi` call
+ * with a detected regression, with or without an explanation, so an OpenAI
+ * failure does not retry (and spend quota) on every open.
+ */
+export function shouldMarkRegressionAi(
+  withAi: boolean,
+  result: { detected: boolean }
+): boolean {
+  return withAi && result.detected;
+}

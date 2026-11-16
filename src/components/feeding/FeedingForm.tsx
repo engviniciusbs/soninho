@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,11 @@ import { createClient } from "@/lib/supabase/client";
 import { useBaby } from "@/components/providers/BabyProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DateTimeRangeFields } from "@/components/forms/DateTimeRangeFields";
+import {
+  useTimeRangeValidation,
+  type TimeRangeNames,
+} from "@/components/forms/useTimeRangeValidation";
 import {
   Select,
   SelectContent,
@@ -88,6 +93,35 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+const RANGE_NAMES: TimeRangeNames<FormData> = {
+  startDate: "start_date",
+  startTime: "start_time_input",
+  endDate: "end_date",
+  endTime: "end_time_input",
+};
+
+function buildFormValues(current?: FeedingTimelineItem | null): FormData {
+  const start = current ? new Date(current.startTime) : new Date();
+  const end = current?.endTime ? new Date(current.endTime) : new Date();
+
+  const bottle = current?.type === "BOTTLE" ? (current.raw as BottleFeeding) : null;
+  const breast = current?.type === "BREAST" ? (current.raw as BreastfeedingSession) : null;
+  const solid = current?.type === "SOLID" ? (current.raw as SolidFeeding) : null;
+
+  return {
+    start_date: toLocalDateString(start),
+    start_time_input: toLocalTimeString(start),
+    end_date: toLocalDateString(end),
+    end_time_input: toLocalTimeString(end),
+    volume_ml: bottle?.volume_ml?.toString() ?? "120",
+    milk_type: bottle?.milk_type ?? "FORMULA",
+    side_left_min: breast ? Math.round(breast.side_left_sec / 60).toString() : "0",
+    side_right_min: breast ? Math.round(breast.side_right_sec / 60).toString() : "0",
+    reaction: solid?.reaction ?? "",
+    notes: bottle?.notes ?? breast?.notes ?? solid?.notes ?? "",
+  };
+}
+
 interface FeedingFormProps {
   open: boolean;
   onClose: () => void;
@@ -96,6 +130,24 @@ interface FeedingFormProps {
 }
 
 export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {item ? "Editar registro" : "Registrar alimentação esquecida"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* The popup's content mounts on every opening, so the form starts
+            from `item` (or "now") each time without a reset effect. */}
+        <FeedingFormBody onClose={onClose} item={item} />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function FeedingFormBody({ onClose, item }: Omit<FeedingFormProps, "open">) {
   const supabase = createClient();
   const queryClient = useQueryClient();
   const { activeBaby } = useBaby();
@@ -107,50 +159,22 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
   );
   const [customTag, setCustomTag] = useState("");
 
-  function buildFormValues(current?: FeedingTimelineItem | null): FormData {
-    const start = current ? new Date(current.startTime) : new Date();
-    const end = current?.endTime ? new Date(current.endTime) : new Date();
-
-    const bottle = current?.type === "BOTTLE" ? (current.raw as BottleFeeding) : null;
-    const breast = current?.type === "BREAST" ? (current.raw as BreastfeedingSession) : null;
-    const solid = current?.type === "SOLID" ? (current.raw as SolidFeeding) : null;
-
-    return {
-      start_date: toLocalDateString(start),
-      start_time_input: toLocalTimeString(start),
-      end_date: toLocalDateString(end),
-      end_time_input: toLocalTimeString(end),
-      volume_ml: bottle?.volume_ml?.toString() ?? "120",
-      milk_type: bottle?.milk_type ?? "FORMULA",
-      side_left_min: breast ? Math.round(breast.side_left_sec / 60).toString() : "0",
-      side_right_min: breast ? Math.round(breast.side_right_sec / 60).toString() : "0",
-      reaction: solid?.reaction ?? "",
-      notes: bottle?.notes ?? breast?.notes ?? solid?.notes ?? "",
-    };
-  }
-
   const {
     register,
     handleSubmit,
     setValue,
-    watch,
-    reset,
+    control,
     setError,
     clearErrors,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: buildFormValues(item),
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(buildFormValues(item));
-      setType(item?.type ?? "BOTTLE");
-      setFoodTags(item?.type === "SOLID" ? (item.raw as SolidFeeding).food_tags : []);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, item?.id]);
+  useTimeRangeValidation(control, RANGE_NAMES, { clearErrors, enabled: type === "BREAST" });
+
+  const [milkType, reaction] = useWatch({ control, name: ["milk_type", "reaction"] });
 
   function toggleTag(tag: string) {
     setFoodTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -270,198 +294,157 @@ export function FeedingForm({ open, onClose, item }: FeedingFormProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="rounded-2xl max-w-md max-h-[90dvh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {isEdit ? "Editar registro" : "Registrar alimentação esquecida"}
-          </DialogTitle>
-        </DialogHeader>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Type selector — locked while editing */}
+      <div className="grid grid-cols-3 gap-2" role="group" aria-label="Tipo de alimentação">
+        {TYPE_OPTIONS.map(({ value, label, icon: Icon }) => (
+          <button
+            key={value}
+            type="button"
+            disabled={isEdit}
+            aria-pressed={type === value}
+            onClick={() => setType(value)}
+            className={cn(
+              "flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+              type === value
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
+            )}
+            style={{ touchAction: "manipulation" }}
+          >
+            <Icon className="h-4 w-4" aria-hidden="true" />
+            {label}
+          </button>
+        ))}
+      </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Type selector — locked while editing */}
-          <div className="grid grid-cols-3 gap-2" role="group" aria-label="Tipo de alimentação">
-            {TYPE_OPTIONS.map(({ value, label, icon: Icon }) => (
+      <DateTimeRangeFields
+        control={control}
+        names={RANGE_NAMES}
+        startLabels={type === "BREAST" ? undefined : { date: "Data", time: "Hora" }}
+        showEnd={type === "BREAST"}
+      />
+
+      {type === "BREAST" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label htmlFor="side_left_min" className="text-xs text-muted-foreground">
+              Minutos (Esq.)
+            </label>
+            <Input id="side_left_min" type="number" min={0} {...register("side_left_min")} className="rounded-xl" autoComplete="off" />
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="side_right_min" className="text-xs text-muted-foreground">
+              Minutos (Dir.)
+            </label>
+            <Input id="side_right_min" type="number" min={0} {...register("side_right_min")} className="rounded-xl" autoComplete="off" />
+          </div>
+        </div>
+      )}
+
+      {type === "BOTTLE" && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label htmlFor="volume_ml" className="text-xs text-muted-foreground">
+              Volume (ml)
+            </label>
+            <Input id="volume_ml" type="number" min={1} {...register("volume_ml")} className="rounded-xl" autoComplete="off" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">Tipo de leite</label>
+            <Select value={milkType ?? "FORMULA"} onValueChange={(v) => v && setValue("milk_type", v)}>
+              <SelectTrigger className="rounded-xl" aria-label="Tipo de leite">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FORMULA">Fórmula</SelectItem>
+                <SelectItem value="BREAST_MILK">Leite ordenhado</SelectItem>
+                <SelectItem value="MIXED">Misto</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      )}
+
+      {type === "SOLID" && (
+        <div className="space-y-3">
+          {foodTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {foodTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-medium text-emerald-400"
+                >
+                  {tag} ✕
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="grid grid-cols-3 gap-1.5">
+            {COMMON_FOOD_TAGS.map((tag) => (
               <button
-                key={value}
+                key={tag}
                 type="button"
-                disabled={isEdit}
-                aria-pressed={type === value}
-                onClick={() => setType(value)}
+                aria-pressed={foodTags.includes(tag)}
+                onClick={() => toggleTag(tag)}
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
-                  type === value
-                    ? "border-primary/50 bg-primary/10 text-primary"
+                  "rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all",
+                  foodTags.includes(tag)
+                    ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
                     : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
                 )}
-                style={{ touchAction: "manipulation" }}
               >
-                <Icon className="h-4 w-4" aria-hidden="true" />
-                {label}
+                {tag}
               </button>
             ))}
           </div>
-
-          {/* Start date/time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <label htmlFor="start_date" className="text-xs text-muted-foreground">
-                {type === "BREAST" ? "Data início" : "Data"}
-              </label>
-              <Input id="start_date" type="date" {...register("start_date")} className="rounded-xl" autoComplete="off" />
-            </div>
-            <div className="space-y-1">
-              <label htmlFor="start_time_input" className="text-xs text-muted-foreground">
-                {type === "BREAST" ? "Hora início" : "Hora"}
-              </label>
-              <Input id="start_time_input" type="time" {...register("start_time_input")} className="rounded-xl" autoComplete="off" />
-            </div>
-          </div>
-
-          {type === "BREAST" && (
-            <>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label htmlFor="end_date" className="text-xs text-muted-foreground">
-                    Data fim
-                  </label>
-                  <Input id="end_date" type="date" {...register("end_date")} className="rounded-xl" autoComplete="off" />
-                </div>
-                <div className="space-y-1">
-                  <label htmlFor="end_time_input" className="text-xs text-muted-foreground">
-                    Hora fim
-                  </label>
-                  <Input id="end_time_input" type="time" {...register("end_time_input", { onChange: () => clearErrors("end_time_input") })} aria-invalid={!!errors.end_time_input} className="rounded-xl" autoComplete="off" />
-                  {errors.end_time_input?.message && (
-                    <p role="alert" className="text-xs text-destructive">
-                      {errors.end_time_input.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label htmlFor="side_left_min" className="text-xs text-muted-foreground">
-                    Minutos (Esq.)
-                  </label>
-                  <Input id="side_left_min" type="number" min={0} {...register("side_left_min")} className="rounded-xl" autoComplete="off" />
-                </div>
-                <div className="space-y-1">
-                  <label htmlFor="side_right_min" className="text-xs text-muted-foreground">
-                    Minutos (Dir.)
-                  </label>
-                  <Input id="side_right_min" type="number" min={0} {...register("side_right_min")} className="rounded-xl" autoComplete="off" />
-                </div>
-              </div>
-            </>
-          )}
-
-          {type === "BOTTLE" && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <label htmlFor="volume_ml" className="text-xs text-muted-foreground">
-                  Volume (ml)
-                </label>
-                <Input id="volume_ml" type="number" min={1} {...register("volume_ml")} className="rounded-xl" autoComplete="off" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Tipo de leite</label>
-                {/* eslint-disable-next-line react-hooks/incompatible-library -- reactCompiler is not enabled (next.config.ts), so "compilation skipped" has no runtime effect; RHF watch() is used intentionally (TODO(PR4): consider useWatch). */}
-                <Select value={watch("milk_type") ?? "FORMULA"} onValueChange={(v) => v && setValue("milk_type", v)}>
-                  <SelectTrigger className="rounded-xl" aria-label="Tipo de leite">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="FORMULA">Fórmula</SelectItem>
-                    <SelectItem value="BREAST_MILK">Leite ordenhado</SelectItem>
-                    <SelectItem value="MIXED">Misto</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-
-          {type === "SOLID" && (
-            <div className="space-y-3">
-              {foodTags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {foodTags.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => toggleTag(tag)}
-                      className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 text-xs font-medium text-emerald-400"
-                    >
-                      {tag} ✕
-                    </button>
-                  ))}
-                </div>
-              )}
-              <div className="grid grid-cols-3 gap-1.5">
-                {COMMON_FOOD_TAGS.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    aria-pressed={foodTags.includes(tag)}
-                    onClick={() => toggleTag(tag)}
-                    className={cn(
-                      "rounded-lg border py-1.5 px-1.5 text-[11px] font-medium transition-all",
-                      foodTags.includes(tag)
-                        ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                        : "border-border/50 bg-card/40 text-muted-foreground hover:border-border hover:text-foreground"
-                    )}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={customTag}
-                  onChange={(e) => setCustomTag(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addCustomTag();
-                    }
-                  }}
-                  placeholder="Outro alimento…"
-                  className="rounded-xl"
-                />
-                <Button type="button" variant="outline" onClick={addCustomTag} className="rounded-xl shrink-0">
-                  Adicionar
-                </Button>
-              </div>
-              <Select value={watch("reaction") ?? ""} onValueChange={(v) => v && setValue("reaction", v)}>
-                <SelectTrigger className="rounded-xl" aria-label="Reação do bebê">
-                  <SelectValue placeholder="Reação do bebê (opcional)" />
-                </SelectTrigger>
-                <SelectContent>
-                  {REACTION_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-
-          <div className="space-y-1">
-            <label htmlFor="notes" className="sr-only">Notas</label>
-            <Input id="notes" placeholder="Notas (opcional)" {...register("notes")} className="rounded-xl" autoComplete="off" />
-          </div>
-
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose} className="rounded-xl">
-              Cancelar
-            </Button>
-            <Button type="submit" className="rounded-xl" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando…" : isEdit ? "Atualizar" : "Registrar"}
+          <div className="flex gap-2">
+            <Input
+              value={customTag}
+              onChange={(e) => setCustomTag(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCustomTag();
+                }
+              }}
+              placeholder="Outro alimento…"
+              className="rounded-xl"
+            />
+            <Button type="button" variant="outline" onClick={addCustomTag} className="rounded-xl shrink-0">
+              Adicionar
             </Button>
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+          <Select value={reaction ?? ""} onValueChange={(v) => v && setValue("reaction", v)}>
+            <SelectTrigger className="rounded-xl" aria-label="Reação do bebê">
+              <SelectValue placeholder="Reação do bebê (opcional)" />
+            </SelectTrigger>
+            <SelectContent>
+              {REACTION_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div className="space-y-1">
+        <label htmlFor="notes" className="sr-only">Notas</label>
+        <Input id="notes" placeholder="Notas (opcional)" {...register("notes")} className="rounded-xl" autoComplete="off" />
+      </div>
+
+      <div className="flex gap-2 justify-end">
+        <Button type="button" variant="outline" onClick={onClose} className="rounded-xl">
+          Cancelar
+        </Button>
+        <Button type="submit" className="rounded-xl" disabled={isSubmitting}>
+          {isSubmitting ? "Salvando…" : isEdit ? "Atualizar" : "Registrar"}
+        </Button>
+      </div>
+    </form>
   );
 }

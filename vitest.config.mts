@@ -9,7 +9,7 @@ export default defineConfig({
   css: { postcss: {} },
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
     pool: "forks",
     env: { TZ: "America/Sao_Paulo" },
   },

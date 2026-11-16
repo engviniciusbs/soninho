@@ -10,6 +10,18 @@ export function isCheckViolation(error: { code?: string } | null): boolean {
 
 export type LiveSessionStatus = "running" | "ended" | "mismatch" | "unknown";
 
+/** The fields of a session row the live poll needs. */
+export interface LiveSessionRow {
+  baby_id: string;
+  end_time: string | null;
+}
+
+/** A Supabase response for one session row looked up by id. */
+export interface LiveSessionResult<T extends LiveSessionRow = LiveSessionRow> {
+  data: T | null;
+  error: unknown;
+}
+
 /**
  * Interprets a poll of one session row (looked up by its id) for the timer of
  * `babyId`. Only a response WITHOUT error can stop the local timer: a network
@@ -21,10 +33,7 @@ export type LiveSessionStatus = "running" | "ended" | "mismatch" | "unknown";
  * - "running": still open.
  */
 export function classifyLiveSession(
-  result: {
-    data: { baby_id: string; end_time: string | null } | null;
-    error: unknown;
-  },
+  result: LiveSessionResult,
   babyId: string
 ): LiveSessionStatus {
   if (result.error) return "unknown";

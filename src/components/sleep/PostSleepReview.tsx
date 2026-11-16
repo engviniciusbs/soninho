@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { updateSleepSession } from "@/lib/supabase/queries";
+import { updateSleepSession } from "@/lib/supabase/queries/sleep";
 import {
   HOW_FELL_ASLEEP_OPTIONS,
   WAKE_REASON_OPTIONS,

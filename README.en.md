@@ -238,13 +238,21 @@ src/
 │   └── api/                   # Route Handlers (see "API Routes")
 ├── components/
 │   ├── ui/                    # shadcn/Base UI primitives
-│   ├── sleep/ feeding/ family/ ai/ charts/ settings/ baby/ brand/ landing/
+│   ├── sleep/                 # SleepTimer in timer/*, environment pickers in environment/*
+│   ├── settings/              # GeneralTab, NotificationsTab, ToolsTab, BabyProfileForm, PushNotificationsCard; family/* (invites, members)
+│   ├── forms/                 # DateTimeRangeFields + useTimeRangeValidation (shared by SleepForm/FeedingForm)
+│   ├── landing/               # Landing page; sections/* (Hero, Proof, Closing…)
+│   ├── feeding/ family/ ai/ charts/ baby/ brand/
 │   ├── layout/                # Sidebar, TopBar, BottomNav, MiniTimerBar, NannyRouteGuard, navLinks
 │   └── providers/             # QueryProvider, BabyProvider, UserProfileProvider
 ├── hooks/                     # useSleepTimer, useBreastfeedingTimer, useWakeWindow, usePushNotifications…
+│   ├── useNow.ts              # Shared clock: one interval per cadence, hydration-safe
+│   ├── timer/                 # useSessionClock, useActiveSessionSync (timer base hooks)
+│   └── settings/              # useBabySettings, useNotificationSettings, useSleepExport, useFamilyTeam
 ├── store/                     # Zustand: sleepStore ("soninho-timer"), feedingStore ("soninho-feeding-timer")
 ├── lib/
-│   ├── supabase/              # client.ts (browser), server.ts (cookies), admin.ts (service role), queries
+│   ├── supabase/              # client.ts (browser), server.ts (cookies), admin.ts (service role)
+│   │   └── queries/           #   by domain: babies, sleep, family, notifications, profile (+ feedingQueries.ts)
 │   ├── sleep/                 # Sleep rules (wake windows, suggestion, statistics, regression…)
 │   ├── feeding/               # Intervals, suggestion, statistics, food tags
 │   ├── family/                # Relations, activity messages and logging
@@ -347,11 +355,11 @@ Everything in `src/lib/` is plain, deterministic TypeScript — a good starting 
 ## Testing and Quality
 
 ```bash
-npm test            # unit tests (Vitest)
+npm test            # unit and component tests (Vitest + Testing Library; 400+ tests)
 npm run test:db     # database tests (pgTAP; needs Docker and `npx supabase db start`)
 ```
 
-CI (GitHub Actions) runs lint, `tsc`, tests, build and database tests on every PR. Before opening a PR, run locally:
+Component tests use jsdom per file and characterization snapshots (`__snapshots__/`) to guard UI refactors. CI (GitHub Actions, actions pinned by SHA) runs lint, `tsc`, tests, build and database tests on every PR. Before opening a PR, run locally:
 
 ```bash
 npm run lint

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { dbErrorToResponse } from "@/lib/http/errors";
 import { zUuid } from "@/lib/validation/common";
 import { createClient } from "@/lib/supabase/server";
-import { getUserRoleForBaby } from "@/lib/supabase/queries";
+import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
 
 const updateSchema = z.object({
   type: z.enum(["NAP", "NIGHT_SLEEP"]).optional(),
