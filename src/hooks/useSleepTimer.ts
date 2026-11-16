@@ -109,7 +109,7 @@ export function useSleepTimer() {
       const { data: existing } = await getActiveSleepSession(supabase, baby.id);
       if (existing) {
         restoreFromSession(baby.id, existing.id, existing.start_time, existing.type as SleepType);
-        toast.success("Já existe um sono em andamento — sincronizado ✨");
+        toast.success("Já existe um sono em andamento, sincronizado");
         return;
       }
       // The conflicting session was closed in the meantime: try once more.
@@ -122,7 +122,7 @@ export function useSleepTimer() {
     }
 
     startTimer(baby.id, data.id, data.start_time, sleepType);
-    toast.success(sleepType === "NAP" ? "Soneca iniciada 🌙" : "Sono noturno iniciado 🌙");
+    toast.success(sleepType === "NAP" ? "Soneca iniciada" : "Sono noturno iniciado");
     void recordSleepActivity({
       babyId: baby.id,
       babyName: baby.name,
@@ -177,7 +177,7 @@ export function useSleepTimer() {
       // Already ended by another caregiver — just sync local state
       stopTimer(babyId);
       invalidateSleepQueries();
-      toast.success("Sono já estava finalizado ✨");
+      toast.success("Sono já estava finalizado");
     };
 
     if (current.end_time) {
@@ -205,7 +205,7 @@ export function useSleepTimer() {
 
     const endedId = sessionId;
     stopTimer(babyId);
-    toast.success("Sono registrado com sucesso ✨");
+    toast.success("Sono registrado com sucesso");
     invalidateSleepQueries();
 
     if (activeBaby) {

@@ -116,7 +116,7 @@ export function useBreastfeedingTimer() {
           existing.side_left_sec,
           existing.side_right_sec
         );
-        toast.success("Já existe uma mamada em andamento — sincronizada 🤱");
+        toast.success("Já existe uma mamada em andamento, sincronizada");
         return;
       }
       // The conflicting session was closed in the meantime: try once more.
@@ -127,7 +127,7 @@ export function useBreastfeedingTimer() {
       return;
     }
     startBreastTimer(baby.id, data.id, data.start_time, side);
-    toast.success("Mamada iniciada 🤱");
+    toast.success("Mamada iniciada");
     void recordFeedingActivity({
       babyId: baby.id,
       babyName: baby.name,
@@ -177,7 +177,7 @@ export function useBreastfeedingTimer() {
     const syncEnded = (alreadyEnded: boolean) => {
       stopBreastTimer(babyId);
       invalidateFeedingQueries();
-      if (alreadyEnded) toast.success("Mamada já estava finalizada ✨");
+      if (alreadyEnded) toast.success("Mamada já estava finalizada");
     };
     if (!current || current.end_time) {
       syncEnded(!!current);
@@ -209,7 +209,7 @@ export function useBreastfeedingTimer() {
     const endedId = sessionId;
     stopBreastTimer(babyId);
 
-    toast.success("Mamada registrada com sucesso ✨");
+    toast.success("Mamada registrada com sucesso");
     invalidateFeedingQueries();
 
     if (activeBaby) {

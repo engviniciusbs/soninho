@@ -69,7 +69,7 @@ describe("useSleepTimer (characterization)", () => {
     expect(rows[0]).toMatchObject({ baby_id: baby.id, type: "NAP", end_time: null });
     expect(useSleepStore.getState().timers[baby.id]?.sessionId).toBe(rows[0].id);
     expect(result.current.isRunning).toBe(true);
-    expect(toast.success).toHaveBeenCalledWith("Soneca iniciada 🌙");
+    expect(toast.success).toHaveBeenCalledWith("Soneca iniciada");
     expect(activityCalls("started")).toHaveLength(1);
 
     await flush(5000);
@@ -91,7 +91,7 @@ describe("useSleepTimer (characterization)", () => {
     expect(fake.rows(TABLE)[0].end_time).toEqual(expect.any(String));
     expect(activityCalls("stopped")).toHaveLength(1);
     expect(
-      vi.mocked(toast.success).mock.calls.filter(([m]) => m === "Sono registrado com sucesso ✨")
+      vi.mocked(toast.success).mock.calls.filter(([m]) => m === "Sono registrado com sucesso")
     ).toHaveLength(1);
     expect(result.current.isRunning).toBe(false);
     expect(result.current.elapsed).toBe("00:00:00");
@@ -120,7 +120,7 @@ describe("useSleepTimer (characterization)", () => {
     expect(result.current.isRunning).toBe(true);
     expect(result.current.sleepType).toBe("NIGHT_SLEEP");
     expect(activityCalls("started")).toHaveLength(0);
-    expect(toast.success).toHaveBeenCalledWith("Já existe um sono em andamento — sincronizado ✨");
+    expect(toast.success).toHaveBeenCalledWith("Já existe um sono em andamento, sincronizado");
   });
 
   it("poll_error_keeps_timer", async () => {
