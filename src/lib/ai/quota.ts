@@ -13,3 +13,16 @@ export async function consumeAiQuota(supabase: SupabaseClient): Promise<boolean>
   if (error) throw error;
   return data === true;
 }
+
+/**
+ * Like {@link consumeAiQuota} but never throws: an RPC failure counts as "no
+ * quota", so callers with a deterministic fallback can degrade instead of 500.
+ */
+export async function tryConsumeAiQuota(supabase: SupabaseClient): Promise<boolean> {
+  try {
+    return await consumeAiQuota(supabase);
+  } catch (error) {
+    console.error("AI quota check failed:", error);
+    return false;
+  }
+}

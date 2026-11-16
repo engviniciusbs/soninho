@@ -3,6 +3,7 @@ import {
   regressionAiKey,
   shouldRequestRegressionAi,
   markRegressionAiRequested,
+  shouldMarkRegressionAi,
 } from "./regressionAiGate";
 
 function memStorage() {
@@ -38,5 +39,11 @@ describe("regressionAiGate", () => {
     expect(shouldRequestRegressionAi("b1", day, bad)).toBe(true);
     expect(() => markRegressionAiRequested("b1", day, bad)).not.toThrow();
     expect(shouldRequestRegressionAi("b1", day, null)).toBe(true);
+  });
+
+  it("marks the day for any withAi call with a detected regression", () => {
+    expect(shouldMarkRegressionAi(true, { detected: true })).toBe(true);
+    expect(shouldMarkRegressionAi(true, { detected: false })).toBe(false);
+    expect(shouldMarkRegressionAi(false, { detected: true })).toBe(false);
   });
 });

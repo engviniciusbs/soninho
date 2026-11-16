@@ -5,7 +5,7 @@ import { differenceInWeeks, differenceInMonths } from "date-fns";
 import { createClient } from "@/lib/supabase/server";
 import { getRecentSessions } from "@/lib/supabase/queries/sleep";
 import { getUserRoleForBaby } from "@/lib/supabase/queries/family";
-import { consumeAiQuota } from "@/lib/ai/quota";
+import { tryConsumeAiQuota } from "@/lib/ai/quota";
 import { openai, OPENAI_MODEL } from "@/lib/ai/openai";
 import { detectRegression, computeSleepDebt } from "@/lib/sleep/regression";
 import { getAgeSchedule } from "@/lib/sleep/schedules";
@@ -79,8 +79,8 @@ export async function POST(request: Request) {
       });
     }
 
-    // Quota exhausted: still render the deterministic result, without AI text.
-    if (!(await consumeAiQuota(supabase))) {
+    // Quota exhausted or quota RPC failing: still render the deterministic result, without AI text.
+    if (!(await tryConsumeAiQuota(supabase))) {
       return NextResponse.json({ ...base, explanation: null, tips: [] });
     }
 
