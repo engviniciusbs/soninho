@@ -6,9 +6,11 @@
 --  3. create_baby_with_family(..., p_family_id): a second baby joins the
 --     caller's family instead of always creating a new one.
 --  4. delete_baby(p_baby_id): owner-only; deleting the last baby of a family
---     deletes the family (members, invites, notes and activity logs).
+--     deletes the family (members, invites, notes and activity logs, by cascade).
 --  5. guard_family_member_change: members removed by the cascade of a family
---     that no longer exists do not need a remaining owner.
+--     that no longer exists do not need a remaining owner. Rebuilt from the
+--     latest body (20261116120000_guard_triggers_hardening.sql, which uses
+--     FOR NO KEY UPDATE); only the early return is new.
 
 -- ---------------------------------------------------------------------------
 -- 1. babies.sex
@@ -16,6 +18,8 @@
 alter table public.babies
   add column if not exists sex text null;
 
+alter table public.babies
+  drop constraint if exists babies_sex_check;
 alter table public.babies
   add constraint babies_sex_check check (sex in ('F', 'M'));
 
@@ -99,7 +103,7 @@ grant execute on function public.create_baby_with_family(text, date, text, text,
 -- ---------------------------------------------------------------------------
 -- 5. guard_family_member_change: skip the owner check when the family itself
 --    is gone (cascade from a family deletion). Rest identical to
---    20261115120100_fix_family_authorization.sql.
+--    20261116120000_guard_triggers_hardening.sql (locks are FOR NO KEY UPDATE).
 -- ---------------------------------------------------------------------------
 create or replace function public.guard_family_member_change()
 returns trigger
@@ -128,7 +132,7 @@ begin
     if old.role = 'owner'
        and (new.role <> 'owner' or new.family_id is distinct from old.family_id) then
       -- Serialize concurrent owner demotions/removals in the same family.
-      perform 1 from families where id = old.family_id for update;
+      perform 1 from families where id = old.family_id for no key update;
     end if;
 
     if old.role = 'owner'
@@ -152,7 +156,7 @@ begin
 
   if old.role = 'owner' then
     -- Serialize concurrent owner demotions/removals in the same family.
-    perform 1 from families where id = old.family_id for update;
+    perform 1 from families where id = old.family_id for no key update;
   end if;
 
   if old.role = 'owner'
@@ -206,9 +210,9 @@ begin
 
   if v_baby.family_id is not null
      and not exists (select 1 from babies where family_id = v_baby.family_id) then
-    -- sleep_activity_log.family_id has no ON DELETE action.
-    delete from sleep_activity_log where family_id = v_baby.family_id;
-    -- Cascades to family_members, family_invites, family_notes, feeding_activity_log.
+    -- Cascades to family_members, family_invites, family_notes and
+    -- feeding_activity_log; sleep_activity_log.family_id is ON DELETE SET NULL
+    -- (its rows of this family's babies are already gone with the babies).
     delete from families where id = v_baby.family_id;
   end if;
 end;

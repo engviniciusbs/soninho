@@ -3,7 +3,7 @@
 -- NOTE: depends on supabase/tests/00_helpers.sql (schema `tests`) running first (alphabetical order).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(33);
+select plan(38);
 
 -- ---------------------------------------------------------------- fixtures
 -- F1: owner o1, caregiver g1 | F2: owner o2 | F3, F4: owner o3 (two families)
@@ -30,6 +30,16 @@ insert into public.family_invites (family_id, token, role, created_by, expires_a
   ('00000000-0000-0000-0000-0000000001f1', 'tok-f2c-1', 'caregiver', '00000000-0000-0000-0000-0000000001a1', now() + interval '7 days');
 insert into public.family_notes (family_id, author_id, body) values
   ('00000000-0000-0000-0000-0000000001f1', '00000000-0000-0000-0000-0000000001a1', 'recado');
+-- Rows of F1's baby b1 (must go with it) and of F2's baby b2 (must stay).
+insert into public.sleep_sessions (baby_id, type, start_time, end_time)
+select b, 'NAP', now() - interval '2 hours', now() - interval '1 hour'
+from (values ('00000000-0000-0000-0000-0000000001b1'::uuid), ('00000000-0000-0000-0000-0000000001b2'::uuid)) as v(b);
+insert into public.bottle_feedings (baby_id, start_time, volume_ml, milk_type)
+select b, now() - interval '3 hours', 120, 'FORMULA'
+from (values ('00000000-0000-0000-0000-0000000001b1'::uuid), ('00000000-0000-0000-0000-0000000001b2'::uuid)) as v(b);
+insert into public.breastfeeding_sessions (baby_id, start_time, end_time)
+select b, now() - interval '4 hours', now() - interval '230 minutes'
+from (values ('00000000-0000-0000-0000-0000000001b1'::uuid), ('00000000-0000-0000-0000-0000000001b2'::uuid)) as v(b);
 insert into public.sleep_activity_log (baby_id, family_id, actor_user_id, action) values
   ('00000000-0000-0000-0000-0000000001b1', '00000000-0000-0000-0000-0000000001f1', '00000000-0000-0000-0000-0000000001a1', 'started');
 
@@ -126,6 +136,25 @@ select is((select (select count(*) from public.family_members where family_id = 
               + (select count(*) from public.family_notes where family_id = '00000000-0000-0000-0000-0000000001f1')
               + (select count(*) from public.sleep_activity_log where family_id = '00000000-0000-0000-0000-0000000001f1'))::int, 0,
   'members, invites, notes and activity of the deleted family are gone');
+
+select is((select (select count(*) from public.sleep_sessions where baby_id = '00000000-0000-0000-0000-0000000001b1')
+              + (select count(*) from public.bottle_feedings where baby_id = '00000000-0000-0000-0000-0000000001b1')
+              + (select count(*) from public.breastfeeding_sessions where baby_id = '00000000-0000-0000-0000-0000000001b1'))::int, 0,
+  'sleep and feeding rows of the deleted baby are gone');
+select is((select count(*)::int from public.babies where id = '00000000-0000-0000-0000-0000000001b2'), 1,
+  'other family baby untouched');
+select is((select count(*)::int from public.families where id = '00000000-0000-0000-0000-0000000001f2'), 1,
+  'other family untouched');
+select is((select (select count(*) from public.sleep_sessions where baby_id = '00000000-0000-0000-0000-0000000001b2')
+              + (select count(*) from public.bottle_feedings where baby_id = '00000000-0000-0000-0000-0000000001b2')
+              + (select count(*) from public.breastfeeding_sessions where baby_id = '00000000-0000-0000-0000-0000000001b2')
+              + (select count(*) from public.family_members where family_id = '00000000-0000-0000-0000-0000000001f2'))::int, 4,
+  'other family sessions, feedings and members untouched');
+
+-- guard_family_member_change keeps the FOR NO KEY UPDATE lock of 20261116120000
+select ok(pg_get_functiondef('public.guard_family_member_change()'::regprocedure) ilike '%for no key update%'
+          and pg_get_functiondef('public.guard_family_member_change()'::regprocedure) not ilike '%for update;%',
+  'guard_family_member_change locks families with FOR NO KEY UPDATE');
 
 select * from finish();
 rollback;
