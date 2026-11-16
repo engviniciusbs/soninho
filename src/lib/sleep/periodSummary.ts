@@ -17,13 +17,21 @@ function periodDays(days: number, now: Date): Date[] {
   return eachDayOfInterval({ start: subDays(startOfDay(now), days - 1), end: now });
 }
 
+function withProvisionalEnd(session: SleepSession, now: Date): SleepSession {
+  if (session.end_time) return session;
+  const start = Date.parse(session.start_time);
+  if (!(now.getTime() > start)) return session;
+  return { ...session, end_time: now.toISOString(), duration_min: (now.getTime() - start) / 60_000 };
+}
+
 /**
  * The three figures of the Análise screen for the last `days` local days
  * (today included in the window, like the chart).
  *
  * Today is still running, so the averages use only the complete days, and only
  * those with sleep logged (a day nobody logged is not a day without sleep, the
- * same rule as `computeSleepDebt`). With no such day every figure is `null`:
+ * same rule as `computeSleepDebt`). A sleep still running counts up to
+ * now; it is never the "maior noite", which must be finished. With no such day every figure is `null`:
  * the screen shows an empty state, never zeros.
  */
 export function summarizePeriod(
@@ -40,8 +48,11 @@ export function summarizePeriod(
   }
 
   for (const session of sessions) {
-    if (session.duration_min == null) continue;
-    for (const alloc of allocateSessionToLocalDays(session)) {
+    // A sleep still running counts up to now (the allocation skips open
+    // sessions), so a night that crossed midnight fills yesterday, as in Registro.
+    const counted = withProvisionalEnd(session, now);
+    if (counted.duration_min == null) continue;
+    for (const alloc of allocateSessionToLocalDays(counted)) {
       const bucket = complete.get(alloc.dayKey);
       if (!bucket) continue;
       bucket.minutes += alloc.napMinutes + alloc.nightMinutes;

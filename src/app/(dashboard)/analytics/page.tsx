@@ -61,7 +61,7 @@ function PeriodFigures({ summary }: { summary: AnalyticsData["periodSummary"] })
         />
       </dl>
       <p className="px-1 font-sans text-[13px] font-semibold text-sn-mu">
-        Média de {days} {days === 1 ? "dia completo" : "dias completos"}, sem contar hoje.
+        {`Médias de ${days} ${days === 1 ? "dia completo" : "dias completos"}, sem contar hoje. Maior noite: a mais longa já terminada.`}
       </p>
     </section>
   );

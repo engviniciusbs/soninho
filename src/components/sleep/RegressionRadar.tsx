@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusPill } from "@/components/ui/status-pill";
+import { useBaby } from "@/components/providers/BabyProvider";
 import { useRegression } from "@/hooks/useRegression";
 
 /** The full regression radar (Análise › Radar de regressões): calm or alert, with the explanation and tips. */
 export function RegressionRadar() {
-  const { data, isLoading, isPending, refetch } = useRegression();
+  const { activeBaby, isLoading: babyLoading } = useBaby();
+  const { data, isLoading, isPending, isError, refetch } = useRegression();
 
-  if (isLoading || (isPending && data === undefined)) {
-    return <Skeleton aria-busy="true" className="h-28 w-full rounded-[24px]" />;
-  }
+  // No baby, nothing to check (the query stays disabled, so never a skeleton forever).
+  if (!babyLoading && !activeBaby) return null;
 
-  // The request failed (`useRegression` returns null): say so, not "all calm".
-  if (data === null) {
+  // The request failed: a non-OK response (`useRegression` returns null) or a
+  // rejected fetch (isError). Say so, not "all calm".
+  if ((isError && data === undefined) || data === null) {
     return (
       <Card role="alert" className="gap-2 px-[18px]">
         <p className="font-sans text-[15px] font-semibold text-sn-tx">Não foi possível verificar regressões agora.</p>
@@ -27,7 +29,9 @@ export function RegressionRadar() {
     );
   }
 
-  if (!data) return null;
+  if (babyLoading || isLoading || isPending || !data) {
+    return <Skeleton aria-busy="true" className="h-28 w-full rounded-[24px]" />;
+  }
 
   // ── Calm state ──────────────────────────────────────────────────────────
   if (!data.detected) {

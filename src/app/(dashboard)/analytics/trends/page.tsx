@@ -22,11 +22,12 @@ export default function AnalyticsTrendsPage() {
       {({ avgNapTrend, napCounts, nightStretch }, period) => (
         <>
           <TrendCard title="Duração média das sonecas" period={period}>
-            <SleepQualityTrend data={avgNapTrend} />
+            <SleepQualityTrend data={avgNapTrend} caption="Duração média das sonecas" />
           </TrendCard>
           <TrendCard title="Sonecas por dia" period={period}>
             <SleepQualityTrend
               data={napCounts.map((d) => ({ date: d.date, avgDuration: d.count }))}
+              caption="Sonecas por dia"
               label="Sonecas"
               unit=""
             />
@@ -34,6 +35,7 @@ export default function AnalyticsTrendsPage() {
           <TrendCard title="Maior trecho noturno" period={period}>
             <SleepQualityTrend
               data={nightStretch.map((d) => ({ date: d.date, avgDuration: d.hours }))}
+              caption="Maior trecho noturno"
               label="Horas"
               color="var(--sn-night)"
               unit="h"

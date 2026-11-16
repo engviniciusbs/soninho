@@ -15,12 +15,13 @@ const holder = vi.hoisted(() => ({
   search: "",
   data: {} as Record<string, unknown>,
   regression: null as unknown,
+  regressionState: {} as Record<string, unknown>,
 }));
 const useAnalyticsData = vi.hoisted(() => vi.fn((period: number) => ({ period, ...holder.data })));
 
 vi.mock("@/components/analytics/useAnalyticsData", () => ({ useAnalyticsData }));
 vi.mock("@/hooks/useRegression", () => ({
-  useRegression: () => ({ data: holder.regression, isLoading: false }),
+  useRegression: () => ({ data: holder.regression, isLoading: false, ...holder.regressionState }),
 }));
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(holder.search),
@@ -69,6 +70,7 @@ beforeEach(() => {
   holder.search = "";
   holder.data = fakeData();
   holder.regression = { detected: false, summary: "Nenhum sinal de regressão.", tips: [] };
+  holder.regressionState = {};
   window.history.replaceState(null, "", "/analytics");
 });
 
@@ -112,7 +114,10 @@ describe("AnalyticsPage", () => {
     expect(figure("sono por dia")).toHaveTextContent("12h 10min");
     expect(figure("sonecas por dia")).toHaveTextContent("2,4");
     expect(figure("maior noite")).toHaveTextContent("6h 20min");
-    expect(screen.getByText("Sono por dia")).toBeInTheDocument();
+    expect(
+      screen.getByText("Médias de 6 dias completos, sem contar hoje. Maior noite: a mais longa já terminada.")
+    ).toBeInTheDocument();
+    expect(screen.getByText("Sono por dia", { selector: "h2" })).toBeInTheDocument();
     // The legend names both series.
     const legend = screen.getByRole("list", { name: "Legenda" });
     expect(within(legend).getByText("Noite")).toBeInTheDocument();
@@ -127,12 +132,13 @@ describe("AnalyticsPage", () => {
       last24h: { totalSleepMinutes: 0, napCount: 0, avgNapDuration: 0, longestStretch: 0 },
       dailyTotals: [{ date: "15/11", totalHours: 0, napHours: 0, nightHours: 0 }],
     });
-    mount(<AnalyticsPage />);
+    const { container } = mount(<AnalyticsPage />);
     expect(screen.getByText("Nenhum sono registrado neste período.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Registrar um sono" })).toHaveAttribute("href", "/app");
     expect(screen.queryByText("sono por dia")).toBeNull();
-    expect(screen.queryByText("Sono por dia")).toBeNull();
-    expect(screen.queryByText(/^0/)).toBeNull();
+    expect(screen.queryByText("Sono por dia", { selector: "h2" })).toBeNull();
+    // Scoped to the page: Recharts leaves a hidden text-measuring span on <body>.
+    expect(within(container).queryByText(/^0/)).toBeNull();
   });
 
   it("sleep_only_today_waits_for_a_complete_day_before_the_figures", () => {
@@ -142,7 +148,7 @@ describe("AnalyticsPage", () => {
     mount(<AnalyticsPage />);
     expect(screen.queryByText("sono por dia")).toBeNull();
     expect(screen.getByText("Os números do período aparecem depois do primeiro dia completo.")).toBeInTheDocument();
-    expect(screen.getByText("Sono por dia")).toBeInTheDocument();
+    expect(screen.getByText("Sono por dia", { selector: "h2" })).toBeInTheDocument();
   });
 
   it("regression_notice_only_when_detected", () => {
@@ -240,9 +246,10 @@ describe("Analytics detail pages", () => {
     mount(<TrendsPage />);
     expect(lastPeriod()).toBe(30);
     expect(screen.getByRole("heading", { level: 1, name: "Tendências" })).toBeInTheDocument();
-    expect(screen.getByText("Duração média das sonecas")).toBeInTheDocument();
-    expect(screen.getByText("Sonecas por dia")).toBeInTheDocument();
-    expect(screen.getByText("Maior trecho noturno")).toBeInTheDocument();
+    const titles = [...document.querySelectorAll("[data-slot=card-title]")].map((t) => t.textContent);
+    expect(titles).toEqual(["Duração média das sonecas", "Sonecas por dia", "Maior trecho noturno"]);
+    // Each chart has its text alternative.
+    expect(screen.getByRole("table", { name: "Sonecas por dia" })).toBeInTheDocument();
   });
 
   it("environment_shows_the_correlation_tables", () => {
@@ -282,7 +289,7 @@ describe("Analytics detail pages", () => {
 
   it("quality_with_ratings_shows_the_trend", () => {
     mount(<QualityPage />);
-    expect(screen.getByText("Qualidade média por dia")).toBeInTheDocument();
+    expect(screen.getByText("Qualidade média por dia", { selector: "[data-slot=card-title]" })).toBeInTheDocument();
     expect(screen.queryByText(/Avalie a qualidade ao terminar um sono/)).toBeNull();
   });
 
@@ -300,6 +307,24 @@ describe("Analytics detail pages", () => {
     expect(screen.getByText("Saltos de desenvolvimento costumam mexer com o sono.")).toBeInTheDocument();
     expect(screen.getByText("Mantenha a rotina.")).toBeInTheDocument();
     expect(screen.getByText("4 meses")).toBeInTheDocument();
+  });
+
+  it("regression_failed_request_shows_the_error_with_retry", () => {
+    const refetch = vi.fn();
+    holder.regression = undefined;
+    holder.regressionState = { isError: true, isPending: false, refetch };
+    mount(<RegressionPage />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Não foi possível verificar regressões agora.");
+    fireEvent.click(screen.getByRole("button", { name: "Tentar de novo" }));
+    expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("regression_without_an_active_baby_does_not_load_forever", () => {
+    holder.regression = undefined;
+    holder.regressionState = { isPending: true };
+    const { container } = renderWithProviders(<RegressionPage />, { baby: { activeBaby: null, babies: [] } });
+    expect(container.querySelector("[aria-busy=true]")).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("detail_pages_show_errors_with_retry", () => {

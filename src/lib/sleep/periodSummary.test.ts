@@ -57,10 +57,28 @@ describe("summarizePeriod", () => {
     expect(r.avgNapsPerDay).toBeNull();
   });
 
-  it("a_sleep_in_progress_is_not_a_finished_night", () => {
+  it("a_night_still_running_across_midnight_counts_on_yesterday_but_is_not_a_finished_night", () => {
+    // Running since 23/05 19:00; now is 24/05 09:00. Yesterday is complete and slept 19:00 to 24:00.
     const running = makeSession({ type: "NIGHT_SLEEP", start_time: "2026-05-23T22:00:00Z", end_time: null });
     const r = summarizePeriod([running, nap23a], 7);
+    expect(r.daysWithData).toBe(1);
+    expect(r.avgSleepMinutes).toBe(300 + 60);
+    expect(r.avgNapsPerDay).toBe(1);
     expect(r.longestNightMinutes).toBeNull();
+  });
+
+  it("a_night_running_since_before_yesterday_fills_every_complete_day_it_crossed", () => {
+    // Running since 22/05 19:00: 22/05 gets 5h, 23/05 the whole 24h; today stays out.
+    const running = makeSession({ type: "NIGHT_SLEEP", start_time: "2026-05-22T22:00:00Z", end_time: null });
+    const r = summarizePeriod([running], 7);
+    expect(r.daysWithData).toBe(2);
+    expect(r.avgSleepMinutes).toBe((300 + 1440) / 2);
+    expect(r.longestNightMinutes).toBeNull();
+  });
+
+  it("a_sleep_running_since_after_midnight_leaves_the_complete_days_alone", () => {
+    const running = makeSession({ type: "NAP", start_time: "2026-05-24T11:30:00Z", end_time: null });
+    const r = summarizePeriod([running, nap23a], 7);
     expect(r.avgSleepMinutes).toBe(60);
   });
 

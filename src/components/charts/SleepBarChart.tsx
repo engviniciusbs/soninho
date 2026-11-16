@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { formatValue, INITIAL_SIZE, todayLabel } from "./chartText";
 
 interface Props {
   data: { date: string; napHours: number; nightHours: number }[];
@@ -22,18 +23,20 @@ const NAP = "var(--sn-pr)";
 const RULE = "var(--sn-bd)";
 const MUTED = "var(--sn-mu)";
 
-const hours = (v: number) => `${v.toLocaleString("pt-BR")}h`;
+const hours = (v: number) => formatValue(v, "h");
 
 /**
  * "Sono por dia": night (bottom) and naps stacked per day, with the
  * age target as a reference line. The legend sits below, outside the SVG.
  */
 export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
+  const dayLabel = todayLabel(data);
   return (
     <div className="flex flex-col gap-3">
+      {/* The SVG is decorative for assistive tech: the table below carries the same values. */}
       <div aria-hidden="true">
-        <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={data} barCategoryGap="22%" margin={{ top: 6, right: 4, bottom: 0, left: 0 }}>
+        <ResponsiveContainer width="100%" height={180} initialDimension={INITIAL_SIZE}>
+          <BarChart accessibilityLayer={false} data={data} barCategoryGap="22%" margin={{ top: 6, right: 4, bottom: 0, left: 0 }}>
             <CartesianGrid vertical={false} stroke={RULE} />
             <XAxis
               dataKey="date"
@@ -43,7 +46,7 @@ export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
               interval="preserveStartEnd"
               minTickGap={18}
               // Today is still running: name it, so its short bar is not read as a bad day.
-              tickFormatter={(v: string) => (v === data[data.length - 1]?.date ? "hoje" : v)}
+              tickFormatter={dayLabel}
             />
             <YAxis
               tick={{ fill: MUTED, fontSize: 12 }}
@@ -57,6 +60,7 @@ export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
               cursor={{ fill: "var(--sn-s2)", fillOpacity: 0.5 }}
               formatter={(v) => hours(Number(v))}
               separator=": "
+              labelFormatter={(l) => dayLabel(String(l))}
               contentStyle={{
                 backgroundColor: "var(--sn-s1)",
                 border: `1px solid ${RULE}`,
@@ -72,6 +76,25 @@ export function SleepBarChart({ data, recommendedHours = 14 }: Props) {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <table className="sr-only">
+        <caption>Sono por dia</caption>
+        <thead>
+          <tr>
+            <th scope="col">Dia</th>
+            <th scope="col">Noite</th>
+            <th scope="col">Sonecas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((d) => (
+            <tr key={d.date}>
+              <th scope="row">{dayLabel(d.date)}</th>
+              <td>{hours(d.nightHours)}</td>
+              <td>{hours(d.napHours)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <ul aria-label="Legenda" className="flex flex-wrap gap-x-4 gap-y-1 font-sans text-[13px] font-semibold text-sn-mu">
         <li className="flex items-center gap-1.5">
           <span aria-hidden="true" className="size-2.5 rounded-[3px] bg-sn-night" />

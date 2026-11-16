@@ -24,6 +24,7 @@ export default function AnalyticsQualityPage() {
             <CardContent>
               <SleepQualityTrend
                 data={dailyQuality.map((d) => ({ date: d.date, avgDuration: d.avgQuality }))}
+                caption="Qualidade média por dia"
                 label="Qualidade"
                 unit=""
                 domain={[1, 5]}
